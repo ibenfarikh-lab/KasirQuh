@@ -796,7 +796,17 @@
       return parseInt(stringVal.toString().replace(/\./g, '')) || 0;
     }
 
-    let userAuth = JSON.parse(localStorage.getItem('auth_kasir_v13')) || { user: "admin", pass: "admin" };
+    // DATABASE CLOUD REAL-TIME LISTENER (AKUN LOGIN)
+    let userAuth = { user: "admin", pass: "admin" };
+    db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
+      if (doc.exists) {
+        userAuth = doc.data();
+      } else {
+        // Buat default data akun di cloud jika belum ada
+        db.collection("pengaturan").doc("auth").set(userAuth);
+      }
+      refreshData();
+    });
 
     function cekStatusLogin() {
       if (sessionStorage.getItem('isLoggedIn') === 'true') {
@@ -833,9 +843,14 @@
       const u = document.getElementById('setting-user').value.trim();
       const p = document.getElementById('setting-pass').value.trim();
       if (!u || !p) return alert("Username dan Password tidak boleh kosong!");
-      userAuth.user = u; userAuth.pass = p;
-      localStorage.setItem('auth_kasir_v13', JSON.stringify(userAuth));
-      alert("Akun login berhasil diperbarui!");
+      
+      db.collection("pengaturan").doc("auth").set({ user: u, pass: p })
+        .then(() => {
+          alert("Akun login berhasil diperbarui secara online ke Cloud!");
+        })
+        .catch(err => {
+          alert("Gagal menyimpan akun ke cloud: " + err.message);
+        });
     }
 
     // DATABASE CLOUD REAL-TIME LISTENER (PRODUK)
@@ -848,7 +863,7 @@
       refreshData();
     });
 
-    // DATABASE CLOUD REAL-TIME LISTENER (PELANGGAN) - Tanpa auto-create CUST-UMUM
+    // DATABASE CLOUD REAL-TIME LISTENER (PELANGGAN)
     let databasePelanggan = [];
     db.collection("pelanggan").onSnapshot((snapshot) => {
       databasePelanggan = [];
