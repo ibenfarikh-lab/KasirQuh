@@ -251,7 +251,7 @@
 </head>
 <body data-theme="light">
 
-  <div id="loginModal" class="login-overlay">
+  <div id="loginModal" class="login-overlay" style="display: none;">
     <div class="login-card">
       <h2>KasirQuh</h2>
       <p id="login-sub-title">TokoQuh</p>
@@ -838,8 +838,8 @@
 
         if (cloudData.updatedAt && cloudData.updatedAt.toString() !== oldUpdatedAt) {
           localStorage.setItem('auth_updated_at_v13', cloudData.updatedAt);
-          if (sessionStorage.getItem('isLoggedIn') === 'true') {
-            sessionStorage.removeItem('isLoggedIn');
+          if (localStorage.getItem('isLoggedIn') === 'true') {
+            localStorage.removeItem('isLoggedIn');
             alert("🔐 Pengaturan akun/password telah diubah oleh administrator. Silakan login kembali dengan sandi baru.");
             cekStatusLogin();
           }
@@ -853,7 +853,7 @@
     });
 
     function cekStatusLogin() {
-      if (sessionStorage.getItem('isLoggedIn') === 'true') {
+      if (localStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('loginModal').style.display = 'none';
       } else {
         document.getElementById('loginModal').style.display = 'flex';
@@ -866,7 +866,7 @@
       const p = document.getElementById('login-password').value.trim();
 
       if (u === userAuth.user && p === userAuth.pass) {
-        sessionStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('isLoggedIn', 'true');
         document.getElementById('loginModal').style.display = 'none';
         document.getElementById('login-username').value = '';
         document.getElementById('login-password').value = '';
@@ -878,7 +878,7 @@
 
     function logout() {
       if (confirm("Apakah Anda yakin ingin keluar?")) {
-        sessionStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('isLoggedIn');
         cekStatusLogin();
       }
     }
@@ -930,12 +930,16 @@
     let stokCurrentPage = 1;
     let posCurrentPage = 1;
 
-    function getItemsPerPage() {
+    function getItemsPerPage(isInventory = false) {
       let isDesktop = window.innerWidth >= 768;
       if (isDesktop) {
         return (viewMode === 'list') ? 18 : 24;
       } else {
-        return (viewMode === 'list') ? 7 : 4;
+        if (isInventory) {
+          return (viewMode === 'list') ? 5 : 4; // Stok: List 5 item, Grid 4 item di HP
+        } else {
+          return (viewMode === 'list') ? 7 : 4; // Kasir: List 7 item, Grid 4 item di HP
+        }
       }
     }
 
@@ -978,7 +982,7 @@
 
       let konfirmasi = confirm("Apakah Anda yakin ingin keluar ke halaman login?");
       if (konfirmasi) {
-        sessionStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('isLoggedIn');
         cekStatusLogin();
         history.pushState({tab: activeTab}, "", "");
       } else {
@@ -2056,15 +2060,15 @@
         filteredItems.push({ code, ...item });
       }
 
-      // Dynamic itemsPerPage based on device and view mode
-      let itemsPerPage = getItemsPerPage();
+      // Dynamic itemsPerPage for Inventory (Stock) -> List 5 items, Grid 4 items on mobile; 18/24 on desktop
+      let itemsPerPageStok = getItemsPerPage(true);
 
-      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
       if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
       if (stokCurrentPage < 1) stokCurrentPage = 1;
 
-      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPage;
-      let stokEndIndex = stokStartIndex + itemsPerPage;
+      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
+      let stokEndIndex = stokStartIndex + itemsPerPageStok;
       let paginatedStokItems = filteredItems.slice(stokStartIndex, stokEndIndex);
 
       document.getElementById("stok-page-info").innerText = `Hal ${stokCurrentPage} dari ${totalStokPages} (Total: ${filteredItems.length} barang)`;
@@ -2127,7 +2131,7 @@
       }
 
       updateDropdowns(Array.from(categories));
-      renderKatalogKasirPaginated(filteredItems, itemsPerPage);
+      renderKatalogKasirPaginated(filteredItems);
 
       const repBody = document.getElementById("report-body");
       repBody.innerHTML = "";
@@ -2209,7 +2213,7 @@
       }
     }
 
-    function renderKatalogKasirPaginated(filteredItems, itemsPerPage) {
+    function renderKatalogKasirPaginated(filteredItems) {
       const catalogGrid = document.getElementById("pos-catalog-container");
       const catalogList = document.getElementById("pos-catalog-list-container");
       catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
@@ -2217,12 +2221,15 @@
       if (viewMode === 'grid') { catalogGrid.style.display = 'grid'; catalogList.style.display = 'none'; }
       else { catalogGrid.style.display = 'none'; catalogList.style.display = 'flex'; }
 
-      let totalPosPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+      // Dynamic itemsPerPage for POS (Kasir) -> List 7 items, Grid 4 items on mobile; 18/24 on desktop
+      let itemsPerPagePos = getItemsPerPage(false);
+
+      let totalPosPages = Math.ceil(filteredItems.length / itemsPerPagePos) || 1;
       if (posCurrentPage > totalPosPages) posCurrentPage = totalPosPages;
       if (posCurrentPage < 1) posCurrentPage = 1;
 
-      let posStartIndex = (posCurrentPage - 1) * itemsPerPage;
-      let posEndIndex = posStartIndex + itemsPerPage;
+      let posStartIndex = (posCurrentPage - 1) * itemsPerPagePos;
+      let posEndIndex = posStartIndex + itemsPerPagePos;
       let paginatedPosItems = filteredItems.slice(posStartIndex, posEndIndex);
 
       document.getElementById("pos-page-info").innerText = `Hal ${posCurrentPage} dari ${totalPosPages}`;
@@ -2275,6 +2282,7 @@
 
     setLanguage(currentLang);
     setTheme(currentTheme);
+    cekStatusLogin();
   </script>
 </body>
 </html>
