@@ -193,6 +193,8 @@
     .cust-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .cust-bookkeeping { background: var(--table-header); border: 1px dashed var(--input-border); border-radius: 8px; padding: 8px; font-size: 0.78rem; margin-top: 4px; }
 
+    .empty-state { text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 0.85rem; background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 12px; margin-top: 10px; width: 100%; }
+
     .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 10000; justify-content: center; align-items: center; padding: 15px; }
     .modal-backdrop.show { display: flex; }
     .modal-content { background: var(--card-bg); border-radius: 16px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15); border: 1px solid var(--border-color); color: var(--text-color); }
@@ -855,12 +857,6 @@
         data.id = doc.id;
         databasePelanggan.push(data);
       });
-      // Jika kosong, sediakan default Pelanggan Umum secara cloud
-      if (databasePelanggan.length === 0) {
-        db.collection("pelanggan").doc("CUST-UMUM").set({
-          nama: "Pelanggan Umum", phone: "-", alamat: "-", catatan: []
-        });
-      }
       refreshData();
     });
 
@@ -1142,7 +1138,6 @@
           cust.catatan.push({ id: "NOTE-" + Date.now(), waktu: waktuOtomatis, jenis: jenis, nominal: nominal, keterangan: keterangan || "-" });
         }
         
-        // Simpan ke Cloud Firestore
         db.collection("pelanggan").doc(custId).update({ catatan: cust.catatan })
           .then(() => {
             closeBookkeepingModal();
@@ -1542,7 +1537,7 @@
         }
       }
       if (count === 0) {
-        const emptyMsg = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 15px;">Barang tidak ditemukan...</div>`;
+        const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia atau barang tidak ditemukan.</div>`;
         catalogGrid.innerHTML = emptyMsg; catalogList.innerHTML = emptyMsg;
       }
     }
@@ -1804,6 +1799,8 @@
       const searchInputEl = document.getElementById("inventory-search-input");
       const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
+      let countStok = 0;
+
       for (let code in databaseProduk) {
         let item = databaseProduk[code];
         let kat = item.kategori || "Umum";
@@ -1815,6 +1812,7 @@
         if (!(item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword))) continue;
         if (filterKat !== "Semua" && kat !== filterKat) continue;
 
+        countStok++;
         let margin = item.harga - item.modal;
         let badgeStokClass = stok > 0 ? "badge-stok" : "badge-stok-habis";
 
@@ -1858,6 +1856,12 @@
         `;
       }
 
+      if (countStok === 0) {
+        const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang atau barang tidak ditemukan.</div>`;
+        invList.innerHTML = emptyStokMsg;
+        invGrid.innerHTML = emptyStokMsg;
+      }
+
       updateDropdowns(Array.from(categories));
       renderKatalogKasir(searchKeyword, filterKat);
 
@@ -1878,6 +1882,10 @@
         `;
       });
 
+      if (riwayatTransaksi.length === 0) {
+        repBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">⚠️ Belum ada riwayat transaksi.</td></tr>`;
+      }
+
       document.getElementById("dash-omset").innerText = totalOmset.toLocaleString('id-ID');
       document.getElementById("dash-profit").innerText = totalProfit.toLocaleString('id-ID');
       document.getElementById("dash-trans").innerText = riwayatTransaksi.length;
@@ -1885,51 +1893,56 @@
 
       const custContainer = document.getElementById("customer-list-wrapper");
       custContainer.innerHTML = "";
-      databasePelanggan.forEach(c => {
-        let catatanHtml = "";
-        if (c.catatan && c.catatan.length > 0) {
-          c.catatan.forEach(note => {
-            let colorStyle = note.jenis === 'Belanja (belum dibayar)' ? 'color: #dc2626;' : (note.jenis === 'Hutang / Kasbon' ? 'color: #2563eb;' : 'color: var(--text-color);');
-            catatanHtml += `
-              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 6px 0;">
-                <div>
-                  <span style="font-weight: bold; font-size: 0.72rem; ${colorStyle}">[${note.jenis}]</span> 
-                  <span style="font-size: 0.75rem;">${note.keterangan}</span>
-                  ${note.nominal > 0 ? `<b style="font-size: 0.75rem;">(Rp ${note.nominal.toLocaleString('id-ID')})</b>` : ''}
-                  <div style="font-size: 0.65rem; color: var(--text-muted);">${note.waktu}</div>
+      
+      if (databasePelanggan.length === 0) {
+        custContainer.innerHTML = `<div class="empty-state">⚠️ Belum ada data pelanggan tersimpan.</div>`;
+      } else {
+        databasePelanggan.forEach(c => {
+          let catatanHtml = "";
+          if (c.catatan && c.catatan.length > 0) {
+            c.catatan.forEach(note => {
+              let colorStyle = note.jenis === 'Belanja (belum dibayar)' ? 'color: #dc2626;' : (note.jenis === 'Hutang / Kasbon' ? 'color: #2563eb;' : 'color: var(--text-color);');
+              catatanHtml += `
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 6px 0;">
+                  <div>
+                    <span style="font-weight: bold; font-size: 0.72rem; ${colorStyle}">[${note.jenis}]</span> 
+                    <span style="font-size: 0.75rem;">${note.keterangan}</span>
+                    ${note.nominal > 0 ? `<b style="font-size: 0.75rem;">(Rp ${note.nominal.toLocaleString('id-ID')})</b>` : ''}
+                    <div style="font-size: 0.65rem; color: var(--text-muted);">${note.waktu}</div>
+                  </div>
+                  <div style="display: flex; gap: 4px;">
+                    <button style="background: var(--border-color); color: var(--text-color); padding: 2px 6px; font-size: 0.68rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openBookkeepingModal('${c.id}', '${note.id}')">Edit</button>
+                    <button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem; border-radius: 6px;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button>
+                  </div>
                 </div>
-                <div style="display: flex; gap: 4px;">
-                  <button style="background: var(--border-color); color: var(--text-color); padding: 2px 6px; font-size: 0.68rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openBookkeepingModal('${c.id}', '${note.id}')">Edit</button>
-                  <button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem; border-radius: 6px;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button>
-                </div>
-              </div>
-            `;
-          });
-        } else {
-          catatanHtml = `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Belum ada catatan pembukuan.</div>`;
-        }
+              `;
+            });
+          } else {
+            catatanHtml = `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Belum ada catatan pembukuan.</div>`;
+          }
 
-        custContainer.innerHTML += `
-          <div class="cust-list-item">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <div style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">${c.nama}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat}</div>
+          custContainer.innerHTML += `
+            <div class="cust-list-item">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">${c.nama}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat}</div>
+                </div>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">
+                  <button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button>
+                  <button style="background: #25D366; color: white; padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="bagikanCatatanWhatsApp('${c.id}')">💬 WA</button>
+                  <button style="background: var(--border-color); color: var(--text-color); padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openCustomerModal('${c.id}')">Edit</button>
+                  <button class="btn-danger" style="border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
+                </div>
               </div>
-              <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">
-                <button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button>
-                <button style="background: #25D366; color: white; padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="bagikanCatatanWhatsApp('${c.id}')">💬 WA</button>
-                <button style="background: var(--border-color); color: var(--text-color); padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openCustomerModal('${c.id}')">Edit</button>
-                <button class="btn-danger" style="border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
+              <div class="cust-bookkeeping">
+                <div style="font-weight: bold; font-size: 0.75rem; margin-bottom: 4px; color: var(--text-muted);">📖 Buku Catatan Pelanggan:</div>
+                ${catatanHtml}
               </div>
             </div>
-            <div class="cust-bookkeeping">
-              <div style="font-weight: bold; font-size: 0.75rem; margin-bottom: 4px; color: var(--text-muted);">📖 Buku Catatan Pelanggan:</div>
-              ${catatanHtml}
-            </div>
-          </div>
-        `;
-      });
+          `;
+        });
+      }
     }
 
     function showNotif(msg) {
