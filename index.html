@@ -836,7 +836,7 @@
       alert("Akun login berhasil diperbarui!");
     }
 
-    // DATABASE CLOUD REAL-TIME LISTENER
+    // DATABASE CLOUD REAL-TIME LISTENER (PRODUK)
     let databaseProduk = {};
     db.collection("produk").onSnapshot((snapshot) => {
       databaseProduk = {};
@@ -846,10 +846,25 @@
       refreshData();
     });
 
+    // DATABASE CLOUD REAL-TIME LISTENER (PELANGGAN)
+    let databasePelanggan = [];
+    db.collection("pelanggan").onSnapshot((snapshot) => {
+      databasePelanggan = [];
+      snapshot.forEach((doc) => {
+        let data = doc.data();
+        data.id = doc.id;
+        databasePelanggan.push(data);
+      });
+      // Jika kosong, sediakan default Pelanggan Umum secara cloud
+      if (databasePelanggan.length === 0) {
+        db.collection("pelanggan").doc("CUST-UMUM").set({
+          nama: "Pelanggan Umum", phone: "-", alamat: "-", catatan: []
+        });
+      }
+      refreshData();
+    });
+
     let riwayatTransaksi = JSON.parse(localStorage.getItem('riwayat_kasir_v13')) || [];
-    let databasePelanggan = JSON.parse(localStorage.getItem('db_pelanggan_v13')) || [
-      { id: "CUST-1", nama: "Pelanggan Umum", phone: "-", alamat: "-", catatan: [] }
-    ];
     let pengaturanToko = JSON.parse(localStorage.getItem('setting_toko_v13')) || {
       nama: "TokoQuh", alamat: "Jl. Merdeka", phone: "089"
     };
@@ -1126,9 +1141,14 @@
         } else {
           cust.catatan.push({ id: "NOTE-" + Date.now(), waktu: waktuOtomatis, jenis: jenis, nominal: nominal, keterangan: keterangan || "-" });
         }
-        localStorage.setItem('db_pelanggan_v13', JSON.stringify(databasePelanggan));
-        closeBookkeepingModal();
-        refreshData();
+        
+        // Simpan ke Cloud Firestore
+        db.collection("pelanggan").doc(custId).update({ catatan: cust.catatan })
+          .then(() => {
+            closeBookkeepingModal();
+            showNotif("Catatan disimpan ke Cloud!");
+          })
+          .catch(err => alert("Gagal menyimpan catatan: " + err.message));
       }
     }
 
@@ -1137,8 +1157,9 @@
         let cust = databasePelanggan.find(c => c.id === custId);
         if (cust && cust.catatan) {
           cust.catatan = cust.catatan.filter(n => n.id !== noteId);
-          localStorage.setItem('db_pelanggan_v13', JSON.stringify(databasePelanggan));
-          refreshData();
+          db.collection("pelanggan").doc(custId).update({ catatan: cust.catatan })
+            .then(() => showNotif("Catatan dihapus!"))
+            .catch(err => alert("Gagal menghapus: " + err.message));
         }
       }
     }
@@ -1666,6 +1687,7 @@
       db.collection("produk").doc(code).set(dataBarang)
         .then(() => {
           closeProductModal();
+          switchTab('data-barang', false); 
           showNotif("Barang tersimpan ke Cloud!");
         })
         .catch(err => alert("Gagal menyimpan ke cloud: " + err.message));
@@ -1687,22 +1709,27 @@
 
       if (!nama) return alert("Nama pelanggan tidak boleh kosong!");
 
-      if (id) {
-        let cust = databasePelanggan.find(c => c.id === id);
-        if (cust) { cust.nama = nama; cust.phone = phone; cust.alamat = alamat; }
-      } else {
-        databasePelanggan.push({ id: "CUST-" + Date.now(), nama, phone, alamat, catatan: [] });
-      }
-      localStorage.setItem('db_pelanggan_v13', JSON.stringify(databasePelanggan));
-      closeCustomerModal();
-      refreshData();
+      let custId = id || ("CUST-" + Date.now());
+      let dataPelanggan = {
+        nama: nama,
+        phone: phone,
+        alamat: alamat,
+        catatan: id ? (databasePelanggan.find(c => c.id === id)?.catatan || []) : []
+      };
+
+      db.collection("pelanggan").doc(custId).set(dataPelanggan)
+        .then(() => {
+          closeCustomerModal();
+          showNotif("Pelanggan tersimpan ke Cloud!");
+        })
+        .catch(err => alert("Gagal menyimpan pelanggan: " + err.message));
     }
 
     function hapusPelanggan(id) {
-      if (confirm("Hapus pelanggan ini?")) {
-        databasePelanggan = databasePelanggan.filter(c => c.id !== id);
-        localStorage.setItem('db_pelanggan_v13', JSON.stringify(databasePelanggan));
-        refreshData();
+      if (confirm("Hapus pelanggan ini dari Cloud?")) {
+        db.collection("pelanggan").doc(id).delete()
+          .then(() => showNotif("Pelanggan berhasil dihapus!"))
+          .catch(err => alert("Gagal menghapus: " + err.message));
       }
     }
 
