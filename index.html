@@ -848,7 +848,7 @@
       refreshData();
     });
 
-    // DATABASE CLOUD REAL-TIME LISTENER (PELANGGAN)
+    // DATABASE CLOUD REAL-TIME LISTENER (PELANGGAN) - Tanpa auto-create CUST-UMUM
     let databasePelanggan = [];
     db.collection("pelanggan").onSnapshot((snapshot) => {
       databasePelanggan = [];
@@ -904,10 +904,11 @@
         return;
       }
 
-      let konfirmasi = confirm("Apakah Anda yakin ingin keluar dari aplikasi KasirQuh?");
+      let konfirmasi = confirm("Apakah Anda yakin ingin keluar ke halaman login?");
       if (konfirmasi) {
-        window.close();
-        document.body.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#0f172a;color:white;font-family:sans-serif;text-align:center;"><h2>Aplikasi telah ditutup.<br>Anda dapat menutup tab ini.</h2></div>`;
+        sessionStorage.removeItem('isLoggedIn');
+        cekStatusLogin();
+        history.pushState({tab: activeTab}, "", "");
       } else {
         history.pushState({tab: activeTab}, "", "");
       }
