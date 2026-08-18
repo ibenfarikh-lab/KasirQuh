@@ -6,12 +6,11 @@
   <title>KasirQuh</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   
-  <!-- Firebase SDK (Compat Version agar cocok dengan struktur kode) -->
+  <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // Konfigurasi Firebase Anda yang sudah benar
     const firebaseConfig = {
       apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
       authDomain: "kasirquh.firebaseapp.com",
@@ -189,6 +188,11 @@
     .inv-card-details { background: var(--table-header); padding: 6px; border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
     .inv-card-row { display: flex; justify-content: space-between; }
 
+    /* Pagination styling */
+    .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.8rem; }
+    .pagination-btn { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.78rem; }
+    .pagination-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
+
     .customer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 5px; }
     .cust-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .cust-bookkeeping { background: var(--table-header); border: 1px dashed var(--input-border); border-radius: 8px; padding: 8px; font-size: 0.78rem; margin-top: 4px; }
@@ -270,6 +274,12 @@
           <h3 style="margin-top: 0; font-size: 0.95rem;" data-i18n="availableItems">📦 Daftar Barang Tersedia</h3>
           <div class="product-catalog-grid" id="pos-catalog-container"></div>
           <div class="product-catalog-list" id="pos-catalog-list-container" style="display: none;"></div>
+          <!-- Pagination Kasir -->
+          <div class="pagination-bar" id="pos-pagination-bar">
+            <button class="pagination-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀ Sebelumnya</button>
+            <span id="pos-page-info">Hal 1 dari 1</span>
+            <button class="pagination-btn" id="pos-next-btn" onclick="changePosPage(1)">Berikutnya ▶</button>
+          </div>
         </div>
       </div>
 
@@ -351,6 +361,13 @@
       </div>
       <div id="inventory-list-wrapper" class="inventory-list"></div>
       <div id="inventory-grid-wrapper" class="inventory-grid" style="display: none;"></div>
+      
+      <!-- Pagination Stok -->
+      <div class="pagination-bar" id="stok-pagination-bar">
+        <button class="pagination-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀ Sebelumnya</button>
+        <span id="stok-page-info">Hal 1 dari 1</span>
+        <button class="pagination-btn" id="stok-next-btn" onclick="changeStokPage(1)">Berikutnya ▶</button>
+      </div>
     </div>
 
     <div class="fab-container no-print">
@@ -421,7 +438,6 @@
       </div>
 
       <div id="sub-pelanggan" class="sub-tab-content active">
-        <!-- Tombol Ekspor dan Impor Pelanggan Sejajar 1 Baris di HP & Desktop -->
         <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; align-items: center;">
           <button onclick="eksporPelangganExcel()" style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;">📥 Export Pelanggan (CSV)</button>
           <label style="background: #2563eb; color: white; padding: 7px 10px; font-size: 0.72rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0;">
@@ -815,7 +831,6 @@
       return parseInt(stringVal.toString().replace(/\./g, '')) || 0;
     }
 
-    // DATABASE CLOUD REAL-TIME LISTENER (AKUN LOGIN & FORCE LOGOUT)
     let userAuth = { user: "admin", pass: "admin", updatedAt: 0 };
     db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
       if (doc.exists) {
@@ -885,7 +900,6 @@
         });
     }
 
-    // DATABASE CLOUD REAL-TIME LISTENER (PRODUK)
     let databaseProduk = {};
     db.collection("produk").onSnapshot((snapshot) => {
       databaseProduk = {};
@@ -895,7 +909,6 @@
       refreshData();
     });
 
-    // DATABASE CLOUD REAL-TIME LISTENER (PELANGGAN)
     let databasePelanggan = [];
     db.collection("pelanggan").onSnapshot((snapshot) => {
       databasePelanggan = [];
@@ -913,6 +926,11 @@
     };
     let scanCooldownDuration = parseInt(localStorage.getItem('setting_cooldown_v13')) || 1500;
     let viewMode = localStorage.getItem('inventory_view_mode_v13') || 'grid';
+
+    // Pagination variables
+    let stokCurrentPage = 1;
+    let posCurrentPage = 1;
+    const itemsPerPage = 15; // Tampilkan 15 item per halaman agar HP sangat ringan & tidak hang
 
     let cart = [];
     let isCooldown = false;
@@ -1036,7 +1054,6 @@
       if (isScannerDbOpen) toggleScannerDb();
     }
 
-    // PENCARIAN FOTO ONLINE GLOBAL MENGGUNAKAN WIKIMEDIA COMMONS & DICEBEAR (BEBAS API KEY)
     async function cariFotoOnline() {
       const namaProduk = document.getElementById("db-name").value.trim();
       if (!namaProduk) return alert("Harap isi Nama Barang terlebih dahulu sebelum mencari foto online!");
@@ -1315,7 +1332,21 @@
       refreshData();
     }
 
-    function syncAndFilterGlobal(val) { refreshData(); }
+    function syncAndFilterGlobal(val) { 
+      stokCurrentPage = 1;
+      posCurrentPage = 1;
+      refreshData(); 
+    }
+
+    function changeStokPage(delta) {
+      stokCurrentPage += delta;
+      refreshData();
+    }
+
+    function changePosPage(delta) {
+      posCurrentPage += delta;
+      refreshData();
+    }
 
     function playBeep() {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1543,59 +1574,6 @@
       hitungKembalian();
     }
 
-    function renderKatalogKasir(keyword = "", filterKat = "Semua") {
-      const catalogGrid = document.getElementById("pos-catalog-container");
-      const catalogList = document.getElementById("pos-catalog-list-container");
-      catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
-
-      if (viewMode === 'grid') { catalogGrid.style.display = 'grid'; catalogList.style.display = 'none'; }
-      else { catalogGrid.style.display = 'none'; catalogList.style.display = 'flex'; }
-
-      let count = 0;
-      for (let code in databaseProduk) {
-        let p = databaseProduk[code];
-        let kat = p.kategori || "Umum";
-        let sat = p.satuan || "pcs";
-        let stok = p.stok !== undefined ? p.stok : 0;
-        let nameMatch = p.nama.toLowerCase().includes(keyword.toLowerCase());
-        let codeMatch = code.toLowerCase().includes(keyword.toLowerCase());
-
-        if ((nameMatch || codeMatch) && (filterKat === "Semua" || kat === filterKat)) {
-          count++;
-          let fotoSrc = p.foto || defaultPlaceholderImg;
-          let isHabis = stok <= 0;
-          let unitLabel = sat === 'kg' ? '/Kg' : '';
-
-          catalogGrid.innerHTML += `
-            <div class="catalog-item">
-              <img src="${fotoSrc}" class="catalog-img">
-              <div class="catalog-name" title="${p.nama}">${p.nama}</div>
-              <div style="font-size: 0.68rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'}; margin-bottom: 2px;">Stok: ${stok} ${sat}</div>
-              <div class="catalog-price">Rp ${p.harga.toLocaleString('id-ID')}<span style="font-size:0.65rem;">${unitLabel}</span></div>
-              <button class="btn-add-item" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">${isHabis ? 'Habis' : '+ Tambah'}</button>
-            </div>
-          `;
-
-          catalogList.innerHTML += `
-            <div class="catalog-list-item">
-              <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-                <img src="${fotoSrc}" class="inv-list-img">
-                <div style="min-width: 0;">
-                  <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-                  <div style="font-size: 0.72rem; color: #2563eb; font-weight: 600;">Rp ${p.harga.toLocaleString('id-ID')}${unitLabel} <span style="color: ${isHabis ? '#dc2626' : 'var(--text-muted)'};">(Stok: ${stok} ${sat})</span></div>
-                </div>
-              </div>
-              <button class="btn-add-item" ${isHabis ? 'disabled' : ''} style="width: auto; padding: 6px 12px;" onclick="tambahManualDariCode('${code}')">${isHabis ? 'Habis' : '+ Tambah'}</button>
-            </div>
-          `;
-        }
-      }
-      if (count === 0) {
-        const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia atau barang tidak ditemukan.</div>`;
-        catalogGrid.innerHTML = emptyMsg; catalogList.innerHTML = emptyMsg;
-      }
-    }
-
     function hapusCart(i) { cart.splice(i, 1); renderCart(); }
 
     function togglePayMethod() {
@@ -1762,15 +1740,19 @@
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    function importStokExcel(event) {
+    // BATCH WRITE IMPORT: Sangat stabil untuk ratusan data & aman dari kegagalan cloud
+    async function importStokExcel(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         const text = e.target.result;
         const rows = text.split("\n");
         let successCount = 0;
+
+        let batch = db.batch();
+        let batchCounter = 0;
 
         for (let i = 1; i < rows.length; i++) {
           let row = rows[i].trim();
@@ -1799,15 +1781,31 @@
               if (!code) code = "BRG-" + Date.now() + "-" + i;
               let existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
               
-              db.collection("produk").doc(code).set({
+              let docRef = db.collection("produk").doc(code);
+              batch.set(docRef, {
                 nama: nama, kategori: kategori, satuan: satuan, stok: stok, modal: modal, harga: harga, foto: existingFoto
               });
+
+              batchCounter++;
               successCount++;
+
+              // Firestore batch limit is 500 writes per batch
+              if (batchCounter >= 400) {
+                await batch.commit();
+                batch = db.batch();
+                batchCounter = 0;
+              }
             }
           }
         }
-        alert(`Berhasil mengimpor ${successCount} data barang ke Cloud Database!`);
+
+        if (batchCounter > 0) {
+          await batch.commit();
+        }
+
+        alert(`Berhasil mengimpor ${successCount} data barang ke Cloud Database dengan aman!`);
         document.getElementById("import-csv-file").value = "";
+        refreshData();
       };
       reader.readAsText(file);
     }
@@ -1828,10 +1826,12 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         const text = e.target.result;
         const rows = text.split("\n");
         let successCount = 0;
+        let batch = db.batch();
+        let batchCounter = 0;
 
         for (let i = 1; i < rows.length; i++) {
           let row = rows[i].trim();
@@ -1857,15 +1857,23 @@
               let existingCust = databasePelanggan.find(c => c.id === custId);
               let catatan = existingCust ? (existingCust.catatan || []) : [];
 
-              db.collection("pelanggan").doc(custId).set({
-                nama: nama, phone: phone, alamat: alamat, catatan: catatan
-              });
+              let docRef = db.collection("pelanggan").doc(custId);
+              batch.set(docRef, { nama: nama, phone: phone, alamat: alamat, catatan: catatan });
+              batchCounter++;
               successCount++;
+
+              if (batchCounter >= 400) {
+                await batch.commit();
+                batch = db.batch();
+                batchCounter = 0;
+              }
             }
           }
         }
+        if (batchCounter > 0) await batch.commit();
         alert(`Berhasil mengimpor ${successCount} data pelanggan ke Cloud!`);
         document.getElementById("import-cust-file").value = "";
+        refreshData();
       };
       reader.readAsText(file);
     }
@@ -2031,71 +2039,89 @@
       const searchInputEl = document.getElementById("inventory-search-input");
       const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
-      let countStok = 0;
-
+      // Filter items first
+      let filteredItems = [];
       for (let code in databaseProduk) {
         let item = databaseProduk[code];
         let kat = item.kategori || "Umum";
-        let sat = item.satuan || "pcs";
-        let stok = item.stok !== undefined ? item.stok : 0;
-        let fotoSrc = item.foto || defaultPlaceholderImg;
         categories.add(kat);
 
         if (!(item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword))) continue;
         if (filterKat !== "Semua" && kat !== filterKat) continue;
 
-        countStok++;
-        let margin = item.harga - item.modal;
-        let badgeStokClass = stok > 0 ? "badge-stok" : "badge-stok-habis";
-
-        invList.innerHTML += `
-          <div class="inv-list-item">
-            <img src="${fotoSrc}" class="inv-list-img">
-            <div class="inv-list-details">
-              <div class="inv-list-title" title="${item.nama}">${item.nama}</div>
-              <div class="inv-list-sub"><span>${code}</span> • <span class="badge-kat">${kat}</span> • <span class="${badgeStokClass}">Stok: ${stok} ${sat}</span></div>
-              <div class="inv-list-price">Rp ${item.harga.toLocaleString('id-ID')}/${sat} <span style="font-size:0.68rem; color:#16a34a;">(+${margin.toLocaleString('id-ID')})</span></div>
-            </div>
-            <div class="inv-list-actions">
-              <button style="background: var(--border-color); color: var(--text-color); padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openProductModal('${code}')">Edit</button>
-              <button class="btn-danger" onclick="hapusBarang('${code}')">Hapus</button>
-            </div>
-          </div>
-        `;
-
-        invGrid.innerHTML += `
-          <div class="inv-card">
-            <div class="inv-card-top">
-              <img src="${fotoSrc}" class="inv-card-img">
-              <div class="inv-card-info">
-                <div class="inv-card-title" title="${item.nama}">${item.nama}</div>
-                <div class="inv-card-code">${code}</div>
-                <div style="margin-top: 2px; display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
-                  <span class="badge-kat">${kat}</span><span class="${badgeStokClass}">Stok: ${stok} ${sat}</span>
-                </div>
-              </div>
-            </div>
-            <div class="inv-card-details">
-              <div class="inv-card-row"><span>Modal:</span><b>Rp ${item.modal.toLocaleString('id-ID')}</b></div>
-              <div class="inv-card-row"><span>Harga:</span><b>Rp ${item.harga.toLocaleString('id-ID')}</b></div>
-              <div class="inv-card-row" style="color: #16a34a;"><span>Untung:</span><b>Rp ${margin.toLocaleString('id-ID')}</b></div>
-            </div>
-            <div style="display: flex; gap: 4px;">
-              <button style="flex: 1; background: var(--border-color); color: var(--text-color); padding: 5px; font-size: 0.75rem; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="openProductModal('${code}')">Edit</button>
-              <button class="btn-danger" style="flex: 1; padding: 5px; font-weight: bold; border-radius: 6px;" onclick="hapusBarang('${code}')">Hapus</button>
-            </div>
-          </div>
-        `;
+        filteredItems.push({ code, ...item });
       }
 
-      if (countStok === 0) {
+      // Pagination calculation for Inventory
+      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+      if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
+      if (stokCurrentPage < 1) stokCurrentPage = 1;
+
+      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPage;
+      let stokEndIndex = stokStartIndex + itemsPerPage;
+      let paginatedStokItems = filteredItems.slice(stokStartIndex, stokEndIndex);
+
+      document.getElementById("stok-page-info").innerText = `Hal ${stokCurrentPage} dari ${totalStokPages} (Total: ${filteredItems.length} barang)`;
+      document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
+      document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
+
+      if (paginatedStokItems.length === 0) {
         const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang atau barang tidak ditemukan.</div>`;
         invList.innerHTML = emptyStokMsg;
         invGrid.innerHTML = emptyStokMsg;
+      } else {
+        paginatedStokItems.forEach(item => {
+          let code = item.code;
+          let kat = item.kategori || "Umum";
+          let sat = item.satuan || "pcs";
+          let stok = item.stok !== undefined ? item.stok : 0;
+          let fotoSrc = item.foto || defaultPlaceholderImg;
+          let margin = item.harga - item.modal;
+          let badgeStokClass = stok > 0 ? "badge-stok" : "badge-stok-habis";
+
+          invList.innerHTML += `
+            <div class="inv-list-item">
+              <img src="${fotoSrc}" class="inv-list-img">
+              <div class="inv-list-details">
+                <div class="inv-list-title" title="${item.nama}">${item.nama}</div>
+                <div class="inv-list-sub"><span>${code}</span> • <span class="badge-kat">${kat}</span> • <span class="${badgeStokClass}">Stok: ${stok} ${sat}</span></div>
+                <div class="inv-list-price">Rp ${item.harga.toLocaleString('id-ID')}/${sat} <span style="font-size:0.68rem; color:#16a34a;">(+${margin.toLocaleString('id-ID')})</span></div>
+              </div>
+              <div class="inv-list-actions">
+                <button style="background: var(--border-color); color: var(--text-color); padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openProductModal('${code}')">Edit</button>
+                <button class="btn-danger" onclick="hapusBarang('${code}')">Hapus</button>
+              </div>
+            </div>
+          `;
+
+          invGrid.innerHTML += `
+            <div class="inv-card">
+              <div class="inv-card-top">
+                <img src="${fotoSrc}" class="inv-card-img">
+                <div class="inv-card-info">
+                  <div class="inv-card-title" title="${item.nama}">${item.nama}</div>
+                  <div class="inv-card-code">${code}</div>
+                  <div style="margin-top: 2px; display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+                    <span class="badge-kat">${kat}</span><span class="${badgeStokClass}">Stok: ${stok} ${sat}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="inv-card-details">
+                <div class="inv-card-row"><span>Modal:</span><b>Rp ${item.modal.toLocaleString('id-ID')}</b></div>
+                <div class="inv-card-row"><span>Harga:</span><b>Rp ${item.harga.toLocaleString('id-ID')}</b></div>
+                <div class="inv-card-row" style="color: #16a34a;"><span>Untung:</span><b>Rp ${margin.toLocaleString('id-ID')}</b></div>
+              </div>
+              <div style="display: flex; gap: 4px;">
+                <button style="flex: 1; background: var(--border-color); color: var(--text-color); padding: 5px; font-size: 0.75rem; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="openProductModal('${code}')">Edit</button>
+                <button class="btn-danger" style="flex: 1; padding: 5px; font-weight: bold; border-radius: 6px;" onclick="hapusBarang('${code}')">Hapus</button>
+              </div>
+            </div>
+          `;
+        });
       }
 
       updateDropdowns(Array.from(categories));
-      renderKatalogKasir(searchKeyword, filterKat);
+      renderKatalogKasirPaginated(filteredItems);
 
       const repBody = document.getElementById("report-body");
       repBody.innerHTML = "";
@@ -2177,13 +2203,70 @@
       }
     }
 
+    function renderKatalogKasirPaginated(filteredItems) {
+      const catalogGrid = document.getElementById("pos-catalog-container");
+      const catalogList = document.getElementById("pos-catalog-list-container");
+      catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
+
+      if (viewMode === 'grid') { catalogGrid.style.display = 'grid'; catalogList.style.display = 'none'; }
+      else { catalogGrid.style.display = 'none'; catalogList.style.display = 'flex'; }
+
+      let totalPosPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+      if (posCurrentPage > totalPosPages) posCurrentPage = totalPosPages;
+      if (posCurrentPage < 1) posCurrentPage = 1;
+
+      let posStartIndex = (posCurrentPage - 1) * itemsPerPage;
+      let posEndIndex = posStartIndex + itemsPerPage;
+      let paginatedPosItems = filteredItems.slice(posStartIndex, posEndIndex);
+
+      document.getElementById("pos-page-info").innerText = `Hal ${posCurrentPage} dari ${totalPosPages}`;
+      document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
+      document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
+
+      if (paginatedPosItems.length === 0) {
+        const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia atau barang tidak ditemukan.</div>`;
+        catalogGrid.innerHTML = emptyMsg; catalogList.innerHTML = emptyMsg;
+      } else {
+        paginatedPosItems.forEach(p => {
+          let code = p.code;
+          let sat = p.satuan || "pcs";
+          let stok = p.stok !== undefined ? p.stok : 0;
+          let fotoSrc = p.foto || defaultPlaceholderImg;
+          let isHabis = stok <= 0;
+          let unitLabel = sat === 'kg' ? '/Kg' : '';
+
+          catalogGrid.innerHTML += `
+            <div class="catalog-item">
+              <img src="${fotoSrc}" class="catalog-img">
+              <div class="catalog-name" title="${p.nama}">${p.nama}</div>
+              <div style="font-size: 0.68rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'}; margin-bottom: 2px;">Stok: ${stok} ${sat}</div>
+              <div class="catalog-price">Rp ${p.harga.toLocaleString('id-ID')}<span style="font-size:0.65rem;">${unitLabel}</span></div>
+              <button class="btn-add-item" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">${isHabis ? 'Habis' : '+ Tambah'}</button>
+            </div>
+          `;
+
+          catalogList.innerHTML += `
+            <div class="catalog-list-item">
+              <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                <img src="${fotoSrc}" class="inv-list-img">
+                <div style="min-width: 0;">
+                  <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
+                  <div style="font-size: 0.72rem; color: #2563eb; font-weight: 600;">Rp ${p.harga.toLocaleString('id-ID')}${unitLabel} <span style="color: ${isHabis ? '#dc2626' : 'var(--text-muted)'};">(Stok: ${stok} ${sat})</span></div>
+                </div>
+              </div>
+              <button class="btn-add-item" ${isHabis ? 'disabled' : ''} style="width: auto; padding: 6px 12px;" onclick="tambahManualDariCode('${code}')">${isHabis ? 'Habis' : '+ Tambah'}</button>
+            </div>
+          `;
+        });
+      }
+    }
+
     function showNotif(msg) {
       const notif = document.getElementById("scan-notif");
       notif.innerText = msg; notif.style.display = "block";
       setTimeout(() => { notif.style.display = "none"; }, 1500);
     }
 
-    // Inisialisasi awal aman setelah elemen dimuat
     setLanguage(currentLang);
     setTheme(currentTheme);
   </script>
