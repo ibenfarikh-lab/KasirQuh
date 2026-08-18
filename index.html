@@ -188,7 +188,6 @@
     .inv-card-details { background: var(--table-header); padding: 6px; border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
     .inv-card-row { display: flex; justify-content: space-between; }
 
-    /* Pagination styling */
     .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.8rem; }
     .pagination-btn { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.78rem; }
     .pagination-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
@@ -927,10 +926,18 @@
     let scanCooldownDuration = parseInt(localStorage.getItem('setting_cooldown_v13')) || 1500;
     let viewMode = localStorage.getItem('inventory_view_mode_v13') || 'grid';
 
-    // Pagination variables
+    // Pagination variables & Dynamic Size
     let stokCurrentPage = 1;
     let posCurrentPage = 1;
-    const itemsPerPage = 15; // Tampilkan 15 item per halaman agar HP sangat ringan & tidak hang
+
+    function getItemsPerPage() {
+      let isDesktop = window.innerWidth >= 768;
+      if (isDesktop) {
+        return (viewMode === 'list') ? 18 : 24;
+      } else {
+        return (viewMode === 'list') ? 7 : 4;
+      }
+    }
 
     let cart = [];
     let isCooldown = false;
@@ -1740,7 +1747,6 @@
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    // BATCH WRITE IMPORT: Sangat stabil untuk ratusan data & aman dari kegagalan cloud
     async function importStokExcel(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1789,7 +1795,6 @@
               batchCounter++;
               successCount++;
 
-              // Firestore batch limit is 500 writes per batch
               if (batchCounter >= 400) {
                 await batch.commit();
                 batch = db.batch();
@@ -2039,7 +2044,6 @@
       const searchInputEl = document.getElementById("inventory-search-input");
       const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
-      // Filter items first
       let filteredItems = [];
       for (let code in databaseProduk) {
         let item = databaseProduk[code];
@@ -2052,7 +2056,9 @@
         filteredItems.push({ code, ...item });
       }
 
-      // Pagination calculation for Inventory
+      // Dynamic itemsPerPage based on device and view mode
+      let itemsPerPage = getItemsPerPage();
+
       let totalStokPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
       if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
       if (stokCurrentPage < 1) stokCurrentPage = 1;
@@ -2121,7 +2127,7 @@
       }
 
       updateDropdowns(Array.from(categories));
-      renderKatalogKasirPaginated(filteredItems);
+      renderKatalogKasirPaginated(filteredItems, itemsPerPage);
 
       const repBody = document.getElementById("report-body");
       repBody.innerHTML = "";
@@ -2203,7 +2209,7 @@
       }
     }
 
-    function renderKatalogKasirPaginated(filteredItems) {
+    function renderKatalogKasirPaginated(filteredItems, itemsPerPage) {
       const catalogGrid = document.getElementById("pos-catalog-container");
       const catalogList = document.getElementById("pos-catalog-list-container");
       catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
