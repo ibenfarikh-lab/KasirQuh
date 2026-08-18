@@ -803,7 +803,6 @@
         let cloudData = doc.data();
         let oldUpdatedAt = localStorage.getItem('auth_updated_at_v13') || "0";
 
-        // Jika data cloud mendeteksi perubahan versi/waktu update baru, paksa logout perangkat ini
         if (cloudData.updatedAt && cloudData.updatedAt.toString() !== oldUpdatedAt) {
           localStorage.setItem('auth_updated_at_v13', cloudData.updatedAt);
           if (sessionStorage.getItem('isLoggedIn') === 'true') {
@@ -840,7 +839,7 @@
         document.getElementById('login-password').value = '';
         history.replaceState({tab: "penjualan"}, "", "");
       } else {
-        alert("Username atau Password salah!");
+        alert("Username atau Password salah! Silakan hubungi admin untuk mendapatkan akses.");
       }
     }
 
