@@ -796,14 +796,26 @@
       return parseInt(stringVal.toString().replace(/\./g, '')) || 0;
     }
 
-    // DATABASE CLOUD REAL-TIME LISTENER (AKUN LOGIN)
-    let userAuth = { user: "admin", pass: "admin" };
+    // DATABASE CLOUD REAL-TIME LISTENER (AKUN LOGIN & FORCE LOGOUT)
+    let userAuth = { user: "admin", pass: "admin", updatedAt: 0 };
     db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
       if (doc.exists) {
-        userAuth = doc.data();
+        let cloudData = doc.data();
+        let oldUpdatedAt = localStorage.getItem('auth_updated_at_v13') || "0";
+
+        // Jika data cloud mendeteksi perubahan versi/waktu update baru, paksa logout perangkat ini
+        if (cloudData.updatedAt && cloudData.updatedAt.toString() !== oldUpdatedAt) {
+          localStorage.setItem('auth_updated_at_v13', cloudData.updatedAt);
+          if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            sessionStorage.removeItem('isLoggedIn');
+            alert("🔐 Pengaturan akun/password telah diubah oleh administrator. Silakan login kembali dengan sandi baru.");
+            cekStatusLogin();
+          }
+        }
+        userAuth = cloudData;
       } else {
-        // Buat default data akun di cloud jika belum ada
-        db.collection("pengaturan").doc("auth").set(userAuth);
+        let defaultAuth = { user: "admin", pass: "admin", updatedAt: Date.now() };
+        db.collection("pengaturan").doc("auth").set(defaultAuth);
       }
       refreshData();
     });
@@ -844,9 +856,11 @@
       const p = document.getElementById('setting-pass').value.trim();
       if (!u || !p) return alert("Username dan Password tidak boleh kosong!");
       
-      db.collection("pengaturan").doc("auth").set({ user: u, pass: p })
+      let newUpdatedAt = Date.now();
+      db.collection("pengaturan").doc("auth").set({ user: u, pass: p, updatedAt: newUpdatedAt })
         .then(() => {
-          alert("Akun login berhasil diperbarui secara online ke Cloud!");
+          localStorage.setItem('auth_updated_at_v13', newUpdatedAt);
+          alert("Akun login berhasil diperbarui secara online! Semua perangkat lain akan otomatis keluar.");
         })
         .catch(err => {
           alert("Gagal menyimpan akun ke cloud: " + err.message);
