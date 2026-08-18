@@ -421,9 +421,10 @@
       </div>
 
       <div id="sub-pelanggan" class="sub-tab-content active">
-        <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
-          <button onclick="eksporPelangganExcel()" style="background: #107c41; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">📥 Export Pelanggan (CSV)</button>
-          <label style="background: #2563eb; color: white; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
+        <!-- Tombol Ekspor dan Impor Pelanggan Sejajar 1 Baris di HP & Desktop -->
+        <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; align-items: center;">
+          <button onclick="eksporPelangganExcel()" style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;">📥 Export Pelanggan (CSV)</button>
+          <label style="background: #2563eb; color: white; padding: 7px 10px; font-size: 0.72rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0;">
             📤 Import Pelanggan (CSV)
             <input type="file" id="import-cust-file" accept=".csv" onchange="importPelangganExcel(event)" style="display: none;">
           </label>
@@ -451,9 +452,9 @@
           </div>
         </div>
 
-        <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
-          <button style="background: #107c41; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem;" onclick="eksporExcel()" data-i18n="btnExport">📥 Export Laporan (CSV)</button>
-          <label style="background: #2563eb; color: white; padding: 8px 14px; font-size: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
+        <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; margin-top: 12px; align-items: center;">
+          <button style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;" onclick="eksporExcel()" data-i18n="btnExport">📥 Export Laporan (CSV)</button>
+          <label style="background: #2563eb; color: white; padding: 7px 10px; font-size: 0.72rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0;">
             📤 Import Laporan (CSV)
             <input type="file" id="import-report-file" accept=".csv" onchange="importLaporanExcel(event)" style="display: none;">
           </label>
@@ -1035,47 +1036,53 @@
       if (isScannerDbOpen) toggleScannerDb();
     }
 
+    // PENCARIAN FOTO ONLINE GLOBAL MENGGUNAKAN WIKIMEDIA COMMONS & DICEBEAR (BEBAS API KEY)
     async function cariFotoOnline() {
       const namaProduk = document.getElementById("db-name").value.trim();
       if (!namaProduk) return alert("Harap isi Nama Barang terlebih dahulu sebelum mencari foto online!");
 
       const resultsContainer = document.getElementById("online-image-results");
       resultsContainer.style.display = "grid";
-      resultsContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 15px;">Mencari foto untuk "${namaProduk}"...</div>`;
+      resultsContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 15px;">Mencari foto global untuk "${namaProduk}"...</div>`;
 
       try {
         let searchKeyword = encodeURIComponent(namaProduk);
-        let url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${searchKeyword}&search_simple=1&action=process&json=1&page_size=8`;
+        let url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchKeyword}&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url&format=json&origin=*`;
+        
         let response = await fetch(url);
         let data = await response.json();
 
         resultsContainer.innerHTML = "";
         let foundImages = 0;
 
-        if (data.products && data.products.length > 0) {
-          data.products.forEach(prod => {
-            let imgUrl = prod.image_front_small_url || prod.image_small_url || prod.image_url;
-            if (imgUrl) {
-              foundImages++;
-              let thumbDiv = document.createElement("div");
-              thumbDiv.style.cssText = "cursor: pointer; border: 2px solid transparent; border-radius: 6px; overflow: hidden; height: 60px; background: #fff; display: flex; align-items: center; justify-content: center;";
-              thumbDiv.innerHTML = `<img src="${imgUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;" crossorigin="anonymous">`;
-              
-              thumbDiv.onclick = function() {
-                document.querySelectorAll('#online-image-results > div').forEach(el => el.style.borderColor = 'transparent');
-                thumbDiv.style.borderColor = '#2563eb';
-                convertImgToBase64(imgUrl, function(base64Str) {
-                  document.getElementById("db-selected-online-img").value = base64Str;
-                  showNotif("Foto online dipilih!");
-                });
-              };
-              resultsContainer.appendChild(thumbDiv);
+        if (data.query && data.query.pages) {
+          let pages = data.query.pages;
+          for (let key in pages) {
+            let page = pages[key];
+            if (page.imageinfo && page.imageinfo[0] && page.imageinfo[0].url) {
+              let imgUrl = page.imageinfo[0].url;
+              if (imgUrl.match(/\.(jpg|jpeg|png|webp)/i)) {
+                foundImages++;
+                let thumbDiv = document.createElement("div");
+                thumbDiv.style.cssText = "cursor: pointer; border: 2px solid transparent; border-radius: 6px; overflow: hidden; height: 60px; background: #fff; display: flex; align-items: center; justify-content: center;";
+                thumbDiv.innerHTML = `<img src="${imgUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;" crossorigin="anonymous">`;
+                
+                thumbDiv.onclick = function() {
+                  document.querySelectorAll('#online-image-results > div').forEach(el => el.style.borderColor = 'transparent');
+                  thumbDiv.style.borderColor = '#2563eb';
+                  convertImgToBase64(imgUrl, function(base64Str) {
+                    document.getElementById("db-selected-online-img").value = base64Str;
+                    showNotif("Foto global dipilih!");
+                  });
+                };
+                resultsContainer.appendChild(thumbDiv);
+              }
             }
-          });
+          }
         }
 
         if (foundImages === 0) {
-          let styles = ['identicon', 'initials', 'shapes'];
+          let styles = ['identicon', 'bottts', 'shapes', 'fun-emoji'];
           styles.forEach(st => {
             let fallbackUrl = `https://api.dicebear.com/7.x/${st}/svg?seed=${encodeURIComponent(namaProduk)}`;
             let thumbDiv = document.createElement("div");
@@ -1087,14 +1094,14 @@
               thumbDiv.style.borderColor = '#2563eb';
               convertImgToBase64(fallbackUrl, function(base64Str) {
                 document.getElementById("db-selected-online-img").value = base64Str;
-                showNotif("Ikon/Logo produk dipilih!");
+                showNotif("Ikon produk universal dipilih!");
               });
             };
             resultsContainer.appendChild(thumbDiv);
           });
         }
       } catch (error) {
-        resultsContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; font-size: 0.75rem; color: #dc2626; padding: 10px;">Gagal memuat foto.</div>`;
+        resultsContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; font-size: 0.75rem; color: #dc2626; padding: 10px;">Gagal memuat foto. Periksa koneksi internet Anda.</div>`;
       }
     }
 
