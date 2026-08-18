@@ -339,8 +339,15 @@
     </div>
 
     <div id="data-barang" class="tab-content">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuStock">Manajemen Stok</h2>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button onclick="eksporStokExcel()" style="background: #107c41; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">📥 Export Stok (CSV)</button>
+          <label style="background: #2563eb; color: white; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
+            📤 Import Excel/Spreadsheet
+            <input type="file" id="import-csv-file" accept=".csv" onchange="importStokExcel(event)" style="display: none;">
+          </label>
+        </div>
       </div>
       <div id="inventory-list-wrapper" class="inventory-list"></div>
       <div id="inventory-grid-wrapper" class="inventory-grid" style="display: none;"></div>
@@ -414,6 +421,13 @@
       </div>
 
       <div id="sub-pelanggan" class="sub-tab-content active">
+        <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+          <button onclick="eksporPelangganExcel()" style="background: #107c41; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">📥 Export Pelanggan (CSV)</button>
+          <label style="background: #2563eb; color: white; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
+            📤 Import Pelanggan (CSV)
+            <input type="file" id="import-cust-file" accept=".csv" onchange="importPelangganExcel(event)" style="display: none;">
+          </label>
+        </div>
         <div id="customer-list-wrapper" class="customer-list"></div>
       </div>
 
@@ -437,8 +451,12 @@
           </div>
         </div>
 
-        <div style="margin-bottom: 12px;">
-          <button style="background: #107c41; width: 100%; max-width: 200px; border-radius: 8px; padding: 10px;" onclick="eksporExcel()" data-i18n="btnExport">Export Laporan (CSV)</button>
+        <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
+          <button style="background: #107c41; padding: 8px 14px; border-radius: 8px; font-size: 0.8rem;" onclick="eksporExcel()" data-i18n="btnExport">📥 Export Laporan (CSV)</button>
+          <label style="background: #2563eb; color: white; padding: 8px 14px; font-size: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
+            📤 Import Laporan (CSV)
+            <input type="file" id="import-report-file" accept=".csv" onchange="importLaporanExcel(event)" style="display: none;">
+          </label>
         </div>
         <div style="width: 100%; overflow-x: auto;">
           <table style="width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.8rem; color: var(--text-color);">
@@ -1725,6 +1743,184 @@
       }
     }
 
+    function eksporStokExcel() {
+      let csv = "data:text/csv;charset=utf-8,Kode,Nama Barang,Kategori,Satuan,Stok,Harga Modal,Harga Jual\n";
+      for (let code in databaseProduk) {
+        let p = databaseProduk[code];
+        csv += `"${code}","${p.nama}","${p.kategori || 'Umum'}","${p.satuan || 'pcs'}",${p.stok || 0},${p.modal || 0},${p.harga || 0}\n`;
+      }
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", `Data_Stok_Barang_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function importStokExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const rows = text.split("\n");
+        let successCount = 0;
+
+        for (let i = 1; i < rows.length; i++) {
+          let row = rows[i].trim();
+          if (!row) continue;
+
+          let cols = [];
+          let currentVal = "";
+          let inQuotes = false;
+          for (let char of row) {
+            if (char === '"') { inQuotes = !inQuotes; }
+            else if (char === ',' && !inQuotes) { cols.push(currentVal); currentVal = ""; }
+            else { currentVal += char; }
+          }
+          cols.push(currentVal);
+
+          if (cols.length >= 7) {
+            let code = cols[0].trim().replace(/^"|"$/g, '');
+            let nama = cols[1].trim().replace(/^"|"$/g, '');
+            let kategori = cols[2].trim().replace(/^"|"$/g, '') || "Umum";
+            let satuan = cols[3].trim().replace(/^"|"$/g, '') || "pcs";
+            let stok = parseFloat(cols[4]) || 0;
+            let modal = parseFloat(cols[5]) || 0;
+            let harga = parseFloat(cols[6]) || 0;
+
+            if (nama) {
+              if (!code) code = "BRG-" + Date.now() + "-" + i;
+              let existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+              
+              db.collection("produk").doc(code).set({
+                nama: nama, kategori: kategori, satuan: satuan, stok: stok, modal: modal, harga: harga, foto: existingFoto
+              });
+              successCount++;
+            }
+          }
+        }
+        alert(`Berhasil mengimpor ${successCount} data barang ke Cloud Database!`);
+        document.getElementById("import-csv-file").value = "";
+      };
+      reader.readAsText(file);
+    }
+
+    function eksporPelangganExcel() {
+      let csv = "data:text/csv;charset=utf-8,ID,Nama Pelanggan,Telepon,Alamat\n";
+      databasePelanggan.forEach(c => {
+        csv += `"${c.id}","${c.nama}","${c.phone || '-'}","${c.alamat || '-'}"\n`;
+      });
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", `Data_Pelanggan_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function importPelangganExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const rows = text.split("\n");
+        let successCount = 0;
+
+        for (let i = 1; i < rows.length; i++) {
+          let row = rows[i].trim();
+          if (!row) continue;
+
+          let cols = [];
+          let currentVal = "";
+          let inQuotes = false;
+          for (let char of row) {
+            if (char === '"') { inQuotes = !inQuotes; }
+            else if (char === ',' && !inQuotes) { cols.push(currentVal); currentVal = ""; }
+            else { currentVal += char; }
+          }
+          cols.push(currentVal);
+
+          if (cols.length >= 4) {
+            let custId = cols[0].trim().replace(/^"|"$/g, '') || ("CUST-" + Date.now() + "-" + i);
+            let nama = cols[1].trim().replace(/^"|"$/g, '');
+            let phone = cols[2].trim().replace(/^"|"$/g, '') || "-";
+            let alamat = cols[3].trim().replace(/^"|"$/g, '') || "-";
+
+            if (nama) {
+              let existingCust = databasePelanggan.find(c => c.id === custId);
+              let catatan = existingCust ? (existingCust.catatan || []) : [];
+
+              db.collection("pelanggan").doc(custId).set({
+                nama: nama, phone: phone, alamat: alamat, catatan: catatan
+              });
+              successCount++;
+            }
+          }
+        }
+        alert(`Berhasil mengimpor ${successCount} data pelanggan ke Cloud!`);
+        document.getElementById("import-cust-file").value = "";
+      };
+      reader.readAsText(file);
+    }
+
+    function eksporExcel() {
+      if (riwayatTransaksi.length === 0) return alert("Belum ada transaksi!");
+      let csv = "data:text/csv;charset=utf-8,Waktu,Metode,Jumlah Item/Berat,Total Omset,Total Modal,Keuntungan Bersih\n";
+      riwayatTransaksi.forEach(t => {
+        csv += `"${t.waktu}","${t.metode}",${t.qty},${t.total},${t.modal},${t.untung}\n`;
+      });
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", `Laporan_Keuntungan_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function importLaporanExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const rows = text.split("\n");
+        let successCount = 0;
+
+        for (let i = 1; i < rows.length; i++) {
+          let row = rows[i].trim();
+          if (!row) continue;
+
+          let cols = [];
+          let currentVal = "";
+          let inQuotes = false;
+          for (let char of row) {
+            if (char === '"') { inQuotes = !inQuotes; }
+            else if (char === ',' && !inQuotes) { cols.push(currentVal); currentVal = ""; }
+            else { currentVal += char; }
+          }
+          cols.push(currentVal);
+
+          if (cols.length >= 7) {
+            let waktu = cols[0].trim().replace(/^"|"$/g, '');
+            let metode = cols[1].trim().replace(/^"|"$/g, '');
+            let qty = parseFloat(cols[2]) || 0;
+            let total = parseFloat(cols[3]) || 0;
+            let modal = parseFloat(cols[4]) || 0;
+            let untung = parseFloat(cols[5]) || 0;
+
+            if (waktu) {
+              riwayatTransaksi.push({ waktu, metode, qty, total, modal, untung });
+              successCount++;
+            }
+          }
+        }
+        localStorage.setItem('riwayat_kasir_v13', JSON.stringify(riwayatTransaksi));
+        alert(`Berhasil mengimpor ${successCount} riwayat transaksi!`);
+        document.getElementById("import-report-file").value = "";
+        refreshData();
+      };
+      reader.readAsText(file);
+    }
+
     function simpanPelanggan() {
       const id = document.getElementById("cust-id").value.trim();
       const nama = document.getElementById("cust-name").value.trim();
@@ -1978,18 +2174,6 @@
       const notif = document.getElementById("scan-notif");
       notif.innerText = msg; notif.style.display = "block";
       setTimeout(() => { notif.style.display = "none"; }, 1500);
-    }
-
-    function eksporExcel() {
-      if (riwayatTransaksi.length === 0) return alert("Belum ada transaksi!");
-      let csv = "data:text/csv;charset=utf-8,Waktu,Metode,Jumlah Item/Berat,Total Omset,Total Modal,Keuntungan Bersih\n";
-      riwayatTransaksi.forEach(t => {
-        csv += `"${t.waktu}","${t.metode}",${t.qty},${t.total},${t.modal},${t.untung}\n`;
-      });
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csv));
-      link.setAttribute("download", `Laporan_Keuntungan_${new Date().toISOString().slice(0,10)}.csv`);
-      document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
     // Inisialisasi awal aman setelah elemen dimuat
