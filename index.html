@@ -1371,7 +1371,18 @@
     function syncAndFilterGlobal(val) { 
       stokCurrentPage = 1;
       posCurrentPage = 1;
+      
+      const activeInputId = document.activeElement ? document.activeElement.id : null;
       refreshData(); 
+      
+      if (activeInputId === 'inventory-search-input') {
+        const inputEl = document.getElementById('inventory-search-input');
+        if (inputEl) {
+          inputEl.focus();
+          const len = inputEl.value.length;
+          inputEl.setSelectionRange(len, len);
+        }
+      }
     }
 
     function changeStokPage(delta) {
