@@ -291,9 +291,9 @@
         </div>
       </div>
       
-      <!-- Filter Kategori di Halaman Kasir (Dirapikan sebaris) -->
-      <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; gap: 8px;">
-        <select id="filter-category-pos" onchange="refreshData()" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); max-width: 200px;">
+      <!-- Filter Kategori di Halaman Kasir (Dibuat full 100% lebar layar) -->
+      <div style="display: flex; margin-bottom: 12px; width: 100%;">
+        <select id="filter-category-pos" onchange="refreshData()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
           <option value="Semua" data-i18n="allCategory">Semua Kategori</option>
         </select>
       </div>
@@ -382,7 +382,6 @@
         </div>
       </div>
 
-      <!-- Diperbarui: Kategori - Ekspor Stok - Impor Stok sejajar horizontal tanpa bertumpuk -->
       <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; gap: 6px; width: 100%;">
         <select id="filter-category" onchange="refreshData()" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); flex: 1; min-width: 0;">
           <option value="Semua" data-i18n="allCategory">Semua Kategori</option>
