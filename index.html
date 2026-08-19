@@ -146,12 +146,20 @@
     .product-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; width: 100%; }
     .catalog-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: space-between; transition: 0.2s; overflow: hidden; position: relative; }
     .catalog-item:hover { border-color: #3b82f6; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    .catalog-img { width: 100%; height: 90px; object-fit: cover; border-radius: 6px; margin-bottom: 6px; background: var(--border-color); }
+    
+    /* Tombol + dan - disusun secara vertikal di depan gambar sesuai permintaan */
+    .catalog-item-inner { display: flex; align-items: center; gap: 6px; width: 100%; margin-bottom: 6px; }
+    .catalog-left-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+    .btn-side-action { width: 26px; height: 26px; border-radius: 6px; border: none; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
+    .btn-side-plus { background: #16a34a; }
+    .btn-side-plus:hover { background: #15803d; }
+    .btn-side-minus { background: #dc2626; }
+    .btn-side-minus:hover { background: #b91c1c; }
+    .btn-side-action:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
+
+    .catalog-img { flex: 1; height: 90px; object-fit: cover; border-radius: 6px; background: var(--border-color); min-width: 0; }
     .catalog-name { font-size: 0.8rem; font-weight: bold; color: var(--text-color); width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
     .catalog-price { font-size: 0.8rem; color: #2563eb; font-weight: bold; margin-bottom: 6px; }
-    .btn-add-item { background: #10b981; color: white; border: none; padding: 6px; font-size: 0.75rem; border-radius: 6px; width: 100%; cursor: pointer; font-weight: bold; transition: 0.2s; }
-    .btn-add-item:hover { background: #059669; }
-    .btn-add-item:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
     .product-catalog-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .catalog-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
@@ -169,7 +177,6 @@
     .view-toggle-btn { flex: 1; background: var(--border-color); color: var(--text-muted); border: 1px solid var(--input-border); padding: 6px 10px; font-size: 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
     .view-toggle-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 
-    /* CSS BARU UNTUK LIST VIEW STOK YANG RAPI & TERSTRUKTUR */
     .inventory-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 5px; }
     .inv-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .inv-list-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0; background: var(--border-color); }
@@ -192,9 +199,11 @@
     .inv-card-details { background: var(--table-header); padding: 6px; border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
     .inv-card-row { display: flex; justify-content: space-between; }
 
-    .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.8rem; }
-    .pagination-btn { background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.78rem; }
-    .pagination-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
+    .header-pagination-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; width: 100%; }
+    .inline-pagination { display: none; align-items: center; gap: 6px; background: var(--card-bg); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; }
+    .inline-pagination.show { display: flex; }
+    .inline-page-btn { background: #2563eb; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.72rem; }
+    .inline-page-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
     .customer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 5px; }
     .cust-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
@@ -271,20 +280,22 @@
 
   <div class="main-content">
     
+    <!-- HALAMAN KASIR -->
     <div id="penjualan" class="tab-content active">
-      <h2 style="font-size: 1.3rem; margin-top: 0;" data-i18n="menuPos">Halaman Kasir</h2>
+      <div class="header-pagination-container">
+        <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuPos">Halaman Kasir</h2>
+        <div class="inline-pagination" id="pos-pagination-wrapper">
+          <button class="inline-page-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀</button>
+          <span id="pos-page-info">Hal 1 dari 1</span>
+          <button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">Selanjutnya ▶</button>
+        </div>
+      </div>
       
       <div class="pos-container">
         <div class="card no-print" style="margin-bottom: 0;">
           <h3 style="margin-top: 0; font-size: 0.95rem;" data-i18n="availableItems">📦 Daftar Barang Tersedia</h3>
           <div class="product-catalog-grid" id="pos-catalog-container"></div>
           <div class="product-catalog-list" id="pos-catalog-list-container" style="display: none;"></div>
-          <!-- Pagination Kasir -->
-          <div class="pagination-bar" id="pos-pagination-bar">
-            <button class="pagination-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀ Sebelumnya</button>
-            <span id="pos-page-info">Hal 1 dari 1</span>
-            <button class="pagination-btn" id="pos-next-btn" onclick="changePosPage(1)">Berikutnya ▶</button>
-          </div>
         </div>
       </div>
 
@@ -353,9 +364,18 @@
       </div>
     </div>
 
+    <!-- HALAMAN MANAJEMEN STOK -->
     <div id="data-barang" class="tab-content">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+      <div class="header-pagination-container">
         <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuStock">Manajemen Stok</h2>
+        <div class="inline-pagination" id="stok-pagination-wrapper">
+          <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
+          <span id="stok-page-info">Hal 1 dari 1</span>
+          <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">Selanjutnya ▶</button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
           <button onclick="eksporStokExcel()" style="background: #107c41; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">📥 Export Stok (CSV)</button>
           <label style="background: #2563eb; color: white; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
@@ -364,15 +384,9 @@
           </label>
         </div>
       </div>
+
       <div id="inventory-list-wrapper" class="inventory-list"></div>
       <div id="inventory-grid-wrapper" class="inventory-grid" style="display: none;"></div>
-      
-      <!-- Pagination Stok -->
-      <div class="pagination-bar" id="stok-pagination-bar">
-        <button class="pagination-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀ Sebelumnya</button>
-        <span id="stok-page-info">Hal 1 dari 1</span>
-        <button class="pagination-btn" id="stok-next-btn" onclick="changeStokPage(1)">Berikutnya ▶</button>
-      </div>
     </div>
 
     <div class="fab-container no-print">
@@ -434,6 +448,7 @@
       </button>
     </div>
 
+    <!-- HALAMAN LAPORAN / DATA -->
     <div id="laporan" class="tab-content">
       <h2 style="font-size: 1.3rem; margin-top: 0;" data-i18n="menuData">Ringkasan Laporan</h2>
       
@@ -497,6 +512,7 @@
       </div>
     </div>
 
+    <!-- HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
       <h2 style="font-size: 1.3rem; margin-top: 0;" data-i18n="menuSettings">Pengaturan Sistem</h2>
       
@@ -932,7 +948,6 @@
     let scanCooldownDuration = parseInt(localStorage.getItem('setting_cooldown_v13')) || 1500;
     let viewMode = localStorage.getItem('inventory_view_mode_v13') || 'grid';
 
-    // Pagination variables & Dynamic Size
     let stokCurrentPage = 1;
     let posCurrentPage = 1;
 
@@ -942,9 +957,9 @@
         return (viewMode === 'list') ? 18 : 24;
       } else {
         if (isInventory) {
-          return (viewMode === 'list') ? 5 : 4; // Stok: List 5 item, Grid 4 item di HP
+          return (viewMode === 'list') ? 5 : 4; 
         } else {
-          return (viewMode === 'list') ? 7 : 4; // Kasir: List 7 item, Grid 4 item di HP
+          return (viewMode === 'list') ? 7 : 4; 
         }
       }
     }
@@ -1477,6 +1492,25 @@
       }
     }
 
+    function kurangManualDariCode(barcode) {
+      const existingItem = cart.find(item => item.barcode === barcode);
+      if (existingItem) {
+        let index = cart.indexOf(existingItem);
+        let step = (existingItem.satuan === 'kg') ? 0.1 : 1;
+        existingItem.qty -= step;
+        existingItem.qty = parseFloat(existingItem.qty.toFixed(3));
+
+        if (existingItem.qty <= 0) {
+          cart.splice(index, 1);
+        } else {
+          existingItem.subtotal = Math.round(existingItem.qty * existingItem.harga);
+          existingItem.submodal = Math.round(existingItem.qty * existingItem.modal);
+        }
+        renderCart();
+        refreshData();
+      }
+    }
+
     function tambahItemKeCart(barcode, produk) {
       const isKg = (produk.satuan === 'kg');
       let inputJumlah = 1;
@@ -1508,6 +1542,7 @@
         });
       }
       renderCart();
+      refreshData();
     }
 
     function ubahQty(index, delta) {
@@ -1528,6 +1563,7 @@
         item.submodal = Math.round(item.qty * item.modal);
       }
       renderCart();
+      refreshData();
     }
 
     function editBeratDirect(index) {
@@ -1546,6 +1582,7 @@
         item.submodal = Math.round(item.qty * item.modal);
       }
       renderCart();
+      refreshData();
     }
 
     function renderCart() {
@@ -1553,8 +1590,10 @@
       tbody.innerHTML = "";
       totalBelanja = 0;
 
+      let totalItemCount = 0;
       cart.forEach((item, index) => {
         totalBelanja += item.subtotal;
+        totalItemCount += (item.satuan === 'kg' ? 1 : item.qty);
         let qtyDisplay = item.satuan === 'kg' ? `${item.qty} Kg` : item.qty;
         let hargaUnitDisplay = item.satuan === 'kg' ? `/Kg` : '';
 
@@ -1586,12 +1625,16 @@
 
       if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px 0;">Keranjang Kosong</td></tr>`;
 
-      document.getElementById("cart-count").innerText = cart.length;
+      document.getElementById("cart-count").innerText = totalItemCount;
       document.getElementById("grand-total").innerText = totalBelanja.toLocaleString('id-ID');
       hitungKembalian();
     }
 
-    function hapusCart(i) { cart.splice(i, 1); renderCart(); }
+    function hapusCart(i) { 
+      cart.splice(i, 1); 
+      renderCart(); 
+      refreshData();
+    }
 
     function togglePayMethod() {
       const m = document.getElementById("pay-method").value;
@@ -2076,9 +2119,15 @@
       let stokEndIndex = stokStartIndex + itemsPerPageStok;
       let paginatedStokItems = filteredItems.slice(stokStartIndex, stokEndIndex);
 
-      document.getElementById("stok-page-info").innerText = `Hal ${stokCurrentPage} dari ${totalStokPages} (Total: ${filteredItems.length} barang)`;
-      document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
-      document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
+      const stokPaginationWrapper = document.getElementById("stok-pagination-wrapper");
+      if (filteredItems.length > 0) {
+        stokPaginationWrapper.classList.add("show");
+        document.getElementById("stok-page-info").innerText = `Hal ${stokCurrentPage} dari ${totalStokPages}`;
+        document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
+        document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
+      } else {
+        stokPaginationWrapper.classList.remove("show");
+      }
 
       if (paginatedStokItems.length === 0) {
         const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang atau barang tidak ditemukan.</div>`;
@@ -2093,11 +2142,6 @@
           let fotoSrc = item.foto || defaultPlaceholderImg;
           let margin = item.harga - item.modal;
 
-          // SUSUNAN BARU LIST VIEW STOK:
-          // 1. Nama barang
-          // 2. Barcode
-          // 3. Jumlah stok barang - kategori
-          // 4. Harga jual - keuntungan
           invList.innerHTML += `
             <div class="inv-list-item">
               <img src="${fotoSrc}" class="inv-list-img">
@@ -2241,9 +2285,15 @@
       let posEndIndex = posStartIndex + itemsPerPagePos;
       let paginatedPosItems = filteredItems.slice(posStartIndex, posEndIndex);
 
-      document.getElementById("pos-page-info").innerText = `Hal ${posCurrentPage} dari ${totalPosPages}`;
-      document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
-      document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
+      const posPaginationWrapper = document.getElementById("pos-pagination-wrapper");
+      if (filteredItems.length > 0) {
+        posPaginationWrapper.classList.add("show");
+        document.getElementById("pos-page-info").innerText = `Hal ${posCurrentPage} dari ${totalPosPages}`;
+        document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
+        document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
+      } else {
+        posPaginationWrapper.classList.remove("show");
+      }
 
       if (paginatedPosItems.length === 0) {
         const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia atau barang tidak ditemukan.</div>`;
@@ -2257,28 +2307,41 @@
           let isHabis = stok <= 0;
           let unitLabel = sat === 'kg' ? '/Kg' : '';
 
-          catalogGrid.innerHTML += `
-            <div class="catalog-item">
-              <img src="${fotoSrc}" class="catalog-img">
-              <div class="catalog-name" title="${p.nama}">${p.nama}</div>
-              <div style="font-size: 0.68rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'}; margin-bottom: 2px;">Stok: ${stok} ${sat}</div>
-              <div class="catalog-price">Rp ${p.harga.toLocaleString('id-ID')}<span style="font-size:0.65rem;">${unitLabel}</span></div>
-              <button class="btn-add-item" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">${isHabis ? 'Habis' : '+ Tambah'}</button>
-            </div>
-          `;
+          let cartItem = cart.find(item => item.barcode === code);
+          let currentQtyInCart = cartItem ? cartItem.qty : 0;
 
-          catalogList.innerHTML += `
-            <div class="catalog-list-item">
-              <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-                <img src="${fotoSrc}" class="inv-list-img">
-                <div style="min-width: 0;">
-                  <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-                  <div style="font-size: 0.72rem; color: #2563eb; font-weight: 600;">Rp ${p.harga.toLocaleString('id-ID')}${unitLabel} <span style="color: ${isHabis ? '#dc2626' : 'var(--text-muted)'};">(Stok: ${stok} ${sat})</span></div>
+          if (viewMode === 'grid') {
+            catalogGrid.innerHTML += `
+              <div class="catalog-item">
+                <div class="catalog-item-inner">
+                  <div class="catalog-left-actions">
+                    <button class="btn-side-action btn-side-plus" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
+                    <button class="btn-side-action btn-side-minus" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
+                  </div>
+                  <img src="${fotoSrc}" class="catalog-img">
+                </div>
+                <div class="catalog-name" title="${p.nama}">${p.nama}</div>
+                <div style="font-size: 0.68rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'}; margin-bottom: 2px;">Stok: ${stok} ${sat}</div>
+                <div class="catalog-price">Rp ${p.harga.toLocaleString('id-ID')}<span style="font-size:0.65rem;">${unitLabel}</span></div>
+              </div>
+            `;
+          } else {
+            catalogList.innerHTML += `
+              <div class="catalog-list-item">
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+                  <div class="catalog-left-actions">
+                    <button class="btn-side-action btn-side-plus" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
+                    <button class="btn-side-action btn-side-minus" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
+                  </div>
+                  <img src="${fotoSrc}" class="inv-list-img">
+                  <div style="min-width: 0; flex: 1;">
+                    <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
+                    <div style="font-size: 0.72rem; color: #2563eb; font-weight: 600;">Rp ${p.harga.toLocaleString('id-ID')}${unitLabel} <span style="color: ${isHabis ? '#dc2626' : 'var(--text-muted)'};">(Stok: ${stok} ${sat})</span></div>
+                  </div>
                 </div>
               </div>
-              <button class="btn-add-item" ${isHabis ? 'disabled' : ''} style="width: auto; padding: 6px 12px;" onclick="tambahManualDariCode('${code}')">${isHabis ? 'Habis' : '+ Tambah'}</button>
-            </div>
-          `;
+            `;
+          }
         });
       }
     }
