@@ -154,23 +154,8 @@
     .btn-scan-toggle:hover { background: #1d4ed8; }
     .btn-scan-toggle svg { width: 22px; height: 22px; fill: currentColor; display: block; }
     
-    .product-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; width: 100%; }
-    .catalog-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: space-between; transition: 0.2s; overflow: hidden; position: relative; }
-    .catalog-item:hover { border-color: #3b82f6; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .product-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 5px; width: 100%; }
     
-    .catalog-item-inner { display: flex; align-items: center; gap: 6px; width: 100%; margin-bottom: 6px; }
-    .catalog-left-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
-    .btn-side-action { width: 26px; height: 26px; border-radius: 6px; border: none; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
-    .btn-side-plus { background: #16a34a; }
-    .btn-side-plus:hover { background: #15803d; }
-    .btn-side-minus { background: #dc2626; }
-    .btn-side-minus:hover { background: #b91c1c; }
-    .btn-side-action:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
-
-    .catalog-img { flex: 1; height: 90px; object-fit: cover; border-radius: 6px; background: var(--border-color); min-width: 0; }
-    .catalog-name { font-size: 0.8rem; font-weight: bold; color: var(--text-color); width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
-    .catalog-price { font-size: 0.8rem; color: #2563eb; font-weight: bold; margin-bottom: 6px; }
-
     .product-catalog-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .catalog-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
     .catalog-list-img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); background: var(--border-color); flex-shrink: 0; }
@@ -970,7 +955,7 @@
     let posCurrentPage = 1;
 
     function getItemsPerPage(isInventory = false) {
-      return 25;
+      return 24;
     }
 
     let cart = [];
@@ -2346,36 +2331,44 @@
       } else {
         paginatedPosItems.forEach(p => {
           let code = p.code;
+          let kat = p.kategori || "Umum";
           let sat = p.satuan || "pcs";
           let stok = p.stok !== undefined ? p.stok : 0;
           let fotoSrc = p.foto || defaultPlaceholderImg;
           let isHabis = stok <= 0;
           let unitLabel = sat === 'kg' ? '/Kg' : '';
+          let margin = p.harga - p.modal;
 
           let cartItem = cart.find(item => item.barcode === code);
           let currentQtyInCart = cartItem ? cartItem.qty : 0;
 
           catalogGrid.innerHTML += `
-            <div class="catalog-item">
-              <div class="catalog-item-inner">
-                <div class="catalog-left-actions">
-                  <button class="btn-side-action btn-side-plus" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
-                  <button class="btn-side-action btn-side-minus" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
+            <div class="inv-card">
+              <div class="inv-card-top">
+                <div style="display: flex; gap: 6px; width: 100%; margin-bottom: 2px;">
+                  <button class="btn-edit" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #16a34a; color: white;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah (+)"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>
+                  <button class="btn-danger" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi (-)"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg></button>
                 </div>
-                <img src="${fotoSrc}" class="catalog-img">
+                <img src="${fotoSrc}" class="inv-card-img">
+                <div class="inv-card-info">
+                  <div class="inv-card-title" title="${p.nama}">${p.nama}</div>
+                  <div class="inv-card-code">${code}</div>
+                  <div style="margin-top: 2px; display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
+                    <span class="badge-kat">${kat}</span><span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">Stok: ${stok} ${sat}</span>
+                  </div>
+                </div>
               </div>
-              <div class="catalog-name" title="${p.nama}">${p.nama}</div>
-              <div style="font-size: 0.68rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'}; margin-bottom: 2px;">Stok: ${stok} ${sat}</div>
-              <div class="catalog-price">Rp ${p.harga.toLocaleString('id-ID')}<span style="font-size:0.65rem;">${unitLabel}</span></div>
+              <div class="inv-card-details">
+                <div class="inv-card-row"><span>Harga:</span><b>Rp ${p.harga.toLocaleString('id-ID')}${unitLabel}</b></div>
+              </div>
             </div>
           `;
 
-          // Mode List: Tombol aksi (+ dan -) berada di samping kiri gambar tanpa angka akumulasi/nol di tengahnya
           catalogList.innerHTML += `
             <div class="catalog-list-item">
               <div style="display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 28px; align-items: center;">
-                <button class="btn-side-action btn-side-plus" style="width: 28px; height: 28px; border-radius: 6px; font-size: 0.9rem;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
-                <button class="btn-side-action btn-side-minus" style="width: 28px; height: 28px; border-radius: 6px; font-size: 0.9rem;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
+                <button class="btn-side-action" style="width: 28px; height: 28px; border-radius: 6px; font-size: 0.9rem; background: #16a34a; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah (+)">+</button>
+                <button class="btn-side-action" style="width: 28px; height: 28px; border-radius: 6px; font-size: 0.9rem; background: #dc2626; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi (-)">-</button>
               </div>
               <img src="${fotoSrc}" class="catalog-list-img">
               <div style="min-width: 0; flex: 1;">
