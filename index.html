@@ -107,8 +107,21 @@
 
     .cart-badge { position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; border-radius: 50%; padding: 2px 6px; border: 2px solid white; }
 
-    .fab-filter-panel { display: none; background: var(--card-bg); padding: 12px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid var(--border-color); flex-direction: column; gap: 10px; width: 260px; animation: fadeIn 0.2s ease-in-out; }
-    .fab-filter-panel.show { display: flex; }
+    /* Kotak Sticky Pencarian Full Bar di Atas */
+    .sticky-search-bar {
+      display: none;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+      background: var(--card-bg);
+      padding: 10px 12px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid var(--border-color);
+      margin-bottom: 12px;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    .sticky-search-bar.show { display: block; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -189,9 +202,6 @@
     .btn-qty { width: 24px; height: 24px; background: var(--border-color); border: 1px solid var(--input-border); border-radius: 6px; color: var(--text-color); font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; padding: 0; }
     .btn-qty:hover { background: var(--input-border); }
     .qty-val { font-weight: bold; font-size: 0.85rem; min-width: 18px; text-align: center; }
-
-    .view-toggle-btn { flex: 1; background: var(--border-color); color: var(--text-muted); border: 1px solid var(--input-border); padding: 6px 10px; font-size: 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
-    .view-toggle-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 
     .inventory-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 5px; }
     .inv-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
@@ -328,6 +338,11 @@
 
   <div class="main-content">
     
+    <!-- Kotak Sticky Pencarian Full Bar di Atas -->
+    <div id="sticky-search-container" class="sticky-search-bar no-print">
+      <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama / kode barang..." oninput="syncAndFilterGlobal(this.value)" style="width: 100%; padding: 10px; font-size: 0.9rem;" data-i18n-placeholder="searchPlaceholder">
+    </div>
+
     <!-- HALAMAN KASIR -->
     <div id="penjualan" class="tab-content active">
       <div style="display: flex; margin-bottom: 12px; width: 100%;">
@@ -432,15 +447,7 @@
         <svg viewBox="0 0 24 24"><path d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h3v16H7V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h1v16h-1V4z"/></svg>
       </button>
 
-      <div id="fab-stok-panel" class="fab-filter-panel">
-        <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama / kode..." oninput="syncAndFilterGlobal(this.value)" onkeypress="handleEnterSearch(event)" style="padding: 8px; font-size: 0.8rem;" data-i18n-placeholder="searchPlaceholder">
-        <div style="display: flex; gap: 4px; background: var(--border-color); padding: 3px; border-radius: 8px;">
-          <button id="btn-view-list" class="view-toggle-btn active" onclick="setViewMode('list')" title="Tampilan List" data-i18n="viewList">📋 List</button>
-          <button id="btn-view-grid" class="view-toggle-btn" onclick="setViewMode('grid')" title="Tampilan Grid" data-i18n="viewGrid">🔲 Grid</button>
-        </div>
-      </div>
-
-      <button id="fab-filter-btn" class="fab-main" onclick="toggleFabFilterPanel()" title="Cari & Filter">
+      <button id="fab-filter-btn" class="fab-main" onclick="toggleStickySearchBar()" title="Cari Barang">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       </button>
 
@@ -560,6 +567,13 @@
           <select id="setting-theme" onchange="gantiTema(this.value)">
             <option value="light" data-i18n="themeLight">Terang (Light)</option>
             <option value="dark" data-i18n="themeDark">Gelap (Dark)</option>
+          </select>
+
+          <!-- Opsi Tampilan List atau Grid Baru di Pengaturan -->
+          <label style="font-size: 0.85rem; margin-top: 5px;" data-i18n="labelViewMode">Tampilan Katalog / Stok:</label>
+          <select id="setting-view-mode" onchange="gantiViewModeSetting(this.value)">
+            <option value="grid" data-i18n="viewGridOption">Kotak (Grid)</option>
+            <option value="list" data-i18n="viewListOption">Daftar (List)</option>
           </select>
         </div>
       </div>
@@ -768,8 +782,9 @@
         availableItems: "📦 Daftar Barang Tersedia", shoppingCart: "Keranjang Belanja", thItem: "Barang",
         thQty: "Qty / Berat", thTotal: "Total", totalLabel: "Total", payCash: "Tunai", placeholderNominal: "Nominal Bayar",
         placeholderWa: "No. WhatsApp Pelanggan (Cth: 08123...)", changeLabel: "Kembalian", btnFinishPrint: "Selesai & Cetak Struk",
-        btnShareWa: "Bagikan Struk via WhatsApp", searchPlaceholder: "🔍 Cari nama / kode...", allCategory: "Semua Kategori",
-        viewList: "📋 List", viewGrid: "🔲 Grid", subCust: "👥 Data Pelanggan", subReport: "📋 Laporan Transaksi",
+        btnShareWa: "Bagikan Struk via WhatsApp", searchPlaceholder: "🔍 Cari nama / kode barang...", allCategory: "Semua Kategori",
+        labelViewMode: "Tampilan Katalog / Stok:", viewGridOption: "Kotak (Grid)", viewListOption: "Daftar (List)",
+        subCust: "👥 Data Pelanggan", subReport: "📋 Laporan Transaksi",
         dashOmset: "TOTAL OMSET", dashProfit: "KEUNTUNGAN BERSIH", dashTrans: "TRANSAKSI SUKSES", dashItems: "TOTAL ITEM BARANG",
         btnExport: "Export Laporan (CSV)", thTime: "Waktu", thMethod: "Metode", thQtyKg: "Qty/Kg", thOmset: "Omset", thProfit: "Untung",
         setTitleShop: "Identitas Toko", labelShopName: "Nama Toko / Usaha:", labelShopAddress: "Alamat Toko:", labelShopPhone: "Nomor Telepon / WA:",
@@ -792,7 +807,8 @@
         availableItems: "📦 Available Products", shoppingCart: "Shopping Cart", thItem: "Product", thQty: "Qty / Weight",
         thTotal: "Total", totalLabel: "Total", payCash: "Cash", placeholderNominal: "Payment Amount", placeholderWa: "Customer WhatsApp No. (Ex: 08123...)",
         changeLabel: "Change", btnFinishPrint: "Finish & Print Receipt", btnShareWa: "Share Receipt via WhatsApp", searchPlaceholder: "🔍 Search name / code...",
-        allCategory: "All Categories", viewList: "📋 List", viewGrid: "🔲 Grid", subCust: "👥 Customer Data", subReport: "📋 Transaction Report",
+        allCategory: "All Categories", labelViewMode: "Catalog / Stock View:", viewGridOption: "Grid", viewListOption: "List",
+        subCust: "👥 Customer Data", subReport: "📋 Transaction Report",
         dashOmset: "TOTAL REVENUE", dashProfit: "NET PROFIT", dashTrans: "SUCCESS TRANSACTIONS", dashItems: "TOTAL ITEMS", btnExport: "Export Report (CSV)",
         thTime: "Time", thMethod: "Method", thQtyKg: "Qty/Kg", thOmset: "Revenue", thProfit: "Profit", setTitleShop: "Store Identity",
         labelShopName: "Store / Business Name:", labelShopAddress: "Store Address:", labelShopPhone: "Phone Number / WhatsApp:", btnSaveProfile: "Save Profile",
@@ -812,7 +828,7 @@
         btnLogin: "تسجيل الدخول", menuPos: "الكاشير", menuStock: "المخزون", menuData: "البيانات", menuSettings: "الإعدادات",
         availableItems: "📦 المنتجات المتاحة", shoppingCart: "سلة التسوق", thItem: "المنتج", thQty: "الكمية / الوزن", thTotal: "المجموع", totalLabel: "المجموع",
         payCash: "نقداً", placeholderNominal: "المبلغ المدفوع", placeholderWa: "رقم واتساب العميل...", changeLabel: "الباقي", btnFinishPrint: "إنهاء وطباعة الإيصال",
-        btnShareWa: "مشاركة الإيصال عبر واتساب", searchPlaceholder: "🔍 بحث بالاسم أو الكود...", allCategory: "جميع الفئات", viewList: "📋 قائمة", viewGrid: "🔲 شبكة",
+        btnShareWa: "مشاركة الإيصال عبر واتساب", searchPlaceholder: "🔍 بحث بالاسم أو الكود...", allCategory: "جميع الفئات", labelViewMode: "عرض الكتالوج / المخزون:", viewGridOption: "شبكة (Grid)", viewListOption: "قائمة (List)",
         subCust: "👥 بيانات العملاء", subReport: "📋 تقرير المعاملات", dashOmset: "إجمالي الإيرادات", dashProfit: "صافي الربح", dashTrans: "المعاملات الناجحة",
         dashItems: "إجمالي الأصناف", btnExport: "تصدير التقرير (CSV)", thTime: "الوقت", thMethod: "الطريقة", thQtyKg: "الكمية/كغ", thOmset: "الإيراد", thProfit: "الربح",
         setTitleShop: "هوية المتجر", labelShopName: "اسم المتجر / النشاط:", labelShopAddress: "عنوان المتجر:", labelShopPhone: "رقم الهاتق / واتساب:", btnSaveProfile: "حفظ الملف الشخصي",
@@ -868,6 +884,14 @@
     }
 
     function gantiTema(theme) { setTheme(theme); }
+
+    function gantiViewModeSetting(mode) {
+      viewMode = mode;
+      localStorage.setItem('inventory_view_mode_v13', mode);
+      const viewSelect = document.getElementById("setting-view-mode");
+      if (viewSelect) viewSelect.value = mode;
+      refreshData();
+    }
 
     function formatInputRupiah(input) {
       let angka = input.value.replace(/[^,\d]/g, '').toString();
@@ -1032,9 +1056,9 @@
         return;
       }
 
-      const fabPanel = document.getElementById("fab-stok-panel");
-      if (fabPanel && fabPanel.classList.contains("show")) {
-        fabPanel.classList.remove("show");
+      const searchBar = document.getElementById("sticky-search-container");
+      if (searchBar && searchBar.classList.contains("show")) {
+        searchBar.classList.remove("show");
         history.pushState({tab: activeTab}, "", "");
         return;
       }
@@ -1062,17 +1086,17 @@
 
     function closeCartModal() { document.getElementById("cartModal").classList.remove("show"); }
 
-    function toggleFabFilterPanel() {
-      const panel = document.getElementById("fab-stok-panel");
-      if (panel) {
-        panel.classList.toggle("show");
-        if(panel.classList.contains("show")) {
+    function toggleStickySearchBar() {
+      const searchBar = document.getElementById("sticky-search-container");
+      if (searchBar) {
+        searchBar.classList.toggle("show");
+        if(searchBar.classList.contains("show")) {
           setTimeout(() => document.getElementById("inventory-search-input").focus(), 100);
-          history.pushState({tab: activeTab, floating: 'filter'}, "", "");
+          history.pushState({tab: activeTab, floating: 'search'}, "", "");
+        } else {
+          document.getElementById("inventory-search-input").value = "";
+          syncAndFilterGlobal("");
         }
-      } else {
-        const catPos = document.getElementById("filter-category-pos");
-        if(catPos) catPos.focus();
       }
     }
 
@@ -1423,12 +1447,6 @@
         fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
       }
       updatePermanentBarTitle();
-      refreshData();
-    }
-
-    function setViewMode(mode) {
-      viewMode = mode;
-      localStorage.setItem('inventory_view_mode_v13', mode);
       refreshData();
     }
 
@@ -2146,6 +2164,9 @@
       document.getElementById("setting-shop-address").value = pengaturanToko.alamat;
       document.getElementById("setting-shop-phone").value = pengaturanToko.phone;
       document.getElementById("setting-cooldown").value = scanCooldownDuration;
+      
+      const viewSelect = document.getElementById("setting-view-mode");
+      if (viewSelect) viewSelect.value = viewMode;
 
       document.getElementById("login-sub-title").innerText = pengaturanToko.nama || "TokoQuh";
       document.getElementById("receipt-shop-name").innerText = pengaturanToko.nama;
