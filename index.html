@@ -147,7 +147,6 @@
     .catalog-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; align-items: center; text-align: center; justify-content: space-between; transition: 0.2s; overflow: hidden; position: relative; }
     .catalog-item:hover { border-color: #3b82f6; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     
-    /* Tombol + dan - disusun secara vertikal di depan gambar sesuai permintaan */
     .catalog-item-inner { display: flex; align-items: center; gap: 6px; width: 100%; margin-bottom: 6px; }
     .catalog-left-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
     .btn-side-action { width: 26px; height: 26px; border-radius: 6px; border: none; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
@@ -186,8 +185,9 @@
     .inv-list-sub { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .inv-list-price { font-size: 0.78rem; font-weight: 600; color: #2563eb; }
     
-    .inv-list-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; width: 60px; }
-    .inv-list-actions button { width: 100%; padding: 5px 0; font-size: 0.7rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; text-align: center; }
+    .inv-list-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; width: 36px; }
+    .inv-list-actions button { width: 100%; height: 32px; padding: 0; font-size: 0.7rem; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .inv-list-actions button svg { width: 16px; height: 16px; fill: currentColor; }
 
     .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 5px; width: 100%; }
     .inv-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
@@ -202,7 +202,7 @@
     .header-pagination-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; width: 100%; }
     .inline-pagination { display: none; align-items: center; gap: 6px; background: var(--card-bg); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; }
     .inline-pagination.show { display: flex; }
-    .inline-page-btn { background: #2563eb; color: white; border: none; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.72rem; }
+    .inline-page-btn { background: #2563eb; color: white; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; }
     .inline-page-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
     .customer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 5px; }
@@ -286,8 +286,8 @@
         <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuPos">Halaman Kasir</h2>
         <div class="inline-pagination" id="pos-pagination-wrapper">
           <button class="inline-page-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀</button>
-          <span id="pos-page-info">Hal 1 dari 1</span>
-          <button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">Selanjutnya ▶</button>
+          <span id="pos-page-info">1/1</span>
+          <button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">▶</button>
         </div>
       </div>
       
@@ -370,16 +370,16 @@
         <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuStock">Manajemen Stok</h2>
         <div class="inline-pagination" id="stok-pagination-wrapper">
           <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
-          <span id="stok-page-info">Hal 1 dari 1</span>
-          <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">Selanjutnya ▶</button>
+          <span id="stok-page-info">1/1</span>
+          <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
         </div>
       </div>
 
       <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-          <button onclick="eksporStokExcel()" style="background: #107c41; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">📥 Export Stok (CSV)</button>
+          <button onclick="eksporStokExcel()" style="background: #107c41; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">Ekspor Stok</button>
           <label style="background: #2563eb; color: white; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
-            📤 Import Excel/Spreadsheet
+            Impor Stok
             <input type="file" id="import-csv-file" accept=".csv" onchange="importStokExcel(event)" style="display: none;">
           </label>
         </div>
@@ -459,9 +459,9 @@
 
       <div id="sub-pelanggan" class="sub-tab-content active">
         <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; align-items: center;">
-          <button onclick="eksporPelangganExcel()" style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;">📥 Export Pelanggan (CSV)</button>
+          <button onclick="eksporPelangganExcel()" style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;">Ekspor Pelanggan</button>
           <label style="background: #2563eb; color: white; padding: 7px 10px; font-size: 0.72rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0;">
-            📤 Import Pelanggan (CSV)
+            Impor Pelanggan
             <input type="file" id="import-cust-file" accept=".csv" onchange="importPelangganExcel(event)" style="display: none;">
           </label>
         </div>
@@ -959,7 +959,7 @@
         if (isInventory) {
           return (viewMode === 'list') ? 5 : 4; 
         } else {
-          return (viewMode === 'list') ? 7 : 4; 
+          return (viewMode === 'list') ? 6 : 4; 
         }
       }
     }
@@ -2122,7 +2122,7 @@
       const stokPaginationWrapper = document.getElementById("stok-pagination-wrapper");
       if (filteredItems.length > 0) {
         stokPaginationWrapper.classList.add("show");
-        document.getElementById("stok-page-info").innerText = `Hal ${stokCurrentPage} dari ${totalStokPages}`;
+        document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
         document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
         document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
       } else {
@@ -2144,6 +2144,10 @@
 
           invList.innerHTML += `
             <div class="inv-list-item">
+              <div style="display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;">
+                <button class="btn-edit" onclick="openProductModal('${code}')" title="Edit Barang" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>
+                <button class="btn-danger" onclick="hapusBarang('${code}')" title="Hapus Barang" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+              </div>
               <img src="${fotoSrc}" class="inv-list-img">
               <div class="inv-list-details">
                 <div class="inv-list-title" title="${item.nama}">${item.nama}</div>
@@ -2151,16 +2155,16 @@
                 <div class="inv-list-sub">${stok} ${sat} - ${kat}</div>
                 <div class="inv-list-price">Rp ${item.harga.toLocaleString('id-ID')} - <span style="color:#16a34a;">Rp ${margin.toLocaleString('id-ID')}</span></div>
               </div>
-              <div class="inv-list-actions">
-                <button class="btn-edit" onclick="openProductModal('${code}')">Edit</button>
-                <button class="btn-danger" onclick="hapusBarang('${code}')">Hapus</button>
-              </div>
             </div>
           `;
 
           invGrid.innerHTML += `
             <div class="inv-card">
               <div class="inv-card-top">
+                <div style="display: flex; gap: 6px; width: 100%; margin-bottom: 2px;">
+                  <button class="btn-edit" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;" onclick="openProductModal('${code}')" title="Edit Barang"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>
+                  <button class="btn-danger" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;" onclick="hapusBarang('${code}')" title="Hapus Barang"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+                </div>
                 <img src="${fotoSrc}" class="inv-card-img">
                 <div class="inv-card-info">
                   <div class="inv-card-title" title="${item.nama}">${item.nama}</div>
@@ -2174,10 +2178,6 @@
                 <div class="inv-card-row"><span>Modal:</span><b>Rp ${item.modal.toLocaleString('id-ID')}</b></div>
                 <div class="inv-card-row"><span>Harga:</span><b>Rp ${item.harga.toLocaleString('id-ID')}</b></div>
                 <div class="inv-card-row" style="color: #16a34a;"><span>Untung:</span><b>Rp ${margin.toLocaleString('id-ID')}</b></div>
-              </div>
-              <div style="display: flex; gap: 4px;">
-                <button class="btn-edit" style="flex: 1; padding: 5px; font-weight: bold; border-radius: 6px;" onclick="openProductModal('${code}')">Edit</button>
-                <button class="btn-danger" style="flex: 1; padding: 5px; font-weight: bold; border-radius: 6px;" onclick="hapusBarang('${code}')">Hapus</button>
               </div>
             </div>
           `;
@@ -2288,7 +2288,7 @@
       const posPaginationWrapper = document.getElementById("pos-pagination-wrapper");
       if (filteredItems.length > 0) {
         posPaginationWrapper.classList.add("show");
-        document.getElementById("pos-page-info").innerText = `Hal ${posCurrentPage} dari ${totalPosPages}`;
+        document.getElementById("pos-page-info").innerText = `${posCurrentPage}/${totalPosPages}`;
         document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
         document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
       } else {
