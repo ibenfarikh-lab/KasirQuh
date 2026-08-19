@@ -83,7 +83,23 @@
     .fab-main:hover, .fab-scanner:hover, .fab-add:hover { background-color: #1d4ed8; transform: scale(1.05); }
     .fab-main svg, .fab-scanner svg, .fab-add svg { width: 22px; height: 22px; fill: #ffffff; display: block; }
 
-    .fab-menu-panel { display: none; background: var(--card-bg); padding: 8px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid var(--border-color); flex-direction: column; gap: 4px; width: 180px; animation: fadeIn 0.2s ease-in-out; }
+    /* Panel Menu Popover di Pojok Kanan Atas Bar Bawah */
+    .fab-menu-panel { 
+      display: none; 
+      position: absolute; 
+      bottom: 55px; 
+      right: 12px; 
+      background: var(--card-bg); 
+      padding: 8px; 
+      border-radius: 12px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+      border: 1px solid var(--border-color); 
+      flex-direction: column; 
+      gap: 4px; 
+      width: 180px; 
+      z-index: 1000;
+      animation: fadeIn 0.2s ease-in-out; 
+    }
     .fab-menu-panel.show { display: flex; }
     .fab-menu-btn { background: none; border: none; color: var(--text-color); padding: 10px 12px; text-align: left; font-size: 0.9rem; cursor: pointer; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-weight: 600; transition: 0.2s; }
     .fab-menu-btn:hover, .fab-menu-btn.active { background: var(--border-color); color: #2563eb; }
@@ -199,7 +215,7 @@
     .inv-card-details { background: var(--table-header); padding: 6px; border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
     .inv-card-row { display: flex; justify-content: space-between; }
 
-    /* Bar Bawah Permanen (Fixed Footer Bar) seperti Address Bar / Navigasi Browser */
+    /* Bar Bawah Permanen (Fixed Footer Bar) dengan Menu di Pojok Kanan */
     .permanent-bottom-bar { 
       position: fixed; 
       bottom: 0; 
@@ -211,9 +227,34 @@
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      padding: 10px 16px; 
+      padding: 8px 16px; 
       z-index: 998; 
     }
+
+    .bottom-right-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .btn-bar-action {
+      background: #2563eb;
+      color: white;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      position: relative;
+      padding: 0;
+    }
+    .btn-bar-action:hover { background: #1d4ed8; }
+    .btn-bar-action svg { width: 20px; height: 20px; fill: #ffffff; }
 
     .inline-pagination { display: none; align-items: center; gap: 6px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; }
     .inline-pagination.show { display: flex; }
@@ -267,7 +308,7 @@
       .main-content { padding: 10px; padding-bottom: 95px; }
       .inventory-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .product-catalog-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-      .fab-container { bottom: 65px; right: 15px; }
+      .fab-container { bottom: 65px; right: 15px; display: none; /* Tombol melayang lama disembunyikan karena sudah dipindah ke bar bawah */ }
     }
 
     @media print {
@@ -297,7 +338,6 @@
     
     <!-- HALAMAN KASIR -->
     <div id="penjualan" class="tab-content active">
-      <!-- Filter Kategori di Halaman Kasir -->
       <div style="display: flex; margin-bottom: 12px; width: 100%;">
         <select id="filter-category-pos" onchange="refreshData()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
           <option value="Semua" data-i18n="allCategory">Semua Kategori</option>
@@ -392,61 +432,6 @@
 
       <div id="inventory-list-wrapper" class="inventory-list"></div>
       <div id="inventory-grid-wrapper" class="inventory-grid" style="display: none;"></div>
-    </div>
-
-    <div class="fab-container no-print">
-      <button id="fab-scan-btn" class="fab-scanner" onclick="toggleScannerPos()" title="Buka/Tutup Scanner">
-        <svg viewBox="0 0 24 24">
-          <path d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h3v16H7V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h1v16h-1V4z"/>
-        </svg>
-      </button>
-
-      <div id="fab-stok-panel" class="fab-filter-panel">
-        <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama / kode..." oninput="syncAndFilterGlobal(this.value)" onkeypress="handleEnterSearch(event)" style="padding: 8px; font-size: 0.8rem;" data-i18n-placeholder="searchPlaceholder">
-        
-        <div style="display: flex; gap: 4px; background: var(--border-color); padding: 3px; border-radius: 8px;">
-          <button id="btn-view-list" class="view-toggle-btn active" onclick="setViewMode('list')" title="Tampilan List" data-i18n="viewList">📋 List</button>
-          <button id="btn-view-grid" class="view-toggle-btn" onclick="setViewMode('grid')" title="Tampilan Grid" data-i18n="viewGrid">🔲 Grid</button>
-        </div>
-      </div>
-
-      <button id="fab-filter-btn" class="fab-main" onclick="toggleFabFilterPanel()" title="Cari & Filter">
-        <svg viewBox="0 0 24 24">
-          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-        </svg>
-      </button>
-
-      <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang">
-        <svg viewBox="0 0 24 24">
-          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>
-        <span class="cart-badge" id="cart-count">0</span>
-      </button>
-
-      <button id="fab-add-btn" class="fab-add" onclick="openProductModal()" title="Tambah Barang" style="display: none;">
-        <svg viewBox="0 0 24 24">
-          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-        </svg>
-      </button>
-
-      <button id="fab-add-cust-btn" class="fab-add" onclick="openCustomerModal()" title="Tambah Pelanggan" style="display: none;">
-        <svg viewBox="0 0 24 24">
-          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-        </svg>
-      </button>
-      
-      <div id="fab-menu-panel" class="fab-menu-panel">
-        <button class="fab-menu-btn active" onclick="switchTab('penjualan', true)"><span>🛒</span> <span data-i18n="menuPos">Kasir</span></button>
-        <button class="fab-menu-btn" onclick="switchTab('data-barang', true)"><span>📦</span> <span data-i18n="menuStock">Stok</span></button>
-        <button class="fab-menu-btn" onclick="switchTab('laporan', true)"><span>📊</span> <span data-i18n="menuData">Data</span></button>
-        <button class="fab-menu-btn" onclick="switchTab('pengaturan', true)"><span>⚙️</span> <span data-i18n="menuSettings">Pengaturan</span></button>
-      </div>
-
-      <button class="fab-main" onclick="toggleFabMenuPanel()" title="Menu Utama">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-        </svg>
-      </button>
     </div>
 
     <!-- HALAMAN LAPORAN / DATA -->
@@ -589,7 +574,7 @@
 
   </div>
 
-  <!-- PERMANENT BOTTOM BAR (Bar Permanen Bawah Seragam di Luar Area Scroll) -->
+  <!-- PERMANENT BOTTOM BAR (Bar Permanen Bawah dengan Menu di Pojok Kanan) -->
   <div class="permanent-bottom-bar no-print">
     <h2 id="permanent-title" style="font-size: 1.05rem; margin: 0; font-weight: 700;">Halaman Kasir</h2>
     
@@ -605,6 +590,46 @@
       <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
       <span id="stok-page-info">1/1</span>
       <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
+    </div>
+
+    <!-- Tombol Aksi & Menu di Pojok Kanan Bar Bawah -->
+    <div class="bottom-right-container">
+      <!-- Tombol Scanner Barcode (Khusus Halaman Kasir) -->
+      <button id="bottom-scan-btn" class="btn-bar-action" onclick="toggleScannerPos()" title="Buka/Tutup Scanner">
+        <svg viewBox="0 0 24 24"><path d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h3v16H7V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h1v16h-1V4z"/></svg>
+      </button>
+
+      <!-- Tombol Filter Pencarian -->
+      <button id="bottom-filter-btn" class="btn-bar-action" onclick="toggleFabFilterPanel()" title="Cari & Filter">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      </button>
+
+      <!-- Tombol Tambah Produk / Pelanggan -->
+      <button id="bottom-add-btn" class="btn-bar-action" onclick="openProductModal()" title="Tambah Barang" style="display: none; background: #16a34a;">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
+      <button id="bottom-add-cust-btn" class="btn-bar-action" onclick="openCustomerModal()" title="Tambah Pelanggan" style="display: none; background: #16a34a;">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
+
+      <!-- Tombol Keranjang (Khusus Kasir) -->
+      <button id="bottom-cart-btn" class="btn-bar-action" onclick="openCartModal()" title="Buka Keranjang">
+        <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span class="cart-badge" id="cart-count">0</span>
+      </button>
+
+      <!-- Panel Menu Utama (Garis 3) di Pojok Kanan -->
+      <div id="fab-menu-panel" class="fab-menu-panel">
+        <button class="fab-menu-btn active" onclick="switchTab('penjualan', true)"><span>🛒</span> <span data-i18n="menuPos">Kasir</span></button>
+        <button class="fab-menu-btn" onclick="switchTab('data-barang', true)"><span>📦</span> <span data-i18n="menuStock">Stok</span></button>
+        <button class="fab-menu-btn" onclick="switchTab('laporan', true)"><span>📊</span> <span data-i18n="menuData">Data</span></button>
+        <button class="fab-menu-btn" onclick="switchTab('pengaturan', true)"><span>⚙️</span> <span data-i18n="menuSettings">Pengaturan</span></button>
+      </div>
+
+      <!-- Tombol Utama Menu Garis 3 Paling Pojok Kanan -->
+      <button class="btn-bar-action" onclick="toggleFabMenuPanel()" title="Menu Utama" style="background: #0f172a;">
+        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
     </div>
   </div>
 
@@ -625,9 +650,7 @@
           <div class="input-with-btn">
             <input type="text" id="db-code" placeholder="Kosongkan jika ingin generate otomatis" data-i18n-placeholder="placeholderAutoCode">
             <button class="btn-scan-toggle" onclick="toggleScannerDb()" title="Scan Barcode Produk">
-              <svg viewBox="0 0 24 24">
-                <path d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h3v16H7V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h1v16h-1V4z"/>
-              </svg>
+              <svg viewBox="0 0 24 24"><path d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h3v16H7V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h1v16h-1V4z"/></svg>
             </button>
           </div>
         </div>
@@ -1012,7 +1035,7 @@
       }
 
       const fabPanel = document.getElementById("fab-stok-panel");
-      if (fabPanel.classList.contains("show")) {
+      if (fabPanel && fabPanel.classList.contains("show")) {
         fabPanel.classList.remove("show");
         history.pushState({tab: activeTab}, "", "");
         return;
@@ -1042,11 +1065,18 @@
     function closeCartModal() { document.getElementById("cartModal").classList.remove("show"); }
 
     function toggleFabFilterPanel() {
+      // Toggle search/filter view or popup if any
       const panel = document.getElementById("fab-stok-panel");
-      panel.classList.toggle("show");
-      if(panel.classList.contains("show")) {
-        setTimeout(() => document.getElementById("inventory-search-input").focus(), 100);
-        history.pushState({tab: activeTab, floating: 'filter'}, "", "");
+      if (panel) {
+        panel.classList.toggle("show");
+        if(panel.classList.contains("show")) {
+          setTimeout(() => document.getElementById("inventory-search-input").focus(), 100);
+          history.pushState({tab: activeTab, floating: 'filter'}, "", "");
+        }
+      } else {
+        // Fallback for POS / general search focus
+        const catPos = document.getElementById("filter-category-pos");
+        if(catPos) catPos.focus();
       }
     }
 
@@ -1327,12 +1357,12 @@
       document.getElementById(subTabId).classList.add('active');
       if (subTabId === 'sub-pelanggan') {
         document.getElementById('sub-btn-pelanggan').classList.add('active');
-        document.getElementById('fab-add-btn').style.display = 'none';
-        document.getElementById('fab-add-cust-btn').style.display = 'flex';
+        document.getElementById('bottom-add-btn').style.display = 'none';
+        document.getElementById('bottom-add-cust-btn').style.display = 'flex';
       } else {
         document.getElementById('sub-btn-laporan').classList.add('active');
-        document.getElementById('fab-add-btn').style.display = 'none';
-        document.getElementById('fab-add-cust-btn').style.display = 'none';
+        document.getElementById('bottom-add-btn').style.display = 'none';
+        document.getElementById('bottom-add-cust-btn').style.display = 'none';
       }
       updatePermanentBarTitle();
     }
@@ -1376,25 +1406,25 @@
 
       if (pushHistory) history.pushState({tab: tabId}, "", "");
 
-      const fabCart = document.getElementById('fab-cart-btn');
-      const fabScan = document.getElementById('fab-scan-btn');
-      const fabFilter = document.getElementById('fab-filter-btn');
-      const fabAdd = document.getElementById('fab-add-btn');
-      const fabAddCust = document.getElementById('fab-add-cust-btn');
+      const bottomCart = document.getElementById('bottom-cart-btn');
+      const bottomScan = document.getElementById('bottom-scan-btn');
+      const bottomFilter = document.getElementById('bottom-filter-btn');
+      const bottomAdd = document.getElementById('bottom-add-btn');
+      const bottomAddCust = document.getElementById('bottom-add-cust-btn');
 
-      document.getElementById('fab-stok-panel').classList.remove('show');
-      document.getElementById('fab-menu-panel').classList.remove('show');
+      const menuPanel = document.getElementById('fab-menu-panel');
+      if (menuPanel) menuPanel.classList.remove('show');
 
       if (tabId === 'penjualan') {
-        fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
+        bottomCart.style.display = 'flex'; bottomScan.style.display = 'flex'; bottomFilter.style.display = 'flex'; bottomAdd.style.display = 'none'; bottomAddCust.style.display = 'none';
       } else if (tabId === 'data-barang') {
-        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'flex'; fabAddCust.style.display = 'none';
+        bottomCart.style.display = 'none'; bottomScan.style.display = 'none'; bottomFilter.style.display = 'flex'; bottomAdd.style.display = 'flex'; bottomAddCust.style.display = 'none';
       } else if (tabId === 'laporan') {
-        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none';
-        if (activeSubDataTab === 'sub-pelanggan') { fabAdd.style.display = 'none'; fabAddCust.style.display = 'flex'; }
-        else { fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; }
+        bottomCart.style.display = 'none'; bottomScan.style.display = 'none'; bottomFilter.style.display = 'none';
+        if (activeSubDataTab === 'sub-pelanggan') { bottomAdd.style.display = 'none'; bottomAddCust.style.display = 'flex'; }
+        else { bottomAdd.style.display = 'none'; bottomAddCust.style.display = 'none'; }
       } else {
-        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
+        bottomCart.style.display = 'none'; bottomScan.style.display = 'none'; bottomFilter.style.display = 'none'; bottomAdd.style.display = 'none'; bottomAddCust.style.display = 'none';
       }
       updatePermanentBarTitle();
       refreshData();
@@ -1403,26 +1433,13 @@
     function setViewMode(mode) {
       viewMode = mode;
       localStorage.setItem('inventory_view_mode_v13', mode);
-      document.getElementById('btn-view-list').classList.toggle('active', mode === 'list');
-      document.getElementById('btn-view-grid').classList.toggle('active', mode === 'grid');
       refreshData();
     }
 
     function syncAndFilterGlobal(val) { 
       stokCurrentPage = 1;
       posCurrentPage = 1;
-      
-      const activeInputId = document.activeElement ? document.activeElement.id : null;
       refreshData(); 
-      
-      if (activeInputId) {
-        const inputEl = document.getElementById(activeInputId);
-        if (inputEl && activeInputId === 'inventory-search-input') {
-          inputEl.focus();
-          const len = inputEl.value.length;
-          inputEl.setSelectionRange(len, len);
-        }
-      }
     }
 
     function changeStokPage(delta) {
@@ -1525,17 +1542,6 @@
         updateUnitLabel();
       }
       toggleScannerDb();
-    }
-
-    function handleEnterSearch(e) {
-      if (e.key === 'Enter') {
-        const val = e.target.value.trim();
-        if(val && databaseProduk[val]) {
-          tambahManualDariCode(val);
-          e.target.value = "";
-          refreshData();
-        }
-      }
     }
 
     function tambahManualDariCode(barcode) {
@@ -2083,20 +2089,24 @@
 
     function updateDropdowns(kategoriList) {
       const filterSelect = document.getElementById("filter-category");
-      const currentVal = filterSelect.value;
-      let html = `<option value="Semua">${translations[currentLang].allCategory || "Semua Kategori"}</option>`;
-      kategoriList.forEach(kat => {
-        html += `<option value="${kat}" ${kat === currentVal ? "selected" : ""}>${kat}</option>`;
-      });
-      if (filterSelect.innerHTML !== html) filterSelect.innerHTML = html;
+      if(filterSelect) {
+        const currentVal = filterSelect.value;
+        let html = `<option value="Semua">${translations[currentLang].allCategory || "Semua Kategori"}</option>`;
+        kategoriList.forEach(kat => {
+          html += `<option value="${kat}" ${kat === currentVal ? "selected" : ""}>${kat}</option>`;
+        });
+        if (filterSelect.innerHTML !== html) filterSelect.innerHTML = html;
+      }
 
       const filterPosSelect = document.getElementById("filter-category-pos");
-      const currentPosVal = filterPosSelect.value;
-      let htmlPos = `<option value="Semua">${translations[currentLang].allCategory || "Semua Kategori"}</option>`;
-      kategoriList.forEach(kat => {
-        htmlPos += `<option value="${kat}" ${kat === currentPosVal ? "selected" : ""}>${kat}</option>`;
-      });
-      if (filterPosSelect.innerHTML !== htmlPos) filterPosSelect.innerHTML = htmlPos;
+      if(filterPosSelect) {
+        const currentPosVal = filterPosSelect.value;
+        let htmlPos = `<option value="Semua">${translations[currentLang].allCategory || "Semua Kategori"}</option>`;
+        kategoriList.forEach(kat => {
+          htmlPos += `<option value="${kat}" ${kat === currentPosVal ? "selected" : ""}>${kat}</option>`;
+        });
+        if (filterPosSelect.innerHTML !== htmlPos) filterPosSelect.innerHTML = htmlPos;
+      }
     }
 
     function simpanPengaturanToko() {
@@ -2146,8 +2156,6 @@
       document.getElementById("receipt-shop-address").innerText = pengaturanToko.alamat;
       document.getElementById("receipt-shop-phone").innerText = "Telp: " + pengaturanToko.phone;
 
-      document.getElementById('btn-view-list').classList.toggle('active', viewMode === 'list');
-      document.getElementById('btn-view-grid').classList.toggle('active', viewMode === 'grid');
       document.getElementById('inventory-list-wrapper').style.display = (viewMode === 'list') ? 'flex' : 'none';
       document.getElementById('inventory-grid-wrapper').style.display = (viewMode === 'grid') ? 'grid' : 'none';
 
@@ -2156,8 +2164,10 @@
       invList.innerHTML = ""; invGrid.innerHTML = "";
 
       let categories = new Set();
-      const filterKat = document.getElementById("filter-category").value;
-      const filterKatPos = document.getElementById("filter-category-pos").value;
+      const filterKatEl = document.getElementById("filter-category");
+      const filterKat = filterKatEl ? filterKatEl.value : "Semua";
+      const filterKatPosEl = document.getElementById("filter-category-pos");
+      const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
       
       const searchInputEl = document.getElementById("inventory-search-input");
       const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
@@ -2196,7 +2206,6 @@
       let stokEndIndex = stokStartIndex + itemsPerPageStok;
       let paginatedStokItems = filteredItems.slice(stokStartIndex, stokEndIndex);
 
-      const stokPaginationWrapper = document.getElementById("stok-pagination-wrapper");
       if (filteredItems.length > 0) {
         document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
         document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
@@ -2344,10 +2353,11 @@
     function renderKatalogKasirPaginated(filteredItems) {
       const catalogGrid = document.getElementById("pos-catalog-container");
       const catalogList = document.getElementById("pos-catalog-list-container");
+      if(!catalogGrid || !catalogList) return;
       catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
 
-      if (viewMode === 'grid') { catalogGrid.style.display = 'grid'; catalogList.style.display = 'none'; }
-      else { catalogGrid.style.display = 'none'; catalogList.style.display = 'flex'; }
+      catalogGrid.style.display = 'grid'; 
+      catalogList.style.display = 'none';
 
       let itemsPerPagePos = getItemsPerPage(false);
 
@@ -2380,44 +2390,27 @@
           let cartItem = cart.find(item => item.barcode === code);
           let currentQtyInCart = cartItem ? cartItem.qty : 0;
 
-          if (viewMode === 'grid') {
-            catalogGrid.innerHTML += `
-              <div class="catalog-item">
-                <div class="catalog-item-inner">
-                  <div class="catalog-left-actions">
-                    <button class="btn-side-action btn-side-plus" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
-                    <button class="btn-side-action btn-side-minus" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
-                  </div>
-                  <img src="${fotoSrc}" class="catalog-img">
+          catalogGrid.innerHTML += `
+            <div class="catalog-item">
+              <div class="catalog-item-inner">
+                <div class="catalog-left-actions">
+                  <button class="btn-side-action btn-side-plus" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
+                  <button class="btn-side-action btn-side-minus" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
                 </div>
-                <div class="catalog-name" title="${p.nama}">${p.nama}</div>
-                <div style="font-size: 0.68rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'}; margin-bottom: 2px;">Stok: ${stok} ${sat}</div>
-                <div class="catalog-price">Rp ${p.harga.toLocaleString('id-ID')}<span style="font-size:0.65rem;">${unitLabel}</span></div>
+                <img src="${fotoSrc}" class="catalog-img">
               </div>
-            `;
-          } else {
-            catalogList.innerHTML += `
-              <div class="catalog-list-item">
-                <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
-                  <div class="catalog-left-actions">
-                    <button class="btn-side-action btn-side-plus" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
-                    <button class="btn-side-action btn-side-minus" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
-                  </div>
-                  <img src="${fotoSrc}" class="inv-list-img">
-                  <div style="min-width: 0; flex: 1;">
-                    <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-                    <div style="font-size: 0.72rem; color: #2563eb; font-weight: 600;">Rp ${p.harga.toLocaleString('id-ID')}${unitLabel} <span style="color: ${isHabis ? '#dc2626' : 'var(--text-muted)'};">(Stok: ${stok} ${sat})</span></div>
-                  </div>
-                </div>
-              </div>
-            `;
-          }
+              <div class="catalog-name" title="${p.nama}">${p.nama}</div>
+              <div style="font-size: 0.68rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'}; margin-bottom: 2px;">Stok: ${stok} ${sat}</div>
+              <div class="catalog-price">Rp ${p.harga.toLocaleString('id-ID')}<span style="font-size:0.65rem;">${unitLabel}</span></div>
+            </div>
+          `;
         });
       }
     }
 
     function showNotif(msg) {
       const notif = document.getElementById("scan-notif");
+      if(!notif) return;
       notif.innerText = msg; notif.style.display = "block";
       setTimeout(() => { notif.style.display = "none"; }, 1500);
     }
