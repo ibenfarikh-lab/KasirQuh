@@ -63,7 +63,7 @@
     .login-card h2 { margin-top: 0; margin-bottom: 5px; color: #0f172a; font-size: 1.5rem; }
     .login-card p { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
     
-    .main-content { flex: 1; padding: 20px; overflow-y: auto; overflow-x: hidden; position: relative; }
+    .main-content { flex: 1; padding: 20px; padding-bottom: 100px; overflow-y: auto; overflow-x: hidden; position: relative; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
@@ -199,26 +199,29 @@
     .inv-card-details { background: var(--table-header); padding: 6px; border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
     .inv-card-row { display: flex; justify-content: space-between; }
 
-    /* Sticky Header & Pagination Container agar tidak hilang saat di-scroll */
+    /* Sticky Header & Pagination Container persis di paling bawah (di atas FAB & batas layar bawah) */
     .header-pagination-container { 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      margin-bottom: 12px; 
+      margin-top: 15px; 
+      margin-bottom: 0px; 
       flex-wrap: wrap; 
-      gap: 8px; 
+      gap: 6px; 
       width: 100%; 
       position: sticky; 
-      top: -20px; 
+      bottom: 0; 
       background-color: var(--bg-color); 
-      padding-top: 15px; 
-      padding-bottom: 10px; 
+      padding-top: 8px; 
+      padding-bottom: 8px; 
+      border-top: 1px solid var(--border-color);
+      box-shadow: 0 -3px 8px rgba(0,0,0,0.04);
       z-index: 10; 
     }
 
-    .inline-pagination { display: none; align-items: center; gap: 6px; background: var(--card-bg); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; }
+    .inline-pagination { display: none; align-items: center; gap: 4px; background: var(--card-bg); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 6px; font-size: 0.75rem; }
     .inline-pagination.show { display: flex; }
-    .inline-page-btn { background: #2563eb; color: white; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; }
+    .inline-page-btn { background: #2563eb; color: white; border: none; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
     .inline-page-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
     .customer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
@@ -265,7 +268,7 @@
     .developer-info a:hover { text-decoration: underline; }
 
     @media (max-width: 768px) {
-      .main-content { padding: 10px; padding-bottom: 85px; }
+      .main-content { padding: 10px; padding-bottom: 100px; }
       .inventory-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .product-catalog-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
       .fab-container { bottom: 20px; right: 20px; }
@@ -298,15 +301,6 @@
     
     <!-- HALAMAN KASIR -->
     <div id="penjualan" class="tab-content active">
-      <div class="header-pagination-container">
-        <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuPos">Halaman Kasir</h2>
-        <div class="inline-pagination" id="pos-pagination-wrapper">
-          <button class="inline-page-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀</button>
-          <span id="pos-page-info">1/1</span>
-          <button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">▶</button>
-        </div>
-      </div>
-      
       <!-- Filter Kategori di Halaman Kasir -->
       <div style="display: flex; margin-bottom: 12px; width: 100%;">
         <select id="filter-category-pos" onchange="refreshData()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
@@ -319,6 +313,15 @@
           <h3 style="margin-top: 0; font-size: 0.95rem;" data-i18n="availableItems">📦 Daftar Barang Tersedia</h3>
           <div class="product-catalog-grid" id="pos-catalog-container"></div>
           <div class="product-catalog-list" id="pos-catalog-list-container" style="display: none;"></div>
+        </div>
+      </div>
+
+      <div class="header-pagination-container">
+        <h2 style="font-size: 1.1rem; margin: 0;" data-i18n="menuPos">Halaman Kasir</h2>
+        <div class="inline-pagination" id="pos-pagination-wrapper">
+          <button class="inline-page-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀</button>
+          <span id="pos-page-info">1/1</span>
+          <button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">▶</button>
         </div>
       </div>
 
@@ -389,15 +392,6 @@
 
     <!-- HALAMAN MANAJEMEN STOK -->
     <div id="data-barang" class="tab-content">
-      <div class="header-pagination-container">
-        <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuStock">Manajemen Stok</h2>
-        <div class="inline-pagination" id="stok-pagination-wrapper">
-          <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
-          <span id="stok-page-info">1/1</span>
-          <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
-        </div>
-      </div>
-
       <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; gap: 6px; width: 100%;">
         <select id="filter-category" onchange="refreshData()" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); flex: 1; min-width: 0;">
           <option value="Semua" data-i18n="allCategory">Semua Kategori</option>
@@ -411,6 +405,15 @@
 
       <div id="inventory-list-wrapper" class="inventory-list"></div>
       <div id="inventory-grid-wrapper" class="inventory-grid" style="display: none;"></div>
+
+      <div class="header-pagination-container">
+        <h2 style="font-size: 1.1rem; margin: 0;" data-i18n="menuStock">Manajemen Stok</h2>
+        <div class="inline-pagination" id="stok-pagination-wrapper">
+          <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
+          <span id="stok-page-info">1/1</span>
+          <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
+        </div>
+      </div>
     </div>
 
     <div class="fab-container no-print">
@@ -470,10 +473,6 @@
 
     <!-- HALAMAN LAPORAN / DATA -->
     <div id="laporan" class="tab-content">
-      <div class="header-pagination-container">
-        <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuData">Ringkasan Laporan</h2>
-      </div>
-      
       <div class="sub-nav-tabs no-print">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')" data-i18n="subCust">👥 Data Pelanggan</button>
         <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')" data-i18n="subReport">📋 Laporan Transaksi</button>
@@ -532,14 +531,14 @@
           </table>
         </div>
       </div>
+
+      <div class="header-pagination-container">
+        <h2 style="font-size: 1.1rem; margin: 0;" data-i18n="menuData">Ringkasan Laporan</h2>
+      </div>
     </div>
 
     <!-- HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
-      <div class="header-pagination-container">
-        <h2 style="font-size: 1.3rem; margin: 0;" data-i18n="menuSettings">Pengaturan Sistem</h2>
-      </div>
-      
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;" data-i18n="setTitleShop">Identitas Toko</h3>
         <div class="form-vertical">
@@ -611,6 +610,10 @@
 
       <div class="developer-info">
         Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)
+      </div>
+
+      <div class="header-pagination-container">
+        <h2 style="font-size: 1.1rem; margin: 0;" data-i18n="menuSettings">Pengaturan Sistem</h2>
       </div>
     </div>
 
