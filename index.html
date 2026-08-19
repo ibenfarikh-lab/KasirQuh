@@ -205,7 +205,7 @@
     .inline-page-btn { background: #2563eb; color: white; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; }
     .inline-page-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
-    .customer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 5px; }
+    .customer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .cust-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .cust-bookkeeping { background: var(--table-header); border: 1px dashed var(--input-border); border-radius: 8px; padding: 8px; font-size: 0.78rem; margin-top: 4px; }
 
@@ -2031,7 +2031,6 @@
     }
 
     function updateDropdowns(kategoriList) {
-      // Update dropdown stok
       const filterSelect = document.getElementById("filter-category");
       const currentVal = filterSelect.value;
       let html = `<option value="Semua">${translations[currentLang].allCategory || "Semua Kategori"}</option>`;
@@ -2040,7 +2039,6 @@
       });
       if (filterSelect.innerHTML !== html) filterSelect.innerHTML = html;
 
-      // Update dropdown kasir
       const filterPosSelect = document.getElementById("filter-category-pos");
       const currentPosVal = filterPosSelect.value;
       let htmlPos = `<option value="Semua">${translations[currentLang].allCategory || "Semua Kategori"}</option>`;
@@ -2120,19 +2118,21 @@
         let kat = item.kategori || "Umum";
         categories.add(kat);
 
-        // Filter untuk halaman Stok
         let matchSearch = (item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword));
         let matchKat = (filterKat === "Semua" || kat === filterKat);
         if (matchSearch && matchKat) {
           filteredItems.push({ code, ...item });
         }
 
-        // Filter untuk halaman Kasir
         let matchKatPos = (filterKatPos === "Semua" || kat === filterKatPos);
         if (matchKatPos) {
           filteredItemsPos.push({ code, ...item });
         }
       }
+
+      // Mengurutkan item berdasarkan Abjad (A-Z) nama produk
+      filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
+      filteredItemsPos.sort((a, b) => a.nama.localeCompare(b.nama));
 
       let itemsPerPageStok = getItemsPerPage(true);
 
