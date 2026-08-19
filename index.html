@@ -291,6 +291,13 @@
         </div>
       </div>
       
+      <!-- Filter Kategori di Halaman Kasir -->
+      <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <select id="filter-category-pos" onchange="refreshData()" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+          <option value="Semua" data-i18n="allCategory">Semua Kategori</option>
+        </select>
+      </div>
+
       <div class="pos-container">
         <div class="card no-print" style="margin-bottom: 0;">
           <h3 style="margin-top: 0; font-size: 0.95rem;" data-i18n="availableItems">📦 Daftar Barang Tersedia</h3>
@@ -375,6 +382,7 @@
         </div>
       </div>
 
+      <!-- Diperbarui: Kategori sejajar di sebelah kiri ekspor & impor stok -->
       <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
         <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
           <select id="filter-category" onchange="refreshData()" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
@@ -1708,7 +1716,7 @@
 
       cart.forEach((item, idx) => {
         let unitText = item.satuan === 'kg' ? 'Kg' : 'x';
-        text += `${idx + 1}. ${item.nama}\n   ${item.qty} ${unitText} @Rp ${item.harga.toLocaleString('id-ID')} = *Rp ${item.subtotal.toLocaleString('id-ID')}*\n`;
+        text += `${idx + 1}. ${item.nama}\n   ${item.qty} ${unitText} @Rp ${item.harga.toLocaleString('id-ID')} = *Rp ${item.subtotal.toLocaleString('id-ID')}* \n`;
       });
 
       let kembalian = bayar - totalBelanja;
@@ -2026,6 +2034,7 @@
     }
 
     function updateDropdowns(kategoriList) {
+      // Update dropdown stok
       const filterSelect = document.getElementById("filter-category");
       const currentVal = filterSelect.value;
       let html = `<option value="Semua">${translations[currentLang].allCategory || "Semua Kategori"}</option>`;
@@ -2033,6 +2042,15 @@
         html += `<option value="${kat}" ${kat === currentVal ? "selected" : ""}>${kat}</option>`;
       });
       if (filterSelect.innerHTML !== html) filterSelect.innerHTML = html;
+
+      // Update dropdown kasir
+      const filterPosSelect = document.getElementById("filter-category-pos");
+      const currentPosVal = filterPosSelect.value;
+      let htmlPos = `<option value="Semua">${translations[currentLang].allCategory || "Semua Kategori"}</option>`;
+      kategoriList.forEach(kat => {
+        htmlPos += `<option value="${kat}" ${kat === currentPosVal ? "selected" : ""}>${kat}</option>`;
+      });
+      if (filterPosSelect.innerHTML !== htmlPos) filterPosSelect.innerHTML = htmlPos;
     }
 
     function simpanPengaturanToko() {
@@ -2093,19 +2111,30 @@
 
       let categories = new Set();
       const filterKat = document.getElementById("filter-category").value;
+      const filterKatPos = document.getElementById("filter-category-pos").value;
       const searchInputEl = document.getElementById("inventory-search-input");
       const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
       let filteredItems = [];
+      let filteredItemsPos = [];
+
       for (let code in databaseProduk) {
         let item = databaseProduk[code];
         let kat = item.kategori || "Umum";
         categories.add(kat);
 
-        if (!(item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword))) continue;
-        if (filterKat !== "Semua" && kat !== filterKat) continue;
+        // Filter untuk halaman Stok
+        let matchSearch = (item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword));
+        let matchKat = (filterKat === "Semua" || kat === filterKat);
+        if (matchSearch && matchKat) {
+          filteredItems.push({ code, ...item });
+        }
 
-        filteredItems.push({ code, ...item });
+        // Filter untuk halaman Kasir
+        let matchKatPos = (filterKatPos === "Semua" || kat === filterKatPos);
+        if (matchKatPos) {
+          filteredItemsPos.push({ code, ...item });
+        }
       }
 
       let itemsPerPageStok = getItemsPerPage(true);
@@ -2184,7 +2213,7 @@
       }
 
       updateDropdowns(Array.from(categories));
-      renderKatalogKasirPaginated(filteredItems);
+      renderKatalogKasirPaginated(filteredItemsPos);
 
       const repBody = document.getElementById("report-body");
       repBody.innerHTML = "";
