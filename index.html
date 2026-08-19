@@ -291,7 +291,12 @@
         </div>
       </div>
       
-      <!-- Filter Kategori di Halaman Kasir (Dibuat full 100% lebar layar) -->
+      <!-- Kolom Pencarian Instan di Halaman Kasir (Serupa dengan Halaman Stok) -->
+      <div style="margin-bottom: 8px; width: 100%;">
+        <input type="text" id="pos-search-input" placeholder="🔍 Cari nama / kode barang di kasir..." oninput="syncAndFilterGlobal(this.value)" style="padding: 9px 12px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;" data-i18n-placeholder="searchPlaceholder">
+      </div>
+
+      <!-- Filter Kategori di Halaman Kasir -->
       <div style="display: flex; margin-bottom: 12px; width: 100%;">
         <select id="filter-category-pos" onchange="refreshData()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
           <option value="Semua" data-i18n="allCategory">Semua Kategori</option>
@@ -1375,9 +1380,9 @@
       const activeInputId = document.activeElement ? document.activeElement.id : null;
       refreshData(); 
       
-      if (activeInputId === 'inventory-search-input') {
-        const inputEl = document.getElementById('inventory-search-input');
-        if (inputEl) {
+      if (activeInputId) {
+        const inputEl = document.getElementById(activeInputId);
+        if (inputEl && (activeInputId === 'inventory-search-input' || activeInputId === 'pos-search-input')) {
           inputEl.focus();
           const len = inputEl.value.length;
           inputEl.setSelectionRange(len, len);
@@ -2118,8 +2123,12 @@
       let categories = new Set();
       const filterKat = document.getElementById("filter-category").value;
       const filterKatPos = document.getElementById("filter-category-pos").value;
+      
       const searchInputEl = document.getElementById("inventory-search-input");
       const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
+
+      const posSearchInputEl = document.getElementById("pos-search-input");
+      const posSearchKeyword = posSearchInputEl ? posSearchInputEl.value.toLowerCase() : "";
 
       let filteredItems = [];
       let filteredItemsPos = [];
@@ -2135,8 +2144,9 @@
           filteredItems.push({ code, ...item });
         }
 
+        let matchSearchPos = (item.nama.toLowerCase().includes(posSearchKeyword) || code.toLowerCase().includes(posSearchKeyword));
         let matchKatPos = (filterKatPos === "Semua" || kat === filterKatPos);
-        if (matchKatPos) {
+        if (matchSearchPos && matchKatPos) {
           filteredItemsPos.push({ code, ...item });
         }
       }
