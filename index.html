@@ -49,7 +49,7 @@
     }
 
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-    body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-color); flex-direction: column; transition: background-color 0.3s, color 0.3s; }
+    body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-color); flex-direction: column; transition: background-color 0.3s, color 0.3s; overflow: hidden; }
     
     .login-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -63,7 +63,7 @@
     .login-card h2 { margin-top: 0; margin-bottom: 5px; color: #0f172a; font-size: 1.5rem; }
     .login-card p { color: #64748b; font-size: 0.85rem; margin-bottom: 20px; }
     
-    .main-content { flex: 1; padding: 20px; padding-bottom: 100px; overflow-y: auto; overflow-x: hidden; position: relative; }
+    .main-content { flex: 1; padding: 15px; padding-bottom: 90px; overflow-y: auto; overflow-x: hidden; position: relative; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
@@ -73,15 +73,15 @@
     .sub-tab-content { display: none; }
     .sub-tab-content.active { display: block; }
     
-    .fab-container { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; z-index: 9999; }
+    .fab-container { position: fixed; bottom: 70px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 9999; }
     
     .fab-main, .fab-scanner, .fab-add { 
-      width: 50px; height: 50px; background-color: #2563eb; color: white; border-radius: 50%; 
+      width: 45px; height: 45px; background-color: #2563eb; color: white; border-radius: 50%; 
       display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); 
       border: none; cursor: pointer; transition: transform 0.2s, background-color 0.2s; position: relative; padding: 0;
     }
     .fab-main:hover, .fab-scanner:hover, .fab-add:hover { background-color: #1d4ed8; transform: scale(1.05); }
-    .fab-main svg, .fab-scanner svg, .fab-add svg { width: 24px; height: 24px; fill: #ffffff; display: block; }
+    .fab-main svg, .fab-scanner svg, .fab-add svg { width: 22px; height: 22px; fill: #ffffff; display: block; }
 
     .fab-menu-panel { display: none; background: var(--card-bg); padding: 8px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid var(--border-color); flex-direction: column; gap: 4px; width: 180px; animation: fadeIn 0.2s ease-in-out; }
     .fab-menu-panel.show { display: flex; }
@@ -199,29 +199,25 @@
     .inv-card-details { background: var(--table-header); padding: 6px; border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
     .inv-card-row { display: flex; justify-content: space-between; }
 
-    /* Sticky Header & Pagination Container persis di paling bawah (di atas FAB & batas layar bawah) */
-    .header-pagination-container { 
+    /* Bar Bawah Permanen (Fixed Footer Bar) seperti Address Bar / Navigasi Browser */
+    .permanent-bottom-bar { 
+      position: fixed; 
+      bottom: 0; 
+      left: 0; 
+      width: 100%; 
+      background-color: var(--card-bg); 
+      border-top: 1px solid var(--border-color); 
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.06); 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      margin-top: 15px; 
-      margin-bottom: 0px; 
-      flex-wrap: wrap; 
-      gap: 6px; 
-      width: 100%; 
-      position: sticky; 
-      bottom: 0; 
-      background-color: var(--bg-color); 
-      padding-top: 8px; 
-      padding-bottom: 8px; 
-      border-top: 1px solid var(--border-color);
-      box-shadow: 0 -3px 8px rgba(0,0,0,0.04);
-      z-index: 10; 
+      padding: 10px 16px; 
+      z-index: 998; 
     }
 
-    .inline-pagination { display: none; align-items: center; gap: 4px; background: var(--card-bg); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 6px; font-size: 0.75rem; }
+    .inline-pagination { display: none; align-items: center; gap: 6px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; }
     .inline-pagination.show { display: flex; }
-    .inline-page-btn { background: #2563eb; color: white; border: none; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
+    .inline-page-btn { background: #2563eb; color: white; border: none; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
     .inline-page-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
     .customer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
@@ -268,10 +264,10 @@
     .developer-info a:hover { text-decoration: underline; }
 
     @media (max-width: 768px) {
-      .main-content { padding: 10px; padding-bottom: 100px; }
+      .main-content { padding: 10px; padding-bottom: 95px; }
       .inventory-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
       .product-catalog-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-      .fab-container { bottom: 20px; right: 20px; }
+      .fab-container { bottom: 65px; right: 15px; }
     }
 
     @media print {
@@ -313,15 +309,6 @@
           <h3 style="margin-top: 0; font-size: 0.95rem;" data-i18n="availableItems">📦 Daftar Barang Tersedia</h3>
           <div class="product-catalog-grid" id="pos-catalog-container"></div>
           <div class="product-catalog-list" id="pos-catalog-list-container" style="display: none;"></div>
-        </div>
-      </div>
-
-      <div class="header-pagination-container">
-        <h2 style="font-size: 1.1rem; margin: 0;" data-i18n="menuPos">Halaman Kasir</h2>
-        <div class="inline-pagination" id="pos-pagination-wrapper">
-          <button class="inline-page-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀</button>
-          <span id="pos-page-info">1/1</span>
-          <button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">▶</button>
         </div>
       </div>
 
@@ -405,15 +392,6 @@
 
       <div id="inventory-list-wrapper" class="inventory-list"></div>
       <div id="inventory-grid-wrapper" class="inventory-grid" style="display: none;"></div>
-
-      <div class="header-pagination-container">
-        <h2 style="font-size: 1.1rem; margin: 0;" data-i18n="menuStock">Manajemen Stok</h2>
-        <div class="inline-pagination" id="stok-pagination-wrapper">
-          <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
-          <span id="stok-page-info">1/1</span>
-          <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
-        </div>
-      </div>
     </div>
 
     <div class="fab-container no-print">
@@ -531,10 +509,6 @@
           </table>
         </div>
       </div>
-
-      <div class="header-pagination-container">
-        <h2 style="font-size: 1.1rem; margin: 0;" data-i18n="menuData">Ringkasan Laporan</h2>
-      </div>
     </div>
 
     <!-- HALAMAN PENGATURAN -->
@@ -611,12 +585,27 @@
       <div class="developer-info">
         Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)
       </div>
-
-      <div class="header-pagination-container">
-        <h2 style="font-size: 1.1rem; margin: 0;" data-i18n="menuSettings">Pengaturan Sistem</h2>
-      </div>
     </div>
 
+  </div>
+
+  <!-- PERMANENT BOTTOM BAR (Bar Permanen Bawah Seragam di Luar Area Scroll) -->
+  <div class="permanent-bottom-bar no-print">
+    <h2 id="permanent-title" style="font-size: 1.05rem; margin: 0; font-weight: 700;">Halaman Kasir</h2>
+    
+    <!-- Paginasi Kasir -->
+    <div class="inline-pagination" id="pos-pagination-wrapper">
+      <button class="inline-page-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀</button>
+      <span id="pos-page-info">1/1</span>
+      <button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">▶</button>
+    </div>
+
+    <!-- Paginasi Stok -->
+    <div class="inline-pagination" id="stok-pagination-wrapper">
+      <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
+      <span id="stok-page-info">1/1</span>
+      <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
+    </div>
   </div>
 
   <div id="productModal" class="modal-backdrop">
@@ -844,6 +833,7 @@
 
       const langSelect = document.getElementById("setting-language");
       if (langSelect) langSelect.value = lang;
+      updatePermanentBarTitle();
     }
 
     function gantiBahasa(lang) { setLanguage(lang); }
@@ -1344,6 +1334,32 @@
         document.getElementById('fab-add-btn').style.display = 'none';
         document.getElementById('fab-add-cust-btn').style.display = 'none';
       }
+      updatePermanentBarTitle();
+    }
+
+    function updatePermanentBarTitle() {
+      const titleEl = document.getElementById("permanent-title");
+      const posPag = document.getElementById("pos-pagination-wrapper");
+      const stokPag = document.getElementById("stok-pagination-wrapper");
+
+      posPag.classList.remove("show");
+      stokPag.classList.remove("show");
+
+      if (activeTab === 'penjualan') {
+        titleEl.innerText = translations[currentLang].menuPos || "Kasir";
+        posPag.classList.add("show");
+      } else if (activeTab === 'data-barang') {
+        titleEl.innerText = translations[currentLang].menuStock || "Manajemen Stok";
+        stokPag.classList.add("show");
+      } else if (activeTab === 'laporan') {
+        if (activeSubDataTab === 'sub-pelanggan') {
+          titleEl.innerText = translations[currentLang].subCust || "Data Pelanggan";
+        } else {
+          titleEl.innerText = translations[currentLang].subReport || "Laporan Transaksi";
+        }
+      } else if (activeTab === 'pengaturan') {
+        titleEl.innerText = translations[currentLang].menuSettings || "Pengaturan Sistem";
+      }
     }
 
     function switchTab(tabId, pushHistory = true) {
@@ -1380,6 +1396,7 @@
       } else {
         fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
       }
+      updatePermanentBarTitle();
       refreshData();
     }
 
@@ -2159,7 +2176,6 @@
           filteredItems.push({ code, ...item });
         }
 
-        // Halaman Kasir otomatis menyaring berdasarkan FAB Search (inventory-search-input)
         let matchSearchPos = (item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword));
         let matchKatPos = (filterKatPos === "Semua" || kat === filterKatPos);
         if (matchSearchPos && matchKatPos) {
@@ -2167,7 +2183,6 @@
         }
       }
 
-      // Mengurutkan item berdasarkan Abjad (A-Z) nama produk
       filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
       filteredItemsPos.sort((a, b) => a.nama.localeCompare(b.nama));
 
@@ -2183,12 +2198,9 @@
 
       const stokPaginationWrapper = document.getElementById("stok-pagination-wrapper");
       if (filteredItems.length > 0) {
-        stokPaginationWrapper.classList.add("show");
         document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
         document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
         document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
-      } else {
-        stokPaginationWrapper.classList.remove("show");
       }
 
       if (paginatedStokItems.length === 0) {
@@ -2347,14 +2359,10 @@
       let posEndIndex = posStartIndex + itemsPerPagePos;
       let paginatedPosItems = filteredItems.slice(posStartIndex, posEndIndex);
 
-      const posPaginationWrapper = document.getElementById("pos-pagination-wrapper");
       if (filteredItems.length > 0) {
-        posPaginationWrapper.classList.add("show");
         document.getElementById("pos-page-info").innerText = `${posCurrentPage}/${totalPosPages}`;
         document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
         document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
-      } else {
-        posPaginationWrapper.classList.remove("show");
       }
 
       if (paginatedPosItems.length === 0) {
@@ -2417,6 +2425,7 @@
     setLanguage(currentLang);
     setTheme(currentTheme);
     cekStatusLogin();
+    updatePermanentBarTitle();
   </script>
 </body>
 </html>
