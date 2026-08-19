@@ -775,7 +775,7 @@
         btnResetHist: "Clear Transaction History", btnResetProd: "Delete All Product Database", setTitleSession: "Application Session", btnLogout: "🚪 Logout",
         modalAddProd: "Add New Product", labelProdName: "Product Name", labelProdCode: "Barcode Code (Optional):", placeholderAutoCode: "Leave blank to auto-generate",
         labelProdKat: "Category (Optional):", labelProdUnit: "Product Unit:", unitPcs: "Pcs (Unit Item)", unitKg: "Kilogram / Kg (Scale Weight)",
-        labelProdStock: "Stock Quantity (Pcs):", labelProdCost: "Cost Price (Rp):", labelProdPrice: "Selling Price (Rp):", labelProdImg: "Product Image (Optional):",
+        labelProdStock: "Stock Quantity (Pcs):", labelProdCost: "Cost Price (Rp):", labelProdPrice: "Selling Price (Rp):", labelProdImage: "Product Image (Optional):",
         btnSaveProd: "Save Product", modalAddCust: "Add New Customer", labelCustName: "Customer Name", labelCustPhone: "Phone Number / WhatsApp:", labelCustAddress: "Address:",
         btnSaveCust: "Save Customer", modalAddNote: "Add Customer Note", labelNoteDate: "Note Date & Time:", labelNoteType: "Note Type:", noteType1: "Shopping (unpaid)",
         noteType2: "Debt / Tab", noteType3: "General Note / Description", labelNoteAmount: "Amount (Rp) - Optional:", labelNoteDesc: "Description / Content:", btnSaveNote: "Save Note"
@@ -969,7 +969,6 @@
     let stokCurrentPage = 1;
     let posCurrentPage = 1;
 
-    // Diatur kembali menjadi tepat 25 item per halaman untuk semua halaman Kasir & Stok
     function getItemsPerPage(isInventory = false) {
       return 25;
     }
@@ -1779,7 +1778,7 @@
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = 120; canvas.height = 120;
-            canvas.drawImage(img, 0, 0, 120, 120);
+            ctx.drawImage(img, 0, 0, 120, 120);
             commitCloudSave(code, name, category, unit, stock, cost, price, canvas.toDataURL('image/jpeg', 0.7));
           };
         };
@@ -2371,20 +2370,19 @@
             </div>
           `;
 
+          // Mode List: Tombol + di atas, angka kuantiti di tengah vertikal, tombol - di bawah
           catalogList.innerHTML += `
             <div class="catalog-list-item">
-              <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
-                <img src="${fotoSrc}" class="catalog-list-img">
-                <div style="min-width: 0;">
-                  <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p.nama}">${p.nama}</div>
-                  <div style="font-size: 0.75rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'};">Stok: ${stok} ${sat}</div>
-                  <div style="font-size: 0.78rem; font-weight: bold; color: #2563eb;">Rp ${p.harga.toLocaleString('id-ID')}${unitLabel}</div>
-                </div>
+              <div style="display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 32px; align-items: center;">
+                <button class="btn-side-action btn-side-plus" style="width: 32px; height: 32px; border-radius: 6px; font-size: 1rem;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
+                <span style="font-size: 0.85rem; font-weight: bold; text-align: center; line-height: 20px;">${currentQtyInCart}</span>
+                <button class="btn-side-action btn-side-minus" style="width: 32px; height: 32px; border-radius: 6px; font-size: 1rem;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
               </div>
-              <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
-                <button class="btn-side-action btn-side-minus" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
-                <span style="font-size: 0.85rem; font-weight: bold; min-width: 20px; text-align: center;">${currentQtyInCart}</span>
-                <button class="btn-side-action btn-side-plus" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
+              <img src="${fotoSrc}" class="catalog-list-img">
+              <div style="min-width: 0; flex: 1;">
+                <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p.nama}">${p.nama}</div>
+                <div style="font-size: 0.75rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'};">Stok: ${stok} ${sat}</div>
+                <div style="font-size: 0.78rem; font-weight: bold; color: #2563eb;">Rp ${p.harga.toLocaleString('id-ID')}${unitLabel}</div>
               </div>
             </div>
           `;
