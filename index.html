@@ -376,7 +376,10 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+          <select id="filter-category" onchange="refreshData()" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+            <option value="Semua" data-i18n="allCategory">Semua Kategori</option>
+          </select>
           <button onclick="eksporStokExcel()" style="background: #107c41; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">Ekspor Stok</button>
           <label style="background: #2563eb; color: white; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
             Impor Stok
@@ -399,10 +402,6 @@
       <div id="fab-stok-panel" class="fab-filter-panel">
         <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama / kode..." oninput="syncAndFilterGlobal(this.value)" onkeypress="handleEnterSearch(event)" style="padding: 8px; font-size: 0.8rem;" data-i18n-placeholder="searchPlaceholder">
         
-        <select id="filter-category" onchange="refreshData()" style="padding: 8px; font-size: 0.8rem;">
-          <option value="Semua" data-i18n="allCategory">Semua Kategori</option>
-        </select>
-
         <div style="display: flex; gap: 4px; background: var(--border-color); padding: 3px; border-radius: 8px;">
           <button id="btn-view-list" class="view-toggle-btn active" onclick="setViewMode('list')" title="Tampilan List" data-i18n="viewList">📋 List</button>
           <button id="btn-view-grid" class="view-toggle-btn" onclick="setViewMode('grid')" title="Tampilan Grid" data-i18n="viewGrid">🔲 Grid</button>
