@@ -73,7 +73,6 @@
     .sub-tab-content { display: none; }
     .sub-tab-content.active { display: block; }
     
-    /* Tombol FAB Melayang Lainnya */
     .fab-container { position: fixed; bottom: 70px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; z-index: 9999; }
     
     .fab-main, .fab-scanner, .fab-add { 
@@ -84,21 +83,11 @@
     .fab-main:hover, .fab-scanner:hover, .fab-add:hover { background-color: #1d4ed8; transform: scale(1.05); }
     .fab-main svg, .fab-scanner svg, .fab-add svg { width: 22px; height: 22px; fill: #ffffff; display: block; }
 
-    /* Panel Menu Popover di Pojok Kanan Atas Bar Bawah */
     .fab-menu-panel { 
-      display: none; 
-      position: absolute; 
-      bottom: 55px; 
-      right: 12px; 
-      background: var(--card-bg); 
-      padding: 8px; 
-      border-radius: 12px; 
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-      border: 1px solid var(--border-color); 
-      flex-direction: column; 
-      gap: 4px; 
-      width: 180px; 
-      z-index: 1000;
+      display: none; position: absolute; bottom: 55px; right: 12px; 
+      background: var(--card-bg); padding: 8px; border-radius: 12px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border-color); 
+      flex-direction: column; gap: 4px; width: 180px; z-index: 1000;
       animation: fadeIn 0.2s ease-in-out; 
     }
     .fab-menu-panel.show { display: flex; }
@@ -107,19 +96,11 @@
 
     .cart-badge { position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; border-radius: 50%; padding: 2px 6px; border: 2px solid white; }
 
-    /* Kotak Sticky Pencarian Full Bar di Atas */
     .sticky-search-bar {
-      display: none;
-      position: sticky;
-      top: 0;
-      z-index: 99;
-      background: var(--card-bg);
-      padding: 10px 12px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      border: 1px solid var(--border-color);
-      margin-bottom: 12px;
-      animation: fadeIn 0.2s ease-in-out;
+      display: none; position: sticky; top: 0; z-index: 99;
+      background: var(--card-bg); padding: 10px 12px; border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid var(--border-color);
+      margin-bottom: 12px; animation: fadeIn 0.2s ease-in-out;
     }
     .sticky-search-bar.show { display: block; }
 
@@ -190,8 +171,10 @@
     .catalog-name { font-size: 0.8rem; font-weight: bold; color: var(--text-color); width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
     .catalog-price { font-size: 0.8rem; color: #2563eb; font-weight: bold; margin-bottom: 6px; }
 
+    /* Gaya Tampilan Katalog List di Kasir */
     .product-catalog-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .catalog-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+    .catalog-list-img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); background: var(--border-color); flex-shrink: 0; }
 
     .cart-table-wrapper { width: 100%; margin-top: 5px; }
     .cart-table { width: 100%; border-collapse: collapse; background: var(--card-bg); font-size: 0.8rem; table-layout: fixed; color: var(--text-color); }
@@ -226,41 +209,19 @@
     .inv-card-details { background: var(--table-header); padding: 6px; border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
     .inv-card-row { display: flex; justify-content: space-between; }
 
-    /* Bar Bawah Permanen (Fixed Footer Bar) dengan Tombol Menu Saja di Pojok Kanan */
     .permanent-bottom-bar { 
-      position: fixed; 
-      bottom: 0; 
-      left: 0; 
-      width: 100%; 
-      background-color: var(--card-bg); 
-      border-top: 1px solid var(--border-color); 
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.06); 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      padding: 10px 16px; 
-      z-index: 998; 
+      position: fixed; bottom: 0; left: 0; width: 100%; 
+      background-color: var(--card-bg); border-top: 1px solid var(--border-color); 
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.06); display: flex; 
+      justify-content: space-between; align-items: center; padding: 10px 16px; z-index: 998; 
     }
 
-    .bottom-right-menu-container {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
+    .bottom-right-menu-container { position: relative; display: flex; align-items: center; }
 
     .btn-bar-menu {
-      background: #0f172a;
-      color: white;
-      border: none;
-      width: 38px;
-      height: 38px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s;
-      padding: 0;
+      background: #0f172a; color: white; border: none; width: 38px; height: 38px;
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.2s; padding: 0;
     }
     .btn-bar-menu:hover { background: #1e293b; }
     .btn-bar-menu svg { width: 20px; height: 20px; fill: #ffffff; }
@@ -354,6 +315,7 @@
       <div class="pos-container">
         <div class="card no-print" style="margin-bottom: 0;">
           <h3 style="margin-top: 0; font-size: 0.95rem;" data-i18n="availableItems">📦 Daftar Barang Tersedia</h3>
+          <!-- Katalog Kasir (Grid & List) -->
           <div class="product-catalog-grid" id="pos-catalog-container"></div>
           <div class="product-catalog-list" id="pos-catalog-list-container" style="display: none;"></div>
         </div>
@@ -441,7 +403,7 @@
       <div id="inventory-grid-wrapper" class="inventory-grid" style="display: none;"></div>
     </div>
 
-    <!-- Tombol-tombol FAB Melayang (Selain Menu) -->
+    <!-- Tombol-tombol FAB Melayang -->
     <div class="fab-container no-print">
       <button id="fab-scan-btn" class="fab-scanner" onclick="toggleScannerPos()" title="Buka/Tutup Scanner">
         <svg viewBox="0 0 24 24"><path d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h3v16H7V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h1v16h-1V4z"/></svg>
@@ -569,7 +531,7 @@
             <option value="dark" data-i18n="themeDark">Gelap (Dark)</option>
           </select>
 
-          <!-- Opsi Tampilan List atau Grid Baru di Pengaturan -->
+          <!-- Opsi Tampilan List atau Grid (Berlaku untuk Kasir & Stok) -->
           <label style="font-size: 0.85rem; margin-top: 5px;" data-i18n="labelViewMode">Tampilan Katalog / Stok:</label>
           <select id="setting-view-mode" onchange="gantiViewModeSetting(this.value)">
             <option value="grid" data-i18n="viewGridOption">Kotak (Grid)</option>
@@ -612,25 +574,22 @@
 
   </div>
 
-  <!-- PERMANENT BOTTOM BAR (Bar Permanen Bawah dengan Tombol Menu di Pojok Kanan) -->
+  <!-- PERMANENT BOTTOM BAR -->
   <div class="permanent-bottom-bar no-print">
     <h2 id="permanent-title" style="font-size: 1.05rem; margin: 0; font-weight: 700;">Halaman Kasir</h2>
     
-    <!-- Paginasi Kasir -->
     <div class="inline-pagination" id="pos-pagination-wrapper">
       <button class="inline-page-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀</button>
       <span id="pos-page-info">1/1</span>
       <button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">▶</button>
     </div>
 
-    <!-- Paginasi Stok -->
     <div class="inline-pagination" id="stok-pagination-wrapper">
       <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
       <span id="stok-page-info">1/1</span>
       <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
     </div>
 
-    <!-- Menu Utama di Pojok Kanan Bar Bawah -->
     <div class="bottom-right-menu-container">
       <div id="fab-menu-panel" class="fab-menu-panel">
         <button class="fab-menu-btn active" onclick="switchTab('penjualan', true)"><span>🛒</span> <span data-i18n="menuPos">Kasir</span></button>
@@ -2173,6 +2132,7 @@
       document.getElementById("receipt-shop-address").innerText = pengaturanToko.alamat;
       document.getElementById("receipt-shop-phone").innerText = "Telp: " + pengaturanToko.phone;
 
+      // Pengaturan Tampilan List/Grid di Halaman Stok
       document.getElementById('inventory-list-wrapper').style.display = (viewMode === 'list') ? 'flex' : 'none';
       document.getElementById('inventory-grid-wrapper').style.display = (viewMode === 'grid') ? 'grid' : 'none';
 
@@ -2371,10 +2331,12 @@
       const catalogGrid = document.getElementById("pos-catalog-container");
       const catalogList = document.getElementById("pos-catalog-list-container");
       if(!catalogGrid || !catalogList) return;
-      catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
+      
+      // Pengaturan Tampilan List/Grid di Halaman Kasir
+      catalogGrid.style.display = (viewMode === 'grid') ? 'grid' : 'none';
+      catalogList.style.display = (viewMode === 'list') ? 'flex' : 'none';
 
-      catalogGrid.style.display = 'grid'; 
-      catalogList.style.display = 'none';
+      catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
 
       let itemsPerPagePos = getItemsPerPage(false);
 
@@ -2407,6 +2369,7 @@
           let cartItem = cart.find(item => item.barcode === code);
           let currentQtyInCart = cartItem ? cartItem.qty : 0;
 
+          // Render Grid View Kasir
           catalogGrid.innerHTML += `
             <div class="catalog-item">
               <div class="catalog-item-inner">
@@ -2419,6 +2382,25 @@
               <div class="catalog-name" title="${p.nama}">${p.nama}</div>
               <div style="font-size: 0.68rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'}; margin-bottom: 2px;">Stok: ${stok} ${sat}</div>
               <div class="catalog-price">Rp ${p.harga.toLocaleString('id-ID')}<span style="font-size:0.65rem;">${unitLabel}</span></div>
+            </div>
+          `;
+
+          // Render List View Kasir
+          catalogList.innerHTML += `
+            <div class="catalog-list-item">
+              <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+                <img src="${fotoSrc}" class="catalog-list-img">
+                <div style="min-width: 0;">
+                  <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${p.nama}">${p.nama}</div>
+                  <div style="font-size: 0.75rem; color: ${isHabis ? '#dc2626' : 'var(--text-muted)'};">Stok: ${stok} ${sat}</div>
+                  <div style="font-size: 0.78rem; font-weight: bold; color: #2563eb;">Rp ${p.harga.toLocaleString('id-ID')}${unitLabel}</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+                <button class="btn-side-action btn-side-minus" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')" title="Kurangi">-</button>
+                <span style="font-size: 0.85rem; font-weight: bold; min-width: 20px; text-align: center;">${currentQtyInCart}</span>
+                <button class="btn-side-action btn-side-plus" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')" title="Tambah">+</button>
+              </div>
             </div>
           `;
         });
