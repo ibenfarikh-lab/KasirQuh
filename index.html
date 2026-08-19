@@ -169,14 +169,18 @@
     .view-toggle-btn { flex: 1; background: var(--border-color); color: var(--text-muted); border: 1px solid var(--input-border); padding: 6px 10px; font-size: 0.9rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
     .view-toggle-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
 
+    /* CSS BARU UNTUK LIST VIEW STOK YANG RAPI & TERSTRUKTUR */
     .inventory-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 5px; }
-    .inv-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; width: 100%; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
-    .inv-list-img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0; background: var(--border-color); }
+    .inv-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .inv-list-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0; background: var(--border-color); }
+    
     .inv-list-details { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-    .inv-list-title { font-weight: bold; font-size: 0.82rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .inv-list-sub { font-size: 0.72rem; color: var(--text-muted); display: flex; gap: 6px; align-items: center; }
-    .inv-list-price { font-size: 0.75rem; font-weight: 600; color: #2563eb; }
-    .inv-list-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .inv-list-title { font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .inv-list-sub { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .inv-list-price { font-size: 0.78rem; font-weight: 600; color: #2563eb; }
+    
+    .inv-list-actions { display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; width: 60px; }
+    .inv-list-actions button { width: 100%; padding: 5px 0; font-size: 0.7rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; text-align: center; }
 
     .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 5px; width: 100%; }
     .inv-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
@@ -213,7 +217,9 @@
     input, select, textarea { width: 100%; }
     button { background: #2563eb; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
     button:hover { background: #1d4ed8; }
-    .btn-danger { background: #ef4444; padding: 4px 6px; font-size: 0.72rem; border-radius: 6px; color: white; border: none; cursor: pointer; } .btn-danger:hover { background: #dc2626; }
+    .btn-danger { background: #ef4444; color: white; border: none; cursor: pointer; } 
+    .btn-danger:hover { background: #dc2626; }
+    .btn-edit { background: var(--border-color); color: var(--text-color); }
     .btn-logout { background: #ef4444; color: white; width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; font-weight: bold; margin-top: 10px; }
     .btn-logout:hover { background: #dc2626; }
     .btn-success { background: #16a34a; width: 100%; padding: 10px; margin-top: 8px; font-size: 0.95rem; border-radius: 8px; } .btn-success:hover { background: #15803d; }
@@ -1572,7 +1578,7 @@
             </td>
             <td style="text-align: right; font-weight: 600;">${item.subtotal.toLocaleString('id-ID')}</td>
             <td class="no-print" style="text-align: center;">
-              <button class="btn-danger" onclick="hapusCart(${index})">✕</button>
+              <button class="btn-danger" onclick="hapusCart(${index})" style="padding: 4px 6px; font-size: 0.72rem; border-radius: 6px;">✕</button>
             </td>
           </tr>
         `;
@@ -2060,7 +2066,6 @@
         filteredItems.push({ code, ...item });
       }
 
-      // Dynamic itemsPerPage for Inventory (Stock) -> List 5 items, Grid 4 items on mobile; 18/24 on desktop
       let itemsPerPageStok = getItemsPerPage(true);
 
       let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
@@ -2087,18 +2092,23 @@
           let stok = item.stok !== undefined ? item.stok : 0;
           let fotoSrc = item.foto || defaultPlaceholderImg;
           let margin = item.harga - item.modal;
-          let badgeStokClass = stok > 0 ? "badge-stok" : "badge-stok-habis";
 
+          // SUSUNAN BARU LIST VIEW STOK:
+          // 1. Nama barang
+          // 2. Barcode
+          // 3. Jumlah stok barang - kategori
+          // 4. Harga jual - keuntungan
           invList.innerHTML += `
             <div class="inv-list-item">
               <img src="${fotoSrc}" class="inv-list-img">
               <div class="inv-list-details">
                 <div class="inv-list-title" title="${item.nama}">${item.nama}</div>
-                <div class="inv-list-sub"><span>${code}</span> • <span class="badge-kat">${kat}</span> • <span class="${badgeStokClass}">Stok: ${stok} ${sat}</span></div>
-                <div class="inv-list-price">Rp ${item.harga.toLocaleString('id-ID')}/${sat} <span style="font-size:0.68rem; color:#16a34a;">(+${margin.toLocaleString('id-ID')})</span></div>
+                <div class="inv-list-sub">${code}</div>
+                <div class="inv-list-sub">${stok} ${sat} - ${kat}</div>
+                <div class="inv-list-price">Rp ${item.harga.toLocaleString('id-ID')} - <span style="color:#16a34a;">Rp ${margin.toLocaleString('id-ID')}</span></div>
               </div>
               <div class="inv-list-actions">
-                <button style="background: var(--border-color); color: var(--text-color); padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openProductModal('${code}')">Edit</button>
+                <button class="btn-edit" onclick="openProductModal('${code}')">Edit</button>
                 <button class="btn-danger" onclick="hapusBarang('${code}')">Hapus</button>
               </div>
             </div>
@@ -2112,7 +2122,7 @@
                   <div class="inv-card-title" title="${item.nama}">${item.nama}</div>
                   <div class="inv-card-code">${code}</div>
                   <div style="margin-top: 2px; display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
-                    <span class="badge-kat">${kat}</span><span class="${badgeStokClass}">Stok: ${stok} ${sat}</span>
+                    <span class="badge-kat">${kat}</span><span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">Stok: ${stok} ${sat}</span>
                   </div>
                 </div>
               </div>
@@ -2122,7 +2132,7 @@
                 <div class="inv-card-row" style="color: #16a34a;"><span>Untung:</span><b>Rp ${margin.toLocaleString('id-ID')}</b></div>
               </div>
               <div style="display: flex; gap: 4px;">
-                <button style="flex: 1; background: var(--border-color); color: var(--text-color); padding: 5px; font-size: 0.75rem; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="openProductModal('${code}')">Edit</button>
+                <button class="btn-edit" style="flex: 1; padding: 5px; font-weight: bold; border-radius: 6px;" onclick="openProductModal('${code}')">Edit</button>
                 <button class="btn-danger" style="flex: 1; padding: 5px; font-weight: bold; border-radius: 6px;" onclick="hapusBarang('${code}')">Hapus</button>
               </div>
             </div>
@@ -2179,7 +2189,7 @@
                     <div style="font-size: 0.65rem; color: var(--text-muted);">${note.waktu}</div>
                   </div>
                   <div style="display: flex; gap: 4px;">
-                    <button style="background: var(--border-color); color: var(--text-color); padding: 2px 6px; font-size: 0.68rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openBookkeepingModal('${c.id}', '${note.id}')">Edit</button>
+                    <button class="btn-edit" style="padding: 2px 6px; font-size: 0.68rem; border-radius: 6px;" onclick="openBookkeepingModal('${c.id}', '${note.id}')">Edit</button>
                     <button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem; border-radius: 6px;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button>
                   </div>
                 </div>
@@ -2199,8 +2209,8 @@
                 <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end;">
                   <button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button>
                   <button style="background: #25D366; color: white; padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="bagikanCatatanWhatsApp('${c.id}')">💬 WA</button>
-                  <button style="background: var(--border-color); color: var(--text-color); padding: 4px 8px; font-size: 0.72rem; border: none; border-radius: 6px; cursor: pointer;" onclick="openCustomerModal('${c.id}')">Edit</button>
-                  <button class="btn-danger" style="border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
+                  <button class="btn-edit" style="padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openCustomerModal('${c.id}')">Edit</button>
+                  <button class="btn-danger" style="padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
                 </div>
               </div>
               <div class="cust-bookkeeping">
@@ -2221,7 +2231,6 @@
       if (viewMode === 'grid') { catalogGrid.style.display = 'grid'; catalogList.style.display = 'none'; }
       else { catalogGrid.style.display = 'none'; catalogList.style.display = 'flex'; }
 
-      // Dynamic itemsPerPage for POS (Kasir) -> List 7 items, Grid 4 items on mobile; 18/24 on desktop
       let itemsPerPagePos = getItemsPerPage(false);
 
       let totalPosPages = Math.ceil(filteredItems.length / itemsPerPagePos) || 1;
