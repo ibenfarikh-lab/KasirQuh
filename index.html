@@ -266,6 +266,8 @@
     .btn-success { background: #16a34a; width: 100%; padding: 10px; margin-top: 8px; font-size: 0.95rem; border-radius: 8px; } .btn-success:hover { background: #15803d; }
     .btn-whatsapp { background: #25D366; width: 100%; padding: 10px; margin-top: 6px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; }
     .btn-whatsapp:hover { background: #1ebe5d; }
+    .btn-clear-cart { background: #64748b; width: 100%; padding: 10px; margin-top: 6px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; }
+    .btn-clear-cart:hover { background: #475569; }
     
     .summary-box { background: var(--table-header); padding: 10px; border-radius: 8px; margin-top: 8px; text-align: right; border: 1px solid var(--border-color); }
     .badge-kat { background: var(--border-color); color: var(--text-color); padding: 2px 6px; border-radius: 6px; font-size: 0.65rem; font-weight: 600; display: inline-block; white-space: nowrap; }
@@ -373,6 +375,9 @@
           <button class="btn-whatsapp no-print" onclick="bagikanStrukWhatsApp()">
             <svg style="width: 18px; height: 18px; fill: currentColor;" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.124-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
             <span data-i18n="btnShareWa">Bagikan Struk via WhatsApp</span>
+          </button>
+          <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" data-i18n="btnClearCart">
+            🗑️ Kosongkan Keranjang
           </button>
         </div>
       </div>
@@ -757,7 +762,7 @@
         availableItems: "📦 Daftar Barang Tersedia", shoppingCart: "Keranjang Belanja", thItem: "Barang",
         thQty: "Qty / Berat", thTotal: "Total", totalLabel: "Total", payCash: "Tunai", placeholderNominal: "Nominal Bayar",
         placeholderWa: "No. WhatsApp Pelanggan (Cth: 08123...)", changeLabel: "Kembalian", btnFinishPrint: "Selesai & Cetak Struk",
-        btnShareWa: "Bagikan Struk via WhatsApp", searchPlaceholder: "🔍 Cari nama / kode barang...", allCategory: "Semua Kategori",
+        btnShareWa: "Bagikan Struk via WhatsApp", btnClearCart: "🗑️ Kosongkan Keranjang", searchPlaceholder: "🔍 Cari nama / kode barang...", allCategory: "Semua Kategori",
         labelViewMode: "Tampilan Katalog / Stok:", viewGridOption: "Kotak (Grid)", viewListOption: "Daftar (List)",
         subCust: "👥 Data Pelanggan", subReport: "📋 Laporan Transaksi",
         dashOmset: "TOTAL OMSET", dashProfit: "KEUNTUNGAN BERSIH", dashTrans: "TRANSAKSI SUKSES", dashItems: "TOTAL ITEM BARANG",
@@ -781,7 +786,7 @@
         btnLogin: "Login", menuPos: "POS", menuStock: "Stock", menuData: "Data", menuSettings: "Settings",
         availableItems: "📦 Available Products", shoppingCart: "Shopping Cart", thItem: "Product", thQty: "Qty / Weight",
         thTotal: "Total", totalLabel: "Total", payCash: "Cash", placeholderNominal: "Payment Amount", placeholderWa: "Customer WhatsApp No. (Ex: 08123...)",
-        changeLabel: "Change", btnFinishPrint: "Finish & Print Receipt", btnShareWa: "Share Receipt via WhatsApp", searchPlaceholder: "🔍 Search name / code...",
+        changeLabel: "Change", btnFinishPrint: "Finish & Print Receipt", btnShareWa: "Share Receipt via WhatsApp", btnClearCart: "🗑️ Clear Cart", searchPlaceholder: "🔍 Search name / code...",
         allCategory: "All Categories", labelViewMode: "Catalog / Stock View:", viewGridOption: "Grid", viewListOption: "List",
         subCust: "👥 Customer Data", subReport: "📋 Transaction Report",
         dashOmset: "TOTAL REVENUE", dashProfit: "NET PROFIT", dashTrans: "SUCCESS TRANSACTIONS", dashItems: "TOTAL ITEMS", btnExport: "Export Report (CSV)",
@@ -803,7 +808,7 @@
         btnLogin: "تسجيل الدخول", menuPos: "الكاشير", menuStock: "المخزون", menuData: "البيانات", menuSettings: "الإعدادات",
         availableItems: "📦 المنتجات المتاحة", shoppingCart: "سلة التسوق", thItem: "المنتج", thQty: "الكمية / الوزن", thTotal: "المجموع", totalLabel: "المجموع",
         payCash: "نقداً", placeholderNominal: "المبلغ المدفوع", placeholderWa: "رقم واتساب العميل...", changeLabel: "الباقي", btnFinishPrint: "إنهاء وطباعة الإيصال",
-        btnShareWa: "مشاركة الإيصال عبر واتساب", searchPlaceholder: "🔍 بحث بالاسم أو الكود...", allCategory: "جميع الفئات", labelViewMode: "عرض الكتالوج / المخزون:", viewGridOption: "شبكة (Grid)", viewListOption: "قائمة (List)",
+        btnShareWa: "مشاركة الإيصال عبر واتساب", btnClearCart: "🗑️ تفريغ السلة", searchPlaceholder: "🔍 بحث بالاسم أو الكود...", allCategory: "جميع الفئات", labelViewMode: "عرض الكتالوج / المخزون:", viewGridOption: "شبكة (Grid)", viewListOption: "قائمة (List)",
         subCust: "👥 بيانات العملاء", subReport: "📋 تقرير المعاملات", dashOmset: "إجمالي الإيرادات", dashProfit: "صافي الربح", dashTrans: "المعاملات الناجحة",
         dashItems: "إجمالي الأصناف", btnExport: "تصدير التقرير (CSV)", thTime: "الوقت", thMethod: "الطريقة", thQtyKg: "الكمية/كغ", thOmset: "الإيراد", thProfit: "الربح",
         setTitleShop: "هوية المتجر", labelShopName: "اسم المتجر / النشاط:", labelShopAddress: "عنوان المتجر:", labelShopPhone: "رقم الهاتق / واتساب:", btnSaveProfile: "حفظ الملف الشخصي",
@@ -867,7 +872,6 @@
 
     function gantiTema(theme) { setTheme(theme); }
 
-    // Listener otomatis jika opsi 'auto' dipilih dan pengguna mengubah tema perangkat HP
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
       if (currentTheme === 'auto') {
         document.body.setAttribute('data-theme', e.matches ? 'dark' : 'light');
@@ -1685,6 +1689,16 @@
       cart.splice(i, 1); 
       renderCart(); 
       refreshData();
+    }
+
+    function kosongkanKeranjang() {
+      if (cart.length === 0) return alert("Keranjang sudah kosong!");
+      if (confirm("Apakah Anda yakin ingin mengosongkan seluruh isi keranjang?")) {
+        cart = [];
+        renderCart();
+        refreshData();
+        showNotif("Keranjang dikosongkan");
+      }
     }
 
     function togglePayMethod() {
