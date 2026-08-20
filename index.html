@@ -646,7 +646,7 @@
   <div id="productModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 id="modal-title">Tambah Barang Belanja Stok</h3>
+        <h3 id="modal-title">Tambah Barang Stok</h3>
         <button class="btn-close-modal" onclick="closeProductModal()">&times;</button>
       </div>
       <div class="form-group">
@@ -684,7 +684,7 @@
             </select>
           </div>
           <div style="flex: 1; min-width: 130px;">
-            <label id="lbl-db-stock" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Jumlah Beli:</label>
+            <label id="lbl-db-stock" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Jumlah Stok:</label>
             <input type="number" step="any" id="db-stock" placeholder="0" min="0">
           </div>
         </div>
@@ -710,7 +710,7 @@
           <input type="hidden" id="db-selected-online-img" value="">
         </div>
 
-        <button id="modal-submit-btn" onclick="tambahkanKeBelanjaStok()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px; background: #16a34a;">Tambahkan ke Belanja Stok</button>
+        <button id="modal-submit-btn" onclick="simpanBarangLangsung()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px; background: #16a34a;">Simpan ke Stok</button>
       </div>
     </div>
   </div>
@@ -1033,10 +1033,23 @@
         document.getElementById("db-cost").value = (p.modal || 0).toLocaleString('id-ID');
         document.getElementById("db-price").value = (p.harga || 0).toLocaleString('id-ID');
         document.getElementById("db-selected-online-img").value = p.foto || "";
-      } else {
+      } else if (activeTab === 'belanja-stok') {
         title.innerText = "Tambah Barang Belanja Stok";
         submitBtn.innerText = "Tambahkan ke Belanja Stok";
         submitBtn.setAttribute("onclick", "tambahkanKeBelanjaStok()");
+
+        document.getElementById("db-code").value = "";
+        document.getElementById("db-name").value = "";
+        document.getElementById("db-category").value = "";
+        document.getElementById("db-unit").value = "pcs";
+        document.getElementById("db-stock").value = "";
+        document.getElementById("db-cost").value = "";
+        document.getElementById("db-price").value = "";
+        document.getElementById("db-selected-online-img").value = "";
+      } else {
+        title.innerText = "Tambah Barang Stok Baru";
+        submitBtn.innerText = "Simpan ke Stok";
+        submitBtn.setAttribute("onclick", "simpanBarangLangsung()");
 
         document.getElementById("db-code").value = "";
         document.getElementById("db-name").value = "";
@@ -1056,6 +1069,32 @@
 
       modal.classList.add("show");
       history.pushState({tab: activeTab, modal: 'product'}, "", "");
+    }
+
+    function simpanBarangLangsung() {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
+      const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      const price = parseRupiahToNumber(document.getElementById("db-price").value);
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+      const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+
+      db.collection("produk").doc(code).set({
+        nama: name,
+        kategori: category,
+        satuan: unit,
+        stok: stokVal,
+        modal: cost,
+        harga: price,
+        foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
+      }, { merge: true }).then(() => {
+        closeProductModal();
+        showNotif("Barang baru ditambahkan ke stok!");
+      }).catch(err => alert("Gagal menyimpan: " + err.message));
     }
 
     function simpanEditBarang(code) {
