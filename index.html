@@ -460,6 +460,12 @@
       </div>
 
       <div id="sub-pelanggan" class="sub-tab-content active">
+        <!-- Kotak Akumulasi Total Keuangan Seluruh Pelanggan -->
+        <div class="card" style="margin-bottom: 12px; background: var(--table-header); padding: 12px 16px;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">TOTAL AKUMULASI KEUANGAN / CATATAN PELANGGAN</div>
+          <div style="font-size: 1.25rem; font-weight: bold; color: #2563eb;">Rp <span id="customer-total-financial">0</span></div>
+        </div>
+
         <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; align-items: center;">
           <button onclick="eksporPelangganExcel()" style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;">Ekspor Pelanggan</button>
           <label style="background: #2563eb; color: white; padding: 7px 10px; font-size: 0.72rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0;">
@@ -650,6 +656,7 @@
         <button class="btn-close-modal" onclick="closeProductModal()">&times;</button>
       </div>
       <div class="form-group">
+        <input type="hidden" id="edit-restock-id" value="">
         <div>
           <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Nama Barang: <span style="color:red;">*</span></label>
           <input type="text" id="db-name" placeholder="Contoh: Beras Ramos / Kopi Botol" oninput="autoFillDataBarang(this.value)" autocomplete="off">
@@ -1014,12 +1021,30 @@
       }
     }
 
-    function openProductModal(codeToEdit = null) {
+    function openProductModal(codeToEdit = null, restockId = null) {
       const modal = document.getElementById("productModal");
       const title = document.getElementById("modal-title");
       const submitBtn = document.getElementById("modal-submit-btn");
 
-      if (codeToEdit && databaseProduk[codeToEdit]) {
+      document.getElementById("edit-restock-id").value = restockId || "";
+
+      if (restockId) {
+        let rItem = restockListItems.find(i => i.id === restockId);
+        if (rItem) {
+          title.innerText = "Edit Barang Belanja Stok";
+          submitBtn.innerText = "Simpan Perubahan Belanja";
+          submitBtn.setAttribute("onclick", `simpanEditBelanjaStok('${restockId}')`);
+
+          document.getElementById("db-code").value = rItem.code || "";
+          document.getElementById("db-name").value = rItem.nama || "";
+          document.getElementById("db-category").value = rItem.kategori || "";
+          document.getElementById("db-unit").value = rItem.satuan || "pcs";
+          document.getElementById("db-stock").value = rItem.qty !== undefined ? rItem.qty : 1;
+          document.getElementById("db-cost").value = (rItem.modal || 0).toLocaleString('id-ID');
+          document.getElementById("db-price").value = (rItem.harga || 0).toLocaleString('id-ID');
+          document.getElementById("db-selected-online-img").value = rItem.foto || "";
+        }
+      } else if (codeToEdit && databaseProduk[codeToEdit]) {
         let p = databaseProduk[codeToEdit];
         title.innerText = "Edit Barang Stok";
         submitBtn.innerText = "Simpan Perubahan";
@@ -1122,6 +1147,35 @@
       }).catch(err => alert("Gagal menyimpan: " + err.message));
     }
 
+    function simpanEditBelanjaStok(restockId) {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
+      const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      const price = parseRupiahToNumber(document.getElementById("db-price").value);
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+
+      let rItem = restockListItems.find(i => i.id === restockId);
+      if (rItem) {
+        rItem.code = code;
+        rItem.nama = name;
+        rItem.kategori = category;
+        rItem.satuan = unit;
+        rItem.qty = qtyBeli;
+        rItem.modal = cost;
+        rItem.harga = price;
+        if (selectedOnlineImg) rItem.foto = selectedOnlineImg;
+
+        localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+        closeProductModal();
+        refreshData();
+        showNotif("Belanja stok diperbarui!");
+      }
+    }
+
     function autoFillDataBarang(namaInput) {
       const sugBox = document.getElementById("autocomplete-suggestions");
       if (!namaInput.trim()) {
@@ -1180,6 +1234,7 @@
       document.getElementById("online-image-results").innerHTML = "";
       document.getElementById("db-selected-online-img").value = "";
       document.getElementById("autocomplete-suggestions").style.display = "none";
+      document.getElementById("edit-restock-id").value = "";
       if (isScannerDbOpen) toggleScannerDb();
     }
 
@@ -2157,7 +2212,7 @@
       updateDropdowns(Array.from(categories));
       renderKatalogKasirPaginated(filteredItemsPos);
 
-      /* Render Halaman Belanja Stok */
+      /* Render Halaman Belanja Stok dengan Tombol Edit dan Hapus */
       if(restockListWrapper && restockGridWrapper) {
         restockListWrapper.innerHTML = ""; restockGridWrapper.innerHTML = "";
         let totalEstBelanja = 0;
@@ -2173,7 +2228,10 @@
 
             restockListWrapper.innerHTML += `
               <div class="inv-list-item">
-                <button onclick="hapusItemBelanja('${item.id}')" class="btn-danger" style="width: 32px; height: 32px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="Hapus">✕</button>
+                <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                  <button class="btn-edit" onclick="openProductModal(null, '${item.id}')" title="Edit" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">✏️</button>
+                  <button class="btn-danger" onclick="hapusItemBelanja('${item.id}')" title="Hapus" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">✕</button>
+                </div>
                 <img src="${fotoSrc}" class="inv-list-img">
                 <div class="inv-list-details">
                   <div class="inv-list-title">${item.nama}</div>
@@ -2189,7 +2247,10 @@
             restockGridWrapper.innerHTML += `
               <div class="inv-card">
                 <div class="inv-card-top">
-                  <button onclick="hapusItemBelanja('${item.id}')" class="btn-danger" style="width: 100%; height: 26px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.72rem; font-weight: bold; margin-bottom: 2px;">Hapus</button>
+                  <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 2px;">
+                    <button class="btn-edit" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal(null, '${item.id}')">Edit</button>
+                    <button class="btn-danger" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="hapusItemBelanja('${item.id}')">Hapus</button>
+                  </div>
                   <img src="${fotoSrc}" class="inv-card-img">
                   <div class="inv-card-info">
                     <div class="inv-card-title">${item.nama}</div>
@@ -2208,7 +2269,7 @@
         document.getElementById("restock-est-total").innerText = totalEstBelanja.toLocaleString('id-ID');
       }
 
-      /* Laporan & Pelanggan */
+      /* Laporan & Pelanggan dengan Akumulasi Total Keuangan */
       const repBody = document.getElementById("report-body");
       repBody.innerHTML = "";
       let totalOmset = 0; let totalProfit = 0;
@@ -2225,24 +2286,34 @@
 
       const custContainer = document.getElementById("customer-list-wrapper");
       custContainer.innerHTML = "";
+      let grandTotalAllCustomersFinancial = 0;
+
       if (databasePelanggan.length === 0) {
         custContainer.innerHTML = `<div class="empty-state">Belum ada data pelanggan.</div>`;
       } else {
         databasePelanggan.forEach(c => {
           let catatanHtml = "";
+          let custTotalNominal = 0;
+
           if (c.catatan && c.catatan.length > 0) {
             c.catatan.forEach(note => {
-              catatanHtml += `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 6px 0;"><div><span style="font-weight: bold; font-size: 0.72rem;">[${note.jenis}]</span> <span style="font-size: 0.75rem;">${note.keterangan}</span></div><button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button></div>`;
+              let nom = note.nominal || 0;
+              custTotalNominal += nom;
+              catatanHtml += `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 6px 0;"><div><span style="font-weight: bold; font-size: 0.72rem;">[${note.jenis}]</span> <span style="font-size: 0.75rem;">${note.keterangan}</span> ${nom > 0 ? '<b style="color:#2563eb;">(Rp ' + nom.toLocaleString('id-ID') + ')</b>' : ''}</div><button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button></div>`;
             });
           } else {
-            catatanHtml = `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Belum ada catatan.</div>`;
+            catatanHtml = `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Belum ada catatan keuangan.</div>`;
           }
+
+          grandTotalAllCustomersFinancial += custTotalNominal;
+
           custContainer.innerHTML += `
             <div class="cust-list-item">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                   <div style="font-weight: bold; font-size: 0.85rem;">${c.nama}</div>
                   <div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat}</div>
+                  <div style="font-size: 0.78rem; font-weight: 600; color: #2563eb; margin-top: 3px;">Total Nilai Catatan: Rp ${custTotalNominal.toLocaleString('id-ID')}</div>
                 </div>
                 <div style="display: flex; gap: 4px;">
                   <button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button>
@@ -2255,6 +2326,7 @@
           `;
         });
       }
+      document.getElementById("customer-total-financial").innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
     }
 
     function renderKatalogKasirPaginated(filteredItems) {
