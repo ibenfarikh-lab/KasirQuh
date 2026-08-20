@@ -522,14 +522,13 @@
       </div>
     </div>
 
-    <!-- 5. HALAMAN CATATAN BEBAS (Sinkron Cloud Database) -->
+    <!-- 5. HALAMAN CATATAN (Berbasis Card Catatan 1, 2, dst.) -->
     <div id="catatan" class="tab-content">
-      <div class="card" style="display: flex; flex-direction: column; height: calc(100vh - 120px); margin-bottom: 0;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <h3 style="margin: 0; font-size: 1rem;">📝 Catatan Bebas</h3>
-          <button onclick="simpanCatatanBebasCloud()" style="background: #16a34a; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">Simpan ke Cloud</button>
+      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">
+          Daftar Catatan Terorganisir (Tersinkron ke Cloud)
         </div>
-        <textarea id="free-text-note" placeholder="Ketik apa saja di sini... Catatan ini tersinkronisasi otomatis ke database online!" oninput="autosaveCatatanBebas()" style="flex: 1; resize: none; padding: 12px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); outline: none;"></textarea>
+        <div id="catatan-list-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
     </div>
 
@@ -746,6 +745,28 @@
     </div>
   </div>
 
+  <!-- MODAL TAMBAH/EDIT CATATAN -->
+  <div id="catatanModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="catatan-modal-title">Tambah Catatan Baru</h3>
+        <button class="btn-close-modal" onclick="closeCatatanModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <input type="hidden" id="catatan-id" value="">
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Judul Catatan: <span style="color:red;">*</span></label>
+          <input type="text" id="catatan-title-input" placeholder="Contoh: Catatan 1 / Daftar Belanjaan Toko">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Isi Catatan:</label>
+          <textarea id="catatan-desc-input" rows="5" placeholder="Tulis isi catatan di sini..." style="border-radius: 8px; resize: vertical;"></textarea>
+        </div>
+        <button onclick="simpanCatatanCard()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px; background: #16a34a;">Simpan Catatan</button>
+      </div>
+    </div>
+  </div>
+
   <div id="customerModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="modal-header">
@@ -896,14 +917,17 @@
       refreshData();
     });
 
-    db.collection("pengaturan").doc("catatan_bebas").onSnapshot((doc) => {
+    let daftarCatatanCard = [];
+    db.collection("pengaturan").doc("daftar_catatan_v13").onSnapshot((doc) => {
       if (doc.exists) {
-        let cloudNote = doc.data().teks || "";
-        const noteEl = document.getElementById("free-text-note");
-        if (noteEl && noteEl.value !== cloudNote) {
-          noteEl.value = cloudNote;
-        }
+        daftarCatatanCard = doc.data().items || [];
+      } else {
+        daftarCatatanCard = [
+          { id: "NOTE-1", judul: "Catatan 1", isi: "Contoh isi catatan pertama Anda...", waktu: new Date().toLocaleString('id-ID') }
+        ];
+        db.collection("pengaturan").doc("daftar_catatan_v13").set({ items: daftarCatatanCard });
       }
+      refreshDataCatatan();
     });
 
     function cekStatusLogin() {
@@ -1003,6 +1027,7 @@
       if (document.getElementById("productModal").classList.contains("show")) { closeProductModal(); history.pushState({tab: activeTab}, "", ""); return; }
       if (document.getElementById("customerModal").classList.contains("show")) { closeCustomerModal(); history.pushState({tab: activeTab}, "", ""); return; }
       if (document.getElementById("bookkeepingModal").classList.contains("show")) { closeBookkeepingModal(); history.pushState({tab: activeTab}, "", ""); return; }
+      if (document.getElementById("catatanModal").classList.contains("show")) { closeCatatanModal(); history.pushState({tab: activeTab}, "", ""); return; }
       
       const searchBar = document.getElementById("sticky-search-container");
       if (searchBar && searchBar.classList.contains("show")) {
@@ -1017,7 +1042,7 @@
         cekStatusLogin();
         history.replaceState({tab: activeTab}, "", "");
       } else {
-        history.pushState({tab: activeTab}, "", "");
+        history.replaceState({tab: activeTab}, "", "");
       }
     });
 
@@ -1042,23 +1067,98 @@
       }
     }
 
-    let autosaveTimer = null;
-    function autosaveCatatanBebas() {
-      clearTimeout(autosaveTimer);
-      autosaveTimer = setTimeout(() => {
-        simpanCatatanBebasCloud(true);
-      }, 1000);
+    function openCatatanModal(id = null) {
+      const modal = document.getElementById("catatanModal");
+      if (id) {
+        let item = daftarCatatanCard.find(c => c.id === id);
+        if (item) {
+          document.getElementById("catatan-modal-title").innerText = "Edit Catatan";
+          document.getElementById("catatan-id").value = item.id;
+          document.getElementById("catatan-title-input").value = item.judul;
+          document.getElementById("catatan-desc-input").value = item.isi;
+        }
+      } else {
+        document.getElementById("catatan-modal-title").innerText = "Tambah Catatan Baru";
+        document.getElementById("catatan-id").value = "";
+        document.getElementById("catatan-title-input").value = `Catatan ${daftarCatatanCard.length + 1}`;
+        document.getElementById("catatan-desc-input").value = "";
+      }
+      modal.classList.add("show");
+      history.pushState({tab: activeTab, modal: 'catatan'}, "", "");
     }
 
-    function simpanCatatanBebasCloud(isAuto = false) {
-      const teksCatatan = document.getElementById("free-text-note").value;
-      db.collection("pengaturan").doc("catatan_bebas").set({ teks: teksCatatan })
+    function closeCatatanModal() {
+      document.getElementById("catatanModal").classList.remove("show");
+    }
+
+    function simpanCatatanCard() {
+      const id = document.getElementById("catatan-id").value;
+      const judul = document.getElementById("catatan-title-input").value.trim();
+      const isi = document.getElementById("catatan-desc-input").value.trim();
+
+      if (!judul) return alert("Judul catatan wajib diisi!");
+
+      if (id) {
+        let item = daftarCatatanCard.find(c => c.id === id);
+        if (item) {
+          item.judul = judul;
+          item.isi = isi;
+          item.waktu = new Date().toLocaleString('id-ID');
+        }
+      } else {
+        let newItem = {
+          id: "NOTE-" + Date.now(),
+          judul: judul,
+          isi: isi,
+          waktu: new Date().toLocaleString('id-ID')
+        };
+        daftarCatatanCard.push(newItem);
+      }
+
+      db.collection("pengaturan").doc("daftar_catatan_v13").set({ items: daftarCatatanCard })
         .then(() => {
-          if (!isAuto) showNotif("Catatan berhasil disimpan ke Cloud!");
+          closeCatatanModal();
+          showNotif("Catatan berhasil disimpan ke Cloud!");
         })
-        .catch(err => {
-          if (!isAuto) alert("Gagal menyimpan catatan: " + err.message);
-        });
+        .catch(err => alert("Gagal menyimpan: " + err.message));
+    }
+
+    function hapusCatatanCard(id) {
+      if (confirm("Apakah Anda yakin ingin menghapus catatan ini?")) {
+        daftarCatatanCard = daftarCatatanCard.filter(c => c.id !== id);
+        db.collection("pengaturan").doc("daftar_catatan_v13").set({ items: daftarCatatanCard })
+          .then(() => showNotif("Catatan dihapus!"))
+          .catch(err => alert("Gagal menghapus: " + err.message));
+      }
+    }
+
+    function refreshDataCatatan() {
+      const container = document.getElementById("catatan-list-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      if (daftarCatatanCard.length === 0) {
+        container.innerHTML = `<div class="empty-state">Belum ada catatan. Tekan tombol <b>+</b> di kanan bawah untuk membuat catatan baru.</div>`;
+        return;
+      }
+
+      daftarCatatanCard.forEach((item) => {
+        container.innerHTML += `
+          <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+              <div>
+                <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.judul}</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">${item.waktu}</div>
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn-edit" onclick="openCatatanModal('${item.id}')" title="Edit Catatan" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">✏️</button>
+                <button class="btn-danger" onclick="hapusCatatanCard('${item.id}')" title="Hapus Catatan" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">🗑️</button>
+              </div>
+            </div>
+            <div style="font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4; color: var(--text-color); padding-top: 2px;">${item.isi || '(Tidak ada isi catatan)'}</div>
+          </div>
+        `;
+      });
     }
 
     function updateUnitLabel() {
@@ -1162,7 +1262,6 @@
       history.pushState({tab: activeTab, modal: 'product'}, "", "");
     }
 
-    // Fungsi pemroses file foto dari galeri atau kamera HP dengan kompresi otomatis
     function handleImageUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1718,12 +1817,16 @@
         fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
       } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
         fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'flex'; fabAddCust.style.display = 'none';
+        fabAdd.setAttribute("onclick", "openProductModal()");
       } else if (tabId === 'laporan') {
         fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none';
         if (activeSubDataTab === 'sub-pelanggan') { fabAdd.style.display = 'none'; fabAddCust.style.display = 'flex'; }
         else { fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; }
       } else if (tabId === 'catatan') {
-        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; 
+        fabAdd.style.display = 'flex'; 
+        fabAddCust.style.display = 'none';
+        fabAdd.setAttribute("onclick", "openCatatanModal()");
       } else {
         fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
       }
