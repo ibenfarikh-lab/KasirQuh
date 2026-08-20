@@ -648,7 +648,6 @@
         <button class="popup-menu-btn" id="pop-btn-laporan" onclick="switchTab('laporan'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> Data
         </button>
-        <!-- Posisi Catatan tepat setelah menu Data -->
         <button class="popup-menu-btn" id="pop-btn-catatan" onclick="switchTab('catatan'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Catatan
         </button>
@@ -735,7 +734,7 @@
         <div>
           <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Foto Produk (Opsional):</label>
           <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
-            <input type="file" id="db-image" accept="image/*" style="padding: 6px; flex: 1;">
+            <input type="file" id="db-image" accept="image/*" capture="environment" onchange="handleImageUpload(event)" style="padding: 6px; flex: 1; font-size: 0.75rem;">
             <button type="button" onclick="cariFotoOnline()" style="background: #2563eb; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px; white-space: nowrap;" title="Cari Foto Otomatis Online">🔍 Cari Foto Online</button>
           </div>
           <div id="online-image-results" style="display: none; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: 140px; overflow-y: auto; padding: 6px; background: var(--table-header); border: 1px dashed var(--input-border); border-radius: 8px;"></div>
@@ -897,7 +896,6 @@
       refreshData();
     });
 
-    // Sinkronisasi realtime Catatan Bebas dari Firebase Firestore
     db.collection("pengaturan").doc("catatan_bebas").onSnapshot((doc) => {
       if (doc.exists) {
         let cloudNote = doc.data().teks || "";
@@ -1044,13 +1042,12 @@
       }
     }
 
-    // Fungsi Catatan Bebas Cloud
     let autosaveTimer = null;
     function autosaveCatatanBebas() {
       clearTimeout(autosaveTimer);
       autosaveTimer = setTimeout(() => {
         simpanCatatanBebasCloud(true);
-      }, 1000); // Otomatis simpan ke database cloud setelah 1 detik berhenti mengetik
+      }, 1000);
     }
 
     function simpanCatatanBebasCloud(isAuto = false) {
@@ -1163,6 +1160,47 @@
 
       modal.classList.add("show");
       history.pushState({tab: activeTab, modal: 'product'}, "", "");
+    }
+
+    // Fungsi pemroses file foto dari galeri atau kamera HP dengan kompresi otomatis
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          let width = img.width;
+          let height = img.height;
+          const maxSize = 300;
+          
+          if (width > height) {
+            if (width > maxSize) {
+              height *= maxSize / width;
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width *= maxSize / height;
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          document.getElementById("db-selected-online-img").value = compressedBase64;
+          showNotif("Foto berhasil dimuat!");
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
 
     function simpanBarangLangsung() {
@@ -1517,7 +1555,6 @@
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
-    /* FUNGSI BELANJA STOK */
     function tambahkanKeBelanjaStok() {
       const name = document.getElementById("db-name").value.trim();
       if (!name) return alert("Isi nama barang terlebih dahulu!");
