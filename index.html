@@ -189,32 +189,34 @@
       justify-content: space-between; align-items: center; padding: 10px 16px; z-index: 998; 
     }
 
-    .bottom-right-menu-container { position: relative; display: flex; align-items: center; margin-right: 4px; }
+    .bottom-right-menu-container { position: relative; display: flex; align-items: center; margin-right: 1px; }
 
-    /* Floating Menu Pop-up ke samping kiri seperti sebelumnya */
+    /* Floating Menu Pop-up bergaya persis seperti referensi gambar (digeser ke kiri) */
     .floating-menu-popup {
-      display: none; position: absolute; right: 55px; bottom: 0;
+      display: none; position: absolute; right: 65px; bottom: 5px;
       background: var(--card-bg); border: 1px solid var(--border-color);
-      border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-      padding: 8px; display: none; gap: 6px; flex-direction: row; z-index: 9999;
-      animation: fadeInPopup 0.2s ease-in-out;
+      border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+      padding: 10px; display: none; gap: 4px; flex-direction: column; z-index: 9999;
+      animation: fadeInPopup 0.2s ease-in-out; min-width: 170px;
     }
     .floating-menu-popup.show { display: flex; }
 
     @keyframes fadeInPopup {
-      from { opacity: 0; transform: translateX(10px); }
-      to { opacity: 1; transform: translateX(0); }
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .popup-menu-btn {
-      background: #2563eb; color: white; border: none; width: 40px; height: 40px;
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: transform 0.2s, background 0.2s; padding: 0;
+      background: transparent; color: var(--text-color); border: none; padding: 10px 14px;
+      border-radius: 12px; display: flex; align-items: center; gap: 14px;
+      cursor: pointer; transition: background 0.2s; font-size: 0.95rem; font-weight: 600; text-align: left; width: 100%;
     }
-    .popup-menu-btn:hover { background: #1d4ed8; transform: scale(1.05); }
-    .popup-menu-btn svg { width: 20px; height: 20px; fill: white; }
+    .popup-menu-btn:hover { background: var(--border-color); }
+    /* Ikon di sebelah kiri dengan ukuran proporsional dan warna konsisten */
+    .popup-menu-btn svg { width: 22px; height: 22px; fill: #2563eb; flex-shrink: 0; }
+    .popup-menu-btn.active-menu { color: #2563eb; background: rgba(37, 99, 235, 0.08); }
 
-    /* Tombol Menu Bawah: Kotak sudut melengkung 10px, background MERAH, ukuran 45x45 agar sejajar dengan FAB */
+    /* Tombol Menu Bawah (Kotak Merah Terang & Sejajar) */
     .btn-bar-menu {
       background: #ef4444; color: white; border: none; width: 45px; height: 45px;
       border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -223,7 +225,6 @@
     }
     .btn-bar-menu:hover { background: #dc2626; transform: scale(1.05); }
     
-    /* Tiga garis burger lurus vertikal sejajar putih */
     .btn-bar-menu .burger-line {
       width: 20px;
       height: 2.5px;
@@ -304,7 +305,6 @@
 
   <div class="main-content">
     
-    <!-- Kotak Sticky Pencarian Full Bar di Atas -->
     <div id="sticky-search-container" class="sticky-search-bar no-print">
       <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama / kode barang..." oninput="syncAndFilterGlobal(this.value)" style="width: 100%; padding: 10px; font-size: 0.9rem;" data-i18n-placeholder="searchPlaceholder">
     </div>
@@ -594,23 +594,23 @@
     </div>
 
     <div class="bottom-right-menu-container">
-      <!-- Floating Menu Pop-up ke samping kiri -->
+      <!-- Floating Menu Pop-up persis gaya gambar referensi dengan ikon di kiri -->
       <div id="floating-menu-popup" class="floating-menu-popup">
-        <button class="popup-menu-btn" onclick="switchTab('penjualan'); toggleFloatingMenu();" title="Kasir">
-          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <button class="popup-menu-btn" id="pop-btn-penjualan" onclick="switchTab('penjualan'); toggleFloatingMenu();">
+          <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Kasir
         </button>
-        <button class="popup-menu-btn" onclick="switchTab('data-barang'); toggleFloatingMenu();" title="Stok Barang">
-          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        <button class="popup-menu-btn" id="pop-btn-databarang" onclick="switchTab('data-barang'); toggleFloatingMenu();">
+          <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></svg> Stok
         </button>
-        <button class="popup-menu-btn" onclick="switchTab('laporan'); toggleFloatingMenu();" title="Laporan & Data">
-          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        <button class="popup-menu-btn" id="pop-btn-laporan" onclick="switchTab('laporan'); toggleFloatingMenu();">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> Data
         </button>
-        <button class="popup-menu-btn" onclick="switchTab('pengaturan'); toggleFloatingMenu();" title="Pengaturan">
-          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <button class="popup-menu-btn" id="pop-btn-pengaturan" onclick="switchTab('pengaturan'); toggleFloatingMenu();">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Pengaturan
         </button>
       </div>
 
-      <!-- Tombol Menu Bawah (Bentuk Kotak Sudut Melengkung, Warna Merah, Sejajar Kanan dengan FAB) -->
+      <!-- Tombol Menu Bawah (Kotak Merah Terang & Sejajar) -->
       <button class="btn-bar-menu" onclick="toggleFloatingMenu()" title="Menu Utama">
         <span class="burger-line"></span>
         <span class="burger-line"></span>
@@ -1368,6 +1368,18 @@
         }
       } else if (activeTab === 'pengaturan') {
         titleEl.innerText = translations[currentLang].menuSettings || "Pengaturan Sistem";
+      }
+
+      document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
+      const activeBtnMap = {
+        'penjualan': 'pop-btn-penjualan',
+        'data-barang': 'pop-btn-databarang',
+        'laporan': 'pop-btn-laporan',
+        'pengaturan': 'pop-btn-pengaturan'
+      };
+      if (activeBtnMap[activeTab]) {
+        let btnEl = document.getElementById(activeBtnMap[activeTab]);
+        if (btnEl) btnEl.classList.add('active-menu');
       }
     }
 
@@ -2354,7 +2366,6 @@
           let fotoSrc = p.foto || defaultPlaceholderImg;
           let isHabis = stok <= 0;
           let unitLabel = sat === 'kg' ? '/Kg' : '';
-          let margin = p.harga - p.modal;
 
           let cartItem = cart.find(item => item.barcode === code);
           let currentQtyInCart = cartItem ? cartItem.qty : 0;
