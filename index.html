@@ -642,7 +642,7 @@
     </div>
   </div>
 
-  <!-- MODAL TAMBAH BARANG BELANJA STOK -->
+  <!-- MODAL TAMBAH/EDIT BARANG -->
   <div id="productModal" class="modal-backdrop">
     <div class="modal-content">
       <div class="modal-header">
@@ -710,7 +710,7 @@
           <input type="hidden" id="db-selected-online-img" value="">
         </div>
 
-        <button onclick="tambahkanKeBelanjaStok()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px; background: #16a34a;">Tambahkan ke Belanja Stok</button>
+        <button id="modal-submit-btn" onclick="tambahkanKeBelanjaStok()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px; background: #16a34a;">Tambahkan ke Belanja Stok</button>
       </div>
     </div>
   </div>
@@ -1004,38 +1004,83 @@
     function updateUnitLabel() {
       const unit = document.getElementById("db-unit").value;
       if (unit === 'kg') {
-        document.getElementById("lbl-db-stock").innerText = "Jumlah Beli (Kg):";
+        document.getElementById("lbl-db-stock").innerText = "Jumlah Stok (Kg):";
         document.getElementById("lbl-db-cost").innerText = "Harga Modal / Kg (Rp):";
         document.getElementById("lbl-db-price").innerText = "Harga Jual / Kg (Rp):";
       } else {
-        document.getElementById("lbl-db-stock").innerText = "Jumlah Beli:";
+        document.getElementById("lbl-db-stock").innerText = "Jumlah Stok (Pcs):";
         document.getElementById("lbl-db-cost").innerText = "Harga Modal (Rp):";
         document.getElementById("lbl-db-price").innerText = "Harga Jual (Rp):";
       }
     }
 
-    function openProductModal() {
+    function openProductModal(codeToEdit = null) {
       const modal = document.getElementById("productModal");
       const title = document.getElementById("modal-title");
-      title.innerText = "Tambah Barang Belanja Stok";
-      
-      document.getElementById("db-code").value = "";
-      document.getElementById("db-name").value = "";
-      document.getElementById("db-category").value = "";
-      document.getElementById("db-unit").value = "pcs";
-      document.getElementById("db-stock").value = "";
-      document.getElementById("db-cost").value = "";
-      document.getElementById("db-price").value = "";
+      const submitBtn = document.getElementById("modal-submit-btn");
+
+      if (codeToEdit && databaseProduk[codeToEdit]) {
+        let p = databaseProduk[codeToEdit];
+        title.innerText = "Edit Barang Stok";
+        submitBtn.innerText = "Simpan Perubahan";
+        submitBtn.setAttribute("onclick", `simpanEditBarang('${codeToEdit}')`);
+
+        document.getElementById("db-code").value = codeToEdit;
+        document.getElementById("db-name").value = p.nama;
+        document.getElementById("db-category").value = p.kategori || "";
+        document.getElementById("db-unit").value = p.satuan || "pcs";
+        document.getElementById("db-stock").value = p.stok !== undefined ? p.stok : 0;
+        document.getElementById("db-cost").value = (p.modal || 0).toLocaleString('id-ID');
+        document.getElementById("db-price").value = (p.harga || 0).toLocaleString('id-ID');
+        document.getElementById("db-selected-online-img").value = p.foto || "";
+      } else {
+        title.innerText = "Tambah Barang Belanja Stok";
+        submitBtn.innerText = "Tambahkan ke Belanja Stok";
+        submitBtn.setAttribute("onclick", "tambahkanKeBelanjaStok()");
+
+        document.getElementById("db-code").value = "";
+        document.getElementById("db-name").value = "";
+        document.getElementById("db-category").value = "";
+        document.getElementById("db-unit").value = "pcs";
+        document.getElementById("db-stock").value = "";
+        document.getElementById("db-cost").value = "";
+        document.getElementById("db-price").value = "";
+        document.getElementById("db-selected-online-img").value = "";
+      }
 
       updateUnitLabel();
       document.getElementById("db-image").value = "";
       document.getElementById("online-image-results").style.display = "none";
       document.getElementById("online-image-results").innerHTML = "";
-      document.getElementById("db-selected-online-img").value = "";
       document.getElementById("autocomplete-suggestions").style.display = "none";
 
       modal.classList.add("show");
       history.pushState({tab: activeTab, modal: 'product'}, "", "");
+    }
+
+    function simpanEditBarang(code) {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
+      const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      const price = parseRupiahToNumber(document.getElementById("db-price").value);
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+      const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+
+      db.collection("produk").doc(code).update({
+        nama: name,
+        kategori: category,
+        satuan: unit,
+        stok: stokVal,
+        modal: cost,
+        harga: price,
+        foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
+      }).then(() => {
+        closeProductModal();
+        showNotif("Perubahan disimpan!");
+      }).catch(err => alert("Gagal menyimpan: " + err.message));
     }
 
     function autoFillDataBarang(namaInput) {
@@ -2034,7 +2079,10 @@
 
           invList.innerHTML += `
             <div class="inv-list-item">
-              <button class="btn-danger" onclick="hapusBarang('${code}')" title="Hapus" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+              <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                <button class="btn-edit" onclick="openProductModal('${code}')" title="Edit" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">✏️</button>
+                <button class="btn-danger" onclick="hapusBarang('${code}')" title="Hapus" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+              </div>
               <img src="${fotoSrc}" class="inv-list-img">
               <div class="inv-list-details">
                 <div class="inv-list-title">${item.nama}</div>
@@ -2047,7 +2095,10 @@
           invGrid.innerHTML += `
             <div class="inv-card">
               <div class="inv-card-top">
-                <button class="btn-danger" style="width: 100%; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; margin-bottom: 2px;" onclick="hapusBarang('${code}')">Hapus</button>
+                <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 2px;">
+                  <button class="btn-edit" style="flex: 1; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem;" onclick="openProductModal('${code}')">Edit</button>
+                  <button class="btn-danger" style="flex: 1; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem;" onclick="hapusBarang('${code}')">Hapus</button>
+                </div>
                 <img src="${fotoSrc}" class="inv-card-img">
                 <div class="inv-card-info">
                   <div class="inv-card-title">${item.nama}</div>
