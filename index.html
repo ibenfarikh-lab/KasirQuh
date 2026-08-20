@@ -531,7 +531,7 @@
             <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
             <div style="display: flex; align-items: center; gap: 4px;">
               <span style="font-size: 0.9rem; font-weight: bold;">Rp</span>
-              <input type="text" id="catatan-modal-awal" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatan('catatan', 'catatan-modal-awal', 'sticky-lbl-modal-1', 'sticky-lbl-pembayaran-1', 'sticky-lbl-sisa-1');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
+              <input type="text" id="catatan-modal-awal" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatan('catatan', 'catatan-modal-awal', 'sticky-lbl-modal-1', 'sticky-lbl-pembayaran-1', 'sticky-lbl-sisa-1'); simpanModalAwal('catatan');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
             </div>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px;">
@@ -562,7 +562,7 @@
             <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
             <div style="display: flex; align-items: center; gap: 4px;">
               <span style="font-size: 0.9rem; font-weight: bold;">Rp</span>
-              <input type="text" id="catatan2-modal-awal" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatan('catatan2', 'catatan2-modal-awal', 'sticky-lbl-modal-2', 'sticky-lbl-pembayaran-2', 'sticky-lbl-sisa-2');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
+              <input type="text" id="catatan2-modal-awal" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatan('catatan2', 'catatan2-modal-awal', 'sticky-lbl-modal-2', 'sticky-lbl-pembayaran-2', 'sticky-lbl-sisa-2'); simpanModalAwal('catatan2');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
             </div>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px;">
@@ -988,12 +988,16 @@
     let daftarCatatanCard = [];
     db.collection("pengaturan").doc("daftar_catatan_v13").onSnapshot((doc) => {
       if (doc.exists) {
-        daftarCatatanCard = doc.data().items || [];
+        let data = doc.data();
+        daftarCatatanCard = data.items || [];
+        if (data.modalAwal) {
+          document.getElementById('catatan-modal-awal').value = data.modalAwal;
+        }
       } else {
         daftarCatatanCard = [
           { id: "NOTE-1", judul: "Catatan 1", subjudul: "toko bu haji / pembayaran 25.000", isi: "Ayam - 1 kg\nCeker - 1 kg\nAti ampela - 1 kg", waktu: new Date().toLocaleString('id-ID') }
         ];
-        db.collection("pengaturan").doc("daftar_catatan_v13").set({ items: daftarCatatanCard });
+        db.collection("pengaturan").doc("daftar_catatan_v13").set({ items: daftarCatatanCard, modalAwal: "100.000" });
       }
       refreshDataCatatan('catatan', daftarCatatanCard, 'catatan-list-container', 'catatan-modal-awal', 'sticky-lbl-modal-1', 'sticky-lbl-pembayaran-1', 'sticky-lbl-sisa-1');
     });
@@ -1001,15 +1005,33 @@
     let daftarCatatan2Card = [];
     db.collection("pengaturan").doc("daftar_catatan2_v13").onSnapshot((doc) => {
       if (doc.exists) {
-        daftarCatatan2Card = doc.data().items || [];
+        let data = doc.data();
+        daftarCatatan2Card = data.items || [];
+        if (data.modalAwal) {
+          document.getElementById('catatan2-modal-awal').value = data.modalAwal;
+        }
       } else {
         daftarCatatan2Card = [
           { id: "NOTE2-1", judul: "Catatan 2", subjudul: "toko bu haji / pembayaran 50.000", isi: "Beras - 5 kg\nMinyak - 2 liter", waktu: new Date().toLocaleString('id-ID') }
         ];
-        db.collection("pengaturan").doc("daftar_catatan2_v13").set({ items: daftarCatatan2Card });
+        db.collection("pengaturan").doc("daftar_catatan2_v13").set({ items: daftarCatatan2Card, modalAwal: "100.000" });
       }
       refreshDataCatatan('catatan2', daftarCatatan2Card, 'catatan2-list-container', 'catatan2-modal-awal', 'sticky-lbl-modal-2', 'sticky-lbl-pembayaran-2', 'sticky-lbl-sisa-2');
     });
+
+    function simpanModalAwal(targetType) {
+      let inputId = targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
+      let docName = targetType === 'catatan2' ? 'daftar_catatan2_v13' : 'daftar_catatan_v13';
+      let targetList = targetType === 'catatan2' ? daftarCatatan2Card : daftarCatatanCard;
+      let modalVal = document.getElementById(inputId).value;
+
+      db.collection("pengaturan").doc(docName).set({
+        items: targetList,
+        modalAwal: modalVal
+      }, { merge: true }).catch(err => {
+        console.error("Gagal menyimpan modal awal: ", err);
+      });
+    }
 
     function cekStatusLogin() {
       if (localStorage.getItem('isLoggedIn') === 'true') {
@@ -1188,6 +1210,8 @@
 
       let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
       let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
+      let inputId = targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
+      let currentModalVal = document.getElementById(inputId).value;
 
       if (id) {
         let index = targetList.findIndex(c => c.id === id);
@@ -1205,7 +1229,7 @@
         targetList.push(newItem);
       }
 
-      db.collection("pengaturan").doc(docName).set({ items: targetList })
+      db.collection("pengaturan").doc(docName).set({ items: targetList, modalAwal: currentModalVal })
         .then(() => {
           if (targetType === 'catatan2') daftarCatatan2Card = targetList;
           else daftarCatatanCard = targetList;
@@ -1219,10 +1243,12 @@
       if (confirm("Apakah Anda yakin ingin menghapus catatan ini?")) {
         let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
         let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
+        let inputId = targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
+        let currentModalVal = document.getElementById(inputId).value;
         
         targetList = targetList.filter(c => c.id !== id);
 
-        db.collection("pengaturan").doc(docName).set({ items: targetList })
+        db.collection("pengaturan").doc(docName).set({ items: targetList, modalAwal: currentModalVal })
           .then(() => {
             if (targetType === 'catatan2') daftarCatatan2Card = targetList;
             else daftarCatatanCard = targetList;
@@ -1235,6 +1261,8 @@
     function pindahCatatanUrutan(targetType, index, direction) {
       let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
       let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
+      let inputId = targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
+      let currentModalVal = document.getElementById(inputId).value;
 
       let targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= targetList.length) return;
@@ -1243,7 +1271,7 @@
       targetList[index] = targetList[targetIndex];
       targetList[targetIndex] = temp;
 
-      db.collection("pengaturan").doc(docName).set({ items: targetList })
+      db.collection("pengaturan").doc(docName).set({ items: targetList, modalAwal: currentModalVal })
         .then(() => {
           if (targetType === 'catatan2') daftarCatatan2Card = targetList;
           else daftarCatatanCard = targetList;
