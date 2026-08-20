@@ -83,17 +83,6 @@
     .fab-main:hover, .fab-scanner:hover, .fab-add:hover { background-color: #1d4ed8; transform: scale(1.05); }
     .fab-main svg, .fab-scanner svg, .fab-add svg { width: 22px; height: 22px; fill: #ffffff; display: block; }
 
-    .fab-menu-panel { 
-      display: none; position: absolute; bottom: 55px; right: 65px; 
-      background: var(--card-bg); padding: 8px; border-radius: 12px; 
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid var(--border-color); 
-      flex-direction: column; gap: 4px; width: 180px; z-index: 1000;
-      animation: fadeIn 0.2s ease-in-out; 
-    }
-    .fab-menu-panel.show { display: flex; }
-    .fab-menu-btn { background: none; border: none; color: var(--text-color); padding: 10px 12px; text-align: left; font-size: 0.9rem; cursor: pointer; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-weight: 600; transition: 0.2s; }
-    .fab-menu-btn:hover, .fab-menu-btn.active { background: var(--border-color); color: #2563eb; }
-
     .cart-badge { position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; border-radius: 50%; padding: 2px 6px; border: 2px solid white; }
 
     .sticky-search-bar {
@@ -200,15 +189,47 @@
       justify-content: space-between; align-items: center; padding: 10px 16px; z-index: 998; 
     }
 
-    .bottom-right-menu-container { position: relative; display: flex; align-items: center; }
+    .bottom-right-menu-container { position: relative; display: flex; align-items: center; margin-right: 4px; }
 
-    .btn-bar-menu {
-      background: #0f172a; color: white; border: none; width: 38px; height: 38px;
-      border-radius: 8px; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: background 0.2s; padding: 0;
+    /* Floating Menu Pop-up ke samping kiri seperti sebelumnya */
+    .floating-menu-popup {
+      display: none; position: absolute; right: 55px; bottom: 0;
+      background: var(--card-bg); border: 1px solid var(--border-color);
+      border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      padding: 8px; display: none; gap: 6px; flex-direction: row; z-index: 9999;
+      animation: fadeInPopup 0.2s ease-in-out;
     }
-    .btn-bar-menu:hover { background: #1e293b; }
-    .btn-bar-menu svg { width: 20px; height: 20px; fill: #ffffff; }
+    .floating-menu-popup.show { display: flex; }
+
+    @keyframes fadeInPopup {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .popup-menu-btn {
+      background: #2563eb; color: white; border: none; width: 40px; height: 40px;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 0.2s, background 0.2s; padding: 0;
+    }
+    .popup-menu-btn:hover { background: #1d4ed8; transform: scale(1.05); }
+    .popup-menu-btn svg { width: 20px; height: 20px; fill: white; }
+
+    /* Tombol Menu Bawah: Kotak sudut melengkung 10px, background MERAH, ukuran 45x45 agar sejajar dengan FAB */
+    .btn-bar-menu {
+      background: #ef4444; color: white; border: none; width: 45px; height: 45px;
+      border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; cursor: pointer; transition: transform 0.2s, background-color 0.2s; padding: 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .btn-bar-menu:hover { background: #dc2626; transform: scale(1.05); }
+    
+    /* Tiga garis burger lurus vertikal sejajar putih */
+    .btn-bar-menu .burger-line {
+      width: 20px;
+      height: 2.5px;
+      background-color: white;
+      border-radius: 2px;
+    }
 
     .inline-pagination { display: none; align-items: center; gap: 6px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; }
     .inline-pagination.show { display: flex; }
@@ -573,15 +594,27 @@
     </div>
 
     <div class="bottom-right-menu-container">
-      <div id="fab-menu-panel" class="fab-menu-panel">
-        <button class="fab-menu-btn active" onclick="switchTab('penjualan', true)"><span>🛒</span> <span data-i18n="menuPos">Kasir</span></button>
-        <button class="fab-menu-btn" onclick="switchTab('data-barang', true)"><span>📦</span> <span data-i18n="menuStock">Stok</span></button>
-        <button class="fab-menu-btn" onclick="switchTab('laporan', true)"><span>📊</span> <span data-i18n="menuData">Data</span></button>
-        <button class="fab-menu-btn" onclick="switchTab('pengaturan', true)"><span>⚙️</span> <span data-i18n="menuSettings">Pengaturan</span></button>
+      <!-- Floating Menu Pop-up ke samping kiri -->
+      <div id="floating-menu-popup" class="floating-menu-popup">
+        <button class="popup-menu-btn" onclick="switchTab('penjualan'); toggleFloatingMenu();" title="Kasir">
+          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        </button>
+        <button class="popup-menu-btn" onclick="switchTab('data-barang'); toggleFloatingMenu();" title="Stok Barang">
+          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0-2-.9-2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        </button>
+        <button class="popup-menu-btn" onclick="switchTab('laporan'); toggleFloatingMenu();" title="Laporan & Data">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        </button>
+        <button class="popup-menu-btn" onclick="switchTab('pengaturan'); toggleFloatingMenu();" title="Pengaturan">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        </button>
       </div>
 
-      <button class="btn-bar-menu" onclick="toggleFabMenuPanel()" title="Menu Utama">
-        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      <!-- Tombol Menu Bawah (Bentuk Kotak Sudut Melengkung, Warna Merah, Sejajar Kanan dengan FAB) -->
+      <button class="btn-bar-menu" onclick="toggleFloatingMenu()" title="Menu Utama">
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
+        <span class="burger-line"></span>
       </button>
     </div>
   </div>
@@ -834,6 +867,13 @@
       refreshData();
     }
 
+    function toggleFloatingMenu() {
+      const popup = document.getElementById("floating-menu-popup");
+      if (popup) {
+        popup.classList.toggle("show");
+      }
+    }
+
     function formatInputRupiah(input) {
       let angka = input.value.replace(/[^,\d]/g, '').toString();
       let split = angka.split(',');
@@ -981,13 +1021,6 @@
       if (document.getElementById("customerModal").classList.contains("show")) { closeCustomerModal(); history.pushState({tab: activeTab}, "", ""); return; }
       if (document.getElementById("bookkeepingModal").classList.contains("show")) { closeBookkeepingModal(); history.pushState({tab: activeTab}, "", ""); return; }
       
-      const menuPanel = document.getElementById("fab-menu-panel");
-      if (menuPanel.classList.contains("show")) {
-        menuPanel.classList.remove("show");
-        history.pushState({tab: activeTab}, "", "");
-        return;
-      }
-
       const searchBar = document.getElementById("sticky-search-container");
       if (searchBar && searchBar.classList.contains("show")) {
         searchBar.classList.remove("show");
@@ -1004,12 +1037,6 @@
         history.pushState({tab: activeTab}, "", "");
       }
     });
-
-    function toggleFabMenuPanel() {
-      const panel = document.getElementById("fab-menu-panel");
-      panel.classList.toggle("show");
-      if(panel.classList.contains("show")) history.pushState({tab: activeTab, floating: 'menu'}, "", "");
-    }
 
     function openCartModal() {
       document.getElementById("cartModal").classList.add("show");
@@ -1347,14 +1374,7 @@
     function switchTab(tabId, pushHistory = true) {
       activeTab = tabId;
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.fab-menu-btn').forEach(btn => btn.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
-      
-      const fabButtons = document.querySelectorAll('.fab-menu-btn');
-      if (tabId === 'penjualan') fabButtons[0].classList.add('active');
-      if (tabId === 'data-barang') fabButtons[1].classList.add('active');
-      if (tabId === 'laporan') fabButtons[2].classList.add('active');
-      if (tabId === 'pengaturan') fabButtons[3].classList.add('active');
 
       if (pushHistory) history.pushState({tab: tabId}, "", "");
 
@@ -1363,9 +1383,6 @@
       const fabFilter = document.getElementById('fab-filter-btn');
       const fabAdd = document.getElementById('fab-add-btn');
       const fabAddCust = document.getElementById('fab-add-cust-btn');
-
-      const menuPanel = document.getElementById('fab-menu-panel');
-      if (menuPanel) menuPanel.classList.remove('show');
 
       if (tabId === 'penjualan') {
         fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
