@@ -1186,16 +1186,13 @@
 
       if (!judul) return alert("Judul catatan wajib diisi!");
 
-      let targetList = targetType === 'catatan2' ? daftarCatatan2Card : daftarCatatanCard;
+      let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
       let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
 
       if (id) {
-        let item = targetList.find(c => c.id === id);
-        if (item) {
-          item.judul = judul;
-          item.subjudul = subjudul;
-          item.isi = isi;
-          item.waktu = new Date().toLocaleString('id-ID');
+        let index = targetList.findIndex(c => c.id === id);
+        if (index !== -1) {
+          targetList[index] = { ...targetList[index], judul, subjudul, isi, waktu: new Date().toLocaleString('id-ID') };
         }
       } else {
         let newItem = {
@@ -1210,6 +1207,8 @@
 
       db.collection("pengaturan").doc(docName).set({ items: targetList })
         .then(() => {
+          if (targetType === 'catatan2') daftarCatatan2Card = targetList;
+          else daftarCatatanCard = targetList;
           closeCatatanModal();
           showNotif("Catatan berhasil disimpan ke Cloud!");
         })
@@ -1218,25 +1217,23 @@
 
     function hapusCatatanCard(targetType, id) {
       if (confirm("Apakah Anda yakin ingin menghapus catatan ini?")) {
-        let targetList = targetType === 'catatan2' ? daftarCatatan2Card : daftarCatatanCard;
+        let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
         let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
         
-        if (targetType === 'catatan2') {
-          daftarCatatan2Card = daftarCatatan2Card.filter(c => c.id !== id);
-          targetList = daftarCatatan2Card;
-        } else {
-          daftarCatatanCard = daftarCatatanCard.filter(c => c.id !== id);
-          targetList = daftarCatatanCard;
-        }
+        targetList = targetList.filter(c => c.id !== id);
 
         db.collection("pengaturan").doc(docName).set({ items: targetList })
-          .then(() => showNotif("Catatan dihapus!"))
+          .then(() => {
+            if (targetType === 'catatan2') daftarCatatan2Card = targetList;
+            else daftarCatatanCard = targetList;
+            showNotif("Catatan dihapus!");
+          })
           .catch(err => alert("Gagal menghapus: " + err.message));
       }
     }
 
     function pindahCatatanUrutan(targetType, index, direction) {
-      let targetList = targetType === 'catatan2' ? daftarCatatan2Card : daftarCatatanCard;
+      let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
       let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
 
       let targetIndex = index + direction;
@@ -1247,7 +1244,11 @@
       targetList[targetIndex] = temp;
 
       db.collection("pengaturan").doc(docName).set({ items: targetList })
-        .then(() => showNotif("Urutan diperbarui!"))
+        .then(() => {
+          if (targetType === 'catatan2') daftarCatatan2Card = targetList;
+          else daftarCatatanCard = targetList;
+          showNotif("Urutan diperbarui!");
+        })
         .catch(err => alert("Gagal mengubah urutan: " + err.message));
     }
 
