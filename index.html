@@ -533,6 +533,7 @@
           <select id="setting-theme" onchange="gantiTema(this.value)">
             <option value="light" data-i18n="themeLight">Terang (Light)</option>
             <option value="dark" data-i18n="themeDark">Gelap (Dark)</option>
+            <option value="auto" data-i18n="themeAuto">Sistem (Auto)</option>
           </select>
 
           <label style="font-size: 0.85rem; margin-top: 5px;" data-i18n="labelViewMode">Tampilan Katalog / Stok:</label>
@@ -764,7 +765,7 @@
         setTitleShop: "Identitas Toko", labelShopName: "Nama Toko / Usaha:", labelShopAddress: "Alamat Toko:", labelShopPhone: "Nomor Telepon / WA:",
         btnSaveProfile: "Simpan Profil", setTitleAccount: "Ubah Akun Login", labelUsername: "Username Baru:", labelPassword: "Password Baru:",
         btnSaveAccount: "Simpan Akun", setTitlePref: "Preferensi Tampilan & Bahasa", labelLanguage: "Bahasa / Language / اللغة:",
-        labelTheme: "Tema Tampilan:", themeLight: "Terang (Light)", themeDark: "Gelap (Dark)", setTitleScan: "Sensitivitas Auto-Scan Barcode",
+        labelTheme: "Tema Tampilan:", themeLight: "Terang (Light)", themeDark: "Gelap (Dark)", themeAuto: "Sistem (Auto)", setTitleScan: "Sensitivitas Auto-Scan Barcode",
         labelCooldown: "Jeda Cooldown Scan:", scanFast: "1.0 Detik (Cepat)", scanNormal: "1.5 Detik (Normal)", scanSlow: "2.0 Detik (Lambat / Safe)",
         btnSaveCooldown: "Simpan Jeda", setTitleDanger: "Area Berbahaya (Reset Data)", dangerDesc: "Tindakan di bawah ini tidak dapat dibatalkan.",
         btnResetHist: "Kosongkan Riwayat Transaksi", btnResetProd: "Hapus Semua Database Barang", setTitleSession: "Sesi Aplikasi", btnLogout: "🚪 Keluar / Logout",
@@ -787,7 +788,7 @@
         thTime: "Time", thMethod: "Method", thQtyKg: "Qty/Kg", thOmset: "Revenue", thProfit: "Profit", setTitleShop: "Store Identity",
         labelShopName: "Store / Business Name:", labelShopAddress: "Store Address:", labelShopPhone: "Phone Number / WhatsApp:", btnSaveProfile: "Save Profile",
         setTitleAccount: "Change Login Account", labelUsername: "New Username:", labelPassword: "New Password:", btnSaveAccount: "Save Account",
-        setTitlePref: "Display & Language Preferences", labelLanguage: "Language / Bahasa / اللغة:", labelTheme: "Theme:", themeLight: "Light", themeDark: "Dark",
+        setTitlePref: "Display & Language Preferences", labelLanguage: "Language / Bahasa / اللغة:", labelTheme: "Theme:", themeLight: "Light", themeDark: "Dark", themeAuto: "System (Auto)",
         setTitleScan: "Auto-Scan Barcode Sensitivity", labelCooldown: "Scan Cooldown Delay:", scanFast: "1.0 Second (Fast)", scanNormal: "1.5 Seconds (Normal)",
         scanSlow: "2.0 Seconds (Slow / Safe)", btnSaveCooldown: "Save Delay", setTitleDanger: "Danger Area (Reset Data)", dangerDesc: "Actions below cannot be undone.",
         btnResetHist: "Clear Transaction History", btnResetProd: "Delete All Product Database", setTitleSession: "Application Session", btnLogout: "🚪 Logout",
@@ -807,7 +808,7 @@
         dashItems: "إجمالي الأصناف", btnExport: "تصدير التقرير (CSV)", thTime: "الوقت", thMethod: "الطريقة", thQtyKg: "الكمية/كغ", thOmset: "الإيراد", thProfit: "الربح",
         setTitleShop: "هوية المتجر", labelShopName: "اسم المتجر / النشاط:", labelShopAddress: "عنوان المتجر:", labelShopPhone: "رقم الهاتق / واتساب:", btnSaveProfile: "حفظ الملف الشخصي",
         setTitleAccount: "تغيير حساب الدخول", labelUsername: "اسم المستخدم الجديد:", labelPassword: "كلمة المرور الجديدة:", btnSaveAccount: "حفظ الحساب", setTitlePref: "تفضيلات العرض واللغة",
-        labelLanguage: "اللغة / Language / Bahasa:", labelTheme: "مظهر التطبيق:", themeLight: "فاتح (Light)", themeDark: "داكن (Dark)", setTitleScan: "حساسية المسح التلقائي للباركود",
+        labelLanguage: "اللغة / Language / Bahasa:", labelTheme: "مظهر التطبيق:", themeLight: "فاتح (Light)", themeDark: "داكن (Dark)", themeAuto: "النظام (Auto)", setTitleScan: "حساسية المسح التلقائي للباركود",
         labelCooldown: "مهلة المسح (Cooldown):", scanFast: "1.0 ثانية (سريع)", scanNormal: "1.5 ثانية (عادي)", scanSlow: "2.0 ثانية (بطيء / آمن)", btnSaveCooldown: "حفظ المهلة",
         setTitleDanger: "منطقة خطرة (إعادة تعيين البيانات)", dangerDesc: "الإجراءات أدناه لا يمكن التراجع عنها.", btnResetHist: "مسح سجل المعاملات", btnResetProd: "حذف قاعدة بيانات المنتجات بالكامل",
         setTitleSession: "جلسة التطبيق", logout: "🚪 تسجيل الخروج", modalAddProd: "إضافة منتج جديد", labelProdName: "اسم المنتج", labelProdCode: "كود الباركود (اختياري):",
@@ -852,12 +853,26 @@
     function setTheme(theme) {
       currentTheme = theme;
       localStorage.setItem('setting_theme_v13', theme);
-      document.body.setAttribute('data-theme', theme);
+      
+      if (theme === 'auto') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      } else {
+        document.body.setAttribute('data-theme', theme);
+      }
+
       const themeSelect = document.getElementById("setting-theme");
       if (themeSelect) themeSelect.value = theme;
     }
 
     function gantiTema(theme) { setTheme(theme); }
+
+    // Listener otomatis jika opsi 'auto' dipilih dan pengguna mengubah tema perangkat HP
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (currentTheme === 'auto') {
+        document.body.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+      }
+    });
 
     function gantiViewModeSetting(mode) {
       viewMode = mode;
