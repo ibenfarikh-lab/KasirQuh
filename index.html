@@ -32,6 +32,7 @@
       --text-color: #0f172a;
       --text-muted: #64748b;
       --border-color: #e2e8f0;
+      --card-border-green: #22c55e;
       --input-bg: #ffffff;
       --input-border: #cbd5e1;
       --table-header: #f8fafc;
@@ -43,6 +44,7 @@
       --text-color: #f8fafc;
       --text-muted: #94a3b8;
       --border-color: #334155;
+      --card-border-green: #16a34a;
       --input-bg: #0f172a;
       --input-border: #475569;
       --table-header: #1e293b;
@@ -130,7 +132,8 @@
     .scan-status-floating { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); padding: 10px 20px; border-radius: 30px; text-align: center; font-weight: 600; display: none; background: rgba(22, 101, 52, 0.9); backdrop-filter: blur(6px); color: #ffffff; font-size: 0.9rem; z-index: 10006; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
 
     .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-    .card { background: var(--card-bg); padding: 14px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 15px; border: 1px solid var(--border-color); color: var(--text-color); }
+    
+    .card { background: var(--card-bg); padding: 14px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 15px; border: 1.5px solid var(--card-border-green); color: var(--text-color); }
     .card-grid .card { margin-bottom: 0; }
     .card h4 { margin: 0 0 6px 0; color: var(--text-muted); font-size: 0.78rem; letter-spacing: 0.5px; }
     .card .val { font-size: 1.2rem; font-weight: bold; color: var(--text-color); }
@@ -146,7 +149,7 @@
     .product-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 5px; width: 100%; }
     
     .product-catalog-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-    .catalog-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+    .catalog-list-item { background: var(--card-bg); border: 1.5px solid var(--card-border-green); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
     .catalog-list-img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); background: var(--border-color); flex-shrink: 0; }
 
     .cart-table-wrapper { width: 100%; margin-top: 5px; }
@@ -160,7 +163,7 @@
     .qty-val { font-weight: bold; font-size: 0.85rem; min-width: 18px; text-align: center; }
 
     .inventory-list { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 5px; }
-    .inv-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .inv-list-item { background: var(--card-bg); border: 1.5px solid var(--card-border-green); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 12px; width: 100%; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .inv-list-img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0; background: var(--border-color); }
     
     .inv-list-details { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -169,7 +172,7 @@
     .inv-list-price { font-size: 0.78rem; font-weight: 600; color: #2563eb; }
 
     .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 5px; width: 100%; }
-    .inv-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+    .inv-card { background: var(--card-bg); border: 1.5px solid var(--card-border-green); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
     .inv-card-top { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; margin-bottom: 6px; }
     .inv-card-img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); background: var(--border-color); }
     .inv-card-info { width: 100%; min-width: 0; }
@@ -231,7 +234,7 @@
     .inline-page-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 
     .customer-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
-    .cust-list-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .cust-list-item { background: var(--card-bg); border: 1.5px solid var(--card-border-green); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
     .cust-bookkeeping { background: var(--table-header); border: 1px dashed var(--input-border); border-radius: 8px; padding: 8px; font-size: 0.78rem; margin-top: 4px; }
 
     .empty-state { text-align: center; padding: 30px 15px; color: var(--text-muted); font-size: 0.85rem; background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 12px; margin-top: 10px; width: 100%; }
@@ -519,7 +522,18 @@
       </div>
     </div>
 
-    <!-- 5. HALAMAN PENGATURAN -->
+    <!-- 5. HALAMAN CATATAN BEBAS (Sinkron Cloud Database) -->
+    <div id="catatan" class="tab-content">
+      <div class="card" style="display: flex; flex-direction: column; height: calc(100vh - 120px); margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h3 style="margin: 0; font-size: 1rem;">📝 Catatan Bebas</h3>
+          <button onclick="simpanCatatanBebasCloud()" style="background: #16a34a; padding: 6px 12px; font-size: 0.78rem; border-radius: 6px;">Simpan ke Cloud</button>
+        </div>
+        <textarea id="free-text-note" placeholder="Ketik apa saja di sini... Catatan ini tersinkronisasi otomatis ke database online!" oninput="autosaveCatatanBebas()" style="flex: 1; resize: none; padding: 12px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); outline: none;"></textarea>
+      </div>
+    </div>
+
+    <!-- 6. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Identitas Toko</h3>
@@ -633,6 +647,10 @@
         </button>
         <button class="popup-menu-btn" id="pop-btn-laporan" onclick="switchTab('laporan'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> Data
+        </button>
+        <!-- Posisi Catatan tepat setelah menu Data -->
+        <button class="popup-menu-btn" id="pop-btn-catatan" onclick="switchTab('catatan'); toggleFloatingMenu();">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Catatan
         </button>
         <button class="popup-menu-btn" id="pop-btn-pengaturan" onclick="switchTab('pengaturan'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c-.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Pengaturan
@@ -879,6 +897,17 @@
       refreshData();
     });
 
+    // Sinkronisasi realtime Catatan Bebas dari Firebase Firestore
+    db.collection("pengaturan").doc("catatan_bebas").onSnapshot((doc) => {
+      if (doc.exists) {
+        let cloudNote = doc.data().teks || "";
+        const noteEl = document.getElementById("free-text-note");
+        if (noteEl && noteEl.value !== cloudNote) {
+          noteEl.value = cloudNote;
+        }
+      }
+    });
+
     function cekStatusLogin() {
       if (localStorage.getItem('isLoggedIn') === 'true') {
         document.getElementById('loginModal').style.display = 'none';
@@ -1013,6 +1042,26 @@
           syncAndFilterGlobal("");
         }
       }
+    }
+
+    // Fungsi Catatan Bebas Cloud
+    let autosaveTimer = null;
+    function autosaveCatatanBebas() {
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(() => {
+        simpanCatatanBebasCloud(true);
+      }, 1000); // Otomatis simpan ke database cloud setelah 1 detik berhenti mengetik
+    }
+
+    function simpanCatatanBebasCloud(isAuto = false) {
+      const teksCatatan = document.getElementById("free-text-note").value;
+      db.collection("pengaturan").doc("catatan_bebas").set({ teks: teksCatatan })
+        .then(() => {
+          if (!isAuto) showNotif("Catatan berhasil disimpan ke Cloud!");
+        })
+        .catch(err => {
+          if (!isAuto) alert("Gagal menyimpan catatan: " + err.message);
+        });
     }
 
     function updateUnitLabel() {
@@ -1594,6 +1643,8 @@
         titleEl.innerText = "Belanja Stok";
       } else if (activeTab === 'laporan') {
         titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? "Data Pelanggan" : "Laporan Transaksi";
+      } else if (activeTab === 'catatan') {
+        titleEl.innerText = "Catatan Bebas";
       } else if (activeTab === 'pengaturan') {
         titleEl.innerText = "Pengaturan Sistem";
       }
@@ -1604,6 +1655,7 @@
         'data-barang': 'pop-btn-databarang',
         'belanja-stok': 'pop-btn-belanjastok',
         'laporan': 'pop-btn-laporan',
+        'catatan': 'pop-btn-catatan',
         'pengaturan': 'pop-btn-pengaturan'
       };
       if (activeBtnMap[activeTab]) {
@@ -1633,6 +1685,8 @@
         fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none';
         if (activeSubDataTab === 'sub-pelanggan') { fabAdd.style.display = 'none'; fabAddCust.style.display = 'flex'; }
         else { fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; }
+      } else if (tabId === 'catatan') {
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
       } else {
         fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
       }
@@ -1777,7 +1831,7 @@
           let onsStr = prompt(`Masukkan jumlah Ons (1 kg = 10 ons):`, "3");
           if (onsStr === null) return;
           let jmlOns = parseFloat(onsStr.replace(',', '.')) || 3;
-          inputJumlah = jmlOns / 10; // konversi ke kg
+          inputJumlah = jmlOns / 10;
           displaySatuan = 'ons';
         } else {
           return;
@@ -1788,7 +1842,7 @@
           let jumlahRtgStr = prompt(`Masukkan jumlah Renteng (rtg) yang dibeli:`, "1");
           if (jumlahRtgStr === null) return;
           let jmlRtg = parseFloat(jumlahRtgStr.replace(',', '.')) || 1;
-          inputJumlah = jmlRtg * produk.isiRtg; // total pcs
+          inputJumlah = jmlRtg * produk.isiRtg;
           hargaAktif = produk.hargaRtg ? (produk.hargaRtg / produk.isiRtg) : produk.harga;
           modalAktif = produk.modalRtg ? (produk.modalRtg / produk.isiRtg) : produk.modal;
           displaySatuan = 'rtg';
@@ -2314,7 +2368,6 @@
       updateDropdowns(Array.from(categories));
       renderKatalogKasirPaginated(filteredItemsPos);
 
-      /* Render Halaman Belanja Stok dengan Tombol Edit dan Hapus */
       if(restockListWrapper && restockGridWrapper) {
         restockListWrapper.innerHTML = ""; restockGridWrapper.innerHTML = "";
         let totalEstBelanja = 0;
@@ -2372,7 +2425,6 @@
         document.getElementById("restock-est-total").innerText = totalEstBelanja.toLocaleString('id-ID');
       }
 
-      /* Laporan & Pelanggan dengan Akumulasi Total Keuangan */
       const repBody = document.getElementById("report-body");
       repBody.innerHTML = "";
       let totalOmset = 0; let totalProfit = 0;
