@@ -167,7 +167,7 @@
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       </button>
 
-      <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang">
+      <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative;">
         <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
         <span class="cart-badge" id="cart-count">0</span>
       </button>
@@ -179,13 +179,17 @@
       <button id="fab-add-cust-btn" class="fab-add" onclick="openCustomerModal()" title="Tambah Pelanggan" style="display: none;">
         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
       </button>
+
+      <button id="fab-add-catatan-btn" class="fab-add" onclick="openCatatanModal(activeSubCatatanTab)" title="Tambah Catatan" style="display: none;">
+        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
     </div>
 
     <!-- 4. HALAMAN LAPORAN / DATA -->
     <div id="laporan" class="tab-content">
       <div class="sub-nav-tabs no-print">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')">👥 Data Pelanggan</button>
-        <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')">📋 Laporan Transaksi</button>
+        <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')">📋 Data Transaksi</button>
       </div>
 
       <div id="sub-pelanggan" class="sub-tab-content active">
@@ -225,9 +229,9 @@
         </div>
 
         <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; margin-top: 12px; align-items: center;">
-          <button style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;" onclick="eksporExcel()">📥 Export Laporan (CSV)</button>
+          <button style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;" onclick="eksporExcel()">📥 Ekspor Transaksi (csv)</button>
           <label style="background: #2563eb; color: white; padding: 7px 10px; font-size: 0.72rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0;">
-            📤 Import Laporan (CSV)
+            📤 Impor Transaksi
             <input type="file" id="import-report-file" accept=".csv" onchange="importLaporanExcel(event)" style="display: none;">
           </label>
         </div>
@@ -248,69 +252,18 @@
       </div>
     </div>
 
-    <!-- 5. HALAMAN CATATAN 1 -->
+    <!-- 5. HALAMAN CATATAN UTAMA (Dinamis & Bersih) -->
     <div id="catatan" class="tab-content">
-      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-        
-        <div style="position: sticky; top: 0; z-index: 98; background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
-            <div style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 0.9rem; font-weight: bold;">Rp</span>
-              <input type="text" id="catatan-modal-awal" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatan('catatan', 'catatan-modal-awal', 'sticky-lbl-modal-1', 'sticky-lbl-pembayaran-1', 'sticky-lbl-sisa-1'); simpanModalAwal('catatan');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
-            </div>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px;">
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Uang Modal</span>
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Pembayaran</span>
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Sisa Modal</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold;">
-            <span style="color: #2563eb;">Rp <span id="sticky-lbl-modal-1">100.000</span></span>
-            <span style="color: #ea580c;">Rp <span id="sticky-lbl-pembayaran-1">0</span></span>
-            <span style="color: #16a34a;">Rp <span id="sticky-lbl-sisa-1">100.000</span></span>
-          </div>
-        </div>
-
-        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-          Daftar Catatan 1 (Tersinkron ke Cloud)
-        </div>
-        <div id="catatan-list-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 6px; gap: 6px; align-items: center;">
+        <div id="container-sub-tabs-catatan" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;"></div>
+        <button onclick="tambahTabCatatanBaru()" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0;">+</button>
       </div>
+
+      <!-- Wadah Konten Sub-Tab Catatan Dinamis -->
+      <div id="wrapper-content-sub-catatan"></div>
     </div>
 
-    <!-- 6. HALAMAN CATATAN 2 -->
-    <div id="catatan2" class="tab-content">
-      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-        
-        <div style="position: sticky; top: 0; z-index: 98; background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
-            <div style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 0.9rem; font-weight: bold;">Rp</span>
-              <input type="text" id="catatan2-modal-awal" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatan('catatan2', 'catatan2-modal-awal', 'sticky-lbl-modal-2', 'sticky-lbl-pembayaran-2', 'sticky-lbl-sisa-2'); simpanModalAwal('catatan2');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
-            </div>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px;">
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Uang Modal</span>
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Pembayaran</span>
-            <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Sisa Modal</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold;">
-            <span style="color: #2563eb;">Rp <span id="sticky-lbl-modal-2">100.000</span></span>
-            <span style="color: #ea580c;">Rp <span id="sticky-lbl-pembayaran-2">0</span></span>
-            <span style="color: #16a34a;">Rp <span id="sticky-lbl-sisa-2">100.000</span></span>
-          </div>
-        </div>
-
-        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-          Daftar Catatan 2 (Tersinkron ke Cloud)
-        </div>
-        <div id="catatan2-list-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
-      </div>
-    </div>
-
-    <!-- 7. HALAMAN PENGATURAN -->
+    <!-- 6. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Identitas Toko</h3>
@@ -426,10 +379,7 @@
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> Data
         </button>
         <button class="popup-menu-btn" id="pop-btn-catatan" onclick="switchTab('catatan'); toggleFloatingMenu();">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Catatan 1
-        </button>
-        <button class="popup-menu-btn" id="pop-btn-catatan2" onclick="switchTab('catatan2'); toggleFloatingMenu();">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Catatan 2
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Catatan
         </button>
         <button class="popup-menu-btn" id="pop-btn-pengaturan" onclick="switchTab('pengaturan'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c-.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Pengaturan
@@ -614,7 +564,6 @@
 
   <!-- External JavaScript -->
   <script>
-    // Konfigurasi Firebase Anda
     const firebaseConfig = {
       apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
       authDomain: "kasirquh.firebaseapp.com",
