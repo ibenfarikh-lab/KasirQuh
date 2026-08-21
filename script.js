@@ -168,7 +168,7 @@ function renderSubTabsCatatanUI() {
 
     let btn = document.createElement("button");
     btn.className = `sub-tab-btn ${isActive ? 'active' : ''}`;
-    // Tampilan tab diperbarui: teks horizontal & ikon terbungkus kotak melengkung rapi
+    // Teks horizontal rapi dengan ikon dalam kotak melengkung
     btn.style.cssText = "display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;";
     btn.innerHTML = `
       <span style="font-size: 0.9rem; font-weight: bold;">${label}</span> 
@@ -498,6 +498,17 @@ function pindahCatatanUrutanDinamis(targetTabKey, index, direction) {
       showNotif("Urutan diperbarui!");
     })
     .catch(err => alert("Gagal mengubah urutan: " + err.message));
+}
+
+// Fitur Bagikan Aplikasi via WhatsApp
+function bagikanAplikasiWhatsApp() {
+  let urlAplikasi = window.location.origin + window.location.pathname;
+  let pesan = `Halo! Yuk gunakan aplikasi kasir *${pengaturanToko.nama}* untuk mengelola transaksi, stok barang, dan catatan toko secara online.\n\n` +
+              `Silakan buka tautan berikut di browser HP atau komputer Anda:\n` +
+              `${urlAplikasi}\n\n` +
+              `Praktis dan bisa diakses dari mana saja! 🚀`;
+  let waUrl = `https://wa.me/?text=${encodeURIComponent(pesan)}`;
+  window.open(waUrl, '_blank');
 }
 
 function cekStatusLogin() {
