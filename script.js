@@ -147,7 +147,6 @@ function renderSubTabsCatatanUI() {
     let label = labelNamaTabCatatan[tabKey] || tabKey;
     let isActive = (tabKey === activeSubCatatanTab);
 
-    // Tombol tab atas bersih dengan ikon pena & sampah berdampingan
     let btn = document.createElement("button");
     btn.className = `sub-tab-btn ${isActive ? 'active' : ''}`;
     btn.style.cssText = "display: flex; align-items: center; gap: 6px;";
@@ -159,7 +158,6 @@ function renderSubTabsCatatanUI() {
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
 
-    // Muat data untuk tab ini dari Firestore jika belum ada
     if (!databaseCatatanDinamis[tabKey]) {
       db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).onSnapshot((docSnap) => {
         if (docSnap.exists) {
@@ -178,7 +176,6 @@ function renderSubTabsCatatanUI() {
       });
     }
 
-    // Buat HTML Konten Halaman Sub-Tab
     let contentDiv = document.createElement("div");
     contentDiv.id = `sub-content-${tabKey}`;
     contentDiv.className = `sub-tab-content ${isActive ? 'active' : ''}`;
@@ -1300,8 +1297,17 @@ function syncAndFilterGlobal(val) {
   refreshData(); 
 }
 
-function changeStokPage(delta) { stokCurrentPage += delta; refreshData(); }
-function changePosPage(delta) { posCurrentPage += delta; refreshData(); }
+function changeStokPage(delta) { 
+  stokCurrentPage += delta; 
+  refreshData(); 
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function changePosPage(delta) { 
+  posCurrentPage += delta; 
+  refreshData(); 
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 function playBeep() {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
