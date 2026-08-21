@@ -105,6 +105,27 @@ db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
   refreshData();
 });
 
+let pengaturanToko = { nama: "TokoQuh", alamat: "Jl. Merdeka", phone: "089" };
+db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
+  if (doc.exists) {
+    pengaturanToko = doc.data();
+  } else {
+    db.collection("pengaturan").doc("toko_v13").set(pengaturanToko);
+  }
+  refreshData();
+});
+
+let scanCooldownDuration = 1500;
+db.collection("pengaturan").doc("sistem_v13").onSnapshot((doc) => {
+  if (doc.exists) {
+    let data = doc.data();
+    if (data.cooldown) scanCooldownDuration = data.cooldown;
+  } else {
+    db.collection("pengaturan").doc("sistem_v13").set({ cooldown: 1500 });
+  }
+  refreshData();
+});
+
 let daftarNamaTabCatatan = ["catatan1", "catatan2", "catatan3", "catatan4"];
 let labelNamaTabCatatan = {
   catatan1: "Catatan 1",
@@ -543,10 +564,6 @@ db.collection("pelanggan").onSnapshot((snapshot) => {
 
 let restockListItems = JSON.parse(localStorage.getItem('restock_list_items_v13')) || [];
 let riwayatTransaksi = JSON.parse(localStorage.getItem('riwayat_kasir_v13')) || [];
-let pengaturanToko = JSON.parse(localStorage.getItem('setting_toko_v13')) || {
-  nama: "TokoQuh", alamat: "Jl. Merdeka", phone: "089"
-};
-let scanCooldownDuration = parseInt(localStorage.getItem('setting_cooldown_v13')) || 1500;
 let viewMode = localStorage.getItem('inventory_view_mode_v13') || 'grid';
 
 let stokCurrentPage = 1;
@@ -1819,18 +1836,31 @@ function updateDropdowns(kategoriList) {
 }
 
 function simpanPengaturanToko() {
-  pengaturanToko.nama = document.getElementById("setting-shop-name").value.trim() || "TokoQuh";
-  pengaturanToko.alamat = document.getElementById("setting-shop-address").value.trim() || "-";
-  pengaturanToko.phone = document.getElementById("setting-shop-phone").value.trim() || "-";
-  localStorage.setItem('setting_toko_v13', JSON.stringify(pengaturanToko));
-  alert("Profil toko disimpan!");
-  refreshData();
+  const nama = document.getElementById("setting-shop-name").value.trim() || "TokoQuh";
+  const alamat = document.getElementById("setting-shop-address").value.trim() || "-";
+  const phone = document.getElementById("setting-shop-phone").value.trim() || "-";
+
+  db.collection("pengaturan").doc("toko_v13").set({
+    nama: nama,
+    alamat: alamat,
+    phone: phone
+  }).then(() => {
+    alert("Profil toko berhasil disimpan secara online!");
+  }).catch(err => {
+    alert("Gagal menyimpan profil toko: " + err.message);
+  });
 }
 
 function simpanPengaturanScan() {
-  scanCooldownDuration = parseInt(document.getElementById("setting-cooldown").value);
-  localStorage.setItem('setting_cooldown_v13', scanCooldownDuration);
-  alert("Jeda scan diperbarui!");
+  scanCooldownDuration = parseInt(document.getElementById("setting-cooldown").value) || 1500;
+
+  db.collection("pengaturan").doc("sistem_v13").set({
+    cooldown: scanCooldownDuration
+  }, { merge: true }).then(() => {
+    alert("Jeda scan berhasil diperbarui secara online!");
+  }).catch(err => {
+    alert("Gagal menyimpan jeda scan: " + err.message);
+  });
 }
 
 function resetRiwayat() {
