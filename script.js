@@ -1298,12 +1298,16 @@ function syncAndFilterGlobal(val) {
 function changeStokPage(delta) { 
   stokCurrentPage += delta; 
   refreshData(); 
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) mainContent.scrollTop = 0;
   window.scrollTo(0, 0);
 }
 
 function changePosPage(delta) { 
   posCurrentPage += delta; 
   refreshData(); 
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) mainContent.scrollTop = 0;
   window.scrollTo(0, 0);
 }
 
