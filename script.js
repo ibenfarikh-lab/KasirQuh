@@ -45,7 +45,6 @@ function toggleFloatingMenu() {
   if (popup) popup.classList.toggle("show");
 }
 
-// Menutup floating menu saat klik di luar atau saat scroll
 document.addEventListener('click', function(event) {
   const popup = document.getElementById("floating-menu-popup");
   const menuBtn = document.querySelector(".btn-bar-menu");
@@ -106,7 +105,6 @@ db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
   refreshData();
 });
 
-// Sistem Catatan Dinamis (Tab, Edit Nama, Hapus Tab, & Data)
 let daftarNamaTabCatatan = ["catatan1", "catatan2", "catatan3", "catatan4"];
 let labelNamaTabCatatan = {
   catatan1: "Catatan 1",
@@ -1300,13 +1298,21 @@ function syncAndFilterGlobal(val) {
 function changeStokPage(delta) { 
   stokCurrentPage += delta; 
   refreshData(); 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, 50);
 }
 
 function changePosPage(delta) { 
   posCurrentPage += delta; 
   refreshData(); 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, 50);
 }
 
 function playBeep() {
