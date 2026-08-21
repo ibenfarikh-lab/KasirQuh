@@ -252,11 +252,25 @@
       </div>
     </div>
 
-    <!-- 5. HALAMAN CATATAN UTAMA (Digabung Catatan 1 & Catatan 2) -->
+    <!-- 5. HALAMAN CATATAN UTAMA (Catatan 1, 2, 3, 4 dengan Edit Nama) -->
     <div id="catatan" class="tab-content">
-      <div class="sub-nav-tabs no-print">
-        <button id="sub-btn-catatan1" class="sub-tab-btn active" onclick="switchSubCatatanTab('catatan')">📝 Catatan 1</button>
-        <button id="sub-btn-catatan2" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan2')">📝 Catatan 2</button>
+      <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 4px;">
+        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+          <button id="sub-btn-catatan1" class="sub-tab-btn active" onclick="switchSubCatatanTab('catatan')">📝 <span id="label-tab-catatan1">Catatan 1</span></button>
+          <button onclick="ubahNamaSubTabCatatan('catatan')" title="Ubah Nama Tab" style="background: transparent; border: none; cursor: pointer; font-size: 0.8rem; padding: 4px;">✏️</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+          <button id="sub-btn-catatan2" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan2')">📝 <span id="label-tab-catatan2">Catatan 2</span></button>
+          <button onclick="ubahNamaSubTabCatatan('catatan2')" title="Ubah Nama Tab" style="background: transparent; border: none; cursor: pointer; font-size: 0.8rem; padding: 4px;">✏️</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+          <button id="sub-btn-catatan3" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan3')">📝 <span id="label-tab-catatan3">Catatan 3</span></button>
+          <button onclick="ubahNamaSubTabCatatan('catatan3')" title="Ubah Nama Tab" style="background: transparent; border: none; cursor: pointer; font-size: 0.8rem; padding: 4px;">✏️</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+          <button id="sub-btn-catatan4" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan4')">📝 <span id="label-tab-catatan4">Catatan 4</span></button>
+          <button onclick="ubahNamaSubTabCatatan('catatan4')" title="Ubah Nama Tab" style="background: transparent; border: none; cursor: pointer; font-size: 0.8rem; padding: 4px;">✏️</button>
+        </div>
       </div>
 
       <!-- Sub-Tab Catatan 1 -->
@@ -280,10 +294,6 @@
               <span style="color: #ea580c;">Rp <span id="sticky-lbl-pembayaran-1">0</span></span>
               <span style="color: #16a34a;">Rp <span id="sticky-lbl-sisa-1">100.000</span></span>
             </div>
-          </div>
-
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-            Daftar Catatan 1 (Tersinkron ke Cloud)
           </div>
           <div id="catatan-list-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
@@ -311,11 +321,59 @@
               <span style="color: #16a34a;">Rp <span id="sticky-lbl-sisa-2">100.000</span></span>
             </div>
           </div>
-
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
-            Daftar Catatan 2 (Tersinkron ke Cloud)
-          </div>
           <div id="catatan2-list-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab Catatan 3 -->
+      <div id="sub-catatan3" class="sub-tab-content">
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+          <div style="position: sticky; top: 0; z-index: 98; background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 0.9rem; font-weight: bold;">Rp</span>
+                <input type="text" id="catatan3-modal-awal" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatan('catatan3', 'catatan3-modal-awal', 'sticky-lbl-modal-3', 'sticky-lbl-pembayaran-3', 'sticky-lbl-sisa-3'); simpanModalAwal('catatan3');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px;">
+              <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Uang Modal</span>
+              <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Pembayaran</span>
+              <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Sisa Modal</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold;">
+              <span style="color: #2563eb;">Rp <span id="sticky-lbl-modal-3">100.000</span></span>
+              <span style="color: #ea580c;">Rp <span id="sticky-lbl-pembayaran-3">0</span></span>
+              <span style="color: #16a34a;">Rp <span id="sticky-lbl-sisa-3">100.000</span></span>
+            </div>
+          </div>
+          <div id="catatan3-list-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab Catatan 4 -->
+      <div id="sub-catatan4" class="sub-tab-content">
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+          <div style="position: sticky; top: 0; z-index: 98; background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 0.9rem; font-weight: bold;">Rp</span>
+                <input type="text" id="catatan4-modal-awal" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatan('catatan4', 'catatan4-modal-awal', 'sticky-lbl-modal-4', 'sticky-lbl-pembayaran-4', 'sticky-lbl-sisa-4'); simpanModalAwal('catatan4');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px;">
+              <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Uang Modal</span>
+              <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Pembayaran</span>
+              <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Sisa Modal</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold;">
+              <span style="color: #2563eb;">Rp <span id="sticky-lbl-modal-4">100.000</span></span>
+              <span style="color: #ea580c;">Rp <span id="sticky-lbl-pembayaran-4">0</span></span>
+              <span style="color: #16a34a;">Rp <span id="sticky-lbl-sisa-4">100.000</span></span>
+            </div>
+          </div>
+          <div id="catatan4-list-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
       </div>
     </div>
