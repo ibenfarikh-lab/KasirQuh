@@ -101,6 +101,57 @@
       border-bottom: 1px solid var(--border-color);
       text-align: left;
     }
+
+    .inv-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .inv-card-img, .catalog-list-img, .inv-list-img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    .badge-kat {
+      background: #e2e8f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+
+    .badge-stok {
+      background: #dcfce7;
+      color: #16a34a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+
+    .badge-stok-habis {
+      background: #fee2e2;
+      color: #dc2626;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+
+    .inv-list-item, .catalog-list-item {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
   </style>
 </head>
 <body>
@@ -125,18 +176,18 @@
     <!-- Konten Utama / Tab -->
     <main>
       <div id="penjualan" class="tab-content active">
-        <div id="pos-catalog-container"></div>
-        <div id="pos-catalog-list-container"></div>
+        <div id="pos-catalog-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;"></div>
+        <div id="pos-catalog-list-container" style="display: none; flex-direction: column;"></div>
       </div>
 
       <div id="data-barang" class="tab-content">
-        <div id="inventory-list-wrapper"></div>
-        <div id="inventory-grid-wrapper"></div>
+        <div id="inventory-list-wrapper" style="display: none; flex-direction: column;"></div>
+        <div id="inventory-grid-wrapper" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;"></div>
       </div>
 
       <div id="belanja-stok" class="tab-content">
-        <div id="restock-list-wrapper"></div>
-        <div id="restock-grid-wrapper"></div>
+        <div id="restock-list-wrapper" style="display: none; flex-direction: column;"></div>
+        <div id="restock-grid-wrapper" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px;"></div>
         <div style="margin-top: 12px; font-weight: bold;">Total Est: Rp <span id="restock-est-total">0</span></div>
       </div>
 
@@ -166,7 +217,7 @@
     </main>
 
     <!-- Elemen Data Tersembunyi & Notifikasi -->
-    <div id="scan-notif" style="display:none;"></div>
+    <div id="scan-notif" style="display:none; position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 8px 16px; border-radius: 4px; z-index: 1000;"></div>
     <input type="hidden" id="db-selected-online-img">
     <input type="hidden" id="db-name">
     <input type="hidden" id="db-code">
@@ -203,10 +254,631 @@
 
   <!-- Skrip JavaScript Logika Aplikasi -->
   <script>
-    function changePosPage(val) { console.log("POS Page:", val); }
-    function changeStokPage(val) { console.log("Stok Page:", val); }
-    
-    // Tempatkan seluruh kode logika script.js lama Anda di bawah sini jika ingin disatukan sepenuhnya
+    // Variabel Pendukung Global
+    let activeTab = 'penjualan';
+    let activeSubDataTab = 'sub-laporan';
+    let stokCurrentPage = 1;
+    let posCurrentPage = 1;
+    let viewMode = 'grid';
+    let scanCooldownDuration = 1000;
+    let isCooldown = false;
+    let isScannerPosOpen = false;
+    let isScannerDbOpen = false;
+    let html5QrCodePos = null;
+    let html5QrCodeDb = null;
+    let scannerTimeoutTimer = null;
+    let databaseProduk = {};
+    let databasePelanggan = [];
+    let restockListItems = JSON.parse(localStorage.getItem('restock_list_items_v13') || '[]');
+    let riwayatTransaksi = JSON.parse(localStorage.getItem('riwayat_kasir_v13') || '[]');
+    let cart = [];
+    let totalBelanja = 0;
+    let pengaturanToko = JSON.parse(localStorage.getItem('setting_toko_v13') || '{"nama":"TokoQuh","alamat":"-","phone":"-"}');
+    let userAuth = {user: "admin", pass: "admin"};
+    let defaultPlaceholderImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3C/svg%3E";
+
+    function parseRupiahToNumber(str) {
+      if (!str) return 0;
+      if (typeof str === 'number') return str;
+      return parseFloat(str.replace(/[^0-9,-]/g, '').replace(',', '.')) || 0;
+    }
+
+    function simpanBarangLangsung() {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+      let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
+      
+      let cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      let price = parseRupiahToNumber(document.getElementById("db-price").value);
+
+      let finalStok = (unit === 'rtg') ? (stokVal * isiRtg) : stokVal;
+      let finalModal = (unit === 'rtg') ? (cost / isiRtg) : cost;
+      let finalHarga = (unit === 'rtg') ? (price / isiRtg) : price;
+
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+      const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+
+      databaseProduk[code] = {
+        nama: name,
+        kategori: category,
+        satuan: unit,
+        isiRtg: isiRtg,
+        stok: finalStok,
+        modal: finalModal,
+        harga: finalHarga,
+        modalRtg: cost,
+        hargaRtg: price,
+        foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
+      };
+      refreshData();
+      showNotif("Barang baru ditambahkan ke stok!");
+    }
+
+    function simpanEditBarang(code) {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+      let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
+      
+      let cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      let price = parseRupiahToNumber(document.getElementById("db-price").value);
+
+      let finalStok = (unit === 'rtg') ? (stokVal * isiRtg) : stokVal;
+      let finalModal = (unit === 'rtg') ? (cost / isiRtg) : cost;
+      let finalHarga = (unit === 'rtg') ? (price / isiRtg) : price;
+
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+      const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+
+      if (databaseProduk[code]) {
+        databaseProduk[code] = {
+          nama: name,
+          kategori: category,
+          satuan: unit,
+          isiRtg: isiRtg,
+          stok: finalStok,
+          modal: finalModal,
+          harga: finalHarga,
+          modalRtg: cost,
+          hargaRtg: price,
+          foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
+        };
+      }
+      refreshData();
+      showNotif("Perubahan disimpan!");
+    }
+
+    function simpanEditBelanjaStok(restockId) {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+      const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
+      const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      const price = parseRupiahToNumber(document.getElementById("db-price").value);
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+
+      let rItem = restockListItems.find(i => i.id === restockId);
+      if (rItem) {
+        rItem.code = code;
+        rItem.nama = name;
+        rItem.kategori = category;
+        rItem.satuan = unit;
+        rItem.isiRtg = isiRtg;
+        rItem.qty = qtyBeli;
+        rItem.modal = (unit === 'rtg') ? (cost / isiRtg) : cost;
+        rItem.harga = (unit === 'rtg') ? (price / isiRtg) : price;
+        rItem.modalRtg = cost;
+        rItem.hargaRtg = price;
+        if (selectedOnlineImg) rItem.foto = selectedOnlineImg;
+
+        localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+        refreshData();
+        showNotif("Belanja stok diperbarui!");
+      }
+    }
+
+    function closeProductModal() {
+      document.getElementById("db-selected-online-img").value = "";
+      document.getElementById("edit-restock-id").value = "";
+    }
+
+    function convertImgToBase64(url, callback) {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 120; canvas.height = 120;
+        ctx.drawImage(img, 0, 0, 120, 120);
+        callback(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = url;
+    }
+
+    function simpanCatatanPembukuan() {
+      const custId = document.getElementById("bk-cust-id").value;
+      const noteId = document.getElementById("bk-note-id").value;
+      const waktuOtomatis = document.getElementById("bk-datetime").value;
+      const jenis = document.getElementById("bk-type").value;
+      const nominal = parseRupiahToNumber(document.getElementById("bk-amount").value);
+      const keterangan = document.getElementById("bk-desc").value.trim();
+
+      if (!keterangan && nominal <= 0) return alert("Harap isi keterangan atau nominal!");
+
+      let cust = databasePelanggan.find(c => c.id === custId);
+      if (cust) {
+        if (!cust.catatan) cust.catatan = [];
+        if (noteId) {
+          let note = cust.catatan.find(n => n.id === noteId);
+          if (note) { note.jenis = jenis; note.nominal = nominal; note.keterangan = keterangan || "-"; }
+        } else {
+          cust.catatan.push({ id: "NOTE-" + Date.now(), waktu: waktuOtomatis, jenis: jenis, nominal: nominal, keterangan: keterangan || "-" });
+        }
+        refreshData();
+        showNotif("Catatan disimpan!");
+      }
+    }
+
+    function hapusCatatanPembukuan(custId, noteId) {
+      if (confirm("Hapus catatan ini?")) {
+        let cust = databasePelanggan.find(c => c.id === custId);
+        if (cust && cust.catatan) {
+          cust.catatan = cust.catatan.filter(n => n.id !== noteId);
+          refreshData();
+          showNotif("Catatan dihapus!");
+        }
+      }
+    }
+
+    function bagikanCatatanWhatsApp(custId) {
+      let cust = databasePelanggan.find(c => c.id === custId);
+      if (!cust || !cust.catatan || cust.catatan.length === 0) return alert("Belum ada catatan!");
+      let rawPhone = cust.phone;
+      if (!rawPhone || rawPhone === "-") {
+        let manualPhone = prompt("Masukkan nomor WhatsApp tujuan:");
+        if (!manualPhone) return;
+        rawPhone = manualPhone;
+      }
+      let phone = rawPhone.replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+
+      let text = `*BUKU CATATAN - ${pengaturanToko.nama}* 📖\n`;
+      text += `Nama Pelanggan : *${cust.nama}*\n\n`;
+      cust.catatan.forEach((note, idx) => {
+        text += `${idx + 1}. [${note.jenis}] ${note.keterangan} ${note.nominal > 0 ? '(Rp ' + note.nominal.toLocaleString('id-ID') + ')' : ''}\n`;
+      });
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function tambahkanKeBelanjaStok() {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+      const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
+      const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      const price = parseRupiahToNumber(document.getElementById("db-price").value);
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+      const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+
+      let newItem = {
+        id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+        code: code,
+        nama: name,
+        kategori: category,
+        satuan: unit,
+        isiRtg: isiRtg,
+        qty: qtyBeli,
+        modal: (unit === 'rtg') ? (cost / isiRtg) : cost,
+        harga: (unit === 'rtg') ? (price / isiRtg) : price,
+        modalRtg: cost,
+        hargaRtg: price,
+        foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
+      };
+
+      restockListItems.push(newItem);
+      localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+      switchTab('belanja-stok', false);
+      showNotif("Ditambahkan ke Belanja Stok!");
+    }
+
+    function hapusItemBelanja(itemId) {
+      if (confirm("Hapus item ini dari daftar belanja?")) {
+        restockListItems = restockListItems.filter(item => item.id !== itemId);
+        localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+        refreshData();
+        showNotif("Item dihapus");
+      }
+    }
+
+    function prosesBelanjaStok() {
+      if (restockListItems.length === 0) return alert("Belum ada barang di daftar belanja stok!");
+      if (!confirm("Selesaikan belanja? Ini akan otomatis memperbarui stok, nilai modal, dan harga jual di Halaman Stok utama.")) return;
+
+      restockListItems.forEach(item => {
+        let code = item.code;
+        let produkLama = databaseProduk[code];
+        let stokLama = produkLama && produkLama.stok !== undefined ? produkLama.stok : 0;
+        
+        let qtyPenambahan = (item.satuan === 'rtg') ? (item.qty * item.isiRtg) : item.qty;
+        let stokBaru = parseFloat((stokLama + qtyPenambahan).toFixed(3));
+
+        databaseProduk[code] = {
+          nama: item.nama,
+          kategori: item.kategori,
+          satuan: item.satuan,
+          isiRtg: item.isiRtg,
+          stok: stokBaru,
+          modal: item.modal,
+          harga: item.harga,
+          modalRtg: item.modalRtg,
+          hargaRtg: item.hargaRtg,
+          foto: item.foto !== defaultPlaceholderImg ? item.foto : (produkLama ? produkLama.foto || "" : "")
+        };
+      });
+
+      restockListItems = [];
+      localStorage.removeItem('restock_list_items_v13');
+      refreshData();
+      alert("🎉 Belanja berhasil diproses! Stok, modal, dan harga jual di Halaman Stok telah diperbarui.");
+      switchTab('data-barang', false);
+    }
+
+    function updatePermanentBarTitle() {
+      const titleEl = document.getElementById("permanent-title");
+      const posPag = document.getElementById("pos-pagination-wrapper");
+      const stokPag = document.getElementById("stok-pagination-wrapper");
+
+      posPag.style.display = "none";
+      stokPag.style.display = "none";
+
+      if (activeTab === 'penjualan') {
+        titleEl.innerText = "Kasir";
+        posPag.style.display = "flex";
+      } else if (activeTab === 'data-barang') {
+        titleEl.innerText = "Manajemen Stok";
+        stokPag.style.display = "flex";
+      } else if (activeTab === 'belanja-stok') {
+        titleEl.innerText = "Belanja Stok";
+      } else if (activeTab === 'laporan') {
+        titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? "Data Pelanggan" : "Laporan Transaksi";
+      } else if (activeTab === 'pengaturan') {
+        titleEl.innerText = "Pengaturan Sistem";
+      }
+    }
+
+    function switchTab(tabId, pushHistory = true) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+
+      if (pushHistory) history.pushState({tab: tabId}, "", "");
+
+      const fabCart = document.getElementById('fab-cart-btn');
+      const fabScan = document.getElementById('fab-scan-btn');
+      const fabFilter = document.getElementById('fab-filter-btn');
+      const fabAdd = document.getElementById('fab-add-btn');
+      const fabAddCust = document.getElementById('fab-add-cust-btn');
+
+      if (tabId === 'penjualan') {
+        fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
+      } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'flex'; fabAddCust.style.display = 'none';
+      } else {
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
+      }
+      updatePermanentBarTitle();
+      refreshData();
+    }
+
+    function changeStokPage(delta) { stokCurrentPage += delta; refreshData(); }
+    function changePosPage(delta) { posCurrentPage += delta; refreshData(); }
+
+    function playBeep() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); osc.connect(audioCtx.destination);
+      osc.type = "sine"; osc.frequency.value = 1000; gain.gain.value = 0.1;
+      osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function tambahManualDesdeCode(barcode) {
+      let produk = databaseProduk[barcode];
+      if (produk) {
+        if ((produk.stok || 0) <= 0) return alert("Stok habis!");
+        playBeep();
+        tambahItemKeCart(barcode, produk);
+      }
+    }
+
+    function tambahItemKeCart(barcode, produk) {
+      const isKg = (produk.satuan === 'kg');
+      let inputJumlah = 1;
+      let displaySatuan = 'pcs';
+      let hargaAktif = produk.harga;
+      let modalAktif = produk.modal;
+
+      const existingItem = cart.find(item => item.barcode === barcode && item.satuanJual === displaySatuan);
+      const currentCartQty = existingItem ? existingItem.qty : 0;
+      if (currentCartQty + inputJumlah > (produk.stok || 0)) {
+        alert(`Stok tidak mencukupi! Sisa stok: ${produk.stok} pcs`);
+        return;
+      }
+
+      if (existingItem) {
+        existingItem.qty += inputJumlah;
+        existingItem.subtotal = Math.round(existingItem.qty * hargaAktif);
+        existingItem.submodal = Math.round(existingItem.qty * modalAktif);
+      } else {
+        cart.push({
+          barcode: barcode, nama: produk.nama, kategori: produk.kategori || "Umum", satuan: produk.satuan || "pcs",
+          satuanJual: displaySatuan, modal: modalAktif, harga: hargaAktif, foto: produk.foto || defaultPlaceholderImg,
+          qty: inputJumlah, subtotal: Math.round(inputJumlah * hargaAktif), submodal: Math.round(inputJumlah * modalAktif)
+        });
+      }
+      refreshData();
+    }
+
+    function hapusBarang(code) {
+      if(confirm("Hapus barang ini?")) {
+        delete databaseProduk[code];
+        refreshData();
+        showNotif("Barang dihapus!");
+      }
+    }
+
+    function simpanPelanggan() {
+      const id = document.getElementById("cust-id").value.trim();
+      const nama = document.getElementById("cust-name").value.trim();
+      const phone = document.getElementById("cust-phone").value.trim() || "-";
+      const alamat = document.getElementById("cust-address").value.trim() || "-";
+      if (!nama) return alert("Nama pelanggan wajib diisi!");
+      let custId = id || ("CUST-" + Date.now());
+      let existingIndex = databasePelanggan.findIndex(c => c.id === custId);
+      
+      if (existingIndex >= 0) {
+        databasePelanggan[existingIndex].nama = nama;
+        databasePelanggan[existingIndex].phone = phone;
+        databasePelanggan[existingIndex].alamat = alamat;
+      } else {
+        databasePelanggan.push({ id: custId, nama, phone, alamat, catatan: [] });
+      }
+      refreshData();
+      showNotif("Pelanggan tersimpan!");
+    }
+
+    function hapusPelanggan(id) {
+      if (confirm("Hapus pelanggan ini?")) {
+        databasePelanggan = databasePelanggan.filter(c => c.id !== id);
+        refreshData();
+        showNotif("Pelanggan dihapus!");
+      }
+    }
+
+    function refreshData() {
+      document.getElementById("setting-user").value = userAuth.user;
+      document.getElementById("setting-pass").value = userAuth.pass;
+      document.getElementById("setting-shop-name").value = pengaturanToko.nama;
+      document.getElementById("setting-shop-address").value = pengaturanToko.alamat;
+      document.getElementById("setting-shop-phone").value = pengaturanToko.phone;
+      document.getElementById("setting-cooldown").value = scanCooldownDuration;
+      
+      const viewSelect = document.getElementById("setting-view-mode");
+      if (viewSelect) viewSelect.value = viewMode;
+
+      const invList = document.getElementById("inventory-list-wrapper");
+      const invGrid = document.getElementById("inventory-grid-wrapper");
+      invList.innerHTML = ""; invGrid.innerHTML = "";
+
+      let filteredItems = [];
+      let filteredItemsPos = [];
+
+      for (let code in databaseProduk) {
+        let item = databaseProduk[code];
+        filteredItems.push({ code, ...item });
+        filteredItemsPos.push({ code, ...item });
+      }
+
+      filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
+      filteredItemsPos.sort((a, b) => a.nama.localeCompare(b.nama));
+
+      let itemsPerPageStok = 24;
+      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
+      if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
+      if (stokCurrentPage < 1) stokCurrentPage = 1;
+
+      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
+      let paginatedStokItems = filteredItems.slice(stokStartIndex, stokStartIndex + itemsPerPageStok);
+
+      if (filteredItems.length > 0) {
+        document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
+      }
+
+      if (paginatedStokItems.length === 0) {
+        const emptyStokMsg = `<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 20px;">⚠️ Belum ada data barang stok.</div>`;
+        invList.innerHTML = emptyStokMsg; invGrid.innerHTML = emptyStokMsg;
+      } else {
+        paginatedStokItems.forEach(item => {
+          let code = item.code;
+          let kat = item.kategori || "Umum";
+          let sat = item.satuan || "pcs";
+          let stok = item.stok !== undefined ? item.stok : 0;
+          let fotoSrc = item.foto || defaultPlaceholderImg;
+          let modalVal = sat === 'rtg' ? (item.modalRtg || 0) : (item.modal || 0);
+          let hargaVal = sat === 'rtg' ? (item.hargaRtg || 0) : (item.harga || 0);
+
+          invGrid.innerHTML += `
+            <div class="inv-card">
+              <div class="inv-card-top">
+                <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 2px;">
+                  <button class="btn-danger" style="flex: 1; height: 28px; border-radius: 6px; font-size: 0.75rem; background: #dc2626; color: white; border: none; cursor: pointer;" onclick="hapusBarang('${code}')">Hapus</button>
+                </div>
+                <img src="${fotoSrc}" class="inv-card-img">
+                <div class="inv-card-info">
+                  <div class="inv-card-title" style="font-weight: bold; font-size: 0.85rem;">${item.nama}</div>
+                  <div class="inv-card-code" style="font-size: 0.7rem; color: #64748b;">${code}</div>
+                  <div style="margin-top: 2px;"><span class="badge-kat">${kat}</span> <span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</span></div>
+                </div>
+              </div>
+              <div class="inv-card-details" style="font-size: 0.75rem; margin-top: 6px;">
+                <div>Modal: <b>Rp ${modalVal.toLocaleString('id-ID')}</b></div>
+                <div>Jual: <b>Rp ${hargaVal.toLocaleString('id-ID')}</b></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      renderKatalogKasirPaginated(filteredItemsPos);
+
+      const restockListWrapper = document.getElementById("restock-list-wrapper");
+      const restockGridWrapper = document.getElementById("restock-grid-wrapper");
+      if(restockListWrapper && restockGridWrapper) {
+        restockListWrapper.innerHTML = ""; restockGridWrapper.innerHTML = "";
+        let totalEstBelanja = 0;
+
+        if (restockListItems.length === 0) {
+          const emptyRestockMsg = `<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 20px;">🛒 Belum ada daftar belanja stok.</div>`;
+          restockListWrapper.innerHTML = emptyRestockMsg; restockGridWrapper.innerHTML = emptyRestockMsg;
+        } else {
+          restockListItems.forEach(item => {
+            let fotoSrc = item.foto || defaultPlaceholderImg;
+            let subtotalModal = (item.satuan === 'rtg' ? (item.modalRtg || 0) : (item.modal || 0)) * (item.qty || 1);
+            totalEstBelanja += subtotalModal;
+
+            restockGridWrapper.innerHTML += `
+              <div class="inv-card">
+                <div class="inv-card-top">
+                  <button style="width: 100%; height: 26px; border-radius: 6px; font-size: 0.72rem; background: #dc2626; color: white; border: none; cursor: pointer; margin-bottom: 4px;" onclick="hapusItemBelanja('${item.id}')">Hapus</button>
+                  <img src="${fotoSrc}" class="inv-card-img">
+                  <div class="inv-card-info">
+                    <div style="font-weight: bold; font-size: 0.85rem;">${item.nama}</div>
+                    <div style="font-size: 0.7rem; color: #64748b;">Beli: ${item.qty}</div>
+                  </div>
+                </div>
+                <div class="inv-card-details" style="font-size: 0.75rem; margin-top: 6px;">
+                  <div>Total: <b style="color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</b></div>
+                </div>
+              </div>
+            `;
+          });
+        }
+        document.getElementById("restock-est-total").innerText = totalEstBelanja.toLocaleString('id-ID');
+      }
+
+      const repBody = document.getElementById("report-body");
+      if(repBody) {
+        repBody.innerHTML = "";
+        riwayatTransaksi.forEach(t => {
+          repBody.innerHTML += `<tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 6px;">${t.waktu}</td><td style="padding: 6px;">${t.metode}</td><td style="padding: 6px;">${t.qty}</td><td style="padding: 6px;">Rp ${t.total.toLocaleString('id-ID')}</td><td style="padding: 6px; color: #16a34a; font-weight: bold;">Rp ${t.untung.toLocaleString('id-ID')}</td></tr>`;
+        });
+        if (riwayatTransaksi.length === 0) repBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">Belum ada riwayat transaksi.</td></tr>`;
+      }
+
+      const custContainer = document.getElementById("customer-list-wrapper");
+      if(custContainer) {
+        custContainer.innerHTML = "";
+        let grandTotalAllCustomersFinancial = 0;
+
+        if (databasePelanggan.length === 0) {
+          custContainer.innerHTML = `<div style="text-align: center; color: #64748b; padding: 20px;">Belum ada data pelanggan.</div>`;
+        } else {
+          databasePelanggan.forEach(c => {
+            let custTotalNominal = 0;
+            if (c.catatan && c.catatan.length > 0) {
+              c.catatan.forEach(note => { custTotalNominal += (note.nominal || 0); });
+            }
+            grandTotalAllCustomersFinancial += custTotalNominal;
+
+            custContainer.innerHTML += `
+              <div class="inv-list-item" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: bold; font-size: 0.85rem;">${c.nama}</div>
+                  <div style="font-size: 0.75rem; color: #64748b;">📞 ${c.phone} • 📍 ${c.alamat}</div>
+                  <div style="font-size: 0.78rem; font-weight: 600; color: #2563eb; margin-top: 3px;">Total Nilai Catatan: Rp ${custTotalNominal.toLocaleString('id-ID')}</div>
+                </div>
+                <button style="background: #dc2626; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px; border: none; cursor: pointer;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
+              </div>
+            `;
+          });
+        }
+        document.getElementById("customer-total-financial").innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
+      }
+    }
+
+    function renderKatalogKasirPaginated(filteredItems) {
+      const catalogGrid = document.getElementById("pos-catalog-container");
+      const catalogList = document.getElementById("pos-catalog-list-container");
+      if(!catalogGrid || !catalogList) return;
+      
+      catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
+
+      let itemsPerPagePos = 24;
+      let totalPosPages = Math.ceil(filteredItems.length / itemsPerPagePos) || 1;
+      if (posCurrentPage > totalPosPages) posCurrentPage = totalPosPages;
+      if (posCurrentPage < 1) posCurrentPage = 1;
+
+      let posStartIndex = (posCurrentPage - 1) * itemsPerPagePos;
+      let paginatedPosItems = filteredItems.slice(posStartIndex, posStartIndex + itemsPerPagePos);
+
+      if (filteredItems.length > 0) {
+        document.getElementById("pos-page-info").innerText = `${posCurrentPage}/${totalPosPages}`;
+      }
+
+      if (paginatedPosItems.length === 0) {
+        const emptyMsg = `<div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 20px;">⚠️ Belum ada barang tersedia.</div>`;
+        catalogGrid.innerHTML = emptyMsg; catalogList.innerHTML = emptyMsg;
+      } else {
+        paginatedPosItems.forEach(p => {
+          let code = p.code;
+          let kat = p.kategori || "Umum";
+          let sat = p.satuan || "pcs";
+          let stok = p.stok !== undefined ? p.stok : 0;
+          let fotoSrc = p.foto || defaultPlaceholderImg;
+          let isHabis = stok <= 0;
+          let unitLabel = sat === 'kg' ? '/Kg' : '/Pcs';
+
+          catalogGrid.innerHTML += `
+            <div class="inv-card">
+              <div class="inv-card-top">
+                <button style="width: 100%; height: 30px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer; margin-bottom: 4px;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDesdeCode('${code}')">+</button>
+                <img src="${fotoSrc}" class="inv-card-img">
+                <div class="inv-card-info">
+                  <div style="font-weight: bold; font-size: 0.85rem;">${p.nama}</div>
+                  <div style="font-size: 0.7rem; color: #64748b;">${code}</div>
+                  <div style="margin-top: 2px;"><span class="badge-kat">${kat}</span> <span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${stok}</span></div>
+                </div>
+              </div>
+              <div class="inv-card-details" style="font-size: 0.75rem; margin-top: 4px;">
+                <div><b>Rp ${p.harga.toLocaleString('id-ID')}${unitLabel}</b></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function showNotif(msg) {
+      const notif = document.getElementById("scan-notif");
+      if(!notif) return;
+      notif.innerText = msg; notif.style.display = "block";
+      setTimeout(() => { notif.style.display = "none"; }, 1500);
+    }
+
+    updatePermanentBarTitle();
+    refreshData();
   </script>
 </body>
 </html>
