@@ -254,6 +254,13 @@
 
     <!-- 5. HALAMAN CATATAN UTAMA (Dinamis & Bersih) -->
     <div id="catatan" class="tab-content">
+      
+      <!-- KALENDER HISTORI CATATAN -->
+      <div class="card no-print" style="margin-bottom: 12px; padding: 12px; background: var(--table-header); border: 1.5px solid #2563eb;">
+        <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 6px;">📅 Tanggal Catatan:</label>
+        <input type="date" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="width: 100%; padding: 10px; font-weight: bold; border-color: #2563eb; color: #2563eb;">
+      </div>
+
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 6px; gap: 6px; align-items: center;">
         <div id="container-sub-tabs-catatan" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;"></div>
         <button onclick="tambahTabCatatanBaru()" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0;">+</button>
