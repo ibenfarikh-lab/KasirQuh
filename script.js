@@ -168,11 +168,11 @@ function renderSubTabsCatatanUI() {
 
     let btn = document.createElement("button");
     btn.className = `sub-tab-btn ${isActive ? 'active' : ''}`;
-    btn.style.cssText = "display: flex; align-items: center; gap: 6px;";
+    btn.style.cssText = "display: flex; align-items: center; gap: 6px; white-space: nowrap;";
     btn.innerHTML = `
       <span>${label}</span> 
-      <span onclick="event.stopPropagation(); ubahNamaTabDinamis('${tabKey}')" title="Ubah Nama Tab" style="font-size: 0.75rem; cursor: pointer; opacity: 0.7; padding: 2px;">✏️</span>
-      <span onclick="event.stopPropagation(); hapusTabCatatanDinamis('${tabKey}')" title="Hapus Tab Catatan" style="font-size: 0.75rem; cursor: pointer; opacity: 0.7; padding: 2px; color: #dc2626;">🗑️</span>
+      <span onclick="event.stopPropagation(); ubahNamaTabDinamis('${tabKey}')" title="Ubah Nama Tab" style="font-size: 0.75rem; cursor: pointer; background: rgba(0, 0, 0, 0.15); padding: 4px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">✏️</span>
+      <span onclick="event.stopPropagation(); hapusTabCatatanDinamis('${tabKey}')" title="Hapus Tab Catatan" style="font-size: 0.75rem; cursor: pointer; background: rgba(0, 0, 0, 0.15); padding: 4px 6px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;">🗑️</span>
     `;
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
@@ -562,7 +562,6 @@ db.collection("pelanggan").onSnapshot((snapshot) => {
   refreshData();
 });
 
-// --- CLOUD FIRESTORE SYNC UNTUK RESTOCK & TRANSAKSI ---
 let restockListItems = [];
 db.collection("pengaturan").doc("restock_v13").onSnapshot((doc) => {
   if (doc.exists) {
@@ -588,7 +587,6 @@ db.collection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapsho
   });
   refreshData();
 }, (error) => {
-  // Fallback jika index belum dibuat di Firebase
   db.collection("transaksi").get().then((snapshot) => {
     riwayatTransaksi = [];
     snapshot.forEach((doc) => {
