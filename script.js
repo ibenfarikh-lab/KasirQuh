@@ -168,14 +168,11 @@ function renderSubTabsCatatanUI() {
 
     let btn = document.createElement("button");
     btn.className = `sub-tab-btn ${isActive ? 'active' : ''}`;
-    // Tampilan tab diperbarui: teks horizontal & ikon terbungkus kotak melengkung rapi
-    btn.style.cssText = "display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;";
+    btn.style.cssText = "display: flex; align-items: center; gap: 6px;";
     btn.innerHTML = `
-      <span style="font-size: 0.9rem; font-weight: bold;">${label}</span> 
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span onclick="event.stopPropagation(); ubahNamaTabDinamis('${tabKey}')" title="Ubah Nama Tab" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.85rem; cursor: pointer;">✏️</span>
-        <span onclick="event.stopPropagation(); hapusTabCatatanDinamis('${tabKey}')" title="Hapus Tab Catatan" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: rgba(220, 38, 38, 0.08); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 8px; font-size: 0.85rem; cursor: pointer;">🗑️</span>
-      </div>
+      <span>${label}</span> 
+      <span onclick="event.stopPropagation(); ubahNamaTabDinamis('${tabKey}')" title="Ubah Nama Tab" style="font-size: 0.75rem; cursor: pointer; opacity: 0.7; padding: 2px;">✏️</span>
+      <span onclick="event.stopPropagation(); hapusTabCatatanDinamis('${tabKey}')" title="Hapus Tab Catatan" style="font-size: 0.75rem; cursor: pointer; opacity: 0.7; padding: 2px; color: #dc2626;">🗑️</span>
     `;
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
