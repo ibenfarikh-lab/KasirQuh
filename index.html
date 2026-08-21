@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplikasi Kasir & Toko</title>
-  <!-- Hubungkan file CSS -->
-  <link rel="stylesheet" href="style.css">
+  <!-- Menghubungkan file CSS secara eksplisit -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <!-- Struktur HTML Aplikasi (Sesuaikan dengan elemen UI utama Anda) -->
+  <!-- Struktur HTML Aplikasi -->
   <div id="app-container">
     <!-- Navbar / Header -->
     <header class="permanent-header">
@@ -27,26 +27,22 @@
 
     <!-- Konten Utama / Tab -->
     <main>
-      <!-- Contoh Tab Penjualan / Kasir -->
       <div id="penjualan" class="tab-content active">
         <div id="pos-catalog-container"></div>
         <div id="pos-catalog-list-container"></div>
       </div>
 
-      <!-- Contoh Tab Data Barang -->
       <div id="data-barang" class="tab-content">
         <div id="inventory-list-wrapper"></div>
         <div id="inventory-grid-wrapper"></div>
       </div>
 
-      <!-- Contoh Tab Belanja Stok -->
       <div id="belanja-stok" class="tab-content">
         <div id="restock-list-wrapper"></div>
         <div id="restock-grid-wrapper"></div>
         <div>Total Est: Rp <span id="restock-est-total">0</span></div>
       </div>
 
-      <!-- Contoh Tab Laporan -->
       <div id="laporan" class="tab-content">
         <div class="sub-tab-content active" id="sub-laporan">
           <table>
@@ -59,7 +55,6 @@
         </div>
       </div>
 
-      <!-- Tab Pengaturan -->
       <div id="pengaturan" class="tab-content">
         <input type="text" id="setting-user">
         <input type="password" id="setting-pass">
@@ -107,7 +102,7 @@
     </div>
   </div>
 
-  <!-- Hubungkan file JavaScript -->
-  <script src="script.js"></script>
+  <!-- Menghubungkan file JavaScript secara eksplisit -->
+  <script src="./script.js"></script>
 </body>
 </html>
