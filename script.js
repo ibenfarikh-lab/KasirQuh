@@ -500,17 +500,6 @@ function pindahCatatanUrutanDinamis(targetTabKey, index, direction) {
     .catch(err => alert("Gagal mengubah urutan: " + err.message));
 }
 
-// Fitur Bagikan Aplikasi via WhatsApp
-function bagikanAplikasiWhatsApp() {
-  let urlAplikasi = window.location.origin + window.location.pathname;
-  let pesan = `Halo! Yuk gunakan aplikasi kasir *${pengaturanToko.nama}* untuk mengelola transaksi, stok barang, dan catatan toko secara online.\n\n` +
-              `Silakan buka tautan berikut di browser HP atau komputer Anda:\n` +
-              `${urlAplikasi}\n\n` +
-              `Praktis dan bisa diakses dari mana saja! 🚀`;
-  let waUrl = `https://wa.me/?text=${encodeURIComponent(pesan)}`;
-  window.open(waUrl, '_blank');
-}
-
 function cekStatusLogin() {
   if (localStorage.getItem('isLoggedIn') === 'true') {
     document.getElementById('loginModal').style.display = 'none';
