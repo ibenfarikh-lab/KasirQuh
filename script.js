@@ -1,0 +1,1460 @@
+// --- SCRIPT.JS ---
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          let width = img.width;
+          let height = img.height;
+          const maxSize = 300;
+          
+          if (width > height) {
+            if (width > maxSize) {
+              height *= maxSize / width;
+              width = maxSize;
+            }
+          } else {
+            if (height > maxSize) {
+              width *= maxSize / height;
+              height = maxSize;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          document.getElementById("db-selected-online-img").value = compressedBase64;
+          showNotif("Foto berhasil dimuat!");
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    
+
+    function simpanBarangLangsung() {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+      let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
+      
+      let cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      let price = parseRupiahToNumber(document.getElementById("db-price").value);
+
+      let finalStok = (unit === 'rtg') ? (stokVal * isiRtg) : stokVal;
+      let finalModal = (unit === 'rtg') ? (cost / isiRtg) : cost;
+      let finalHarga = (unit === 'rtg') ? (price / isiRtg) : price;
+
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+      const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+
+      db.collection("produk").doc(code).set({
+        nama: name,
+        kategori: category,
+        satuan: unit,
+        isiRtg: isiRtg,
+        stok: finalStok,
+        modal: finalModal,
+        harga: finalHarga,
+        modalRtg: cost,
+        hargaRtg: price,
+        foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
+      }, { merge: true }).then(() => {
+        closeProductModal();
+        showNotif("Barang baru ditambahkan ke stok!");
+      }).catch(err => alert("Gagal menyimpan: " + err.message));
+    }
+
+    function simpanEditBarang(code) {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+      let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
+      
+      let cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      let price = parseRupiahToNumber(document.getElementById("db-price").value);
+
+      let finalStok = (unit === 'rtg') ? (stokVal * isiRtg) : stokVal;
+      let finalModal = (unit === 'rtg') ? (cost / isiRtg) : cost;
+      let finalHarga = (unit === 'rtg') ? (price / isiRtg) : price;
+
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+      const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+
+      db.collection("produk").doc(code).update({
+        nama: name,
+        kategori: category,
+        satuan: unit,
+        isiRtg: isiRtg,
+        stok: finalStok,
+        modal: finalModal,
+        harga: finalHarga,
+        modalRtg: cost,
+        hargaRtg: price,
+        foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
+      }).then(() => {
+        closeProductModal();
+        showNotif("Perubahan disimpan!");
+      }).catch(err => alert("Gagal menyimpan: " + err.message));
+    }
+
+    function simpanEditBelanjaStok(restockId) {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+      const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
+      const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      const price = parseRupiahToNumber(document.getElementById("db-price").value);
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+
+      let rItem = restockListItems.find(i => i.id === restockId);
+      if (rItem) {
+        rItem.code = code;
+        rItem.nama = name;
+        rItem.kategori = category;
+        rItem.satuan = unit;
+        rItem.isiRtg = isiRtg;
+        rItem.qty = qtyBeli;
+        rItem.modal = (unit === 'rtg') ? (cost / isiRtg) : cost;
+        rItem.harga = (unit === 'rtg') ? (price / isiRtg) : price;
+        rItem.modalRtg = cost;
+        rItem.hargaRtg = price;
+        if (selectedOnlineImg) rItem.foto = selectedOnlineImg;
+
+        localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+        closeProductModal();
+        refreshData();
+        showNotif("Belanja stok diperbarui!");
+      }
+    }
+
+    function autoFillDataBarang(namaInput) {
+      const sugBox = document.getElementById("autocomplete-suggestions");
+      if (!namaInput.trim()) {
+        sugBox.style.display = "none";
+        return;
+      }
+
+      let matches = [];
+      for (let code in databaseProduk) {
+        let p = databaseProduk[code];
+        if (p.nama.toLowerCase().includes(namaInput.toLowerCase())) {
+          matches.push({ code, ...p });
+        }
+      }
+
+      if (matches.length > 0) {
+        sugBox.style.display = "block";
+        sugBox.innerHTML = "";
+        matches.forEach(m => {
+          let div = document.createElement("div");
+          div.style.cssText = "padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;";
+          div.innerText = m.nama + ` (Stok: ${m.stok || 0})`;
+          div.onmousedown = function() {
+            document.getElementById("db-name").value = m.nama;
+            document.getElementById("db-code").value = m.code;
+            document.getElementById("db-category").value = m.kategori || "";
+            document.getElementById("db-unit").value = m.satuan || "pcs";
+            document.getElementById("db-isi-rtg").value = m.isiRtg || 10;
+            document.getElementById("db-cost").value = ((m.satuan === 'rtg' ? m.modalRtg : m.modal) || 0).toLocaleString('id-ID');
+            document.getElementById("db-price").value = ((m.satuan === 'rtg' ? m.hargaRtg : m.harga) || 0).toLocaleString('id-ID');
+            document.getElementById("db-selected-online-img").value = m.foto || "";
+            updateUnitLabel();
+            sugBox.style.display = "none";
+          };
+          sugBox.appendChild(div);
+        });
+      } else {
+        sugBox.style.display = "none";
+      }
+
+      let exactMatchCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === namaInput.toLowerCase());
+      if (exactMatchCode) {
+        let p = databaseProduk[exactMatchCode];
+        document.getElementById("db-code").value = exactMatchCode;
+        document.getElementById("db-category").value = p.kategori || "";
+        document.getElementById("db-unit").value = p.satuan || "pcs";
+        document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
+        document.getElementById("db-cost").value = ((p.satuan === 'rtg' ? p.modalRtg : p.modal) || 0).toLocaleString('id-ID');
+        document.getElementById("db-price").value = ((p.satuan === 'rtg' ? p.hargaRtg : p.harga) || 0).toLocaleString('id-ID');
+        document.getElementById("db-selected-online-img").value = p.foto || "";
+        updateUnitLabel();
+      }
+    }
+
+    function closeProductModal() {
+      document.getElementById("productModal").classList.remove("show");
+      document.getElementById("online-image-results").style.display = "none";
+      document.getElementById("online-image-results").innerHTML = "";
+      document.getElementById("db-selected-online-img").value = "";
+      document.getElementById("autocomplete-suggestions").style.display = "none";
+      document.getElementById("edit-restock-id").value = "";
+      if (typeof isScannerDbOpen !== 'undefined' && isScannerDbOpen) toggleScannerDb();
+    }
+
+    async function cariFotoOnline() {
+      const namaProduk = document.getElementById("db-name").value.trim();
+      if (!namaProduk) return alert("Harap isi Nama Barang terlebih dahulu!");
+      const resultsContainer = document.getElementById("online-image-results");
+      resultsContainer.style.display = "grid";
+      resultsContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; font-size: 0.75rem; color: var(--text-muted); padding: 15px;">Mencari foto...</div>`;
+
+      try {
+        let searchKeyword = encodeURIComponent(namaProduk);
+        let url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${searchKeyword}&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url&format=json&origin=*`;
+        let response = await fetch(url);
+        let data = await response.json();
+        resultsContainer.innerHTML = "";
+        let foundImages = 0;
+
+        if (data.query && data.query.pages) {
+          let pages = data.query.pages;
+          for (let key in pages) {
+            let page = pages[key];
+            if (page.imageinfo && page.imageinfo[0] && page.imageinfo[0].url) {
+              let imgUrl = page.imageinfo[0].url;
+              if (imgUrl.match(/\.(jpg|jpeg|png|webp)/i)) {
+                foundImages++;
+                let thumbDiv = document.createElement("div");
+                thumbDiv.style.cssText = "cursor: pointer; border: 2px solid transparent; border-radius: 6px; overflow: hidden; height: 60px; background: #fff; display: flex; align-items: center; justify-content: center;";
+                thumbDiv.innerHTML = `<img src="${imgUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;" crossorigin="anonymous">`;
+                thumbDiv.onclick = function() {
+                  document.querySelectorAll('#online-image-results > div').forEach(el => el.style.borderColor = 'transparent');
+                  thumbDiv.style.borderColor = '#2563eb';
+                  convertImgToBase64(imgUrl, function(base64Str) {
+                    document.getElementById("db-selected-online-img").value = base64Str;
+                    showNotif("Foto dipilih!");
+                  });
+                };
+                resultsContainer.appendChild(thumbDiv);
+              }
+            }
+          }
+        }
+        if (foundImages === 0) {
+          let styles = ['identicon', 'bottts', 'shapes', 'fun-emoji'];
+          styles.forEach(st => {
+            let fallbackUrl = `https://api.dicebear.com/7.x/${st}/svg?seed=${encodeURIComponent(namaProduk)}`;
+            let thumbDiv = document.createElement("div");
+            thumbDiv.style.cssText = "cursor: pointer; border: 2px solid transparent; border-radius: 6px; overflow: hidden; height: 60px; background: #e2e8f0; display: flex; align-items: center; justify-content: center;";
+            thumbDiv.innerHTML = `<img src="${fallbackUrl}" style="width: 80%; height: 80%; object-fit: contain;">`;
+            thumbDiv.onclick = function() {
+              document.querySelectorAll('#online-image-results > div').forEach(el => el.style.borderColor = 'transparent');
+              thumbDiv.style.borderColor = '#2563eb';
+              convertImgToBase64(fallbackUrl, function(base64Str) {
+                document.getElementById("db-selected-online-img").value = base64Str;
+                showNotif("Ikon dipilih!");
+              });
+            };
+            resultsContainer.appendChild(thumbDiv);
+          });
+        }
+      } catch (error) {
+        resultsContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; font-size: 0.75rem; color: #dc2626; padding: 10px;">Gagal memuat foto.</div>`;
+      }
+    }
+
+    function convertImgToBase64(url, callback) {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 120; canvas.height = 120;
+        ctx.drawImage(img, 0, 0, 120, 120);
+        callback(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = url;
+    }
+
+    function openCustomerModal(id = null) {
+      const modal = document.getElementById("customerModal");
+      const title = document.getElementById("cust-modal-title");
+      if (id) {
+        let cust = databasePelanggan.find(c => c.id === id);
+        if (cust) {
+          title.innerText = "Edit Pelanggan";
+          document.getElementById("cust-id").value = cust.id;
+          document.getElementById("cust-name").value = cust.nama;
+          document.getElementById("cust-phone").value = cust.phone;
+          document.getElementById("cust-address").value = cust.alamat;
+        }
+      } else {
+        title.innerText = "Tambah Pelanggan Baru";
+        document.getElementById("cust-id").value = "";
+        document.getElementById("cust-name").value = "";
+        document.getElementById("cust-phone").value = "";
+        document.getElementById("cust-address").value = "";
+      }
+      modal.classList.add("show");
+      history.pushState({tab: activeTab, modal: 'customer'}, "", "");
+    }
+
+    function closeCustomerModal() { document.getElementById("customerModal").classList.remove("show"); }
+
+    function openBookkeepingModal(custId, noteId = null) {
+      const modal = document.getElementById("bookkeepingModal");
+      document.getElementById("bk-cust-id").value = custId;
+      document.getElementById("bk-note-id").value = noteId || "";
+      let cust = databasePelanggan.find(c => c.id === custId);
+      if (noteId && cust && cust.catatan) {
+        let note = cust.catatan.find(n => n.id === noteId);
+        if (note) {
+          document.getElementById("bk-modal-title").innerText = "Edit Catatan Pelanggan";
+          document.getElementById("bk-datetime").value = note.waktu;
+          document.getElementById("bk-type").value = note.jenis;
+          document.getElementById("bk-amount").value = note.nominal > 0 ? note.nominal.toLocaleString('id-ID') : "";
+          document.getElementById("bk-desc").value = note.keterangan;
+        }
+      } else {
+        document.getElementById("bk-modal-title").innerText = "Tambah Catatan Pelanggan";
+        document.getElementById("bk-datetime").value = new Date().toLocaleString('id-ID');
+        document.getElementById("bk-type").value = "Belanja (belum dibayar)";
+        document.getElementById("bk-amount").value = "";
+        document.getElementById("bk-desc").value = "";
+      }
+      modal.classList.add("show");
+      history.pushState({tab: activeTab, modal: 'bookkeeping'}, "", "");
+    }
+
+    function closeBookkeepingModal() { document.getElementById("bookkeepingModal").classList.remove("show"); }
+
+    function simpanCatatanPembukuan() {
+      const custId = document.getElementById("bk-cust-id").value;
+      const noteId = document.getElementById("bk-note-id").value;
+      const waktuOtomatis = document.getElementById("bk-datetime").value;
+      const jenis = document.getElementById("bk-type").value;
+      const nominal = parseRupiahToNumber(document.getElementById("bk-amount").value);
+      const keterangan = document.getElementById("bk-desc").value.trim();
+
+      if (!keterangan && nominal <= 0) return alert("Harap isi keterangan atau nominal!");
+
+      let cust = databasePelanggan.find(c => c.id === custId);
+      if (cust) {
+        if (!cust.catatan) cust.catatan = [];
+        if (noteId) {
+          let note = cust.catatan.find(n => n.id === noteId);
+          if (note) { note.jenis = jenis; note.nominal = nominal; note.keterangan = keterangan || "-"; }
+        } else {
+          cust.catatan.push({ id: "NOTE-" + Date.now(), waktu: waktuOtomatis, jenis: jenis, nominal: nominal, keterangan: keterangan || "-" });
+        }
+        db.collection("pelanggan").doc(custId).update({ catatan: cust.catatan })
+          .then(() => { closeBookkeepingModal(); showNotif("Catatan disimpan!"); })
+          .catch(err => alert("Gagal menyimpan: " + err.message));
+      }
+    }
+
+    function hapusCatatanPembukuan(custId, noteId) {
+      if (confirm("Hapus catatan ini?")) {
+        let cust = databasePelanggan.find(c => c.id === custId);
+        if (cust && cust.catatan) {
+          cust.catatan = cust.catatan.filter(n => n.id !== noteId);
+          db.collection("pelanggan").doc(custId).update({ catatan: cust.catatan })
+            .then(() => showNotif("Catatan dihapus!"))
+            .catch(err => alert("Gagal menghapus: " + err.message));
+        }
+      }
+    }
+
+    function bagikanCatatanWhatsApp(custId) {
+      let cust = databasePelanggan.find(c => c.id === custId);
+      if (!cust || !cust.catatan || cust.catatan.length === 0) return alert("Belum ada catatan!");
+      let rawPhone = cust.phone;
+      if (!rawPhone || rawPhone === "-") {
+        let manualPhone = prompt("Masukkan nomor WhatsApp tujuan:");
+        if (!manualPhone) return;
+        rawPhone = manualPhone;
+      }
+      let phone = rawPhone.replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+
+      let text = `*BUKU CATATAN - ${pengaturanToko.nama}* 📖\n`;
+      text += `Nama Pelanggan : *${cust.nama}*\n\n`;
+      cust.catatan.forEach((note, idx) => {
+        text += `${idx + 1}. [${note.jenis}] ${note.keterangan} ${note.nominal > 0 ? '(Rp ' + note.nominal.toLocaleString('id-ID') + ')' : ''}\n`;
+      });
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function tambahkanKeBelanjaStok() {
+      const name = document.getElementById("db-name").value.trim();
+      if (!name) return alert("Isi nama barang terlebih dahulu!");
+      let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
+      const category = document.getElementById("db-category").value.trim() || "Umum";
+      const unit = document.getElementById("db-unit").value || "pcs";
+      const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+      const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
+      const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
+      const price = parseRupiahToNumber(document.getElementById("db-price").value);
+      const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
+      const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
+
+      let newItem = {
+        id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+        code: code,
+        nama: name,
+        kategori: category,
+        satuan: unit,
+        isiRtg: isiRtg,
+        qty: qtyBeli,
+        modal: (unit === 'rtg') ? (cost / isiRtg) : cost,
+        harga: (unit === 'rtg') ? (price / isiRtg) : price,
+        modalRtg: cost,
+        hargaRtg: price,
+        foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
+      };
+
+      restockListItems.push(newItem);
+      localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+      closeProductModal();
+      switchTab('belanja-stok', false);
+      showNotif("Ditambahkan ke Belanja Stok!");
+    }
+
+    function hapusItemBelanja(itemId) {
+      if (confirm("Hapus item ini dari daftar belanja?")) {
+        restockListItems = restockListItems.filter(item => item.id !== itemId);
+        localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+        refreshData();
+        showNotif("Item dihapus");
+      }
+    }
+
+    function kosongkanRestockList() {
+      if (restockListItems.length === 0) return alert("Daftar belanja sudah kosong!");
+      if (confirm("Kosongkan seluruh daftar belanja stok?")) {
+        restockListItems = [];
+        localStorage.removeItem('restock_list_items_v13');
+        refreshData();
+        showNotif("Daftar belanja dikosongkan");
+      }
+    }
+
+    async function prosesBelanjaStok() {
+      if (restockListItems.length === 0) return alert("Belum ada barang di daftar belanja stok!");
+      if (!confirm("Selesaikan belanja? Ini akan otomatis memperbarui stok, nilai modal, dan harga jual di Halaman Stok utama.")) return;
+
+      let batch = db.batch();
+      restockListItems.forEach(item => {
+        let code = item.code;
+        let produkLama = databaseProduk[code];
+        let stokLama = produkLama && produkLama.stok !== undefined ? produkLama.stok : 0;
+        
+        let qtyPenambahan = (item.satuan === 'rtg') ? (item.qty * item.isiRtg) : item.qty;
+        let stokBaru = parseFloat((stokLama + qtyPenambahan).toFixed(3));
+
+        let docRef = db.collection("produk").doc(code);
+        batch.set(docRef, {
+          nama: item.nama,
+          kategori: item.kategori,
+          satuan: item.satuan,
+          isiRtg: item.isiRtg,
+          stok: stokBaru,
+          modal: item.modal,
+          harga: item.harga,
+          modalRtg: item.modalRtg,
+          hargaRtg: item.hargaRtg,
+          foto: item.foto !== defaultPlaceholderImg ? item.foto : (produkLama ? produkLama.foto || "" : "")
+        }, { merge: true });
+      });
+
+      await batch.commit();
+      restockListItems = [];
+      localStorage.removeItem('restock_list_items_v13');
+      refreshData();
+      alert("🎉 Belanja berhasil diproses! Stok, modal, dan harga jual di Halaman Stok telah diperbarui.");
+      switchTab('data-barang', false);
+    }
+
+    function switchSubDataTab(subTabId) {
+      activeSubDataTab = subTabId;
+      document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(subTabId).classList.add('active');
+      if (subTabId === 'sub-pelanggan') {
+        document.getElementById('sub-btn-pelanggan').classList.add('active');
+        document.getElementById('fab-add-btn').style.display = 'none';
+        document.getElementById('fab-add-cust-btn').style.display = 'flex';
+      } else {
+        document.getElementById('sub-btn-laporan').classList.add('active');
+        document.getElementById('fab-add-btn').style.display = 'none';
+        document.getElementById('fab-add-cust-btn').style.display = 'none';
+      }
+      updatePermanentBarTitle();
+    }
+
+    function updatePermanentBarTitle() {
+      const titleEl = document.getElementById("permanent-title");
+      const posPag = document.getElementById("pos-pagination-wrapper");
+      const stokPag = document.getElementById("stok-pagination-wrapper");
+
+      posPag.classList.remove("show");
+      stokPag.classList.remove("show");
+
+      if (activeTab === 'penjualan') {
+        titleEl.innerText = "Kasir";
+        posPag.classList.add("show");
+      } else if (activeTab === 'data-barang') {
+        titleEl.innerText = "Manajemen Stok";
+        stokPag.classList.add("show");
+      } else if (activeTab === 'belanja-stok') {
+        titleEl.innerText = "Belanja Stok";
+      } else if (activeTab === 'laporan') {
+        titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? "Data Pelanggan" : "Laporan Transaksi";
+      } else if (activeTab === 'catatan') {
+        titleEl.innerText = "Catatan 1";
+      } else if (activeTab === 'catatan2') {
+        titleEl.innerText = "Catatan 2";
+      } else if (activeTab === 'pengaturan') {
+        titleEl.innerText = "Pengaturan Sistem";
+      }
+
+      document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
+      const activeBtnMap = {
+        'penjualan': 'pop-btn-penjualan',
+        'data-barang': 'pop-btn-databarang',
+        'belanja-stok': 'pop-btn-belanjastok',
+        'laporan': 'pop-btn-laporan',
+        'catatan': 'pop-btn-catatan',
+        'catatan2': 'pop-btn-catatan2',
+        'pengaturan': 'pop-btn-pengaturan'
+      };
+      if (activeBtnMap[activeTab]) {
+        let btnEl = document.getElementById(activeBtnMap[activeTab]);
+        if (btnEl) btnEl.classList.add('active-menu');
+      }
+    }
+
+    function switchTab(tabId, pushHistory = true) {
+      activeTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+
+      if (pushHistory) history.pushState({tab: tabId}, "", "");
+
+      const fabCart = document.getElementById('fab-cart-btn');
+      const fabScan = document.getElementById('fab-scan-btn');
+      const fabFilter = document.getElementById('fab-filter-btn');
+      const fabAdd = document.getElementById('fab-add-btn');
+      const fabAddCust = document.getElementById('fab-add-cust-btn');
+
+      if (tabId === 'penjualan') {
+        fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
+      } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'flex'; fabAddCust.style.display = 'none';
+        fabAdd.setAttribute("onclick", "openProductModal()");
+      } else if (tabId === 'laporan') {
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none';
+        if (activeSubDataTab === 'sub-pelanggan') { fabAdd.style.display = 'none'; fabAddCust.style.display = 'flex'; }
+        else { fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; }
+      } else if (tabId === 'catatan') {
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; 
+        fabAdd.style.display = 'flex'; 
+        fabAddCust.style.display = 'none';
+        fabAdd.setAttribute("onclick", "openCatatanModal('catatan')");
+      } else if (tabId === 'catatan2') {
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; 
+        fabAdd.style.display = 'flex'; 
+        fabAddCust.style.display = 'none';
+        fabAdd.setAttribute("onclick", "openCatatanModal('catatan2')");
+      } else {
+        fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
+      }
+      updatePermanentBarTitle();
+      refreshData();
+    }
+
+    function syncAndFilterGlobal(val) { 
+      stokCurrentPage = 1;
+      posCurrentPage = 1;
+      refreshData(); 
+    }
+
+    function changeStokPage(delta) { stokCurrentPage += delta; refreshData(); }
+    function changePosPage(delta) { posCurrentPage += delta; refreshData(); }
+
+    function playBeep() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); osc.connect(audioCtx.destination);
+      osc.type = "sine"; osc.frequency.value = 1000; gain.gain.value = 0.1;
+      osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function toggleScannerPos() {
+      const modal = document.getElementById("scannerModal");
+      if (!isScannerPosOpen) {
+        modal.classList.add("show");
+        isScannerPosOpen = true;
+        history.pushState({tab: activeTab, scanner: true}, "", "");
+        if (!html5QrCodePos) html5QrCodePos = new Html5Qrcode("reader-pos");
+        html5QrCodePos.start({ facingMode: "environment" }, { fps: 20, qrbox: { width: 300, height: 150 } }, 
+          (decodedText) => {
+            if (scannerTimeoutTimer) { clearTimeout(scannerTimeoutTimer); scannerTimeoutTimer = null; }
+            processBarcodeScanPos(decodedText);
+          }, () => {}
+        ).catch(err => alert("Tidak dapat mengakses kamera."));
+      } else {
+        if (scannerTimeoutTimer) { clearTimeout(scannerTimeoutTimer); scannerTimeoutTimer = null; }
+        modal.classList.remove("show");
+        isScannerPosOpen = false;
+        if (html5QrCodePos && html5QrCodePos.isScanning) html5QrCodePos.stop().catch(err => {});
+      }
+    }
+
+    function processBarcodeScanPos(barcode) {
+      if (isCooldown) return;
+      isCooldown = true;
+      playBeep();
+      let produk = databaseProduk[barcode];
+      if (!produk) {
+        showNotif("Barang tidak ditemukan!");
+        setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
+        return;
+      }
+      if ((produk.stok || 0) <= 0) {
+        showNotif("Stok Habis!");
+        setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
+        return;
+      }
+      showNotif("Berhasil: " + produk.nama);
+      tambahItemKeCart(barcode, produk);
+      setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
+    }
+
+    function toggleScannerDb() {
+      const box = document.getElementById("scanner-box-db");
+      if (!isScannerDbOpen) {
+        box.style.display = "block";
+        isScannerDbOpen = true;
+        history.pushState({tab: activeTab, scannerDb: true}, "", "");
+        if (!html5QrCodeDb) html5QrCodeDb = new Html5Qrcode("reader-db");
+        html5QrCodeDb.start({ facingMode: "environment" }, { fps: 20, qrbox: { width: 250, height: 120 } }, 
+          (decodedText) => { processBarcodeScanDb(decodedText); }, () => {}
+        ).catch(err => alert("Tidak dapat mengakses kamera."));
+      } else {
+        box.style.display = "none";
+        isScannerDbOpen = false;
+        if (html5QrCodeDb && html5QrCodeDb.isScanning) html5QrCodeDb.stop().catch(err => {});
+      }
+    }
+
+    function processBarcodeScanDb(barcode) {
+      playBeep();
+      document.getElementById("db-code").value = barcode;
+      if (databaseProduk[barcode]) {
+        let p = databaseProduk[barcode];
+        document.getElementById("db-name").value = p.nama;
+        document.getElementById("db-category").value = p.kategori || "";
+        document.getElementById("db-unit").value = p.satuan || "pcs";
+        document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
+        document.getElementById("db-cost").value = ((p.satuan === 'rtg' ? p.modalRtg : p.modal) || 0).toLocaleString('id-ID');
+        document.getElementById("db-price").value = ((p.satuan === 'rtg' ? p.hargaRtg : p.harga) || 0).toLocaleString('id-ID');
+        updateUnitLabel();
+      }
+      toggleScannerDb();
+    }
+
+    function tambahManualDariCode(barcode) {
+      let produk = databaseProduk[barcode];
+      if (produk) {
+        if ((produk.stok || 0) <= 0) return alert("Stok habis!");
+        playBeep();
+        tambahItemKeCart(barcode, produk);
+      }
+    }
+
+    function kurangManualDariCode(barcode) {
+      const existingItem = cart.find(item => item.barcode === barcode);
+      if (existingItem) {
+        let index = cart.indexOf(existingItem);
+        let step = (existingItem.satuan === 'kg') ? 0.1 : 1;
+        existingItem.qty -= step;
+        existingItem.qty = parseFloat(existingItem.qty.toFixed(3));
+        if (existingItem.qty <= 0) cart.splice(index, 1);
+        else {
+          existingItem.subtotal = Math.round(existingItem.qty * existingItem.harga);
+          existingItem.submodal = Math.round(existingItem.qty * existingItem.modal);
+        }
+        renderCart();
+        refreshData();
+      }
+    }
+
+    function tambahItemKeCart(barcode, produk) {
+      const isKg = (produk.satuan === 'kg');
+      const isRtg = (produk.satuan === 'rtg');
+      let inputJumlah = 1;
+      let displaySatuan = 'pcs';
+      let hargaAktif = produk.harga;
+      let modalAktif = produk.modal;
+
+      if (isKg) {
+        let pilihanTimbang = prompt(`Pilih satuan timbangan untuk ${produk.nama}:\n1. Kilogram (Kg)\n2. Ons\n\nKetik angka 1 atau 2:`, "1");
+        if (pilihanTimbang === "1") {
+          let kgStr = prompt(`Masukkan jumlah Kilogram (Kg):`, "1");
+          if (kgStr === null) return;
+          inputJumlah = parseFloat(kgStr.replace(',', '.')) || 1;
+          displaySatuan = 'kg';
+        } else if (pilihanTimbang === "2") {
+          let onsStr = prompt(`Masukkan jumlah Ons (1 kg = 10 ons):`, "3");
+          if (onsStr === null) return;
+          let jmlOns = parseFloat(onsStr.replace(',', '.')) || 3;
+          inputJumlah = jmlOns / 10;
+          displaySatuan = 'ons';
+        } else {
+          return;
+        }
+      } else if (isRtg) {
+        let pilihanBeli = prompt(`Beli ${produk.nama} per apa?\n1. Eceran Pcs (@Rp ${produk.harga.toLocaleString('id-ID')})\n2. Renteng / rtg (isi ${produk.isiRtg} pcs - @Rp ${(produk.hargaRtg || (produk.harga * produk.isiRtg)).toLocaleString('id-ID')})\n\nKetik angka 1 atau 2:`, "1");
+        if (pilihanBeli === "2") {
+          let jumlahRtgStr = prompt(`Masukkan jumlah Renteng (rtg) yang dibeli:`, "1");
+          if (jumlahRtgStr === null) return;
+          let jmlRtg = parseFloat(jumlahRtgStr.replace(',', '.')) || 1;
+          inputJumlah = jmlRtg * produk.isiRtg;
+          hargaAktif = produk.hargaRtg ? (produk.hargaRtg / produk.isiRtg) : produk.harga;
+          modalAktif = produk.modalRtg ? (produk.modalRtg / produk.isiRtg) : produk.modal;
+          displaySatuan = 'rtg';
+        } else if (pilihanBeli === "1") {
+          let pcsStr = prompt(`Masukkan jumlah Pcs yang dibeli:`, "1");
+          if (pcsStr === null) return;
+          inputJumlah = parseFloat(pcsStr.replace(',', '.')) || 1;
+          displaySatuan = 'pcs';
+        } else {
+          return;
+        }
+      }
+
+      const existingItem = cart.find(item => item.barcode === barcode && item.satuanJual === displaySatuan);
+      const currentCartQty = existingItem ? existingItem.qty : 0;
+      if (currentCartQty + inputJumlah > (produk.stok || 0)) {
+        alert(`Stok tidak mencukupi! Sisa stok: ${produk.stok} pcs`);
+        return;
+      }
+
+      if (existingItem) {
+        existingItem.qty += inputJumlah;
+        existingItem.subtotal = Math.round(existingItem.qty * hargaAktif);
+        existingItem.submodal = Math.round(existingItem.qty * modalAktif);
+      } else {
+        cart.push({
+          barcode: barcode, nama: produk.nama, kategori: produk.kategori || "Umum", satuan: produk.satuan || "pcs",
+          satuanJual: displaySatuan, modal: modalAktif, harga: hargaAktif, foto: produk.foto || defaultPlaceholderImg,
+          qty: inputJumlah, subtotal: Math.round(inputJumlah * hargaAktif), submodal: Math.round(inputJumlah * modalAktif)
+        });
+      }
+      renderCart();
+      refreshData();
+    }
+
+    function ubahQty(index, delta) {
+      let item = cart[index];
+      let produk = databaseProduk[item.barcode];
+      let stokTersedia = produk ? (produk.stok || 0) : 0;
+      let step = (item.satuan === 'kg') ? 0.1 : 1;
+      if (delta > 0 && item.qty + step > stokTersedia) return alert("Stok tidak mencukupi!");
+
+      if (delta > 0) item.qty += step; else item.qty -= step;
+      item.qty = parseFloat(item.qty.toFixed(3));
+      if (item.qty <= 0) cart.splice(index, 1);
+      else {
+        item.subtotal = Math.round(item.qty * item.harga);
+        item.submodal = Math.round(item.qty * item.modal);
+      }
+      renderCart();
+      refreshData();
+    }
+
+    function renderCart() {
+      const tbody = document.getElementById("cart-body");
+      if(!tbody) return;
+      tbody.innerHTML = "";
+      totalBelanja = 0;
+      let totalItemCount = 0;
+
+      cart.forEach((item, index) => {
+        totalBelanja += item.subtotal;
+        totalItemCount += (item.satuan === 'kg' ? 1 : item.qty);
+        
+        let qtyDisplay = '';
+        if (item.satuanJual === 'ons') {
+          qtyDisplay = `${Math.round(item.qty * 10)} Ons`;
+        } else if (item.satuanJual === 'kg') {
+          qtyDisplay = `${item.qty} Kg`;
+        } else if (item.satuanJual === 'rtg') {
+          qtyDisplay = `${(item.qty / (databaseProduk[item.barcode]?.isiRtg || 10)).toFixed(1)} rtg`;
+        } else {
+          qtyDisplay = `${item.qty} Pcs`;
+        }
+
+        tbody.innerHTML += `
+          <tr>
+            <td>
+              <div class="item-with-img">
+                <img src="${item.foto || defaultPlaceholderImg}" class="prod-img">
+                <div>
+                  <div style="font-weight:600; line-height:1.1;">${item.nama}</div>
+                  <div style="font-size:0.7rem; color:var(--text-muted);">@Rp ${item.harga.toLocaleString('id-ID')}</div>
+                </div>
+              </div>
+            </td>
+            <td style="text-align: center;">
+              <div class="qty-control no-print">
+                <button class="btn-qty" onclick="ubahQty(${index}, -1)">-</button>
+                <span class="qty-val">${qtyDisplay}</span>
+                <button class="btn-qty" onclick="ubahQty(${index}, 1)">+</button>
+              </div>
+            </td>
+            <td style="text-align: right; font-weight: 600;">${item.subtotal.toLocaleString('id-ID')}</td>
+            <td class="no-print" style="text-align: center;">
+              <button class="btn-danger" onclick="hapusCart(${index})" style="padding: 4px 6px; font-size: 0.72rem; border-radius: 6px;">✕</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px 0;">Keranjang Kosong</td></tr>`;
+      document.getElementById("cart-count").innerText = totalItemCount;
+      document.getElementById("grand-total").innerText = totalBelanja.toLocaleString('id-ID');
+      hitungKembalian();
+    }
+
+    function hapusCart(i) { cart.splice(i, 1); renderCart(); refreshData(); }
+
+    function kosongkanKeranjang() {
+      if (cart.length === 0) return alert("Keranjang sudah kosong!");
+      if (confirm("Kosongkan isi keranjang?")) {
+        cart = [];
+        renderCart();
+        refreshData();
+        showNotif("Keranjang dikosongkan");
+      }
+    }
+
+    function togglePayMethod() {
+      const m = document.getElementById("pay-method").value;
+      const input = document.getElementById("pay-amount");
+      if(m === "QRIS") { input.value = totalBelanja.toLocaleString('id-ID'); input.disabled = true; }
+      else { input.disabled = false; input.value = ""; }
+      hitungKembalian();
+    }
+
+    function hitungKembalian() {
+      const bayar = parseRupiahToNumber(document.getElementById("pay-amount").value);
+      const kembalian = bayar - totalBelanja;
+      document.getElementById("change-total").innerText = (kembalian > 0 ? kembalian : 0).toLocaleString('id-ID');
+    }
+
+    function prosesSimpanTransaksi() {
+      cart.forEach(item => {
+        if (databaseProduk[item.barcode]) {
+          let sisaStok = (databaseProduk[item.barcode].stok || 0) - item.qty;
+          let newStok = Math.max(0, parseFloat(sisaStok.toFixed(3)));
+          db.collection("produk").doc(item.barcode).update({ stok: newStok });
+        }
+      });
+      const totalModal = cart.reduce((acc, item) => acc + item.submodal, 0);
+      const keuntungan = totalBelanja - totalModal;
+      const transaksi = {
+        waktu: new Date().toLocaleString('id-ID'),
+        total: totalBelanja, modal: totalModal, untung: keuntungan,
+        metode: document.getElementById("pay-method").value,
+        qty: cart.reduce((acc, item) => acc + item.qty, 0)
+      };
+      riwayatTransaksi.push(transaksi);
+      localStorage.setItem('riwayat_kasir_v13', JSON.stringify(riwayatTransaksi));
+    }
+
+    function selesaiTransaksi() {
+      if (cart.length === 0) return alert("Keranjang kosong!");
+      const bayar = parseRupiahToNumber(document.getElementById("pay-amount").value);
+      const metode = document.getElementById("pay-method").value;
+      if (metode === "Tunai" && bayar < totalBelanja) return alert("Uang pembayaran kurang!");
+
+      prosesSimpanTransaksi();
+      window.print();
+      cart = [];
+      document.getElementById("pay-amount").value = "";
+      document.getElementById("wa-customer-phone").value = "";
+      closeCartModal();
+      renderCart();
+      refreshData();
+    }
+
+    function bagikanStrukWhatsApp() {
+      if (cart.length === 0) return alert("Keranjang kosong!");
+      const bayar = parseRupiahToNumber(document.getElementById("pay-amount").value);
+      const metode = document.getElementById("pay-method").value;
+      if (metode === "Tunai" && bayar < totalBelanja) return alert("Uang pembayaran kurang!");
+
+      let rawPhone = document.getElementById("wa-customer-phone").value.trim();
+      if (!rawPhone) return alert("Masukkan nomor WhatsApp pelanggan!");
+      let phone = rawPhone.replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+
+      let text = `*STRUK PEMBELIAN - ${pengaturanToko.nama}*📦\n`;
+      text += `📅 ${new Date().toLocaleString('id-ID')}\n------------------------------------\n`;
+      cart.forEach((item, idx) => {
+        text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`;
+      });
+      text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*\n`;
+      text += `_Terima kasih!_ 🙏`;
+
+      prosesSimpanTransaksi();
+      cart = [];
+      document.getElementById("pay-amount").value = "";
+      document.getElementById("wa-customer-phone").value = "";
+      closeCartModal();
+      renderCart();
+      refreshData();
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function hapusBarang(code) {
+      if(confirm("Hapus barang ini?")) {
+        db.collection("produk").doc(code).delete()
+          .then(() => showNotif("Barang dihapus!"))
+          .catch(err => alert("Gagal menghapus: " + err.message));
+      }
+    }
+
+    function eksporStokExcel() {
+      let csv = "data:text/csv;charset=utf-8,Kode,Nama,Kategori,Satuan,Stok,Modal,Harga\n";
+      for (let code in databaseProduk) {
+        let p = databaseProduk[code];
+        csv += `"${code}","${p.nama}","${p.kategori || 'Umum'}","${p.satuan || 'pcs'}",${p.stok || 0},${p.modal || 0},${p.harga || 0}\n`;
+      }
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", `Stok_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    async function importStokExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const text = e.target.result;
+        const rows = text.split("\n");
+        let batch = db.batch();
+        let count = 0;
+        for (let i = 1; i < rows.length; i++) {
+          let row = rows[i].trim();
+          if (!row) continue;
+          let cols = row.split(",");
+          if (cols.length >= 7) {
+            let code = cols[0].replace(/"/g, '');
+            let nama = cols[1].replace(/"/g, '');
+            let kat = cols[2].replace(/"/g, '') || "Umum";
+            let sat = cols[3].replace(/"/g, '') || "pcs";
+            let stok = parseFloat(cols[4]) || 0;
+            let modal = parseFloat(cols[5]) || 0;
+            let harga = parseFloat(cols[6]) || 0;
+            if (nama) {
+              if (!code) code = "BRG-" + Date.now() + "-" + i;
+              let docRef = db.collection("produk").doc(code);
+              batch.set(docRef, { nama, kategori: kat, satuan: sat, isiRtg: 10, stok, modal, harga, modalRtg: modal, hargaRtg: harga, foto: "" });
+              count++;
+            }
+          }
+        }
+        await batch.commit();
+        alert(`Berhasil mengimpor ${count} data!`);
+        document.getElementById("import-csv-file").value = "";
+        refreshData();
+      };
+      reader.readAsText(file);
+    }
+
+    function eksporPelangganExcel() {
+      let csv = "data:text/csv;charset=utf-8,ID,Nama,Telepon,Alamat\n";
+      databasePelanggan.forEach(c => { csv += `"${c.id}","${c.nama}","${c.phone || '-'}","${c.alamat || '-'}"\n`; });
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", `Pelanggan_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function importPelangganExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const text = e.target.result;
+        const rows = text.split("\n");
+        let batch = db.batch();
+        let count = 0;
+        for (let i = 1; i < rows.length; i++) {
+          let row = rows[i].trim();
+          if (!row) continue;
+          let cols = row.split(",");
+          if (cols.length >= 4) {
+            let custId = cols[0].replace(/"/g, '') || ("CUST-" + Date.now() + "-" + i);
+            let nama = cols[1].replace(/"/g, '');
+            let phone = cols[2].replace(/"/g, '') || "-";
+            let alamat = cols[3].replace(/"/g, '') || "-";
+            if (nama) {
+              let docRef = db.collection("pelanggan").doc(custId);
+              batch.set(docRef, { nama, phone, alamat, catatan: [] });
+              count++;
+            }
+          }
+        }
+        await batch.commit();
+        alert(`Berhasil mengimpor ${count} pelanggan!`);
+        document.getElementById("import-cust-file").value = "";
+        refreshData();
+      };
+      reader.readAsText(file);
+    }
+
+    function eksporExcel() {
+      if (riwayatTransaksi.length === 0) return alert("Belum ada transaksi!");
+      let csv = "data:text/csv;charset=utf-8,Waktu,Metode,Qty,Omset,Modal,Untung\n";
+      riwayatTransaksi.forEach(t => { csv += `"${t.waktu}","${t.metode}",${t.qty},${t.total},${t.modal},${t.untung}\n`; });
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csv));
+      link.setAttribute("download", `Laporan_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function importLaporanExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const rows = e.target.result.split("\n");
+        let count = 0;
+        for (let i = 1; i < rows.length; i++) {
+          let row = rows[i].trim();
+          if (!row) continue;
+          let cols = row.split(",");
+          if (cols.length >= 6) {
+            riwayatTransaksi.push({ waktu: cols[0].replace(/"/g, ''), metode: cols[1].replace(/"/g, ''), qty: parseFloat(cols[2])||0, total: parseFloat(cols[3])||0, modal: parseFloat(cols[4])||0, untung: parseFloat(cols[5])||0 });
+            count++;
+          }
+        }
+        localStorage.setItem('riwayat_kasir_v13', JSON.stringify(riwayatTransaksi));
+        alert(`Berhasil mengimpor ${count} riwayat!`);
+        refreshData();
+      };
+      reader.readAsText(file);
+    }
+
+    function simpanPelanggan() {
+      const id = document.getElementById("cust-id").value.trim();
+      const nama = document.getElementById("cust-name").value.trim();
+      const phone = document.getElementById("cust-phone").value.trim() || "-";
+      const alamat = document.getElementById("cust-address").value.trim() || "-";
+      if (!nama) return alert("Nama pelanggan wajib diisi!");
+      let custId = id || ("CUST-" + Date.now());
+      let dataPelanggan = { nama, phone, alamat, catatan: id ? (databasePelanggan.find(c => c.id === id)?.catatan || []) : [] };
+      db.collection("pelanggan").doc(custId).set(dataPelanggan)
+        .then(() => { closeCustomerModal(); showNotif("Pelanggan tersimpan!"); })
+        .catch(err => alert("Gagal: " + err.message));
+    }
+
+    function hapusPelanggan(id) {
+      if (confirm("Hapus pelanggan ini?")) {
+        db.collection("pelanggan").doc(id).delete()
+          .then(() => showNotif("Pelanggan dihapus!"))
+          .catch(err => alert("Gagal: " + err.message));
+      }
+    }
+
+    function updateDropdowns(kategoriList) {
+      const filterSelect = document.getElementById("filter-category");
+      if(filterSelect) {
+        let currentVal = filterSelect.value;
+        let html = `<option value="Semua">Semua Kategori</option>`;
+        kategoriList.forEach(kat => { html += `<option value="${kat}" ${kat === currentVal ? "selected" : ""}>${kat}</option>`; });
+        if (filterSelect.innerHTML !== html) filterSelect.innerHTML = html;
+      }
+      const filterPosSelect = document.getElementById("filter-category-pos");
+      if(filterPosSelect) {
+        let currentPosVal = filterPosSelect.value;
+        let htmlPos = `<option value="Semua">Semua Kategori</option>`;
+        kategoriList.forEach(kat => { htmlPos += `<option value="${kat}" ${kat === currentPosVal ? "selected" : ""}>${kat}</option>`; });
+        if (filterPosSelect.innerHTML !== htmlPos) filterPosSelect.innerHTML = htmlPos;
+      }
+    }
+
+    function simpanPengaturanToko() {
+      pengaturanToko.nama = document.getElementById("setting-shop-name").value.trim() || "TokoQuh";
+      pengaturanToko.alamat = document.getElementById("setting-shop-address").value.trim() || "-";
+      pengaturanToko.phone = document.getElementById("setting-shop-phone").value.trim() || "-";
+      localStorage.setItem('setting_toko_v13', JSON.stringify(pengaturanToko));
+      alert("Profil toko disimpan!");
+      refreshData();
+    }
+
+    function simpanPengaturanScan() {
+      scanCooldownDuration = parseInt(document.getElementById("setting-cooldown").value);
+      localStorage.setItem('setting_cooldown_v13', scanCooldownDuration);
+      alert("Jeda scan diperbarui!");
+    }
+
+    function resetRiwayat() {
+      if (confirm("Kosongkan SELURUH riwayat transaksi?")) {
+        riwayatTransaksi = [];
+        localStorage.removeItem('riwayat_kasir_v13');
+        alert("Riwayat dikosongkan.");
+        refreshData();
+      }
+    }
+
+    function resetDatabaseBarang() {
+      if (confirm("Hapus SELURUH database barang?")) {
+        for (let code in databaseProduk) { db.collection("produk").doc(code).delete(); }
+        alert("Database barang dikosongkan.");
+        refreshData();
+      }
+    }
+
+    function refreshData() {
+      document.getElementById("setting-user").value = userAuth.user;
+      document.getElementById("setting-pass").value = userAuth.pass;
+      document.getElementById("setting-shop-name").value = pengaturanToko.nama;
+      document.getElementById("setting-shop-address").value = pengaturanToko.alamat;
+      document.getElementById("setting-shop-phone").value = pengaturanToko.phone;
+      document.getElementById("setting-cooldown").value = scanCooldownDuration;
+      
+      const viewSelect = document.getElementById("setting-view-mode");
+      if (viewSelect) viewSelect.value = viewMode;
+
+      document.getElementById("login-sub-title").innerText = pengaturanToko.nama || "TokoQuh";
+      document.getElementById("receipt-shop-name").innerText = pengaturanToko.nama;
+      document.getElementById("receipt-shop-address").innerText = pengaturanToko.alamat;
+      document.getElementById("receipt-shop-phone").innerText = "Telp: " + pengaturanToko.phone;
+
+      document.getElementById('inventory-list-wrapper').style.display = (viewMode === 'list') ? 'flex' : 'none';
+      document.getElementById('inventory-grid-wrapper').style.display = (viewMode === 'grid') ? 'grid' : 'none';
+      
+      const restockListWrapper = document.getElementById("restock-list-wrapper");
+      const restockGridWrapper = document.getElementById("restock-grid-wrapper");
+      if(restockListWrapper && restockGridWrapper) {
+        restockListWrapper.style.display = (viewMode === 'list') ? 'flex' : 'none';
+        restockGridWrapper.style.display = (viewMode === 'grid') ? 'grid' : 'none';
+      }
+
+      const invList = document.getElementById("inventory-list-wrapper");
+      const invGrid = document.getElementById("inventory-grid-wrapper");
+      invList.innerHTML = ""; invGrid.innerHTML = "";
+
+      let categories = new Set();
+      const filterKatEl = document.getElementById("filter-category");
+      const filterKat = filterKatEl ? filterKatEl.value : "Semua";
+      const filterKatPosEl = document.getElementById("filter-category-pos");
+      const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
+      const searchInputEl = document.getElementById("inventory-search-input");
+      const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
+
+      let filteredItems = [];
+      let filteredItemsPos = [];
+
+      for (let code in databaseProduk) {
+        let item = databaseProduk[code];
+        let kat = item.kategori || "Umum";
+        categories.add(kat);
+
+        if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
+          filteredItems.push({ code, ...item });
+        }
+        if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || kat === filterKatPos)) {
+          filteredItemsPos.push({ code, ...item });
+        }
+      }
+
+      filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
+      filteredItemsPos.sort((a, b) => a.nama.localeCompare(b.nama));
+
+      let itemsPerPageStok = 24;
+      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
+      if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
+      if (stokCurrentPage < 1) stokCurrentPage = 1;
+
+      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
+      let paginatedStokItems = filteredItems.slice(stokStartIndex, stokStartIndex + itemsPerPageStok);
+
+      if (filteredItems.length > 0) {
+        document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
+        document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
+        document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
+      }
+
+      if (paginatedStokItems.length === 0) {
+        const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
+        invList.innerHTML = emptyStokMsg; invGrid.innerHTML = emptyStokMsg;
+      } else {
+        paginatedStokItems.forEach(item => {
+          let code = item.code;
+          let kat = item.kategori || "Umum";
+          let sat = item.satuan || "pcs";
+          let stok = item.stok !== undefined ? item.stok : 0;
+          let fotoSrc = item.foto || defaultPlaceholderImg;
+          let modalVal = sat === 'rtg' ? (item.modalRtg || 0) : (item.modal || 0);
+          let hargaVal = sat === 'rtg' ? (item.hargaRtg || 0) : (item.harga || 0);
+          let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + (item.isiRtg || 10) + ')' : sat;
+
+          invList.innerHTML += `
+            <div class="inv-list-item">
+              <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                <button class="btn-edit" onclick="openProductModal('${code}')" title="Edit" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">✏️</button>
+                <button class="btn-danger" onclick="hapusBarang('${code}')" title="Hapus" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+              </div>
+              <img src="${fotoSrc}" class="inv-list-img">
+              <div class="inv-list-details">
+                <div class="inv-list-title">${item.nama}</div>
+                <div class="inv-list-sub">${code} • Stok: ${stok} ${sat === 'kg' ? 'Kg' : 'pcs'} • ${satuanLabel} • ${kat}</div>
+                <div class="inv-list-price">Modal: Rp ${modalVal.toLocaleString('id-ID')} - Jual: Rp ${hargaVal.toLocaleString('id-ID')}</div>
+              </div>
+            </div>
+          `;
+
+          invGrid.innerHTML += `
+            <div class="inv-card">
+              <div class="inv-card-top">
+                <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 2px;">
+                  <button class="btn-edit" style="flex: 1; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem;" onclick="openProductModal('${code}')">Edit</button>
+                  <button class="btn-danger" style="flex: 1; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem;" onclick="hapusBarang('${code}')">Hapus</button>
+                </div>
+                <img src="${fotoSrc}" class="inv-card-img">
+                <div class="inv-card-info">
+                  <div class="inv-card-title">${item.nama}</div>
+                  <div class="inv-card-code">${code}</div>
+                  <div style="margin-top: 2px;"><span class="badge-kat">${kat}</span> <span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</span></div>
+                </div>
+              </div>
+              <div class="inv-card-details">
+                <div class="inv-card-row"><span>Modal:</span><b>Rp ${modalVal.toLocaleString('id-ID')}</b></div>
+                <div class="inv-card-row"><span>Jual:</span><b>Rp ${hargaVal.toLocaleString('id-ID')}</b></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      updateDropdowns(Array.from(categories));
+      renderKatalogKasirPaginated(filteredItemsPos);
+
+      if(restockListWrapper && restockGridWrapper) {
+        restockListWrapper.innerHTML = ""; restockGridWrapper.innerHTML = "";
+        let totalEstBelanja = 0;
+
+        if (restockListItems.length === 0) {
+          const emptyRestockMsg = `<div class="empty-state" style="grid-column: 1/-1;">🛒 Belum ada daftar belanja stok.<br>Tekan tombol <b>+</b> di kanan bawah untuk menambahkan barang belanjaan.</div>`;
+          restockListWrapper.innerHTML = emptyRestockMsg; restockGridWrapper.innerHTML = emptyRestockMsg;
+        } else {
+          restockListItems.forEach(item => {
+            let fotoSrc = item.foto || defaultPlaceholderImg;
+            let subtotalModal = (item.satuan === 'rtg' ? (item.modalRtg || 0) : (item.modal || 0)) * (item.qty || 1);
+            totalEstBelanja += subtotalModal;
+            let satuanLabel = item.satuan === 'rtg' ? `rtg (isi ${item.isiRtg || 10})` : item.satuan;
+
+            restockListWrapper.innerHTML += `
+              <div class="inv-list-item">
+                <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                  <button class="btn-edit" onclick="openProductModal(null, '${item.id}')" title="Edit" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">✏️</button>
+                  <button class="btn-danger" onclick="hapusItemBelanja('${item.id}')" title="Hapus" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">✕</button>
+                </div>
+                <img src="${fotoSrc}" class="inv-list-img">
+                <div class="inv-list-details">
+                  <div class="inv-list-title">${item.nama}</div>
+                  <div class="inv-list-sub">Beli: ${item.qty} ${satuanLabel}</div>
+                  <div class="inv-list-price">Modal: Rp ${(item.satuan === 'rtg' ? item.modalRtg : item.modal).toLocaleString('id-ID')} - Jual: Rp ${(item.satuan === 'rtg' ? item.hargaRtg : item.harga).toLocaleString('id-ID')}</div>
+                </div>
+                <div style="text-align: right; font-weight: bold; font-size: 0.85rem; color: #2563eb;">
+                  Rp ${subtotalModal.toLocaleString('id-ID')}
+                </div>
+              </div>
+            `;
+
+            restockGridWrapper.innerHTML += `
+              <div class="inv-card">
+                <div class="inv-card-top">
+                  <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 2px;">
+                    <button class="btn-edit" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal(null, '${item.id}')">Edit</button>
+                    <button class="btn-danger" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="hapusItemBelanja('${item.id}')">Hapus</button>
+                  </div>
+                  <img src="${fotoSrc}" class="inv-card-img">
+                  <div class="inv-card-info">
+                    <div class="inv-card-title">${item.nama}</div>
+                    <div class="inv-card-code">Beli: ${item.qty} ${satuanLabel}</div>
+                  </div>
+                </div>
+                <div class="inv-card-details">
+                  <div class="inv-card-row"><span>Modal:</span><b>Rp ${(item.satuan === 'rtg' ? item.modalRtg : item.modal).toLocaleString('id-ID')}</b></div>
+                  <div class="inv-card-row"><span>Jual:</span><b>Rp ${(item.satuan === 'rtg' ? item.hargaRtg : item.harga).toLocaleString('id-ID')}</b></div>
+                  <div class="inv-card-row" style="border-top: 1px dashed var(--border-color); padding-top: 3px; margin-top: 3px;"><span>Total:</span><b style="color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</b></div>
+                </div>
+              </div>
+            `;
+          });
+        }
+        document.getElementById("restock-est-total").innerText = totalEstBelanja.toLocaleString('id-ID');
+      }
+
+      const repBody = document.getElementById("report-body");
+      if(repBody) {
+        repBody.innerHTML = "";
+        let totalOmset = 0; let totalProfit = 0;
+        riwayatTransaksi.forEach(t => {
+          totalOmset += t.total; totalProfit += t.untung;
+          repBody.innerHTML += `<tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 6px;">${t.waktu}</td><td style="padding: 6px;">${t.metode}</td><td style="padding: 6px;">${t.qty}</td><td style="padding: 6px;">Rp ${t.total.toLocaleString('id-ID')}</td><td style="padding: 6px; color: #16a34a; font-weight: bold;">Rp ${t.untung.toLocaleString('id-ID')}</td></tr>`;
+        });
+        if (riwayatTransaksi.length === 0) repBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">Belum ada riwayat transaksi.</td></tr>`;
+      }
+
+      document.getElementById("dash-omset").innerText = totalOmset.toLocaleString('id-ID');
+      document.getElementById("dash-profit").innerText = totalProfit.toLocaleString('id-ID');
+      document.getElementById("dash-trans").innerText = riwayatTransaksi.length;
+      document.getElementById("dash-items").innerText = Object.keys(databaseProduk).length;
+
+      const custContainer = document.getElementById("customer-list-wrapper");
+      if(custContainer) {
+        custContainer.innerHTML = "";
+        let grandTotalAllCustomersFinancial = 0;
+
+        if (databasePelanggan.length === 0) {
+          custContainer.innerHTML = `<div class="empty-state">Belum ada data pelanggan.</div>`;
+        } else {
+          databasePelanggan.forEach(c => {
+            let catatanHtml = "";
+            let custTotalNominal = 0;
+
+            if (c.catatan && c.catatan.length > 0) {
+              c.catatan.forEach(note => {
+                let nom = note.nominal || 0;
+                custTotalNominal += nom;
+                catatanHtml += `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 6px 0;"><div><span style="font-weight: bold; font-size: 0.72rem;">[${note.jenis}]</span> <span style="font-size: 0.75rem;">${note.keterangan}</span> ${nom > 0 ? '<b style="color:#2563eb;">(Rp ' + nom.toLocaleString('id-ID') + ')</b>' : ''}</div><button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button></div>`;
+              });
+            } else {
+              catatanHtml = `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Belum ada catatan keuangan.</div>`;
+            }
+
+            grandTotalAllCustomersFinancial += custTotalNominal;
+
+            custContainer.innerHTML += `
+              <div class="cust-list-item">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div>
+                    <div style="font-weight: bold; font-size: 0.85rem;">${c.nama}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat}</div>
+                    <div style="font-size: 0.78rem; font-weight: 600; color: #2563eb; margin-top: 3px;">Total Nilai Catatan: Rp ${custTotalNominal.toLocaleString('id-ID')}</div>
+                  </div>
+                  <div style="display: flex; gap: 4px;">
+                    <button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button>
+                    <button style="background: #25D366; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="bagikanCatatanWhatsApp('${c.id}')">💬 WA</button>
+                    <button class="btn-danger" style="padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
+                  </div>
+                </div>
+                <div class="cust-bookkeeping">${catatanHtml}</div>
+              </div>
+            `;
+          });
+        }
+        document.getElementById("customer-total-financial").innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
+      }
+    }
+
+    function renderKatalogKasirPaginated(filteredItems) {
+      const catalogGrid = document.getElementById("pos-catalog-container");
+      const catalogList = document.getElementById("pos-catalog-list-container");
+      if(!catalogGrid || !catalogList) return;
+      
+      catalogGrid.style.display = (viewMode === 'grid') ? 'grid' : 'none';
+      catalogList.style.display = (viewMode === 'list') ? 'flex' : 'none';
+      catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
+
+      let itemsPerPagePos = 24;
+      let totalPosPages = Math.ceil(filteredItems.length / itemsPerPagePos) || 1;
+      if (posCurrentPage > totalPosPages) posCurrentPage = totalPosPages;
+      if (posCurrentPage < 1) posCurrentPage = 1;
+
+      let posStartIndex = (posCurrentPage - 1) * itemsPerPagePos;
+      let paginatedPosItems = filteredItems.slice(posStartIndex, posStartIndex + itemsPerPagePos);
+
+      if (filteredItems.length > 0) {
+        document.getElementById("pos-page-info").innerText = `${posCurrentPage}/${totalPosPages}`;
+        document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
+        document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
+      }
+
+      if (paginatedPosItems.length === 0) {
+        const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia.</div>`;
+        catalogGrid.innerHTML = emptyMsg; catalogList.innerHTML = emptyMsg;
+      } else {
+        paginatedPosItems.forEach(p => {
+          let code = p.code;
+          let kat = p.kategori || "Umum";
+          let sat = p.satuan || "pcs";
+          let stok = p.stok !== undefined ? p.stok : 0;
+          let fotoSrc = p.foto || defaultPlaceholderImg;
+          let isHabis = stok <= 0;
+          let unitLabel = sat === 'kg' ? '/Kg' : (sat === 'rtg' ? '/pcs (rtg)' : '/Pcs');
+          let displayHarga = p.harga;
+          let cartItem = cart.find(item => item.barcode === code);
+          let currentQtyInCart = cartItem ? cartItem.qty : 0;
+
+          catalogGrid.innerHTML += `
+            <div class="inv-card">
+              <div class="inv-card-top">
+                <div style="display: flex; gap: 6px; width: 100%; margin-bottom: 2px;">
+                  <button class="btn-edit" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #16a34a; color: white;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">+</button>
+                  <button class="btn-danger" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')">-</button>
+                </div>
+                <img src="${fotoSrc}" class="inv-card-img">
+                <div class="inv-card-info">
+                  <div class="inv-card-title">${p.nama}</div>
+                  <div class="inv-card-code">${code}</div>
+                  <div style="margin-top: 2px;"><span class="badge-kat">${kat}</span> <span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</span></div>
+                </div>
+              </div>
+              <div class="inv-card-details">
+                <div class="inv-card-row"><span>Harga:</span><b>Rp ${displayHarga.toLocaleString('id-ID')}${unitLabel}</b></div>
+              </div>
+            </div>
+          `;
+
+          catalogList.innerHTML += `
+            <div class="catalog-list-item">
+              <div style="display: flex; gap: 4px; flex-shrink: 0; align-items: center;">
+                <button style="width: 28px; height: 28px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">+</button>
+                <button style="width: 28px; height: 28px; border-radius: 6px; background: #dc2626; color: white; border: none; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')">-</button>
+              </div>
+              <img src="${fotoSrc}" class="catalog-list-img">
+              <div style="min-width: 0; flex: 1;">
+                <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: ${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</div>
+                <div style="font-size: 0.78rem; font-weight: bold; color: #2563eb;">Rp ${displayHarga.toLocaleString('id-ID')}${unitLabel}</div>
+              </div>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function showNotif(msg) {
+      const notif = document.getElementById("scan-notif");
+      if(!notif) return;
+      notif.innerText = msg; notif.style.display = "block";
+      setTimeout(() => { notif.style.display = "none"; }, 1500);
+    }
+
+    if(typeof setTheme === 'function') setTheme(currentTheme);
+    if(typeof cekStatusLogin === 'function') cekStatusLogin();
+    updatePermanentBarTitle();
