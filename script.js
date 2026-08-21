@@ -88,7 +88,7 @@ db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
   refreshData();
 });
 
-// Sisten Catatan Dinamis (Tab & Data)
+// Sistem Catatan Dinamis (Tab, Edit Nama, Hapus Tab, & Data)
 let daftarNamaTabCatatan = ["catatan1", "catatan2", "catatan3", "catatan4"];
 let labelNamaTabCatatan = {
   catatan1: "Catatan 1",
@@ -102,7 +102,7 @@ let activeSubCatatanTab = "catatan1";
 db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
   if (doc.exists) {
     let data = doc.data();
-    if (data.list) daftarNamaTabCatatan = data.list;
+    if (data.list && data.list.length > 0) daftarNamaTabCatatan = data.list;
     if (data.labels) labelNamaTabCatatan = data.labels;
   } else {
     db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
@@ -129,11 +129,15 @@ function renderSubTabsCatatanUI() {
     let label = labelNamaTabCatatan[tabKey] || tabKey;
     let isActive = (tabKey === activeSubCatatanTab);
 
-    // Tombol tab atas bersih tanpa emoji
+    // Tombol tab atas bersih dengan ikon pena & sampah berdampingan
     let btn = document.createElement("button");
     btn.className = `sub-tab-btn ${isActive ? 'active' : ''}`;
     btn.style.cssText = "display: flex; align-items: center; gap: 6px;";
-    btn.innerHTML = `<span>${label}</span> <span onclick="event.stopPropagation(); ubahNamaTabDinamis('${tabKey}')" title="Ubah Nama Tab" style="font-size: 0.75rem; cursor: pointer; opacity: 0.7; padding: 2px;">✏️</span>`;
+    btn.innerHTML = `
+      <span>${label}</span> 
+      <span onclick="event.stopPropagation(); ubahNamaTabDinamis('${tabKey}')" title="Ubah Nama Tab" style="font-size: 0.75rem; cursor: pointer; opacity: 0.7; padding: 2px;">✏️</span>
+      <span onclick="event.stopPropagation(); hapusTabCatatanDinamis('${tabKey}')" title="Hapus Tab Catatan" style="font-size: 0.75rem; cursor: pointer; opacity: 0.7; padding: 2px; color: #dc2626;">🗑️</span>
+    `;
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
 
@@ -230,6 +234,27 @@ function ubahNamaTabDinamis(tabKey) {
       renderSubTabsCatatanUI();
       showNotif("Nama catatan diperbarui!");
     }).catch(err => alert("Gagal mengubah nama: " + err.message));
+  }
+}
+
+function hapusTabCatatanDinamis(tabKey) {
+  if (daftarNamaTabCatatan.length <= 1) {
+    return alert("Minimal harus menyisakan 1 tab catatan!");
+  }
+  if (confirm(`Apakah Anda yakin ingin menghapus "${labelNamaTabCatatan[tabKey] || tabKey}" beserta seluruh isinya?`)) {
+    daftarNamaTabCatatan = daftarNamaTabCatatan.filter(k => k !== tabKey);
+    delete labelNamaTabCatatan[tabKey];
+
+    db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+      list: daftarNamaTabCatatan,
+      labels: labelNamaTabCatatan
+    }).then(() => {
+      // Hapus dokumen data catatannya juga di cloud
+      db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).delete().catch(e => {});
+      activeSubCatatanTab = daftarNamaTabCatatan[0];
+      renderSubTabsCatatanUI();
+      showNotif("Tab catatan dihapus!");
+    }).catch(err => alert("Gagal menghapus tab: " + err.message));
   }
 }
 
