@@ -52,9 +52,7 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-.sub-nav-tabs::-webkit-scrollbar {
-  display: none;
-}
+.sub-nav-tabs::-webkit-scrollbar { display: none; }
 
 .sub-tab-btn {
   background: var(--card-bg);
@@ -153,9 +151,7 @@ button:active { opacity: 0.8; }
   box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
 }
 
-.bottom-right-menu-container {
-  position: relative;
-}
+.bottom-right-menu-container { position: relative; }
 
 .floating-menu-popup {
   position: absolute;
@@ -191,9 +187,7 @@ button:active { opacity: 0.8; }
   color: var(--primary-color);
 }
 
-.popup-menu-btn svg {
-  width: 18px; height: 18px; fill: currentColor;
-}
+.popup-menu-btn svg { width: 18px; height: 18px; fill: currentColor; }
 
 .btn-bar-menu {
   background: var(--primary-color);
@@ -208,11 +202,7 @@ button:active { opacity: 0.8; }
   box-shadow: 0 2px 8px rgba(37,99,235,0.3);
 }
 
-.burger-line {
-  width: 18px; height: 2px;
-  background: white;
-  border-radius: 2px;
-}
+.burger-line { width: 18px; height: 2px; background: white; border-radius: 2px; }
 
 .fab-container {
   position: fixed;
@@ -237,9 +227,7 @@ button:active { opacity: 0.8; }
 .fab-scanner { background: #7c3aed; }
 .fab-add { background: #16a34a; }
 
-.fab-main svg, .fab-scanner svg, .fab-add svg {
-  width: 20px; height: 20px; fill: currentColor;
-}
+.fab-main svg, .fab-scanner svg, .fab-add svg { width: 20px; height: 20px; fill: currentColor; }
 
 .cart-badge {
   position: absolute;
@@ -251,9 +239,7 @@ button:active { opacity: 0.8; }
 }
 
 .sticky-search-bar {
-  position: sticky;
-  top: 0;
-  z-index: 99;
+  position: sticky; top: 0; z-index: 99;
   background: var(--bg-color);
   padding: 4px 0 10px 0;
   display: none;
@@ -261,12 +247,7 @@ button:active { opacity: 0.8; }
 
 .sticky-search-bar.show { display: block; }
 
-.inventory-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
+.inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .inv-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);

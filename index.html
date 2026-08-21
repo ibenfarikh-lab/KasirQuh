@@ -167,7 +167,7 @@
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
       </button>
 
-      <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang">
+      <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative;">
         <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
         <span class="cart-badge" id="cart-count">0</span>
       </button>
@@ -252,25 +252,16 @@
       </div>
     </div>
 
-    <!-- 5. HALAMAN CATATAN UTAMA (Catatan 1, 2, 3, 4 dengan Edit Nama) -->
+    <!-- 5. HALAMAN CATATAN UTAMA (Catatan 1, 2, 3, 4 dengan Edit Nama Bersih) -->
     <div id="catatan" class="tab-content">
-      <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 4px;">
-        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-          <button id="sub-btn-catatan1" class="sub-tab-btn active" onclick="switchSubCatatanTab('catatan')">📝 <span id="label-tab-catatan1">Catatan 1</span></button>
-          <button onclick="ubahNamaSubTabCatatan('catatan')" title="Ubah Nama Tab" style="background: transparent; border: none; cursor: pointer; font-size: 0.8rem; padding: 4px;">✏️</button>
-        </div>
-        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-          <button id="sub-btn-catatan2" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan2')">📝 <span id="label-tab-catatan2">Catatan 2</span></button>
-          <button onclick="ubahNamaSubTabCatatan('catatan2')" title="Ubah Nama Tab" style="background: transparent; border: none; cursor: pointer; font-size: 0.8rem; padding: 4px;">✏️</button>
-        </div>
-        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-          <button id="sub-btn-catatan3" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan3')">📝 <span id="label-tab-catatan3">Catatan 3</span></button>
-          <button onclick="ubahNamaSubTabCatatan('catatan3')" title="Ubah Nama Tab" style="background: transparent; border: none; cursor: pointer; font-size: 0.8rem; padding: 4px;">✏️</button>
-        </div>
-        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-          <button id="sub-btn-catatan4" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan4')">📝 <span id="label-tab-catatan4">Catatan 4</span></button>
-          <button onclick="ubahNamaSubTabCatatan('catatan4')" title="Ubah Nama Tab" style="background: transparent; border: none; cursor: pointer; font-size: 0.8rem; padding: 4px;">✏️</button>
-        </div>
+      <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 6px; gap: 6px;">
+        <button id="sub-btn-catatan1" class="sub-tab-btn active" onclick="switchSubCatatanTab('catatan')">📝 <span id="label-tab-catatan1">Catatan 1</span> <span onclick="event.stopPropagation(); ubahNamaSubTabCatatan('catatan');" style="font-size: 0.7rem; opacity: 0.7; margin-left: 4px;">✏️</span></button>
+        
+        <button id="sub-btn-catatan2" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan2')">📝 <span id="label-tab-catatan2">Catatan 2</span> <span onclick="event.stopPropagation(); ubahNamaSubTabCatatan('catatan2');" style="font-size: 0.7rem; opacity: 0.7; margin-left: 4px;">✏️</span></button>
+        
+        <button id="sub-btn-catatan3" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan3')">📝 <span id="label-tab-catatan3">Catatan 3</span> <span onclick="event.stopPropagation(); ubahNamaSubTabCatatan('catatan3');" style="font-size: 0.7rem; opacity: 0.7; margin-left: 4px;">✏️</span></button>
+        
+        <button id="sub-btn-catatan4" class="sub-tab-btn" onclick="switchSubCatatanTab('catatan4')">📝 <span id="label-tab-catatan4">Catatan 4</span> <span onclick="event.stopPropagation(); ubahNamaSubTabCatatan('catatan4');" style="font-size: 0.7rem; opacity: 0.7; margin-left: 4px;">✏️</span></button>
       </div>
 
       <!-- Sub-Tab Catatan 1 -->
@@ -679,7 +670,6 @@
 
   <!-- External JavaScript -->
   <script>
-    // Konfigurasi Firebase Anda
     const firebaseConfig = {
       apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
       authDomain: "kasirquh.firebaseapp.com",

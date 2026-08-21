@@ -88,7 +88,6 @@ db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
   refreshData();
 });
 
-// Sinkronisasi Nama-nama Sub Tab Catatan 1, 2, 3, 4
 let namaTabCatatan = {
   catatan: "Catatan 1",
   catatan2: "Catatan 2",
@@ -127,7 +126,6 @@ function ubahNamaSubTabCatatan(targetKey) {
   }
 }
 
-// Data Catatan 1, 2, 3, 4
 let daftarCatatanCard = [];
 db.collection("pengaturan").doc("daftar_catatan_v13").onSnapshot((doc) => {
   if (doc.exists) {
@@ -1153,15 +1151,15 @@ function updatePermanentBarTitle() {
   const posPag = document.getElementById("pos-pagination-wrapper");
   const stokPag = document.getElementById("stok-pagination-wrapper");
 
-  posPag.classList.remove("show");
-  stokPag.classList.remove("show");
+  if (posPag) posPag.style.display = "none";
+  if (stokPag) stokPag.style.display = "none";
 
   if (activeTab === 'penjualan') {
     titleEl.innerText = "Kasir";
-    posPag.classList.add("show");
+    if (posPag) posPag.style.display = "flex";
   } else if (activeTab === 'data-barang') {
     titleEl.innerText = "Manajemen Stok";
-    stokPag.classList.add("show");
+    if (stokPag) stokPag.style.display = "flex";
   } else if (activeTab === 'belanja-stok') {
     titleEl.innerText = "Belanja Stok";
   } else if (activeTab === 'laporan') {
