@@ -189,7 +189,7 @@
     <div id="laporan" class="tab-content">
       <div class="sub-nav-tabs no-print">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')">👥 Data Pelanggan</button>
-        <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')">📋 Laporan Transaksi</button>
+        <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')">📋 Data Transaksi</button>
       </div>
 
       <div id="sub-pelanggan" class="sub-tab-content active">
@@ -229,9 +229,9 @@
         </div>
 
         <div style="margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; margin-top: 12px; align-items: center;">
-          <button style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;" onclick="eksporExcel()">📥 Export Laporan (CSV)</button>
+          <button style="background: #107c41; padding: 7px 10px; border-radius: 8px; font-size: 0.72rem; white-space: nowrap; flex-shrink: 0;" onclick="eksporExcel()">📥 Ekspor Transaksi (csv)</button>
           <label style="background: #2563eb; color: white; padding: 7px 10px; font-size: 0.72rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; white-space: nowrap; flex-shrink: 0;">
-            📤 Import Laporan (CSV)
+            📤 Impor Transaksi
             <input type="file" id="import-report-file" accept=".csv" onchange="importLaporanExcel(event)" style="display: none;">
           </label>
         </div>
