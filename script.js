@@ -562,8 +562,44 @@ db.collection("pelanggan").onSnapshot((snapshot) => {
   refreshData();
 });
 
-let restockListItems = JSON.parse(localStorage.getItem('restock_list_items_v13')) || [];
-let riwayatTransaksi = JSON.parse(localStorage.getItem('riwayat_kasir_v13')) || [];
+// --- CLOUD FIRESTORE SYNC UNTUK RESTOCK & TRANSAKSI ---
+let restockListItems = [];
+db.collection("pengaturan").doc("restock_v13").onSnapshot((doc) => {
+  if (doc.exists) {
+    restockListItems = doc.data().items || [];
+  } else {
+    db.collection("pengaturan").doc("restock_v13").set({ items: [] });
+  }
+  refreshData();
+});
+
+function simpanRestockKeCloud() {
+  db.collection("pengaturan").doc("restock_v13").set({ items: restockListItems })
+    .catch(err => console.error("Gagal simpan restock ke cloud: ", err));
+}
+
+let riwayatTransaksi = [];
+db.collection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapshot) => {
+  riwayatTransaksi = [];
+  snapshot.forEach((doc) => {
+    let tData = doc.data();
+    tData.firestoreId = doc.id;
+    riwayatTransaksi.push(tData);
+  });
+  refreshData();
+}, (error) => {
+  // Fallback jika index belum dibuat di Firebase
+  db.collection("transaksi").get().then((snapshot) => {
+    riwayatTransaksi = [];
+    snapshot.forEach((doc) => {
+      let tData = doc.data();
+      tData.firestoreId = doc.id;
+      riwayatTransaksi.push(tData);
+    });
+    refreshData();
+  });
+});
+
 let viewMode = localStorage.getItem('inventory_view_mode_v13') || 'grid';
 
 let stokCurrentPage = 1;
@@ -868,7 +904,7 @@ function simpanEditBelanjaStok(restockId) {
     rItem.hargaRtg = price;
     if (selectedOnlineImg) rItem.foto = selectedOnlineImg;
 
-    localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+    simpanRestockKeCloud();
     closeProductModal();
     refreshData();
     showNotif("Belanja stok diperbarui!");
@@ -1152,7 +1188,7 @@ function tambahkanKeBelanjaStok() {
   };
 
   restockListItems.push(newItem);
-  localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+  simpanRestockKeCloud();
   closeProductModal();
   switchTab('belanja-stok', false);
   showNotif("Ditambahkan ke Belanja Stok!");
@@ -1161,7 +1197,7 @@ function tambahkanKeBelanjaStok() {
 function hapusItemBelanja(itemId) {
   if (confirm("Hapus item ini dari daftar belanja?")) {
     restockListItems = restockListItems.filter(item => item.id !== itemId);
-    localStorage.setItem('restock_list_items_v13', JSON.stringify(restockListItems));
+    simpanRestockKeCloud();
     refreshData();
     showNotif("Item dihapus");
   }
@@ -1171,7 +1207,7 @@ function kosongkanRestockList() {
   if (restockListItems.length === 0) return alert("Daftar belanja sudah kosong!");
   if (confirm("Kosongkan seluruh daftar belanja stok?")) {
     restockListItems = [];
-    localStorage.removeItem('restock_list_items_v13');
+    simpanRestockKeCloud();
     refreshData();
     showNotif("Daftar belanja dikosongkan");
   }
@@ -1207,7 +1243,7 @@ async function prosesBelanjaStok() {
 
   await batch.commit();
   restockListItems = [];
-  localStorage.removeItem('restock_list_items_v13');
+  simpanRestockKeCloud();
   refreshData();
   alert("🎉 Belanja berhasil diproses! Stok, modal, dan harga jual di Halaman Stok telah diperbarui.");
   switchTab('data-barang', false);
@@ -1612,12 +1648,14 @@ function prosesSimpanTransaksi() {
   const keuntungan = totalBelanja - totalModal;
   const transaksi = {
     waktu: new Date().toLocaleString('id-ID'),
-    total: totalBelanja, modal: totalModal, untung: keuntungan,
+    waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    total: totalBelanja, 
+    modal: totalModal, 
+    untung: keuntungan,
     metode: document.getElementById("pay-method").value,
     qty: cart.reduce((acc, item) => acc + item.qty, 0)
   };
-  riwayatTransaksi.push(transaksi);
-  localStorage.setItem('riwayat_kasir_v13', JSON.stringify(riwayatTransaksi));
+  db.collection("transaksi").add(transaksi).catch(err => console.error("Gagal simpan transaksi ke cloud: ", err));
 }
 
 function selesaiTransaksi() {
@@ -1778,20 +1816,30 @@ function importLaporanExcel(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
     const rows = e.target.result.split("\n");
+    let batch = db.batch();
     let count = 0;
     for (let i = 1; i < rows.length; i++) {
       let row = rows[i].trim();
       if (!row) continue;
       let cols = row.split(",");
       if (cols.length >= 6) {
-        riwayatTransaksi.push({ waktu: cols[0].replace(/"/g, ''), metode: cols[1].replace(/"/g, ''), qty: parseFloat(cols[2])||0, total: parseFloat(cols[3])||0, modal: parseFloat(cols[4])||0, untung: parseFloat(cols[5])||0 });
+        let newTrxRef = db.collection("transaksi").doc();
+        batch.set(newTrxRef, {
+          waktu: cols[0].replace(/"/g, ''),
+          waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          metode: cols[1].replace(/"/g, ''),
+          qty: parseFloat(cols[2]) || 0,
+          total: parseFloat(cols[3]) || 0,
+          modal: parseFloat(cols[4]) || 0,
+          untung: parseFloat(cols[5]) || 0
+        });
         count++;
       }
     }
-    localStorage.setItem('riwayat_kasir_v13', JSON.stringify(riwayatTransaksi));
-    alert(`Berhasil mengimpor ${count} riwayat!`);
+    await batch.commit();
+    alert(`Berhasil mengimpor ${count} riwayat ke cloud!`);
     refreshData();
   };
   reader.readAsText(file);
@@ -1863,11 +1911,15 @@ function simpanPengaturanScan() {
   });
 }
 
-function resetRiwayat() {
-  if (confirm("Kosongkan SELURUH riwayat transaksi?")) {
-    riwayatTransaksi = [];
-    localStorage.removeItem('riwayat_kasir_v13');
-    alert("Riwayat dikosongkan.");
+async function resetRiwayat() {
+  if (confirm("Kosongkan SELURUH riwayat transaksi di Cloud?")) {
+    let snapshot = await db.collection("transaksi").get();
+    let batch = db.batch();
+    snapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    alert("Riwayat transaksi dikosongkan dari Cloud.");
     refreshData();
   }
 }
