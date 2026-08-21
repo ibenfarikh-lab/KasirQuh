@@ -4,10 +4,106 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplikasi Kasir & Toko</title>
-  <!-- Menghubungkan file CSS secara eksplisit -->
-  <link rel="stylesheet" href="./style.css">
+  <style>
+    :root {
+      --border-color: #e2e8f0;
+      --text-muted: #64748b;
+      --bg-main: #f8fafc;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+    }
+    
+    body {
+      font-family: sans-serif;
+      background-color: var(--bg-main);
+      margin: 0;
+      padding: 0;
+      color: #1e293b;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 16px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .sub-tab-content {
+      display: none;
+    }
+
+    .sub-tab-content.active {
+      display: block;
+    }
+
+    .permanent-header {
+      background: #ffffff;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .permanent-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    .pagination-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination-wrapper button {
+      padding: 4px 10px;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #fab-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    #fab-container button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      padding: 8px;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+    }
+  </style>
 </head>
 <body>
+
   <!-- Struktur HTML Aplikasi -->
   <div id="app-container">
     <!-- Navbar / Header -->
@@ -18,7 +114,7 @@
         <span id="pos-page-info">1/1</span>
         <button id="pos-next-btn" onclick="changePosPage(1)">›</button>
       </div>
-      <div id="stok-pagination-wrapper" class="pagination-wrapper">
+      <div id="stok-pagination-wrapper" class="pagination-wrapper" style="display:none;">
         <button id="stok-prev-btn" onclick="changeStokPage(-1)">‹</button>
         <span id="stok-page-info">1/1</span>
         <button id="stok-next-btn" onclick="changeStokPage(1)">›</button>
@@ -40,7 +136,7 @@
       <div id="belanja-stok" class="tab-content">
         <div id="restock-list-wrapper"></div>
         <div id="restock-grid-wrapper"></div>
-        <div>Total Est: Rp <span id="restock-est-total">0</span></div>
+        <div style="margin-top: 12px; font-weight: bold;">Total Est: Rp <span id="restock-est-total">0</span></div>
       </div>
 
       <div id="laporan" class="tab-content">
@@ -51,22 +147,24 @@
         </div>
         <div class="sub-tab-content" id="sub-pelanggan">
           <div id="customer-list-wrapper"></div>
-          <div>Total Finansial Pelanggan: Rp <span id="customer-total-financial">0</span></div>
+          <div style="margin-top: 12px; font-weight: bold;">Total Finansial Pelanggan: Rp <span id="customer-total-financial">0</span></div>
         </div>
       </div>
 
       <div id="pengaturan" class="tab-content">
-        <input type="text" id="setting-user">
-        <input type="password" id="setting-pass">
-        <input type="text" id="setting-shop-name">
-        <input type="text" id="setting-shop-address">
-        <input type="text" id="setting-shop-phone">
-        <input type="number" id="setting-cooldown">
-        <select id="setting-view-mode"><option value="grid">Grid</option><option value="list">List</option></select>
+        <div style="display: flex; flex-direction: column; gap: 10px; max-width: 300px;">
+          <input type="text" id="setting-user" placeholder="Username">
+          <input type="password" id="setting-pass" placeholder="Password">
+          <input type="text" id="setting-shop-name" placeholder="Nama Toko">
+          <input type="text" id="setting-shop-address" placeholder="Alamat Toko">
+          <input type="text" id="setting-shop-phone" placeholder="No Telepon">
+          <input type="number" id="setting-cooldown" placeholder="Cooldown">
+          <select id="setting-view-mode"><option value="grid">Grid</option><option value="list">List</option></select>
+        </div>
       </div>
     </main>
 
-    <!-- Notifikasi & Elemen Tersembunyi untuk Data -->
+    <!-- Elemen Data Tersembunyi & Notifikasi -->
     <div id="scan-notif" style="display:none;"></div>
     <input type="hidden" id="db-selected-online-img">
     <input type="hidden" id="db-name">
@@ -89,8 +187,8 @@
     <input type="hidden" id="bk-amount">
     <input type="hidden" id="bk-desc">
     <input type="hidden" id="pay-amount">
-    <select id="pay-method"><option value="Tunai">Tunai</option><option value="QRIS">QRIS</option></select>
-    <input type="text" id="wa-customer-phone">
+    <select id="pay-method" style="display:none;"><option value="Tunai">Tunai</option><option value="QRIS">QRIS</option></select>
+    <input type="text" id="wa-customer-phone" style="display:none;">
 
     <!-- Tombol Navigasi / FAB -->
     <div id="fab-container">
@@ -102,7 +200,14 @@
     </div>
   </div>
 
-  <!-- Menghubungkan file JavaScript secara eksplisit -->
-  <script src="./script.js"></script>
+  <!-- Skrip JavaScript Utama -->
+  <script>
+    // Logika dasar navigasi tab & fungsi bantu sementara
+    function changePosPage(val) { console.log("POS Page:", val); }
+    function changeStokPage(val) { console.log("Stok Page:", val); }
+    
+    // Tempatkan seluruh kode script.js Anda yang lain di bawah baris ini jika diperlukan
+    console.log("Aplikasi Kasir Siap");
+  </script>
 </body>
 </html>
