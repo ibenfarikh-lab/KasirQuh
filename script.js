@@ -61,6 +61,14 @@ function formatInputRupiah(input) {
   input.value = rupiah;
 }
 
+function formatSubjudulInput(input) {
+  let val = input.value;
+  let formatted = val.replace(/\b\d+\b/g, (match) => {
+    return parseInt(match).toLocaleString('id-ID');
+  });
+  input.value = formatted;
+}
+
 function parseRupiahToNumber(stringVal) {
   if (!stringVal) return 0;
   return parseInt(stringVal.toString().replace(/\./g, '')) || 0;
@@ -88,52 +96,18 @@ db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
   refreshData();
 });
 
-let namaTabCatatan = {
-  catatan: "Catatan 1",
-  catatan2: "Catatan 2",
-  catatan3: "Catatan 3",
-  catatan4: "Catatan 4"
-};
-
-db.collection("pengaturan").doc("nama_tab_catatan_v13").onSnapshot((doc) => {
-  if (doc.exists) {
-    namaTabCatatan = doc.data();
-  } else {
-    db.collection("pengaturan").doc("nama_tab_catatan_v13").set(namaTabCatatan);
-  }
-  updateLabelTabCatatanUI();
-});
-
-function updateLabelTabCatatanUI() {
-  if (document.getElementById('label-tab-catatan1')) document.getElementById('label-tab-catatan1').innerText = namaTabCatatan.catatan || "Catatan 1";
-  if (document.getElementById('label-tab-catatan2')) document.getElementById('label-tab-catatan2').innerText = namaTabCatatan.catatan2 || "Catatan 2";
-  if (document.getElementById('label-tab-catatan3')) document.getElementById('label-tab-catatan3').innerText = namaTabCatatan.catatan3 || "Catatan 3";
-  if (document.getElementById('label-tab-catatan4')) document.getElementById('label-tab-catatan4').innerText = namaTabCatatan.catatan4 || "Catatan 4";
-  updatePermanentBarTitle();
-}
-
-function ubahNamaSubTabCatatan(targetKey) {
-  let namaLama = namaTabCatatan[targetKey] || targetKey;
-  let namaBaru = prompt(`Masukkan nama baru untuk "${namaLama}":`, namaLama);
-  if (namaBaru !== null && namaBaru.trim() !== "") {
-    namaTabCatatan[targetKey] = namaBaru.trim();
-    db.collection("pengaturan").doc("nama_tab_catatan_v13").set(namaTabCatatan)
-      .then(() => {
-        updateLabelTabCatatanUI();
-        showNotif("Nama catatan diperbarui!");
-      })
-      .catch(err => alert("Gagal mengubah nama: " + err.message));
-  }
-}
-
 let daftarCatatanCard = [];
 db.collection("pengaturan").doc("daftar_catatan_v13").onSnapshot((doc) => {
   if (doc.exists) {
     let data = doc.data();
     daftarCatatanCard = data.items || [];
-    if (data.modalAwal) document.getElementById('catatan-modal-awal').value = data.modalAwal;
+    if (data.modalAwal) {
+      document.getElementById('catatan-modal-awal').value = data.modalAwal;
+    }
   } else {
-    daftarCatatanCard = [{ id: "NOTE-1", judul: "Catatan 1", subjudul: "toko bu haji / pembayaran 25.000", isi: "Ayam - 1 kg", waktu: new Date().toLocaleString('id-ID') }];
+    daftarCatatanCard = [
+      { id: "NOTE-1", judul: "Catatan 1", subjudul: "toko bu haji / pembayaran 25.000", isi: "Ayam - 1 kg\nCeker - 1 kg\nAti ampela - 1 kg", waktu: new Date().toLocaleString('id-ID') }
+    ];
     db.collection("pengaturan").doc("daftar_catatan_v13").set({ items: daftarCatatanCard, modalAwal: "100.000" });
   }
   refreshDataCatatan('catatan', daftarCatatanCard, 'catatan-list-container', 'catatan-modal-awal', 'sticky-lbl-modal-1', 'sticky-lbl-pembayaran-1', 'sticky-lbl-sisa-1');
@@ -144,44 +118,22 @@ db.collection("pengaturan").doc("daftar_catatan2_v13").onSnapshot((doc) => {
   if (doc.exists) {
     let data = doc.data();
     daftarCatatan2Card = data.items || [];
-    if (data.modalAwal) document.getElementById('catatan2-modal-awal').value = data.modalAwal;
+    if (data.modalAwal) {
+      document.getElementById('catatan2-modal-awal').value = data.modalAwal;
+    }
   } else {
-    daftarCatatan2Card = [{ id: "NOTE2-1", judul: "Catatan 2", subjudul: "toko bu haji / pembayaran 50.000", isi: "Beras - 5 kg", waktu: new Date().toLocaleString('id-ID') }];
+    daftarCatatan2Card = [
+      { id: "NOTE2-1", judul: "Catatan 2", subjudul: "toko bu haji / pembayaran 50.000", isi: "Beras - 5 kg\nMinyak - 2 liter", waktu: new Date().toLocaleString('id-ID') }
+    ];
     db.collection("pengaturan").doc("daftar_catatan2_v13").set({ items: daftarCatatan2Card, modalAwal: "100.000" });
   }
   refreshDataCatatan('catatan2', daftarCatatan2Card, 'catatan2-list-container', 'catatan2-modal-awal', 'sticky-lbl-modal-2', 'sticky-lbl-pembayaran-2', 'sticky-lbl-sisa-2');
 });
 
-let daftarCatatan3Card = [];
-db.collection("pengaturan").doc("daftar_catatan3_v13").onSnapshot((doc) => {
-  if (doc.exists) {
-    let data = doc.data();
-    daftarCatatan3Card = data.items || [];
-    if (data.modalAwal) document.getElementById('catatan3-modal-awal').value = data.modalAwal;
-  } else {
-    daftarCatatan3Card = [{ id: "NOTE3-1", judul: "Catatan 3", subjudul: "pembayaran 0", isi: "Contoh barang", waktu: new Date().toLocaleString('id-ID') }];
-    db.collection("pengaturan").doc("daftar_catatan3_v13").set({ items: daftarCatatan3Card, modalAwal: "100.000" });
-  }
-  refreshDataCatatan('catatan3', daftarCatatan3Card, 'catatan3-list-container', 'catatan3-modal-awal', 'sticky-lbl-modal-3', 'sticky-lbl-pembayaran-3', 'sticky-lbl-sisa-3');
-});
-
-let daftarCatatan4Card = [];
-db.collection("pengaturan").doc("daftar_catatan4_v13").onSnapshot((doc) => {
-  if (doc.exists) {
-    let data = doc.data();
-    daftarCatatan4Card = data.items || [];
-    if (data.modalAwal) document.getElementById('catatan4-modal-awal').value = data.modalAwal;
-  } else {
-    daftarCatatan4Card = [{ id: "NOTE4-1", judul: "Catatan 4", subjudul: "pembayaran 0", isi: "Contoh barang", waktu: new Date().toLocaleString('id-ID') }];
-    db.collection("pengaturan").doc("daftar_catatan4_v13").set({ items: daftarCatatan4Card, modalAwal: "100.000" });
-  }
-  refreshDataCatatan('catatan4', daftarCatatan4Card, 'catatan4-list-container', 'catatan4-modal-awal', 'sticky-lbl-modal-4', 'sticky-lbl-pembayaran-4', 'sticky-lbl-sisa-4');
-});
-
 function simpanModalAwal(targetType) {
-  let inputId = targetType === 'catatan4' ? 'catatan4-modal-awal' : targetType === 'catatan3' ? 'catatan3-modal-awal' : targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
-  let docName = targetType === 'catatan4' ? 'daftar_catatan4_v13' : targetType === 'catatan3' ? 'daftar_catatan3_v13' : targetType === 'catatan2' ? 'daftar_catatan2_v13' : 'daftar_catatan_v13';
-  let targetList = targetType === 'catatan4' ? daftarCatatan4Card : targetType === 'catatan3' ? daftarCatatan3Card : targetType === 'catatan2' ? daftarCatatan2Card : daftarCatatanCard;
+  let inputId = targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
+  let docName = targetType === 'catatan2' ? 'daftar_catatan2_v13' : 'daftar_catatan_v13';
+  let targetList = targetType === 'catatan2' ? daftarCatatan2Card : daftarCatatanCard;
   let modalVal = document.getElementById(inputId).value;
 
   db.collection("pengaturan").doc(docName).set({
@@ -272,7 +224,6 @@ let isCooldown = false;
 let totalBelanja = 0;
 let activeTab = 'penjualan';
 let activeSubDataTab = 'sub-pelanggan';
-let activeSubCatatanTab = 'catatan';
 
 let html5QrCodePos = null;
 let isScannerPosOpen = false;
@@ -333,7 +284,7 @@ function toggleStickySearchBar() {
 function openCatatanModal(targetType = 'catatan', id = null) {
   const modal = document.getElementById("catatanModal");
   document.getElementById("catatan-type-target").value = targetType;
-  let targetList = targetType === 'catatan4' ? daftarCatatan4Card : targetType === 'catatan3' ? daftarCatatan3Card : targetType === 'catatan2' ? daftarCatatan2Card : daftarCatatanCard;
+  let targetList = targetType === 'catatan2' ? daftarCatatan2Card : daftarCatatanCard;
 
   if (id) {
     let item = targetList.find(c => c.id === id);
@@ -368,9 +319,9 @@ function simpanCatatanCard() {
 
   if (!judul) return alert("Judul catatan wajib diisi!");
 
-  let targetList = targetType === 'catatan4' ? [...daftarCatatan4Card] : targetType === 'catatan3' ? [...daftarCatatan3Card] : targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
-  let docName = targetType === 'catatan4' ? "daftar_catatan4_v13" : targetType === 'catatan3' ? "daftar_catatan3_v13" : targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
-  let inputId = targetType === 'catatan4' ? 'catatan4-modal-awal' : targetType === 'catatan3' ? 'catatan3-modal-awal' : targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
+  let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
+  let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
+  let inputId = targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
   let currentModalVal = document.getElementById(inputId).value;
 
   if (id) {
@@ -379,9 +330,8 @@ function simpanCatatanCard() {
       targetList[index] = { ...targetList[index], judul, subjudul, isi, waktu: new Date().toLocaleString('id-ID') };
     }
   } else {
-    let prefix = targetType === 'catatan4' ? "NOTE4-" : targetType === 'catatan3' ? "NOTE3-" : targetType === 'catatan2' ? "NOTE2-" : "NOTE-";
     let newItem = {
-      id: prefix + Date.now(),
+      id: (targetType === 'catatan2' ? "NOTE2-" : "NOTE-") + Date.now(),
       judul: judul,
       subjudul: subjudul,
       isi: isi,
@@ -392,9 +342,7 @@ function simpanCatatanCard() {
 
   db.collection("pengaturan").doc(docName).set({ items: targetList, modalAwal: currentModalVal })
     .then(() => {
-      if (targetType === 'catatan4') daftarCatatan4Card = targetList;
-      else if (targetType === 'catatan3') daftarCatatan3Card = targetList;
-      else if (targetType === 'catatan2') daftarCatatan2Card = targetList;
+      if (targetType === 'catatan2') daftarCatatan2Card = targetList;
       else daftarCatatanCard = targetList;
       closeCatatanModal();
       showNotif("Catatan berhasil disimpan ke Cloud!");
@@ -404,18 +352,16 @@ function simpanCatatanCard() {
 
 function hapusCatatanCard(targetType, id) {
   if (confirm("Apakah Anda yakin ingin menghapus catatan ini?")) {
-    let targetList = targetType === 'catatan4' ? [...daftarCatatan4Card] : targetType === 'catatan3' ? [...daftarCatatan3Card] : targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
-    let docName = targetType === 'catatan4' ? "daftar_catatan4_v13" : targetType === 'catatan3' ? "daftar_catatan3_v13" : targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
-    let inputId = targetType === 'catatan4' ? 'catatan4-modal-awal' : targetType === 'catatan3' ? 'catatan3-modal-awal' : targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
+    let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
+    let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
+    let inputId = targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
     let currentModalVal = document.getElementById(inputId).value;
     
     targetList = targetList.filter(c => c.id !== id);
 
     db.collection("pengaturan").doc(docName).set({ items: targetList, modalAwal: currentModalVal })
       .then(() => {
-        if (targetType === 'catatan4') daftarCatatan4Card = targetList;
-        else if (targetType === 'catatan3') daftarCatatan3Card = targetList;
-        else if (targetType === 'catatan2') daftarCatatan2Card = targetList;
+        if (targetType === 'catatan2') daftarCatatan2Card = targetList;
         else daftarCatatanCard = targetList;
         showNotif("Catatan dihapus!");
       })
@@ -424,9 +370,9 @@ function hapusCatatanCard(targetType, id) {
 }
 
 function pindahCatatanUrutan(targetType, index, direction) {
-  let targetList = targetType === 'catatan4' ? [...daftarCatatan4Card] : targetType === 'catatan3' ? [...daftarCatatan3Card] : targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
-  let docName = targetType === 'catatan4' ? "daftar_catatan4_v13" : targetType === 'catatan3' ? "daftar_catatan3_v13" : targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
-  let inputId = targetType === 'catatan4' ? 'catatan4-modal-awal' : targetType === 'catatan3' ? 'catatan3-modal-awal' : targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
+  let targetList = targetType === 'catatan2' ? [...daftarCatatan2Card] : [...daftarCatatanCard];
+  let docName = targetType === 'catatan2' ? "daftar_catatan2_v13" : "daftar_catatan_v13";
+  let inputId = targetType === 'catatan2' ? 'catatan2-modal-awal' : 'catatan-modal-awal';
   let currentModalVal = document.getElementById(inputId).value;
 
   let targetIndex = index + direction;
@@ -438,9 +384,7 @@ function pindahCatatanUrutan(targetType, index, direction) {
 
   db.collection("pengaturan").doc(docName).set({ items: targetList, modalAwal: currentModalVal })
     .then(() => {
-      if (targetType === 'catatan4') daftarCatatan4Card = targetList;
-      else if (targetType === 'catatan3') daftarCatatan3Card = targetList;
-      else if (targetType === 'catatan2') daftarCatatan2Card = targetList;
+      if (targetType === 'catatan2') daftarCatatan2Card = targetList;
       else daftarCatatanCard = targetList;
       showNotif("Urutan diperbarui!");
     })
@@ -450,7 +394,7 @@ function pindahCatatanUrutan(targetType, index, direction) {
 function hitungRingkasanCatatan(tabName, modalInputId, lblModalId, lblBayarId, lblSisaId) {
   let modalAwal = parseRupiahToNumber(document.getElementById(modalInputId).value);
   let totalPembayaran = 0;
-  let targetList = (tabName === 'catatan4') ? daftarCatatan4Card : (tabName === 'catatan3') ? daftarCatatan3Card : (tabName === 'catatan2') ? daftarCatatan2Card : daftarCatatanCard;
+  let targetList = (tabName === 'catatan2') ? daftarCatatan2Card : daftarCatatanCard;
 
   targetList.forEach(item => {
     if (item.subjudul) {
@@ -1109,41 +1053,19 @@ async function prosesBelanjaStok() {
 
 function switchSubDataTab(subTabId) {
   activeSubDataTab = subTabId;
-  document.querySelectorAll('#laporan .sub-tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('#laporan .sub-tab-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sub-tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById(subTabId).classList.add('active');
   if (subTabId === 'sub-pelanggan') {
     document.getElementById('sub-btn-pelanggan').classList.add('active');
     document.getElementById('fab-add-btn').style.display = 'none';
     document.getElementById('fab-add-cust-btn').style.display = 'flex';
-    document.getElementById('fab-add-catatan-btn').style.display = 'none';
   } else {
     document.getElementById('sub-btn-laporan').classList.add('active');
     document.getElementById('fab-add-btn').style.display = 'none';
     document.getElementById('fab-add-cust-btn').style.display = 'none';
-    document.getElementById('fab-add-catatan-btn').style.display = 'none';
   }
   updatePermanentBarTitle();
-}
-
-function switchSubCatatanTab(subTabId) {
-  activeSubCatatanTab = subTabId;
-  document.querySelectorAll('#catatan .sub-tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('#catatan .sub-tab-btn').forEach(el => el.classList.remove('active'));
-  
-  if (subTabId === 'catatan4') {
-    document.getElementById('sub-catatan4').classList.add('active');
-    document.getElementById('sub-btn-catatan4').classList.add('active');
-  } else if (subTabId === 'catatan3') {
-    document.getElementById('sub-catatan3').classList.add('active');
-    document.getElementById('sub-btn-catatan3').classList.add('active');
-  } else if (subTabId === 'catatan2') {
-    document.getElementById('sub-catatan2').classList.add('active');
-    document.getElementById('sub-btn-catatan2').classList.add('active');
-  } else {
-    document.getElementById('sub-catatan1').classList.add('active');
-    document.getElementById('sub-btn-catatan1').classList.add('active');
-  }
 }
 
 function updatePermanentBarTitle() {
@@ -1151,24 +1073,23 @@ function updatePermanentBarTitle() {
   const posPag = document.getElementById("pos-pagination-wrapper");
   const stokPag = document.getElementById("stok-pagination-wrapper");
 
-  if (posPag) posPag.style.display = "none";
-  if (stokPag) stokPag.style.display = "none";
+  posPag.classList.remove("show");
+  stokPag.classList.remove("show");
 
   if (activeTab === 'penjualan') {
     titleEl.innerText = "Kasir";
-    if (posPag) posPag.style.display = "flex";
+    posPag.classList.add("show");
   } else if (activeTab === 'data-barang') {
     titleEl.innerText = "Manajemen Stok";
-    if (stokPag) stokPag.style.display = "flex";
+    stokPag.classList.add("show");
   } else if (activeTab === 'belanja-stok') {
     titleEl.innerText = "Belanja Stok";
   } else if (activeTab === 'laporan') {
     titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? "Data Pelanggan" : "Laporan Transaksi";
   } else if (activeTab === 'catatan') {
-    if (activeSubCatatanTab === 'catatan4') titleEl.innerText = namaTabCatatan.catatan4 || "Catatan 4";
-    else if (activeSubCatatanTab === 'catatan3') titleEl.innerText = namaTabCatatan.catatan3 || "Catatan 3";
-    else if (activeSubCatatanTab === 'catatan2') titleEl.innerText = namaTabCatatan.catatan2 || "Catatan 2";
-    else titleEl.innerText = namaTabCatatan.catatan || "Catatan 1";
+    titleEl.innerText = "Catatan 1";
+  } else if (activeTab === 'catatan2') {
+    titleEl.innerText = "Catatan 2";
   } else if (activeTab === 'pengaturan') {
     titleEl.innerText = "Pengaturan Sistem";
   }
@@ -1180,6 +1101,7 @@ function updatePermanentBarTitle() {
     'belanja-stok': 'pop-btn-belanjastok',
     'laporan': 'pop-btn-laporan',
     'catatan': 'pop-btn-catatan',
+    'catatan2': 'pop-btn-catatan2',
     'pengaturan': 'pop-btn-pengaturan'
   };
   if (activeBtnMap[activeTab]) {
@@ -1200,24 +1122,28 @@ function switchTab(tabId, pushHistory = true) {
   const fabFilter = document.getElementById('fab-filter-btn');
   const fabAdd = document.getElementById('fab-add-btn');
   const fabAddCust = document.getElementById('fab-add-cust-btn');
-  const fabAddCatatan = document.getElementById('fab-add-catatan-btn');
 
   if (tabId === 'penjualan') {
-    fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
+    fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
   } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
-    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'flex'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
+    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'flex'; fabAddCust.style.display = 'none';
     fabAdd.setAttribute("onclick", "openProductModal()");
   } else if (tabId === 'laporan') {
-    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAddCatatan.style.display = 'none';
+    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none';
     if (activeSubDataTab === 'sub-pelanggan') { fabAdd.style.display = 'none'; fabAddCust.style.display = 'flex'; }
     else { fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; }
   } else if (tabId === 'catatan') {
     fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; 
-    fabAdd.style.display = 'none'; 
+    fabAdd.style.display = 'flex'; 
     fabAddCust.style.display = 'none';
-    fabAddCatatan.style.display = 'flex';
+    fabAdd.setAttribute("onclick", "openCatatanModal('catatan')");
+  } else if (tabId === 'catatan2') {
+    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; 
+    fabAdd.style.display = 'flex'; 
+    fabAddCust.style.display = 'none';
+    fabAdd.setAttribute("onclick", "openCatatanModal('catatan2')");
   } else {
-    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
+    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none';
   }
   updatePermanentBarTitle();
   refreshData();
