@@ -45,6 +45,24 @@ function toggleFloatingMenu() {
   if (popup) popup.classList.toggle("show");
 }
 
+// Menutup floating menu saat klik di luar atau saat scroll
+document.addEventListener('click', function(event) {
+  const popup = document.getElementById("floating-menu-popup");
+  const menuBtn = document.querySelector(".btn-bar-menu");
+  if (popup && popup.classList.contains('show')) {
+    if (!popup.contains(event.target) && !menuBtn.contains(event.target)) {
+      popup.classList.remove('show');
+    }
+  }
+});
+
+window.addEventListener('scroll', function() {
+  const popup = document.getElementById("floating-menu-popup");
+  if (popup && popup.classList.contains('show')) {
+    popup.classList.remove('show');
+  }
+}, true);
+
 function formatInputRupiah(input) {
   let angka = input.value.replace(/[^,\d]/g, '').toString();
   let split = angka.split(',');
@@ -249,7 +267,6 @@ function hapusTabCatatanDinamis(tabKey) {
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
-      // Hapus dokumen data catatannya juga di cloud
       db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).delete().catch(e => {});
       activeSubCatatanTab = daftarNamaTabCatatan[0];
       renderSubTabsCatatanUI();
@@ -1220,7 +1237,7 @@ function updatePermanentBarTitle() {
   } else if (activeTab === 'belanja-stok') {
     titleEl.innerText = "Belanja Stok";
   } else if (activeTab === 'laporan') {
-    titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? "Data Pelanggan" : "Laporan Transaksi";
+    titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? "Data Pelanggan" : "Data Transaksi";
   } else if (activeTab === 'catatan') {
     titleEl.innerText = labelNamaTabCatatan[activeSubCatatanTab] || "Catatan";
   } else if (activeTab === 'pengaturan') {
