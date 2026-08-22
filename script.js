@@ -216,16 +216,18 @@ function renderSubTabsCatatanUI() {
 
     let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${tabKey}_v13`;
     catatanListeners[tabKey] = db.collection("pengaturan").doc(namaDokumenCloud).onSnapshot((docSnap) => {
-      // PERBAIKAN: Cek apakah dokumen ada DAN isinya tidak kosong. Jika kosong, paksa ambil template judul lama.
       if (docSnap.exists && docSnap.data().items && docSnap.data().items.length > 0) {
+        // Jika hari ini sudah ada isinya, muat normal
         databaseCatatanDinamis[tabKey] = docSnap.data();
         renderHalamanSubCatatan(tabKey);
       } else {
+        // Jika hari ini kosong, ambil judul dari dokumen utama/lama sebagai template
         let oldDokumenCloud = `catatan_data_${tabKey}_v13`;
         db.collection("pengaturan").doc(oldDokumenCloud).get().then((oldDoc) => {
-          if (oldDoc.exists) {
-            let oldData = oldDoc.data();
-            let freshItems = (oldData.items || []).map(item => ({
+          let sourceData = oldDoc.exists ? oldDoc.data() : null;
+          
+          if (sourceData && sourceData.items && sourceData.items.length > 0) {
+            let freshItems = sourceData.items.map(item => ({
               id: item.id || ("NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4)),
               judul: item.judul || "",
               subjudul: "",
@@ -243,10 +245,41 @@ function renderSubTabsCatatanUI() {
               renderHalamanSubCatatan(tabKey);
             });
           } else {
-            let defaultData = { modalAwal: "0", items: [] };
-            db.collection("pengaturan").doc(namaDokumenCloud).set(defaultData);
-            databaseCatatanDinamis[tabKey] = defaultData;
-            renderHalamanSubCatatan(tabKey);
+            // Coba ambil dari kemarin jika dokumen utama kosong
+            let d = new Date();
+            d.setDate(d.getDate() - 1);
+            let m = '' + (d.getMonth() + 1); if (m.length < 2) m = '0' + m;
+            let day = '' + d.getDate(); if (day.length < 2) day = '0' + day;
+            let yesterdayStr = [d.getFullYear(), m, day].join('-');
+            let yesterdayDocName = `catatan_data_${yesterdayStr}_${tabKey}_v13`;
+
+            db.collection("pengaturan").doc(yesterdayDocName).get().then((yestDoc) => {
+              if (yestDoc.exists && yestDoc.data().items && yestDoc.data().items.length > 0) {
+                let yestData = yestDoc.data();
+                let freshItems = yestData.items.map(item => ({
+                  id: item.id || ("NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4)),
+                  judul: item.judul || "",
+                  subjudul: "",
+                  isi: "",
+                  waktu: new Date().toLocaleString('id-ID')
+                }));
+
+                let templateData = { modalAwal: "0", items: freshItems };
+                db.collection("pengaturan").doc(namaDokumenCloud).set(templateData).then(() => {
+                  databaseCatatanDinamis[tabKey] = templateData;
+                  renderHalamanSubCatatan(tabKey);
+                });
+              } else {
+                let defaultData = { modalAwal: "0", items: [] };
+                db.collection("pengaturan").doc(namaDokumenCloud).set(defaultData).catch(e => {});
+                databaseCatatanDinamis[tabKey] = defaultData;
+                renderHalamanSubCatatan(tabKey);
+              }
+            }).catch(() => {
+              let defaultData = { modalAwal: "0", items: [] };
+              databaseCatatanDinamis[tabKey] = defaultData;
+              renderHalamanSubCatatan(tabKey);
+            });
           }
         }).catch(() => {
           let defaultData = { modalAwal: "0", items: [] };
