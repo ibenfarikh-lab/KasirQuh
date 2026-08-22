@@ -136,6 +136,47 @@ let labelNamaTabCatatan = {
 let databaseCatatanDinamis = {};
 let activeSubCatatanTab = "catatan1";
 
+// State Tanggal untuk Catatan Harian (Poin 1 & 2)
+let selectedCatatanDate = new Date().toISOString().slice(0, 10);
+
+function formatTanggalIndo(dateStr) {
+  if (!dateStr) return "";
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  let dayName = d.toLocaleDateString('id-ID', { weekday: 'long' });
+  let day = String(d.getDate()).padStart(2, '0');
+  let month = String(d.getMonth() + 1).padStart(2, '0');
+  let year = String(d.getFullYear()).slice(-2);
+  return `${dayName}, ${day}/${month}/${year}`;
+}
+
+function ubahTanggalCatatan(dateStr) {
+  if (!dateStr) return;
+  selectedCatatanDate = dateStr;
+  updateDateDisplayUI();
+  renderSubTabsCatatanUI();
+}
+
+function updateDateDisplayUI() {
+  const displayEl = document.getElementById("catatan-date-display");
+  const pickerEl = document.getElementById("catatan-date-picker");
+  if (displayEl) displayEl.innerText = `📅 ${formatTanggalIndo(selectedCatatanDate)}`;
+  if (pickerEl && pickerEl.value !== selectedCatatanDate) {
+    pickerEl.value = selectedCatatanDate;
+  }
+}
+
+function getPreviousDateStr(dateStr) {
+  const parts = dateStr.split('-');
+  let d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  d.setDate(d.getDate() - 1);
+  let y = d.getFullYear();
+  let m = String(d.getMonth() + 1).padStart(2, '0');
+  let day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
   if (doc.exists) {
     let data = doc.data();
@@ -147,8 +188,77 @@ db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
       labels: labelNamaTabCatatan
     });
   }
+  updateDateDisplayUI();
   renderSubTabsCatatanUI();
 });
+
+function setupCatatanListener(tabKey) {
+  const docId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
+
+  db.collection("pengaturan").doc(docId).get().then(async (docSnap) => {
+    if (!docSnap.exists) {
+      let prevDate = getPreviousDateStr(selectedCatatanDate);
+      let prevDocId = `catatan_data_${tabKey}_${prevDate}_v13`;
+      
+      let prevDocSnap = await db.collection("pengaturan").doc(prevDocId).get();
+      let baseModal = "100.000";
+      let baseItems = [];
+
+      if (prevDocSnap.exists) {
+        let prevData = prevDocSnap.data();
+        let prevModalAwal = parseRupiahToNumber(prevData.modalAwal || "0");
+        let prevTotalBayar = 0;
+        if (prevData.items) {
+          prevData.items.forEach(item => {
+            if (item.subjudul) {
+              let subLower = item.subjudul.toLowerCase();
+              let parts = subLower.split('pembayaran');
+              if (parts.length > 1) {
+                prevTotalBayar += parseRupiahToNumber(parts[1]);
+              } else {
+                let matches = item.subjudul.match(/\b[\d\.]+\b/g);
+                if (matches) {
+                  prevTotalBayar += parseRupiahToNumber(matches[matches.length - 1]);
+                }
+              }
+            }
+          });
+        }
+        let prevSisa = prevModalAwal - prevTotalBayar;
+        baseModal = prevSisa > 0 ? prevSisa.toLocaleString('id-ID') : "0";
+
+        if (prevData.items) {
+          baseItems = prevData.items.map(it => ({
+            id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4),
+            judul: it.judul || "Catatan",
+            subjudul: "",
+            isi: "",
+            waktu: new Date().toLocaleString('id-ID')
+          }));
+        }
+      } else {
+        let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
+        baseItems = [
+          { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
+        ];
+      }
+
+      let newData = {
+        modalAwal: baseModal,
+        items: baseItems
+      };
+
+      await db.collection("pengaturan").doc(docId).set(newData);
+    }
+
+    db.collection("pengaturan").doc(docId).onSnapshot((docSnap) => {
+      if (docSnap.exists) {
+        databaseCatatanDinamis[tabKey] = docSnap.data();
+      }
+      renderHalamanSubCatatan(tabKey);
+    });
+  });
+}
 
 function renderSubTabsCatatanUI() {
   const containerTabs = document.getElementById("container-sub-tabs-catatan");
@@ -177,30 +287,15 @@ function renderSubTabsCatatanUI() {
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
 
-    if (!databaseCatatanDinamis[tabKey]) {
-      db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).onSnapshot((docSnap) => {
-        if (docSnap.exists) {
-          databaseCatatanDinamis[tabKey] = docSnap.data();
-        } else {
-          let defaultData = {
-            modalAwal: "100.000",
-            items: [
-              { id: "NOTE-" + Date.now(), judul: label, subjudul: "pembayaran 0", isi: "Contoh barang - 1 pcs", waktu: new Date().toLocaleString('id-ID') }
-            ]
-          };
-          db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).set(defaultData);
-          databaseCatatanDinamis[tabKey] = defaultData;
-        }
-        renderHalamanSubCatatan(tabKey);
-      });
-    }
+    setupCatatanListener(tabKey);
 
     let contentDiv = document.createElement("div");
     contentDiv.id = `sub-content-${tabKey}`;
     contentDiv.className = `sub-tab-content ${isActive ? 'active' : ''}`;
+    // Poin 3: Kotak Uang Modal Awal TIDAK STICKY (mengikuti alur halaman/scroll biasa)
     contentDiv.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-        <div style="position: sticky; top: 0; z-index: 98; background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
+        <div style="background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
             <div style="display: flex; align-items: center; gap: 4px;">
@@ -283,7 +378,7 @@ function hapusTabCatatanDinamis(tabKey) {
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
-      db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).delete().catch(e => {});
+      db.collection("pengaturan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).delete().catch(e => {});
       activeSubCatatanTab = daftarNamaTabCatatan[0];
       renderSubTabsCatatanUI();
       showNotif("Tab catatan dihapus!");
@@ -296,7 +391,7 @@ function simpanModalAwalDinamis(tabKey) {
   if (!inputEl || !databaseCatatanDinamis[tabKey]) return;
   databaseCatatanDinamis[tabKey].modalAwal = inputEl.value;
 
-  db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).set(databaseCatatanDinamis[tabKey], { merge: true })
+  db.collection("pengaturan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).set(databaseCatatanDinamis[tabKey], { merge: true })
     .catch(err => console.error("Gagal simpan modal: ", err));
 }
 
@@ -351,7 +446,7 @@ function renderHalamanSubCatatan(tabKey) {
 
   let listData = dataObj.items || [];
   if (listData.length === 0) {
-    container.innerHTML = `<div class="empty-state">Belum ada catatan. Tekan tombol <b>+</b> di kanan bawah untuk membuat catatan baru.</div>`;
+    container.innerHTML = `<div class="empty-state">Belum ada catatan untuk tanggal ini. Tekan tombol <b>+</b> di kanan bawah untuk membuat catatan baru.</div>`;
     hitungRingkasanCatatanDinamis(tabKey);
     return;
   }
@@ -451,7 +546,7 @@ function simpanCatatanCard() {
   }
 
   dataObj.items = targetList;
-  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_v13`).set(dataObj)
+  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
     .then(() => {
       databaseCatatanDinamis[targetTabKey] = dataObj;
       closeCatatanModal();
@@ -467,7 +562,7 @@ function hapusCatatanCardDinamis(targetTabKey, id) {
     if (!dataObj) return;
     dataObj.items = (dataObj.items || []).filter(c => c.id !== id);
 
-    db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_v13`).set(dataObj)
+    db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
       .then(() => {
         renderHalamanSubCatatan(targetTabKey);
         showNotif("Catatan dihapus!");
@@ -489,7 +584,7 @@ function pindahCatatanUrutanDinamis(targetTabKey, index, direction) {
   targetList[targetIndex] = temp;
 
   dataObj.items = targetList;
-  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_v13`).set(dataObj)
+  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
     .then(() => {
       renderHalamanSubCatatan(targetTabKey);
       showNotif("Urutan diperbarui!");

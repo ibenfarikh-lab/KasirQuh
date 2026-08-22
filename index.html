@@ -252,8 +252,14 @@
       </div>
     </div>
 
-    <!-- 5. HALAMAN CATATAN UTAMA (Dinamis & Bersih) -->
+    <!-- 5. HALAMAN CATATAN UTAMA (Dinamis & Bersih dengan Tanggal) -->
     <div id="catatan" class="tab-content">
+      <!-- KOTAK KALENDER / TANGGAL CATATAN (Poin 1) -->
+      <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
+        <input type="date" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="padding: 6px 10px; font-weight: bold; border-radius: 8px; width: auto; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+      </div>
+
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 6px; gap: 6px; align-items: center;">
         <div id="container-sub-tabs-catatan" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;"></div>
         <button onclick="tambahTabCatatanBaru()" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0;">+</button>
