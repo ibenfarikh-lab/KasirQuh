@@ -127,7 +127,7 @@ db.collection("pengaturan").doc("sistem_v13").onSnapshot((doc) => {
 });
 
 // ==========================================
-// SISTEM CATATAN BERBASIS TANGGAL
+// SISTEM CATATAN BERBASIS TANGGAL & TEMPLATE JUDUL
 // ==========================================
 
 function getTodayDateString() {
@@ -141,7 +141,7 @@ function getTodayDateString() {
 }
 
 let catatanTanggalAktif = getTodayDateString();
-let catatanListeners = {}; // Menyimpan listener cloud agar tidak bocor memori
+let catatanListeners = {}; 
 
 function ubahTanggalCatatan(tanggalBaru) {
   if (!tanggalBaru) {
@@ -150,7 +150,6 @@ function ubahTanggalCatatan(tanggalBaru) {
   } else {
     catatanTanggalAktif = tanggalBaru;
   }
-  // Kosongkan memori sementara, lalu render ulang tab untuk mengambil data tanggal baru
   databaseCatatanDinamis = {};
   renderSubTabsCatatanUI();
 }
@@ -211,29 +210,52 @@ function renderSubTabsCatatanUI() {
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
 
-    // Hentikan pemantauan cloud untuk tanggal/tab lama jika ada
     if (catatanListeners[tabKey]) {
       catatanListeners[tabKey]();
     }
 
-    // Mulai pemantauan cloud untuk tanggal AKTIF
     let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${tabKey}_v13`;
     catatanListeners[tabKey] = db.collection("pengaturan").doc(namaDokumenCloud).onSnapshot((docSnap) => {
       if (docSnap.exists) {
         databaseCatatanDinamis[tabKey] = docSnap.data();
+        renderHalamanSubCatatan(tabKey);
       } else {
-        // JIKA HARI BARU / BELUM ADA DATA: Modal = 0, Daftar = Kosong
-        let defaultData = {
-          modalAwal: "0",
-          items: []
-        };
-        db.collection("pengaturan").doc(namaDokumenCloud).set(defaultData);
-        databaseCatatanDinamis[tabKey] = defaultData;
+        // TEMPLATE JUDUL: Ambil judul dari data lama, tapi reset subjudul & isi jadi kosong
+        let oldDokumenCloud = `catatan_data_${tabKey}_v13`;
+        db.collection("pengaturan").doc(oldDokumenCloud).get().then((oldDoc) => {
+          if (oldDoc.exists) {
+            let oldData = oldDoc.data();
+            let freshItems = (oldData.items || []).map(item => ({
+              id: item.id || ("NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4)),
+              judul: item.judul || "",
+              subjudul: "",
+              isi: "",
+              waktu: new Date().toLocaleString('id-ID')
+            }));
+
+            let templateData = {
+              modalAwal: "0",
+              items: freshItems
+            };
+
+            db.collection("pengaturan").doc(namaDokumenCloud).set(templateData).then(() => {
+              databaseCatatanDinamis[tabKey] = templateData;
+              renderHalamanSubCatatan(tabKey);
+            });
+          } else {
+            let defaultData = { modalAwal: "0", items: [] };
+            db.collection("pengaturan").doc(namaDokumenCloud).set(defaultData);
+            databaseCatatanDinamis[tabKey] = defaultData;
+            renderHalamanSubCatatan(tabKey);
+          }
+        }).catch(() => {
+          let defaultData = { modalAwal: "0", items: [] };
+          databaseCatatanDinamis[tabKey] = defaultData;
+          renderHalamanSubCatatan(tabKey);
+        });
       }
-      renderHalamanSubCatatan(tabKey);
     });
 
-    // KOTAK MODAL - Sifat Sticky Dihapus
     let contentDiv = document.createElement("div");
     contentDiv.id = `sub-content-${tabKey}`;
     contentDiv.className = `sub-tab-content ${isActive ? 'active' : ''}`;
@@ -322,7 +344,6 @@ function hapusTabCatatanDinamis(tabKey) {
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
-      // Hapus dokumen untuk tanggal hari ini saja sebagai pembersihan ringan
       db.collection("pengaturan").doc(`catatan_data_${catatanTanggalAktif}_${tabKey}_v13`).delete().catch(e => {});
       activeSubCatatanTab = daftarNamaTabCatatan[0];
       renderSubTabsCatatanUI();
