@@ -126,34 +126,6 @@ db.collection("pengaturan").doc("sistem_v13").onSnapshot((doc) => {
   refreshData();
 });
 
-// ==========================================
-// SISTEM CATATAN BERBASIS TANGGAL & TEMPLATE JUDUL
-// ==========================================
-
-function getTodayDateString() {
-  const d = new Date();
-  let month = '' + (d.getMonth() + 1);
-  let day = '' + d.getDate();
-  let year = d.getFullYear();
-  if (month.length < 2) month = '0' + month;
-  if (day.length < 2) day = '0' + day;
-  return [year, month, day].join('-');
-}
-
-let catatanTanggalAktif = getTodayDateString();
-let catatanListeners = {}; 
-
-function ubahTanggalCatatan(tanggalBaru) {
-  if (!tanggalBaru) {
-    catatanTanggalAktif = getTodayDateString();
-    document.getElementById('catatan-date-picker').value = catatanTanggalAktif;
-  } else {
-    catatanTanggalAktif = tanggalBaru;
-  }
-  databaseCatatanDinamis = {};
-  renderSubTabsCatatanUI();
-}
-
 let daftarNamaTabCatatan = ["catatan1", "catatan2", "catatan3", "catatan4"];
 let labelNamaTabCatatan = {
   catatan1: "Catatan 1",
@@ -179,11 +151,6 @@ db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
 });
 
 function renderSubTabsCatatanUI() {
-  const datePicker = document.getElementById("catatan-date-picker");
-  if (datePicker && !datePicker.value) {
-    datePicker.value = catatanTanggalAktif;
-  }
-
   const containerTabs = document.getElementById("container-sub-tabs-catatan");
   const containerContent = document.getElementById("wrapper-content-sub-catatan");
   if (!containerTabs || !containerContent) return;
@@ -210,91 +177,35 @@ function renderSubTabsCatatanUI() {
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
 
-    if (catatanListeners[tabKey]) {
-      catatanListeners[tabKey]();
-    }
-
-    let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${tabKey}_v13`;
-    catatanListeners[tabKey] = db.collection("pengaturan").doc(namaDokumenCloud).onSnapshot((docSnap) => {
-      // PENTING: Jika ini HARI INI, muat dokumen apa adanya tanpa template kosong!
-      if (catatanTanggalAktif === getTodayDateString()) {
+    if (!databaseCatatanDinamis[tabKey]) {
+      db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).onSnapshot((docSnap) => {
         if (docSnap.exists) {
           databaseCatatanDinamis[tabKey] = docSnap.data();
-          renderHalamanSubCatatan(tabKey);
         } else {
-          // Jika hari ini belum ada sama sekali, ambil data kemarin secara utuh (agar data Anda kembali)
-          let d = new Date();
-          d.setDate(d.getDate() - 1);
-          let m = '' + (d.getMonth() + 1); if (m.length < 2) m = '0' + m;
-          let day = '' + d.getDate(); if (day.length < 2) day = '0' + day;
-          let yesterdayStr = [d.getFullYear(), m, day].join('-');
-          let yesterdayDocName = `catatan_data_${yesterdayStr}_${tabKey}_v13`;
-
-          db.collection("pengaturan").doc(yesterdayDocName).get().then((yestDoc) => {
-            if (yestDoc.exists) {
-              let yestData = yestDoc.data();
-              databaseCatatanDinamis[tabKey] = yestData;
-              db.collection("pengaturan").doc(namaDokumenCloud).set(yestData);
-              renderHalamanSubCatatan(tabKey);
-            } else {
-              let defaultData = { modalAwal: "0", items: [] };
-              databaseCatatanDinamis[tabKey] = defaultData;
-              db.collection("pengaturan").doc(namaDokumenCloud).set(defaultData);
-              renderHalamanSubCatatan(tabKey);
-            }
-          }).catch(() => {
-            let defaultData = { modalAwal: "0", items: [] };
-            databaseCatatanDinamis[tabKey] = defaultData;
-            renderHalamanSubCatatan(tabKey);
-          });
+          let defaultData = {
+            modalAwal: "100.000",
+            items: [
+              { id: "NOTE-" + Date.now(), judul: label, subjudul: "pembayaran 0", isi: "Contoh barang - 1 pcs", waktu: new Date().toLocaleString('id-ID') }
+            ]
+          };
+          db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).set(defaultData);
+          databaseCatatanDinamis[tabKey] = defaultData;
         }
-      } else {
-        // Untuk HARI LAIN / MASA LALU: Gunakan sistem template judul (judul ada, rincian kosong)
-        if (docSnap.exists && docSnap.data().items && docSnap.data().items.length > 0) {
-          databaseCatatanDinamis[tabKey] = docSnap.data();
-          renderHalamanSubCatatan(tabKey);
-        } else {
-          let oldDokumenCloud = `catatan_data_${tabKey}_v13`;
-          db.collection("pengaturan").doc(oldDokumenCloud).get().then((oldDoc) => {
-            let sourceData = oldDoc.exists ? oldDoc.data() : null;
-            if (sourceData && sourceData.items && sourceData.items.length > 0) {
-              let freshItems = sourceData.items.map(item => ({
-                id: item.id || ("NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4)),
-                judul: item.judul || "",
-                subjudul: "",
-                isi: "",
-                waktu: new Date().toLocaleString('id-ID')
-              }));
-              let templateData = { modalAwal: "0", items: freshItems };
-              db.collection("pengaturan").doc(namaDokumenCloud).set(templateData).then(() => {
-                databaseCatatanDinamis[tabKey] = templateData;
-                renderHalamanSubCatatan(tabKey);
-              });
-            } else {
-              let defaultData = { modalAwal: "0", items: [] };
-              databaseCatatanDinamis[tabKey] = defaultData;
-              renderHalamanSubCatatan(tabKey);
-            }
-          }).catch(() => {
-            let defaultData = { modalAwal: "0", items: [] };
-            databaseCatatanDinamis[tabKey] = defaultData;
-            renderHalamanSubCatatan(tabKey);
-          });
-        }
-      }
-    });
+        renderHalamanSubCatatan(tabKey);
+      });
+    }
 
     let contentDiv = document.createElement("div");
     contentDiv.id = `sub-content-${tabKey}`;
     contentDiv.className = `sub-tab-content ${isActive ? 'active' : ''}`;
     contentDiv.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-        <div style="background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
+        <div style="position: sticky; top: 0; z-index: 98; background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
             <div style="display: flex; align-items: center; gap: 4px;">
               <span style="font-size: 0.9rem; font-weight: bold;">Rp</span>
-              <input type="text" id="modal-awal-${tabKey}" value="0" oninput="formatInputRupiah(this); hitungRingkasanCatatanDinamis('${tabKey}'); simpanModalAwalDinamis('${tabKey}');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
+              <input type="text" id="modal-awal-${tabKey}" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatanDinamis('${tabKey}'); simpanModalAwalDinamis('${tabKey}');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
             </div>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px;">
@@ -303,9 +214,9 @@ function renderSubTabsCatatanUI() {
             <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Sisa Modal</span>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold;">
-            <span style="color: #2563eb;">Rp <span id="lbl-modal-${tabKey}">0</span></span>
+            <span style="color: #2563eb;">Rp <span id="lbl-modal-${tabKey}">100.000</span></span>
             <span style="color: #ea580c;">Rp <span id="lbl-bayar-${tabKey}">0</span></span>
-            <span style="color: #16a34a;">Rp <span id="lbl-sisa-${tabKey}">0</span></span>
+            <span style="color: #16a34a;">Rp <span id="lbl-sisa-${tabKey}">100.000</span></span>
           </div>
         </div>
         <div id="container-list-${tabKey}" style="display: flex; flex-direction: column; gap: 10px;"></div>
@@ -364,7 +275,7 @@ function hapusTabCatatanDinamis(tabKey) {
   if (daftarNamaTabCatatan.length <= 1) {
     return alert("Minimal harus menyisakan 1 tab catatan!");
   }
-  if (confirm(`Apakah Anda yakin ingin menghapus "${labelNamaTabCatatan[tabKey] || tabKey}" dari daftar?`)) {
+  if (confirm(`Apakah Anda yakin ingin menghapus "${labelNamaTabCatatan[tabKey] || tabKey}" beserta seluruh isinya?`)) {
     daftarNamaTabCatatan = daftarNamaTabCatatan.filter(k => k !== tabKey);
     delete labelNamaTabCatatan[tabKey];
 
@@ -372,7 +283,7 @@ function hapusTabCatatanDinamis(tabKey) {
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
-      db.collection("pengaturan").doc(`catatan_data_${catatanTanggalAktif}_${tabKey}_v13`).delete().catch(e => {});
+      db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).delete().catch(e => {});
       activeSubCatatanTab = daftarNamaTabCatatan[0];
       renderSubTabsCatatanUI();
       showNotif("Tab catatan dihapus!");
@@ -385,8 +296,7 @@ function simpanModalAwalDinamis(tabKey) {
   if (!inputEl || !databaseCatatanDinamis[tabKey]) return;
   databaseCatatanDinamis[tabKey].modalAwal = inputEl.value;
 
-  let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${tabKey}_v13`;
-  db.collection("pengaturan").doc(namaDokumenCloud).set(databaseCatatanDinamis[tabKey], { merge: true })
+  db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).set(databaseCatatanDinamis[tabKey], { merge: true })
     .catch(err => console.error("Gagal simpan modal: ", err));
 }
 
@@ -431,7 +341,7 @@ function renderHalamanSubCatatan(tabKey) {
   if (!dataObj) return;
 
   let inputEl = document.getElementById(`modal-awal-${tabKey}`);
-  if (inputEl && dataObj.modalAwal !== undefined) {
+  if (inputEl && dataObj.modalAwal) {
     inputEl.value = dataObj.modalAwal;
   }
 
@@ -441,7 +351,7 @@ function renderHalamanSubCatatan(tabKey) {
 
   let listData = dataObj.items || [];
   if (listData.length === 0) {
-    container.innerHTML = `<div class="empty-state">Belum ada catatan di tanggal ini. Tekan tombol <b>+</b> untuk mulai mencatat.</div>`;
+    container.innerHTML = `<div class="empty-state">Belum ada catatan. Tekan tombol <b>+</b> di kanan bawah untuk membuat catatan baru.</div>`;
     hitungRingkasanCatatanDinamis(tabKey);
     return;
   }
@@ -521,7 +431,7 @@ function simpanCatatanCard() {
 
   if (!judul) return alert("Judul catatan wajib diisi!");
 
-  let dataObj = databaseCatatanDinamis[targetTabKey] || { modalAwal: "0", items: [] };
+  let dataObj = databaseCatatanDinamis[targetTabKey] || { modalAwal: "100.000", items: [] };
   let targetList = [...(dataObj.items || [])];
 
   if (id) {
@@ -541,9 +451,7 @@ function simpanCatatanCard() {
   }
 
   dataObj.items = targetList;
-  let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${targetTabKey}_v13`;
-  
-  db.collection("pengaturan").doc(namaDokumenCloud).set(dataObj)
+  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_v13`).set(dataObj)
     .then(() => {
       databaseCatatanDinamis[targetTabKey] = dataObj;
       closeCatatanModal();
@@ -559,8 +467,7 @@ function hapusCatatanCardDinamis(targetTabKey, id) {
     if (!dataObj) return;
     dataObj.items = (dataObj.items || []).filter(c => c.id !== id);
 
-    let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${targetTabKey}_v13`;
-    db.collection("pengaturan").doc(namaDokumenCloud).set(dataObj)
+    db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_v13`).set(dataObj)
       .then(() => {
         renderHalamanSubCatatan(targetTabKey);
         showNotif("Catatan dihapus!");
@@ -582,19 +489,13 @@ function pindahCatatanUrutanDinamis(targetTabKey, index, direction) {
   targetList[targetIndex] = temp;
 
   dataObj.items = targetList;
-  let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${targetTabKey}_v13`;
-  
-  db.collection("pengaturan").doc(namaDokumenCloud).set(dataObj)
+  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_v13`).set(dataObj)
     .then(() => {
       renderHalamanSubCatatan(targetTabKey);
       showNotif("Urutan diperbarui!");
     })
     .catch(err => alert("Gagal mengubah urutan: " + err.message));
 }
-
-// ==========================================
-// AKHIR SISTEM CATATAN
-// ==========================================
 
 function cekStatusLogin() {
   if (localStorage.getItem('isLoggedIn') === 'true') {
