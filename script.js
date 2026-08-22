@@ -136,7 +136,7 @@ let labelNamaTabCatatan = {
 let databaseCatatanDinamis = {};
 let activeSubCatatanTab = "catatan1";
 
-// State Tanggal untuk Catatan Harian (Poin 1 & 2)
+// State Tanggal untuk Catatan Harian
 let selectedCatatanDate = new Date().toISOString().slice(0, 10);
 
 function formatTanggalIndo(dateStr) {
@@ -194,61 +194,72 @@ db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
 
 function setupCatatanListener(tabKey) {
   const docId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
+  const legacyDocId = `catatan_data_${tabKey}_v13`;
 
   db.collection("pengaturan").doc(docId).get().then(async (docSnap) => {
-    if (!docSnap.exists) {
-      let prevDate = getPreviousDateStr(selectedCatatanDate);
-      let prevDocId = `catatan_data_${tabKey}_${prevDate}_v13`;
-      
-      let prevDocSnap = await db.collection("pengaturan").doc(prevDocId).get();
-      let baseModal = "100.000";
-      let baseItems = [];
+    // Jika tanggal hari ini 22 Agustus dan dokumen tanggal belum lengkap/kosong, paksa tarik dari data lama (legacy)
+    let needsLegacyImport = (selectedCatatanDate === "2026-08-22") && (!docSnap.exists || !docSnap.data().items || docSnap.data().items.length === 0 || (!docSnap.data().items[0].subjudul && docSnap.data().items[0].isi === ""));
 
-      if (prevDocSnap.exists) {
-        let prevData = prevDocSnap.data();
-        let prevModalAwal = parseRupiahToNumber(prevData.modalAwal || "0");
-        let prevTotalBayar = 0;
-        if (prevData.items) {
-          prevData.items.forEach(item => {
-            if (item.subjudul) {
-              let subLower = item.subjudul.toLowerCase();
-              let parts = subLower.split('pembayaran');
-              if (parts.length > 1) {
-                prevTotalBayar += parseRupiahToNumber(parts[1]);
-              } else {
-                let matches = item.subjudul.match(/\b[\d\.]+\b/g);
-                if (matches) {
-                  prevTotalBayar += parseRupiahToNumber(matches[matches.length - 1]);
+    if (!docSnap.exists || needsLegacyImport) {
+      let legacySnap = await db.collection("pengaturan").doc(legacyDocId).get();
+      if (legacySnap.exists && legacySnap.data().items && legacySnap.data().items.length > 0) {
+        // AMBIL SELURUH DATA LAMA SECARA UTUH: Modal 1.6jt + Judul + Subjudul + Isi lengkap!
+        let legacyData = legacySnap.data();
+        await db.collection("pengaturan").doc(docId).set(legacyData);
+      } else if (!docSnap.exists) {
+        let prevDate = getPreviousDateStr(selectedCatatanDate);
+        let prevDocId = `catatan_data_${tabKey}_${prevDate}_v13`;
+        
+        let prevDocSnap = await db.collection("pengaturan").doc(prevDocId).get();
+        let baseModal = "100.000";
+        let baseItems = [];
+
+        if (prevDocSnap.exists) {
+          let prevData = prevDocSnap.data();
+          let prevModalAwal = parseRupiahToNumber(prevData.modalAwal || "0");
+          let prevTotalBayar = 0;
+          if (prevData.items) {
+            prevData.items.forEach(item => {
+              if (item.subjudul) {
+                let subLower = item.subjudul.toLowerCase();
+                let parts = subLower.split('pembayaran');
+                if (parts.length > 1) {
+                  prevTotalBayar += parseRupiahToNumber(parts[1]);
+                } else {
+                  let matches = item.subjudul.match(/\b[\d\.]+\b/g);
+                  if (matches) {
+                    prevTotalBayar += parseRupiahToNumber(matches[matches.length - 1]);
+                  }
                 }
               }
-            }
-          });
-        }
-        let prevSisa = prevModalAwal - prevTotalBayar;
-        baseModal = prevSisa > 0 ? prevSisa.toLocaleString('id-ID') : "0";
+            });
+          }
+          let prevSisa = prevModalAwal - prevTotalBayar;
+          baseModal = prevSisa > 0 ? prevSisa.toLocaleString('id-ID') : "0";
 
-        if (prevData.items) {
-          baseItems = prevData.items.map(it => ({
-            id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4),
-            judul: it.judul || "Catatan",
-            subjudul: "",
-            isi: "",
-            waktu: new Date().toLocaleString('id-ID')
-          }));
+          if (prevData.items) {
+            baseItems = prevData.items.map(it => ({
+              id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4),
+              judul: it.judul || "Catatan",
+              subjudul: "",
+              isi: "",
+              waktu: new Date().toLocaleString('id-ID')
+            }));
+          }
+        } else {
+          let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
+          baseItems = [
+            { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
+          ];
         }
-      } else {
-        let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
-        baseItems = [
-          { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
-        ];
+
+        let newData = {
+          modalAwal: baseModal,
+          items: baseItems
+        };
+
+        await db.collection("pengaturan").doc(docId).set(newData);
       }
-
-      let newData = {
-        modalAwal: baseModal,
-        items: baseItems
-      };
-
-      await db.collection("pengaturan").doc(docId).set(newData);
     }
 
     db.collection("pengaturan").doc(docId).onSnapshot((docSnap) => {
@@ -292,7 +303,6 @@ function renderSubTabsCatatanUI() {
     let contentDiv = document.createElement("div");
     contentDiv.id = `sub-content-${tabKey}`;
     contentDiv.className = `sub-tab-content ${isActive ? 'active' : ''}`;
-    // Poin 3: Kotak Uang Modal Awal TIDAK STICKY (mengikuti alur halaman/scroll biasa)
     contentDiv.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
         <div style="background: var(--card-bg); border: 1.5px solid #2563eb; border-radius: 12px; padding: 12px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; gap: 8px;">
