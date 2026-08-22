@@ -136,7 +136,6 @@ let labelNamaTabCatatan = {
 let databaseCatatanDinamis = {};
 let activeSubCatatanTab = "catatan1";
 
-// State Tanggal untuk Catatan Harian
 let selectedCatatanDate = new Date().toISOString().slice(0, 10);
 
 function formatTanggalIndo(dateStr) {
@@ -197,20 +196,26 @@ function setupCatatanListener(tabKey) {
   const legacyDocId = `catatan_data_${tabKey}_v13`;
 
   db.collection("pengaturan").doc(docId).get().then(async (docSnap) => {
-    // Jika tanggal hari ini 22 Agustus dan dokumen tanggal belum lengkap/kosong, paksa tarik dari data lama (legacy)
-    let needsLegacyImport = (selectedCatatanDate === "2026-08-22") && (!docSnap.exists || !docSnap.data().items || docSnap.data().items.length === 0 || (!docSnap.data().items[0].subjudul && docSnap.data().items[0].isi === ""));
+    let targetData = null;
 
-    if (!docSnap.exists || needsLegacyImport) {
+    // 1. KHUSUS HARI INI (22 Agustus 2026): Wajib ambil dari data lama (Legacy) secara mutlak
+    if (selectedCatatanDate === "2026-08-22") {
       let legacySnap = await db.collection("pengaturan").doc(legacyDocId).get();
       if (legacySnap.exists && legacySnap.data().items && legacySnap.data().items.length > 0) {
-        // AMBIL SELURUH DATA LAMA SECARA UTUH: Modal 1.6jt + Judul + Subjudul + Isi lengkap!
-        let legacyData = legacySnap.data();
-        await db.collection("pengaturan").doc(docId).set(legacyData);
-      } else if (!docSnap.exists) {
+        targetData = legacySnap.data();
+        await db.collection("pengaturan").doc(docId).set(targetData);
+      }
+    }
+
+    // 2. Jika bukan 22 Agustus atau dokumen belum ada, gunakan sistem tanggal / rolling template
+    if (!targetData) {
+      if (docSnap.exists && docSnap.data().items && docSnap.data().items.length > 0 && docSnap.data().items[0].judul !== labelNamaTabCatatan[tabKey]) {
+        targetData = docSnap.data();
+      } else {
         let prevDate = getPreviousDateStr(selectedCatatanDate);
         let prevDocId = `catatan_data_${tabKey}_${prevDate}_v13`;
-        
         let prevDocSnap = await db.collection("pengaturan").doc(prevDocId).get();
+
         let baseModal = "100.000";
         let baseItems = [];
 
@@ -237,6 +242,7 @@ function setupCatatanListener(tabKey) {
           let prevSisa = prevModalAwal - prevTotalBayar;
           baseModal = prevSisa > 0 ? prevSisa.toLocaleString('id-ID') : "0";
 
+          // Ambil judul kartu dari hari sebelumnya, kosongkan subjudul dan isi
           if (prevData.items) {
             baseItems = prevData.items.map(it => ({
               id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4),
@@ -253,21 +259,23 @@ function setupCatatanListener(tabKey) {
           ];
         }
 
-        let newData = {
+        targetData = {
           modalAwal: baseModal,
           items: baseItems
         };
 
-        await db.collection("pengaturan").doc(docId).set(newData);
+        await db.collection("pengaturan").doc(docId).set(targetData);
       }
     }
 
-    db.collection("pengaturan").doc(docId).onSnapshot((docSnap) => {
-      if (docSnap.exists) {
-        databaseCatatanDinamis[tabKey] = docSnap.data();
+    db.collection("pengaturan").doc(docId).onSnapshot((snap) => {
+      if (snap.exists) {
+        databaseCatatanDinamis[tabKey] = snap.data();
       }
       renderHalamanSubCatatan(tabKey);
     });
+  }).catch(err => {
+    console.error("Gagal memuat catatan: ", err);
   });
 }
 
