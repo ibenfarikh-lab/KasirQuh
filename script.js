@@ -191,6 +191,22 @@ db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
   renderSubTabsCatatanUI();
 });
 
+async function findLatestPreviousData(tabKey, targetDateStr) {
+  let currDate = targetDateStr;
+  for (let i = 0; i < 30; i++) {
+    currDate = getPreviousDateStr(currDate);
+    if (currDate < "2026-08-22") break;
+    let checkDocId = `catatan_data_${tabKey}_${currDate}_v13`;
+    let snap = await db.collection("pengaturan").doc(checkDocId).get();
+    if (snap.exists && snap.data().items && snap.data().items.length > 0) {
+      return snap.data();
+    }
+  }
+  let legacySnap = await db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).get();
+  if (legacySnap.exists) return legacySnap.data();
+  return null;
+}
+
 function setupCatatanListener(tabKey) {
   const docId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
   const legacyDocId = `catatan_data_${tabKey}_v13`;
@@ -198,7 +214,6 @@ function setupCatatanListener(tabKey) {
   db.collection("pengaturan").doc(docId).get().then(async (docSnap) => {
     let targetData = null;
 
-    // 1. KHUSUS HARI INI (22 Agustus 2026): Wajib ambil dari data lama (Legacy) secara mutlak
     if (selectedCatatanDate === "2026-08-22") {
       let legacySnap = await db.collection("pengaturan").doc(legacyDocId).get();
       if (legacySnap.exists && legacySnap.data().items && legacySnap.data().items.length > 0) {
@@ -207,7 +222,6 @@ function setupCatatanListener(tabKey) {
       }
     }
 
-    // 2. Cek apakah dokumen tanggal ini kosong atau belum pernah diisi (effectively empty)
     let needsRollOver = !docSnap.exists;
     if (docSnap.exists && docSnap.data().items) {
       let dData = docSnap.data();
@@ -217,47 +231,39 @@ function setupCatatanListener(tabKey) {
       }
     }
 
-    // 3. Jika perlu roll over dari hari sebelumnya secara berantai
     if (!targetData && needsRollOver && selectedCatatanDate !== "2026-08-22") {
-      let prevDate = getPreviousDateStr(selectedCatatanDate);
-      let prevDocId = `catatan_data_${tabKey}_${prevDate}_v13`;
-      let prevDocSnap = await db.collection("pengaturan").doc(prevDocId).get();
+      let prevData = await findLatestPreviousData(tabKey, selectedCatatanDate);
 
       let baseModal = "100.000";
       let baseItems = [];
 
-      if (prevDocSnap.exists) {
-        let prevData = prevDocSnap.data();
+      if (prevData && prevData.items) {
         let prevModalAwal = parseRupiahToNumber(prevData.modalAwal || "0");
         let prevTotalBayar = 0;
-        if (prevData.items) {
-          prevData.items.forEach(item => {
-            if (item.subjudul) {
-              let subLower = item.subjudul.toLowerCase();
-              let parts = subLower.split('pembayaran');
-              if (parts.length > 1) {
-                prevTotalBayar += parseRupiahToNumber(parts[1]);
-              } else {
-                let matches = item.subjudul.match(/\b[\d\.]+\b/g);
-                if (matches) {
-                  prevTotalBayar += parseRupiahToNumber(matches[matches.length - 1]);
-                }
+        prevData.items.forEach(item => {
+          if (item.subjudul) {
+            let subLower = item.subjudul.toLowerCase();
+            let parts = subLower.split('pembayaran');
+            if (parts.length > 1) {
+              prevTotalBayar += parseRupiahToNumber(parts[1]);
+            } else {
+              let matches = item.subjudul.match(/\b[\d\.]+\b/g);
+              if (matches) {
+                prevTotalBayar += parseRupiahToNumber(matches[matches.length - 1]);
               }
             }
-          });
-        }
+          }
+        });
         let prevSisa = prevModalAwal - prevTotalBayar;
         baseModal = prevSisa > 0 ? prevSisa.toLocaleString('id-ID') : "0";
 
-        if (prevData.items) {
-          baseItems = prevData.items.map(it => ({
-            id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4),
-            judul: it.judul || "Catatan",
-            subjudul: "",
-            isi: "",
-            waktu: new Date().toLocaleString('id-ID')
-          }));
-        }
+        baseItems = prevData.items.map(it => ({
+          id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4),
+          judul: it.judul || "Catatan",
+          subjudul: "",
+          isi: "",
+          waktu: new Date().toLocaleString('id-ID')
+        }));
       } else {
         let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
         baseItems = [
