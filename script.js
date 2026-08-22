@@ -216,76 +216,71 @@ function renderSubTabsCatatanUI() {
 
     let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${tabKey}_v13`;
     catatanListeners[tabKey] = db.collection("pengaturan").doc(namaDokumenCloud).onSnapshot((docSnap) => {
-      if (docSnap.exists && docSnap.data().items && docSnap.data().items.length > 0) {
-        // Jika hari ini sudah ada isinya, muat normal
-        databaseCatatanDinamis[tabKey] = docSnap.data();
-        renderHalamanSubCatatan(tabKey);
-      } else {
-        // Jika hari ini kosong, ambil judul dari dokumen utama/lama sebagai template
-        let oldDokumenCloud = `catatan_data_${tabKey}_v13`;
-        db.collection("pengaturan").doc(oldDokumenCloud).get().then((oldDoc) => {
-          let sourceData = oldDoc.exists ? oldDoc.data() : null;
-          
-          if (sourceData && sourceData.items && sourceData.items.length > 0) {
-            let freshItems = sourceData.items.map(item => ({
-              id: item.id || ("NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4)),
-              judul: item.judul || "",
-              subjudul: "",
-              isi: "",
-              waktu: new Date().toLocaleString('id-ID')
-            }));
+      // PENTING: Jika ini HARI INI, muat dokumen apa adanya tanpa template kosong!
+      if (catatanTanggalAktif === getTodayDateString()) {
+        if (docSnap.exists) {
+          databaseCatatanDinamis[tabKey] = docSnap.data();
+          renderHalamanSubCatatan(tabKey);
+        } else {
+          // Jika hari ini belum ada sama sekali, ambil data kemarin secara utuh (agar data Anda kembali)
+          let d = new Date();
+          d.setDate(d.getDate() - 1);
+          let m = '' + (d.getMonth() + 1); if (m.length < 2) m = '0' + m;
+          let day = '' + d.getDate(); if (day.length < 2) day = '0' + day;
+          let yesterdayStr = [d.getFullYear(), m, day].join('-');
+          let yesterdayDocName = `catatan_data_${yesterdayStr}_${tabKey}_v13`;
 
-            let templateData = {
-              modalAwal: "0",
-              items: freshItems
-            };
-
-            db.collection("pengaturan").doc(namaDokumenCloud).set(templateData).then(() => {
-              databaseCatatanDinamis[tabKey] = templateData;
+          db.collection("pengaturan").doc(yesterdayDocName).get().then((yestDoc) => {
+            if (yestDoc.exists) {
+              let yestData = yestDoc.data();
+              databaseCatatanDinamis[tabKey] = yestData;
+              db.collection("pengaturan").doc(namaDokumenCloud).set(yestData);
               renderHalamanSubCatatan(tabKey);
-            });
-          } else {
-            // Coba ambil dari kemarin jika dokumen utama kosong
-            let d = new Date();
-            d.setDate(d.getDate() - 1);
-            let m = '' + (d.getMonth() + 1); if (m.length < 2) m = '0' + m;
-            let day = '' + d.getDate(); if (day.length < 2) day = '0' + day;
-            let yesterdayStr = [d.getFullYear(), m, day].join('-');
-            let yesterdayDocName = `catatan_data_${yesterdayStr}_${tabKey}_v13`;
-
-            db.collection("pengaturan").doc(yesterdayDocName).get().then((yestDoc) => {
-              if (yestDoc.exists && yestDoc.data().items && yestDoc.data().items.length > 0) {
-                let yestData = yestDoc.data();
-                let freshItems = yestData.items.map(item => ({
-                  id: item.id || ("NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4)),
-                  judul: item.judul || "",
-                  subjudul: "",
-                  isi: "",
-                  waktu: new Date().toLocaleString('id-ID')
-                }));
-
-                let templateData = { modalAwal: "0", items: freshItems };
-                db.collection("pengaturan").doc(namaDokumenCloud).set(templateData).then(() => {
-                  databaseCatatanDinamis[tabKey] = templateData;
-                  renderHalamanSubCatatan(tabKey);
-                });
-              } else {
-                let defaultData = { modalAwal: "0", items: [] };
-                db.collection("pengaturan").doc(namaDokumenCloud).set(defaultData).catch(e => {});
-                databaseCatatanDinamis[tabKey] = defaultData;
+            } else {
+              let defaultData = { modalAwal: "0", items: [] };
+              databaseCatatanDinamis[tabKey] = defaultData;
+              db.collection("pengaturan").doc(namaDokumenCloud).set(defaultData);
+              renderHalamanSubCatatan(tabKey);
+            }
+          }).catch(() => {
+            let defaultData = { modalAwal: "0", items: [] };
+            databaseCatatanDinamis[tabKey] = defaultData;
+            renderHalamanSubCatatan(tabKey);
+          });
+        }
+      } else {
+        // Untuk HARI LAIN / MASA LALU: Gunakan sistem template judul (judul ada, rincian kosong)
+        if (docSnap.exists && docSnap.data().items && docSnap.data().items.length > 0) {
+          databaseCatatanDinamis[tabKey] = docSnap.data();
+          renderHalamanSubCatatan(tabKey);
+        } else {
+          let oldDokumenCloud = `catatan_data_${tabKey}_v13`;
+          db.collection("pengaturan").doc(oldDokumenCloud).get().then((oldDoc) => {
+            let sourceData = oldDoc.exists ? oldDoc.data() : null;
+            if (sourceData && sourceData.items && sourceData.items.length > 0) {
+              let freshItems = sourceData.items.map(item => ({
+                id: item.id || ("NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4)),
+                judul: item.judul || "",
+                subjudul: "",
+                isi: "",
+                waktu: new Date().toLocaleString('id-ID')
+              }));
+              let templateData = { modalAwal: "0", items: freshItems };
+              db.collection("pengaturan").doc(namaDokumenCloud).set(templateData).then(() => {
+                databaseCatatanDinamis[tabKey] = templateData;
                 renderHalamanSubCatatan(tabKey);
-              }
-            }).catch(() => {
+              });
+            } else {
               let defaultData = { modalAwal: "0", items: [] };
               databaseCatatanDinamis[tabKey] = defaultData;
               renderHalamanSubCatatan(tabKey);
-            });
-          }
-        }).catch(() => {
-          let defaultData = { modalAwal: "0", items: [] };
-          databaseCatatanDinamis[tabKey] = defaultData;
-          renderHalamanSubCatatan(tabKey);
-        });
+            }
+          }).catch(() => {
+            let defaultData = { modalAwal: "0", items: [] };
+            databaseCatatanDinamis[tabKey] = defaultData;
+            renderHalamanSubCatatan(tabKey);
+          });
+        }
       }
     });
 
