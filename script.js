@@ -216,11 +216,11 @@ function renderSubTabsCatatanUI() {
 
     let namaDokumenCloud = `catatan_data_${catatanTanggalAktif}_${tabKey}_v13`;
     catatanListeners[tabKey] = db.collection("pengaturan").doc(namaDokumenCloud).onSnapshot((docSnap) => {
-      if (docSnap.exists) {
+      // PERBAIKAN: Cek apakah dokumen ada DAN isinya tidak kosong. Jika kosong, paksa ambil template judul lama.
+      if (docSnap.exists && docSnap.data().items && docSnap.data().items.length > 0) {
         databaseCatatanDinamis[tabKey] = docSnap.data();
         renderHalamanSubCatatan(tabKey);
       } else {
-        // TEMPLATE JUDUL: Ambil judul dari data lama, tapi reset subjudul & isi jadi kosong
         let oldDokumenCloud = `catatan_data_${tabKey}_v13`;
         db.collection("pengaturan").doc(oldDokumenCloud).get().then((oldDoc) => {
           if (oldDoc.exists) {
