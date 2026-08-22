@@ -136,7 +136,14 @@ let labelNamaTabCatatan = {
 let databaseCatatanDinamis = {};
 let activeSubCatatanTab = "catatan1";
 
-let selectedCatatanDate = new Date().toISOString().slice(0, 10);
+function getLocalDateStr() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+let selectedCatatanDate = getLocalDateStr();
 
 function formatTanggalIndo(dateStr) {
   if (!dateStr) return "";
