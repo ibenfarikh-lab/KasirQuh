@@ -194,7 +194,6 @@
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || '';
     let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     
-    // Variabel Pagination POS
     let currentPosPage = 1;
 
     window.onload = function() {
@@ -202,7 +201,6 @@
       document.getElementById('setting-theme').value = savedTheme;
       applyThemePelanggan(savedTheme);
 
-      // Listener perubahan tema sistem jika mode 'auto' aktif
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         if (localStorage.getItem('cust_theme_v13') === 'auto') {
           applyThemePelanggan('auto');
@@ -341,7 +339,6 @@
       
       container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
 
-      // Atur jumlah item per halaman: List = 6 item, Grid = 4 item
       let itemsPerPagePos = (catalogViewMode === 'list') ? 6 : 4;
 
       let searchKeyword = document.getElementById("inventory-search-input").value.toLowerCase();
@@ -355,6 +352,9 @@
           matchedProducts.push({ code, ...p });
         }
       }
+
+      // Urutkan produk berdasarkan abjad nama (A-Z)
+      matchedProducts.sort((a, b) => a.nama.localeCompare(b.nama, 'id', { sensitivity: 'base' }));
 
       let totalPages = Math.ceil(matchedProducts.length / itemsPerPagePos) || 1;
       if (currentPosPage > totalPages) currentPosPage = totalPages;
