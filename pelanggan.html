@@ -28,6 +28,21 @@
     </div>
   </div>
 
+  <!-- MODAL FILTER KATEGORI (MUNCUL DARI TOMBOL MERAH ☰) -->
+  <div id="categoryModal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 320px;">
+      <div class="modal-header">
+        <h3>Filter Kategori</h3>
+        <button class="btn-close-modal" onclick="toggleCategoryModal()">&times;</button>
+      </div>
+      <div style="padding: 10px 0;">
+        <select id="filter-category-pos" onchange="gantiKategoriPos(); toggleCategoryModal();" style="width: 100%; padding: 10px; font-size: 0.95rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+          <option value="Semua">Semua Kategori</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
   <div class="main-content">
     
     <!-- STICKY SEARCH BAR -->
@@ -37,15 +52,26 @@
 
     <!-- 1. HALAMAN BELANJA (KATALOG & KASIR) -->
     <div id="belanja" class="tab-content active">
-      <div style="display: flex; margin-bottom: 12px; width: 100%;">
-        <select id="filter-category-pos" onchange="gantiKategoriPos()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
-          <option value="Semua">Semua Kategori</option>
-        </select>
+      
+      <!-- TOP BAR ALA REFERENSI (JUDUL, PAGINATION TENGAH, TOMBOL ☰ MERAH) -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card-bg); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
+        <h2 style="margin: 0; font-size: 1.1rem; color: var(--text-color);">Belanja</h2>
+        
+        <!-- Kotak Pagination di Tengah -->
+        <div style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 4px 10px; gap: 10px;">
+          <button onclick="ubahHalamanPos(-1)" id="btn-prev-page" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 1rem; font-weight: bold;">◄</button>
+          <span id="pos-page-indicator" style="font-size: 0.85rem; font-weight: bold; color: var(--text-color);">1/1</span>
+          <button onclick="ubahHalamanPos(1)" id="btn-next-page" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 1rem; font-weight: bold;">▶</button>
+        </div>
+
+        <!-- Tombol Merah Kanan (☰) -->
+        <button onclick="toggleCategoryModal()" style="background: #dc2626; color: white; border: none; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Pilih Kategori">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
       </div>
 
       <div class="pos-container">
         <div class="card no-print" style="margin-bottom: 0;">
-          <h3 style="margin-top: 0; font-size: 0.95rem;">📦 Katalog Produk Toko</h3>
           <div id="pos-catalog-container"></div>
         </div>
       </div>
@@ -230,6 +256,11 @@
       applyThemePelanggan(theme);
     }
 
+    function toggleCategoryModal() {
+      const modal = document.getElementById("categoryModal");
+      modal.classList.toggle("show");
+    }
+
     function prosesLoginPelanggan(e) {
       e.preventDefault();
       const phone = document.getElementById('cust-login-phone').value.trim();
@@ -339,6 +370,7 @@
       
       container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
 
+      // Grid = 4 item, List = 6 item per halaman
       let itemsPerPagePos = (catalogViewMode === 'list') ? 6 : 4;
 
       let searchKeyword = document.getElementById("inventory-search-input").value.toLowerCase();
@@ -368,7 +400,7 @@
 
       if (count === 0) {
         container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 20px;">Produk tidak ditemukan.</div>`;
-        renderPaginationPos(0, 1);
+        document.getElementById("pos-page-indicator").innerText = `1/1`;
         return;
       }
 
@@ -378,7 +410,6 @@
         let satuan = p.satuan || "Pcs";
         
         if (catalogViewMode === 'list') {
-          // Tampilan List dengan Tombol Hijau (+) & Merah (-) Sesuai Referensi
           container.innerHTML += `
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border: 2px solid #16a34a; border-radius: 12px; margin-bottom: 8px; background: var(--card-bg);">
               <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
@@ -396,7 +427,6 @@
             </div>
           `;
         } else {
-          // Tampilan Grid dengan Tombol Hijau (+) & Merah (-) Sesuai Referensi
           container.innerHTML += `
             <div class="inv-card" style="border: 2px solid #16a34a; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card-bg);">
               <div>
@@ -416,33 +446,7 @@
         }
       });
 
-      renderPaginationPos(totalPages, currentPosPage);
-    }
-
-    function renderPaginationPos(totalPages, currentPage) {
-      let paginationContainer = document.getElementById("pos-pagination-container");
-      if (!paginationContainer) {
-        const posCard = document.querySelector(".pos-container .card");
-        if (posCard) {
-          paginationContainer = document.createElement("div");
-          paginationContainer.id = "pos-pagination-container";
-          paginationContainer.className = "no-print";
-          paginationContainer.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 0.85rem; width: 100%; grid-column: 1 / -1;";
-          posCard.appendChild(paginationContainer);
-        }
-      }
-      if (!paginationContainer) return;
-
-      if (totalPages <= 1) {
-        paginationContainer.innerHTML = "";
-        return;
-      }
-
-      paginationContainer.innerHTML = `
-        <button onclick="ubahHalamanPos(-1)" ${currentPage === 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : 'style="padding: 6px 12px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor:pointer;"'} >◀ Sebelum</button>
-        <span style="color: var(--text-muted); font-weight: 500;">Hal ${currentPage} dari ${totalPages}</span>
-        <button onclick="ubahHalamanPos(1)" ${currentPage === totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : 'style="padding: 6px 12px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor:pointer;"'} >Selanjutnya ▶</button>
-      `;
+      document.getElementById("pos-page-indicator").innerText = `${currentPosPage}/${totalPages}`;
     }
 
     function ubahHalamanPos(direction) {
