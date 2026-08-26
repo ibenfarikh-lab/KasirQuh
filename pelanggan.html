@@ -61,7 +61,8 @@
     <!-- 1. HALAMAN BELANJA (KATALOG & KASIR) -->
     <div id="belanja" class="tab-content active">
       <div class="pos-container">
-        <div class="card no-print" style="margin-bottom: 0;">
+        <!-- DIBERIKAN ID pos-card-wrapper AGAR BISA DISEMBUNYIKAN KETIKA KOSONG -->
+        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none;">
           <div id="pos-catalog-container"></div>
         </div>
       </div>
@@ -395,21 +396,23 @@
 
     function refreshKatalogPelanggan() {
       const container = document.getElementById("pos-catalog-container");
-      if (!container) return;
+      const cardWrapper = document.getElementById("pos-card-wrapper");
+      if (!container || !cardWrapper) return;
       
       container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
 
       if (!isProductsLoaded) {
-        container.innerHTML = `<div class="empty-state" style="text-align: center; padding: 30px; color: var(--text-muted);">Memuat produk...</div>`;
+        cardWrapper.style.display = "none"; // Sembunyikan kotak kartu saat masih memuat
         document.getElementById("pos-page-indicator").innerText = `1/1`;
         return;
       }
+
+      cardWrapper.style.display = "block"; // Munculkan kembali kartu saat data sudah siap
 
       let itemsPerPagePos = 10;
       let searchContainer = document.getElementById("sticky-search-container");
       let searchInputEl = document.getElementById("inventory-search-input");
       
-      // FIX LOGIC: Cek apakah container pencarian benar-benar sedang aktif/terbuka
       let searchKeyword = (searchContainer && searchContainer.style.display === "block" && searchInputEl) ? searchInputEl.value.toLowerCase() : "";
       
       let matchedProducts = [];
