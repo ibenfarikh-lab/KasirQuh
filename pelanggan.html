@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Belanja - KasirQuh</title>
+  
+  <!-- Firebase SDK (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#2563eb">
+</head>
+<body data-theme="light">
+
+  <!-- MODAL IDENTITAS PELANGGAN (MUNCUL JIKA BELUM LOGIN) -->
+  <div id="customerLoginModal" class="login-overlay" style="display: flex;">
+    <div class="login-card">
+      <h2>KasirQuh</h2>
+      <p>Silakan masukkan data diri untuk mulai belanja</p>
+      <form onsubmit="prosesLoginPelanggan(event)" class="form-vertical">
+        <input type="text" id="cust-input-name" placeholder="Nama Lengkap" required>
+        <input type="text" id="cust-input-phone" placeholder="No. WhatsApp (Cth: 08123...)" required>
+        <button type="submit" style="margin-top: 10px; border-radius: 8px; padding: 12px; background: #16a34a;">Masuk & Belanja</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="main-content">
+    
+    <!-- STICKY SEARCH BAR -->
+    <div id="sticky-search-container" class="sticky-search-bar no-print">
+      <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 10px; font-size: 0.9rem;">
+    </div>
+
+    <!-- 1. HALAMAN BELANJA (KATALOG & KASIR) -->
+    <div id="belanja" class="tab-content active">
+      <div style="display: flex; margin-bottom: 12px; width: 100%;">
+        <select id="filter-category-pos" onchange="refreshKatalogPelanggan()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
+          <option value="Semua">Semua Kategori</option>
+        </select>
+      </div>
+
+      <div class="pos-container">
+        <div class="card no-print" style="margin-bottom: 0;">
+          <h3 style="margin-top: 0; font-size: 0.95rem;">📦 Katalog Produk Toko</h3>
+          <div class="product-catalog-grid" id="pos-catalog-container"></div>
+        </div>
+      </div>
+
+      <!-- KERANJANG MODAL -->
+      <div id="cartModal" class="modal-backdrop">
+        <div class="modal-content">
+          <div class="modal-header no-print">
+            <h3>Keranjang Belanja</h3>
+            <button class="btn-close-modal" onclick="closeCartModal()">&times;</button>
+          </div>
+
+          <div class="receipt-header">
+            <h3 id="receipt-shop-name" style="margin: 0;">Nama Toko</h3>
+            <p id="receipt-shop-address" style="margin: 5px 0 0 0; font-size: 0.85rem;">Alamat Toko</p>
+          </div>
+          
+          <div class="cart-table-wrapper">
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th style="width: 45%;">Barang</th>
+                  <th style="width: 25%; text-align: center;">Qty</th>
+                  <th style="width: 20%; text-align: right;">Total</th>
+                  <th class="no-print" style="width: 10%; text-align: center;">#</th>
+                </tr>
+              </thead>
+              <tbody id="cart-body"></tbody>
+            </table>
+          </div>
+
+          <div class="summary-box">
+            <div style="font-size: 1rem; font-weight: bold;">Total: Rp <span id="grand-total">0</span></div>
+          </div>
+
+          <button class="btn-whatsapp no-print" onclick="kirimPesananWhatsApp()">
+            <span>Kirim Pesanan via WhatsApp</span>
+          </button>
+          <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()">
+            🗑️ Kosongkan Keranjang
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. HALAMAN DATA PELANGGAN -->
+    <div id="data-pelanggan" class="tab-content">
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Profil Saya</h3>
+        <div style="font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
+          <div><strong>Nama:</strong> <span id="profile-name">-</span></div>
+          <div><strong>No. WhatsApp:</strong> <span id="profile-phone">-</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Catatan & Riwayat dari Toko</h3>
+        <div id="customer-notes-container" style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="empty-state">Memuat catatan...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. HALAMAN PENGATURAN SISTEM -->
+    <div id="pengaturan" class="tab-content">
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Identitas Pelanggan</h3>
+        <div class="form-vertical">
+          <label style="font-size: 0.85rem;">Nama:</label>
+          <input type="text" id="setting-cust-name">
+          <label style="font-size: 0.85rem;">No. WhatsApp:</label>
+          <input type="text" id="setting-cust-phone">
+          <button onclick="simpanProfilPelanggan()" style="border-radius: 8px; padding: 10px;">Simpan Perubahan</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Preferensi Tampilan</h3>
+        <div class="form-vertical">
+          <label style="font-size: 0.85rem;">Tema Tampilan:</label>
+          <select id="setting-theme" onchange="gantiTemaPelanggan(this.value)">
+            <option value="light">Terang (Light)</option>
+            <option value="dark">Gelap (Dark)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Sesi Aplikasi</h3>
+        <button class="btn-logout" onclick="logoutPelanggan()">🚪 Keluar / Ganti Akun</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FLOATING CART BUTTON -->
+  <div class="fab-container no-print">
+    <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative;">
+      <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      <span class="cart-badge" id="cart-count">0</span>
+    </button>
+  </div>
+
+  <!-- PERMANENT BOTTOM BAR (NAVIGASI) -->
+  <div class="permanent-bottom-bar no-print">
+    <button onclick="switchTabPelanggan('belanja')" id="nav-btn-belanja" style="background: none; border: none; font-weight: bold; color: var(--text-color); cursor: pointer; font-size: 0.85rem;">🛒 Belanja</button>
+    <button onclick="switchTabPelanggan('data-pelanggan')" id="nav-btn-data" style="background: none; border: none; font-weight: bold; color: var(--text-muted); cursor: pointer; font-size: 0.85rem;">👥 Data Pelanggan</button>
+    <button onclick="switchTabPelanggan('pengaturan')" id="nav-btn-pengaturan" style="background: none; border: none; font-weight: bold; color: var(--text-muted); cursor: pointer; font-size: 0.85rem;">⚙️ Pengaturan</button>
+  </div>
+
+  <!-- INISIALISASI FIREBASE & SCRIPT UTAMA PELANGGAN -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
+      authDomain: "kasirquh.firebaseapp.com",
+      projectId: "kasirquh",
+      storageBucket: "kasirquh.firebasestorage.app",
+      messagingSenderId: "87320899036",
+      appId: "1:87320899036:web:592c6768ea4aca6bdbb319",
+      measurementId: "G-2BL7RJN9Z5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let databaseProduk = {};
+    let cart = [];
+    let pengaturanToko = { nama: "TokoQuh", phone: "089" };
+    let currentCustomer = {
+      name: localStorage.getItem('cust_name_v13') || '',
+      phone: localStorage.getItem('cust_phone_v13') || ''
+    };
+
+    // Cek Login Pelanggan saat pertama buka
+    window.onload = function() {
+      if (currentCustomer.name && currentCustomer.phone) {
+        document.getElementById('customerLoginModal').style.display = 'none';
+        muatDataPelangganRealtime();
+      }
+      initFirebaseListeners();
+    };
+
+    function prosesLoginPelanggan(e) {
+      e.preventDefault();
+      const name = document.getElementById('cust-input-name').value.trim();
+      const phone = document.getElementById('cust-input-phone').value.trim();
+      if (!name || !phone) return alert("Nama dan No. WhatsApp wajib diisi!");
+
+      localStorage.setItem('cust_name_v13', name);
+      localStorage.setItem('cust_phone_v13', phone);
+      currentCustomer = { name, phone };
+
+      // Sinkronkan ke koleksi pelanggan Firebase
+      db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
+        if (snapshot.empty) {
+          db.collection("pelanggan").add({ nama: name, phone: phone, alamat: "-", catatan: [] });
+        }
+      });
+
+      document.getElementById('customerLoginModal').style.display = 'none';
+      muatDataPelangganRealtime();
+      refreshKatalogPelanggan();
+    }
+
+    function logoutPelanggan() {
+      if (confirm("Keluar dari sesi ini?")) {
+        localStorage.removeItem('cust_name_v13');
+        localStorage.removeItem('cust_phone_v13');
+        location.reload();
+      }
+    }
+
+    function initFirebaseListeners() {
+      db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
+        if (doc.exists) pengaturanToko = doc.data();
+      });
+
+      db.collection("produk").onSnapshot((snapshot) => {
+        databaseProduk = {};
+        snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); });
+        refreshKatalogPelanggan();
+      });
+    }
+
+    function switchTabPelanggan(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      
+      document.getElementById('nav-btn-belanja').style.color = (tabId === 'belanja') ? '#2563eb' : 'var(--text-muted)';
+      document.getElementById('nav-btn-data').style.color = (tabId === 'data-pelanggan') ? '#2563eb' : 'var(--text-muted)';
+      document.getElementById('nav-btn-pengaturan').style.color = (tabId === 'pengaturan') ? '#2563eb' : 'var(--text-muted)';
+
+      if (tabId === 'pengaturan') {
+        document.getElementById('setting-cust-name').value = currentCustomer.name;
+        document.getElementById('setting-cust-phone').value = currentCustomer.phone;
+      }
+    }
+
+    function refreshKatalogPelanggan() {
+      const container = document.getElementById("pos-catalog-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      let searchKeyword = document.getElementById("inventory-search-input").value.toLowerCase();
+      let filterKat = document.getElementById("filter-category-pos").value;
+      let categories = new Set();
+      let count = 0;
+
+      for (let code in databaseProduk) {
+        let p = databaseProduk[code];
+        let kat = p.kategori || "Umum";
+        categories.add(kat);
+
+        if ((p.nama.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
+          count++;
+          let isHabis = (p.stok || 0) <= 0;
+          let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
+          
+          container.innerHTML += `
+            <div class="inv-card">
+              <div class="inv-card-top">
+                <div style="width: 100%; margin-bottom: 4px;">
+                  <button class="btn-edit" style="width: 100%; height: 30px; background: #16a34a; color: white; border-radius: 6px;" ${isHabis ? 'disabled' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
+                </div>
+                <img src="${fotoSrc}" class="inv-card-img">
+                <div class="inv-card-info">
+                  <div class="inv-card-title">${p.nama}</div>
+                  <div style="margin-top: 2px;"><span class="${p.stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${p.stok > 0 ? 'Tersedia' : 'Habis'}</span></div>
+                </div>
+              </div>
+              <div class="inv-card-details">
+                <div class="inv-card-row"><span>Harga:</span><b>Rp ${(p.harga || 0).toLocaleString('id-ID')}</b></div>
+              </div>
+            </div>
+          `;
+        }
+      }
+      if (count === 0) container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">Produk tidak ditemukan.</div>`;
+    }
+
+    function filterKatalogPelanggan(val) { refreshKatalogPelanggan(); }
+
+    function tambahKeKeranjangPelanggan(code) {
+      let p = databaseProduk[code];
+      if (!p || (p.stok || 0) <= 0) return alert("Stok habis!");
+      
+      let item = cart.find(i => i.code === code);
+      if (item) {
+        if (item.qty + 1 > p.stok) return alert("Stok tidak mencukupi!");
+        item.qty += 1;
+        item.subtotal = item.qty * p.harga;
+      } else {
+        cart.push({ code, nama: p.nama, harga: p.harga, qty: 1, subtotal: p.harga, foto: p.foto });
+      }
+      renderCartPelanggan();
+    }
+
+    function renderCartPelanggan() {
+      const tbody = document.getElementById("cart-body");
+      tbody.innerHTML = "";
+      let total = 0; let totalQty = 0;
+
+      cart.forEach((item, idx) => {
+        total += item.subtotal;
+        totalQty += item.qty;
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.nama}</td>
+            <td style="text-align: center;">${item.qty}</td>
+            <td style="text-align: right;">${item.subtotal.toLocaleString('id-ID')}</td>
+            <td class="no-print" style="text-align: center;"><button class="btn-danger" onclick="hapusItemCart(${idx})" style="padding: 2px 6px;">✕</button></td>
+          </tr>
+        `;
+      });
+
+      if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px;">Keranjang kosong</td></tr>`;
+      document.getElementById("cart-count").innerText = totalQty;
+      document.getElementById("grand-total").innerText = total.toLocaleString('id-ID');
+    }
+
+    function hapusItemCart(idx) { cart.splice(idx, 1); renderCartPelanggan(); }
+    function kosongkanKeranjang() { cart = []; renderCartPelanggan(); }
+
+    function openCartModal() { document.getElementById("cartModal").classList.add("show"); }
+    function closeCartModal() { document.getElementById("cartModal").classList.remove("show"); }
+
+    function kirimPesananWhatsApp() {
+      if (cart.length === 0) return alert("Keranjang kosong!");
+      let phoneToko = pengaturanToko.phone.replace(/[^0-9]/g, '');
+      if (phoneToko.startsWith('0')) phoneToko = '62' + phoneToko.slice(1);
+
+      let text = `*PESANAN BARU DARI PELANGGAN* 🛒\n`;
+      text += `Nama : *${currentCustomer.name}*\n`;
+      text += `No WA : ${currentCustomer.phone}\n------------------------------------\n`;
+      let total = 0;
+      cart.forEach((item, idx) => {
+        text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`;
+        total += item.subtotal;
+      });
+      text += `------------------------------------\n*Total Belanja : Rp ${total.toLocaleString('id-ID')}*`;
+
+      window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
+      cart = [];
+      renderCartPelanggan();
+      closeCartModal();
+    }
+
+    function muatDataPelangganRealtime() {
+      document.getElementById("profile-name").innerText = currentCustomer.name;
+      document.getElementById("profile-phone").innerText = currentCustomer.phone;
+
+      db.collection("pelanggan").where("phone", "==", currentCustomer.phone).onSnapshot((snapshot) => {
+        const container = document.getElementById("customer-notes-container");
+        container.innerHTML = "";
+        let found = false;
+
+        snapshot.forEach((doc) => {
+          found = true;
+          let data = doc.data();
+          if (data.catatan && data.catatan.length > 0) {
+            data.catatan.forEach(note => {
+              container.innerHTML += `
+                <div style="border-bottom: 1px dashed var(--border-color); padding: 6px 0; font-size: 0.85rem;">
+                  <div><b>[${note.jenis}]</b> ${note.keterangan}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">${note.waktu} ${note.nominal > 0 ? '• <b>Rp ' + note.nominal.toLocaleString('id-ID') + '</b>' : ''}</div>
+                </div>
+              `;
+            });
+          } else {
+            container.innerHTML = `<div class="empty-state">Belum ada catatan atau tagihan dari toko.</div>`;
+          }
+        });
+        if (!found) container.innerHTML = `<div class="empty-state">Data profil belum tersinkronisasi.</div>`;
+      });
+    }
+
+    function simpanProfilPelanggan() {
+      const name = document.getElementById("setting-cust-name").value.trim();
+      const phone = document.getElementById("setting-cust-phone").value.trim();
+      if (!name || !phone) return alert("Nama dan nomor tidak boleh kosong!");
+
+      localStorage.setItem('cust_name_v13', name);
+      localStorage.setItem('cust_phone_v13', phone);
+      currentCustomer = { name, phone };
+      alert("Profil berhasil diperbarui!");
+      muatDataPelangganRealtime();
+    }
+
+    function gantiTemaPelanggan(theme) {
+      document.body.setAttribute('data-theme', theme);
+      localStorage.setItem('cust_theme_v13', theme);
+    }
+  </script>
+</body>
+</html>
