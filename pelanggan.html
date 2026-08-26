@@ -28,46 +28,24 @@
     </div>
   </div>
 
-  <!-- MODAL FILTER KATEGORI (MUNCUL DARI TOMBOL MERAH ☰) -->
-  <div id="categoryModal" class="modal-backdrop">
-    <div class="modal-content" style="max-width: 320px;">
-      <div class="modal-header">
-        <h3>Filter Kategori</h3>
-        <button class="btn-close-modal" onclick="toggleCategoryModal()">&times;</button>
-      </div>
-      <div style="padding: 10px 0;">
-        <select id="filter-category-pos" onchange="gantiKategoriPos(); toggleCategoryModal();" style="width: 100%; padding: 10px; font-size: 0.95rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
-          <option value="Semua">Semua Kategori</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div class="main-content">
+  <div class="main-content" style="padding-bottom: 70px;">
     
-    <!-- STICKY SEARCH BAR -->
-    <div id="sticky-search-container" class="sticky-search-bar no-print">
-      <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 10px; font-size: 0.9rem;">
+    <!-- STICKY SEARCH BAR (Hanya Kolom Pencarian di Atas) -->
+    <div id="sticky-search-container" class="sticky-search-bar no-print" style="margin-bottom: 12px;">
+      <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);">
     </div>
 
     <!-- 1. HALAMAN BELANJA (KATALOG & KASIR) -->
     <div id="belanja" class="tab-content active">
       
-      <!-- TOP BAR ALA REFERENSI (JUDUL, PAGINATION TENGAH, TOMBOL ☰ MERAH) -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card-bg); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
-        <h2 style="margin: 0; font-size: 1.1rem; color: var(--text-color);">Belanja</h2>
-        
-        <!-- Kotak Pagination di Tengah -->
-        <div style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 4px 10px; gap: 10px;">
-          <button onclick="ubahHalamanPos(-1)" id="btn-prev-page" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 1rem; font-weight: bold;">◄</button>
+      <!-- KONTROL PAGINATION (PANAH KIRI & KANAN) -->
+      <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card-bg); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+        <span style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted);">Daftar Produk</span>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button onclick="ubahHalamanPos(-1)" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-weight: bold;">◄</button>
           <span id="pos-page-indicator" style="font-size: 0.85rem; font-weight: bold; color: var(--text-color);">1/1</span>
-          <button onclick="ubahHalamanPos(1)" id="btn-next-page" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 1rem; font-weight: bold;">▶</button>
+          <button onclick="ubahHalamanPos(1)" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-weight: bold;">▶</button>
         </div>
-
-        <!-- Tombol Merah Kanan (☰) -->
-        <button onclick="toggleCategoryModal()" style="background: #dc2626; color: white; border: none; width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Pilih Kategori">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-        </button>
       </div>
 
       <div class="pos-container">
@@ -193,7 +171,7 @@
     </button>
   </div>
 
-  <!-- PERMANENT BOTTOM BAR (NAVIGASI) -->
+  <!-- PERMANENT BOTTOM BAR (NAVIGASI UTAMA DI BAWAH) -->
   <div class="permanent-bottom-bar no-print">
     <button onclick="switchTabPelanggan('belanja')" id="nav-btn-belanja" style="background: none; border: none; font-weight: bold; color: var(--text-color); cursor: pointer; font-size: 0.85rem;">🛒 Belanja</button>
     <button onclick="switchTabPelanggan('data-pelanggan')" id="nav-btn-data" style="background: none; border: none; font-weight: bold; color: var(--text-muted); cursor: pointer; font-size: 0.85rem;">👥 Data Pelanggan</button>
@@ -254,11 +232,6 @@
     function gantiTemaPelanggan(theme) {
       localStorage.setItem('cust_theme_v13', theme);
       applyThemePelanggan(theme);
-    }
-
-    function toggleCategoryModal() {
-      const modal = document.getElementById("categoryModal");
-      modal.classList.toggle("show");
     }
 
     function prosesLoginPelanggan(e) {
@@ -322,25 +295,7 @@
       db.collection("produk").onSnapshot((snapshot) => {
         databaseProduk = {};
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); });
-        updateKategoriDropdownPelanggan();
         refreshKatalogPelanggan();
-      });
-    }
-
-    function updateKategoriDropdownPelanggan() {
-      const selectKat = document.getElementById("filter-category-pos");
-      if (!selectKat) return;
-      let currentVal = selectKat.value;
-      let categories = new Set(["Semua"]);
-
-      for (let code in databaseProduk) {
-        let p = databaseProduk[code];
-        if (p.kategori) categories.add(p.kategori);
-      }
-
-      selectKat.innerHTML = "";
-      categories.forEach(kat => {
-        selectKat.innerHTML += `<option value="${kat}" ${kat === currentVal ? 'selected' : ''}>${kat}</option>`;
       });
     }
 
@@ -351,6 +306,13 @@
       document.getElementById('nav-btn-belanja').style.color = (tabId === 'belanja') ? '#2563eb' : 'var(--text-muted)';
       document.getElementById('nav-btn-data').style.color = (tabId === 'data-pelanggan') ? '#2563eb' : 'var(--text-muted)';
       document.getElementById('nav-btn-pengaturan').style.color = (tabId === 'pengaturan') ? '#2563eb' : 'var(--text-muted)';
+
+      const searchContainer = document.getElementById('sticky-search-container');
+      if (tabId === 'belanja') {
+        searchContainer.style.display = 'block';
+      } else {
+        searchContainer.style.display = 'none';
+      }
 
       if (tabId === 'pengaturan' && currentCustomerPhone) {
         db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
@@ -374,13 +336,11 @@
       let itemsPerPagePos = (catalogViewMode === 'list') ? 6 : 4;
 
       let searchKeyword = document.getElementById("inventory-search-input").value.toLowerCase();
-      let filterKat = document.getElementById("filter-category-pos").value;
       
       let matchedProducts = [];
       for (let code in databaseProduk) {
         let p = databaseProduk[code];
-        let kat = p.kategori || "Umum";
-        if ((p.nama.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
+        if (p.nama.toLowerCase().includes(searchKeyword)) {
           matchedProducts.push({ code, ...p });
         }
       }
@@ -455,11 +415,6 @@
     }
 
     function filterKatalogPelanggan(val) {
-      currentPosPage = 1;
-      refreshKatalogPelanggan();
-    }
-
-    function gantiKategoriPos() {
       currentPosPage = 1;
       refreshKatalogPelanggan();
     }
