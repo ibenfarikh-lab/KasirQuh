@@ -48,19 +48,13 @@
     </div>
   </div>
 
-  <!-- MODAL PENCARIAN (MUNCUL KETIKA IKON PENCARIAN DIKLIK) -->
-  <div id="searchModal" class="modal-backdrop" onclick="if(event.target === this) closeSearchModal()" style="background: rgba(0,0,0,0.5);">
-    <div class="modal-content" style="max-width: 400px; border-radius: 16px; padding: 20px; background: var(--card-bg); border: 1px solid var(--border-color);">
-      <div class="modal-header" style="margin-bottom: 12px;">
-        <h3 style="margin: 0; font-size: 1.1rem;">🔍 Cari Barang</h3>
-        <button class="btn-close-modal" onclick="closeSearchModal()">&times;</button>
-      </div>
-      <input type="text" id="inventory-search-input" placeholder="Ketik nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 12px; font-size: 1rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;" autofocus>
-    </div>
-  </div>
-
   <div class="main-content" style="padding-bottom: 80px;">
     
+    <!-- KOLOM PENCARIAN STICKY DI PALING ATAS -->
+    <div id="sticky-search-container" class="sticky-search-bar no-print" style="position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
+      <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
+    </div>
+
     <!-- 1. HALAMAN BELANJA (KATALOG & KASIR) -->
     <div id="belanja" class="tab-content active">
       <div class="pos-container">
@@ -178,14 +172,14 @@
 
   </div>
 
-  <!-- FLOATING BUTTONS (PENCARIAN & KERANJANG) -->
+  <!-- FLOATING BUTTONS (PENCARIAN DI ATAS, KERANJANG DI BAWAH) -->
   <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
-    <!-- Tombol Pencarian Melayang -->
-    <button id="fab-search-btn" class="fab-main" onclick="openSearchModal()" title="Cari Barang" style="background: #2563eb; width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;">
+    <!-- Tombol Pencarian Melayang (Scroll ke atas & fokus kolom pencarian) -->
+    <button id="fab-search-btn" class="fab-main" onclick="scrollToSearch()" title="Cari Barang" style="background: #2563eb; width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </button>
-    <!-- Tombol Keranjang Melayang -->
-    <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative; width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; background: #16a34a;">
+    <!-- Tombol Keranjang Melayang dengan Badge -->
+    <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative; width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
       <span class="cart-badge" id="cart-count" style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; font-size: 0.75rem; padding: 2px 6px; border-radius: 50%; font-weight: bold;">0</span>
     </button>
@@ -272,15 +266,12 @@
       modal.classList.toggle("show");
     }
 
-    function openSearchModal() {
-      const modal = document.getElementById("searchModal");
-      modal.classList.add("show");
-      setTimeout(() => document.getElementById("inventory-search-input").focus(), 100);
-    }
-
-    function closeSearchModal() {
-      const modal = document.getElementById("searchModal");
-      modal.classList.remove("show");
+    function scrollToSearch() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        const input = document.getElementById("inventory-search-input");
+        if (input) input.focus();
+      }, 250);
     }
 
     function prosesLoginPelanggan(e) {
@@ -354,19 +345,23 @@
       
       const titleEl = document.getElementById('bottom-bar-title');
       const paginationBox = document.getElementById('pagination-box');
+      const searchContainer = document.getElementById('sticky-search-container');
       const searchFab = document.getElementById('fab-search-btn');
 
       if (tabId === 'belanja') {
         titleEl.innerText = "Belanja";
         paginationBox.style.display = "flex";
+        if (searchContainer) searchContainer.style.display = "block";
         if (searchFab) searchFab.style.display = "flex";
       } else if (tabId === 'data-pelanggan') {
         titleEl.innerText = "Data Pelanggan";
         paginationBox.style.display = "none";
+        if (searchContainer) searchContainer.style.display = "none";
         if (searchFab) searchFab.style.display = "none";
       } else if (tabId === 'pengaturan') {
         titleEl.innerText = "Pengaturan";
         paginationBox.style.display = "none";
+        if (searchContainer) searchContainer.style.display = "none";
         if (searchFab) searchFab.style.display = "none";
         
         if (currentCustomerPhone) {
