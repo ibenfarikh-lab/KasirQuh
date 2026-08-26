@@ -134,6 +134,7 @@
           <select id="setting-theme" onchange="gantiTemaPelanggan(this.value)" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
             <option value="light">Terang (Light)</option>
             <option value="dark">Gelap (Dark)</option>
+            <option value="auto">Otomatis (Sistem)</option>
           </select>
 
           <label style="font-size: 0.85rem; margin-top: 8px;">Bahasa:</label>
@@ -144,8 +145,8 @@
 
           <label style="font-size: 0.85rem; margin-top: 8px;">Tampilan Katalog:</label>
           <select id="setting-view-mode" onchange="gantiViewMode(this.value)" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
-            <option value="grid">Grid (Kotak Berjajar)</option>
-            <option value="list">List (Baris Ringkas)</option>
+            <option value="grid">Grid (4 Item / Hal)</option>
+            <option value="list">List (6 Item / Hal)</option>
           </select>
         </div>
       </div>
@@ -195,12 +196,19 @@
     
     // Variabel Pagination POS
     let currentPosPage = 1;
-    const itemsPerPagePos = 10;
 
     window.onload = function() {
-      let savedTheme = localStorage.getItem('cust_theme_v13') || 'light';
-      document.body.setAttribute('data-theme', savedTheme);
+      let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
       document.getElementById('setting-theme').value = savedTheme;
+      applyThemePelanggan(savedTheme);
+
+      // Listener perubahan tema sistem jika mode 'auto' aktif
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (localStorage.getItem('cust_theme_v13') === 'auto') {
+          applyThemePelanggan('auto');
+        }
+      });
+
       document.getElementById('setting-view-mode').value = catalogViewMode;
 
       if (currentCustomerPhone) {
@@ -209,6 +217,20 @@
       }
       initFirebaseListeners();
     };
+
+    function applyThemePelanggan(theme) {
+      if (theme === 'auto') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.body.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      } else {
+        document.body.setAttribute('data-theme', theme);
+      }
+    }
+
+    function gantiTemaPelanggan(theme) {
+      localStorage.setItem('cust_theme_v13', theme);
+      applyThemePelanggan(theme);
+    }
 
     function prosesLoginPelanggan(e) {
       e.preventDefault();
@@ -318,6 +340,9 @@
       if (!container) return;
       
       container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
+
+      // Atur jumlah item per halaman: List = 6 item, Grid = 4 item
+      let itemsPerPagePos = (catalogViewMode === 'list') ? 6 : 4;
 
       let searchKeyword = document.getElementById("inventory-search-input").value.toLowerCase();
       let filterKat = document.getElementById("filter-category-pos").value;
@@ -555,14 +580,10 @@
       });
     }
 
-    function gantiTemaPelanggan(theme) {
-      document.body.setAttribute('data-theme', theme);
-      localStorage.setItem('cust_theme_v13', theme);
-    }
-
     function gantiViewMode(mode) {
       catalogViewMode = mode;
       localStorage.setItem('cust_view_v13', mode);
+      currentPosPage = 1;
       refreshKatalogPelanggan();
     }
   </script>
