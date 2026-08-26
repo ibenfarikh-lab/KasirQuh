@@ -28,7 +28,22 @@
     </div>
   </div>
 
-  <div class="main-content" style="padding-bottom: 70px;">
+  <!-- MODAL MENU TOGGLE (MUNCUL DARI TOMBOL MERAH ☰ DI BOTTOM BAR) -->
+  <div id="menuToggleModal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 280px;">
+      <div class="modal-header">
+        <h3>Menu Navigasi</h3>
+        <button class="btn-close-modal" onclick="toggleMenuModal()">&times;</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 10px 0;">
+        <button onclick="switchTabPelanggan('belanja'); toggleMenuModal();" style="padding: 12px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); text-align: left; font-weight: bold; cursor: pointer;">🛒 Belanja</button>
+        <button onclick="switchTabPelanggan('data-pelanggan'); toggleMenuModal();" style="padding: 12px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); text-align: left; font-weight: bold; cursor: pointer;">👥 Data Pelanggan</button>
+        <button onclick="switchTabPelanggan('pengaturan'); toggleMenuModal();" style="padding: 12px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); text-align: left; font-weight: bold; cursor: pointer;">⚙️ Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content" style="padding-bottom: 80px;">
     
     <!-- STICKY SEARCH BAR (Hanya Kolom Pencarian di Atas) -->
     <div id="sticky-search-container" class="sticky-search-bar no-print" style="margin-bottom: 12px;">
@@ -37,17 +52,6 @@
 
     <!-- 1. HALAMAN BELANJA (KATALOG & KASIR) -->
     <div id="belanja" class="tab-content active">
-      
-      <!-- KONTROL PAGINATION (PANAH KIRI & KANAN) -->
-      <div class="no-print" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; background: var(--card-bg); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
-        <span style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted);">Daftar Produk</span>
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <button onclick="ubahHalamanPos(-1)" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-weight: bold;">◄</button>
-          <span id="pos-page-indicator" style="font-size: 0.85rem; font-weight: bold; color: var(--text-color);">1/1</span>
-          <button onclick="ubahHalamanPos(1)" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-weight: bold;">▶</button>
-        </div>
-      </div>
-
       <div class="pos-container">
         <div class="card no-print" style="margin-bottom: 0;">
           <div id="pos-catalog-container"></div>
@@ -171,11 +175,24 @@
     </button>
   </div>
 
-  <!-- PERMANENT BOTTOM BAR (NAVIGASI UTAMA DI BAWAH) -->
-  <div class="permanent-bottom-bar no-print">
-    <button onclick="switchTabPelanggan('belanja')" id="nav-btn-belanja" style="background: none; border: none; font-weight: bold; color: var(--text-color); cursor: pointer; font-size: 0.85rem;">🛒 Belanja</button>
-    <button onclick="switchTabPelanggan('data-pelanggan')" id="nav-btn-data" style="background: none; border: none; font-weight: bold; color: var(--text-muted); cursor: pointer; font-size: 0.85rem;">👥 Data Pelanggan</button>
-    <button onclick="switchTabPelanggan('pengaturan')" id="nav-btn-pengaturan" style="background: none; border: none; font-weight: bold; color: var(--text-muted); cursor: pointer; font-size: 0.85rem;">⚙️ Pengaturan</button>
+  <!-- PERMANENT BOTTOM BAR (NAMA HALAMAN, NAVIGASI HALAMAN, & TOGGLE MENU MERAH) -->
+  <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
+    
+    <!-- 1. Nama Halaman di Sisi Kiri -->
+    <span id="bottom-bar-title" style="font-weight: bold; font-size: 1rem; color: var(--text-color);">Belanja</span>
+
+    <!-- 2. Navigasi Halaman di Tengah (Hanya aktif di tab Belanja) -->
+    <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 4px 10px; gap: 8px;">
+      <button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.9rem; font-weight: bold;">◄</button>
+      <span id="pos-page-indicator" style="font-size: 0.8rem; font-weight: bold; color: var(--text-color);">1/1</span>
+      <button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.9rem; font-weight: bold;">▶</button>
+    </div>
+
+    <!-- 3. Toggle Menu Merah (☰) di Sisi Kanan -->
+    <button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    </button>
+
   </div>
 
   <!-- INISIALISASI FIREBASE & SCRIPT UTAMA -->
@@ -232,6 +249,11 @@
     function gantiTemaPelanggan(theme) {
       localStorage.setItem('cust_theme_v13', theme);
       applyThemePelanggan(theme);
+    }
+
+    function toggleMenuModal() {
+      const modal = document.getElementById("menuToggleModal");
+      modal.classList.toggle("show");
     }
 
     function prosesLoginPelanggan(e) {
@@ -303,26 +325,33 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       
-      document.getElementById('nav-btn-belanja').style.color = (tabId === 'belanja') ? '#2563eb' : 'var(--text-muted)';
-      document.getElementById('nav-btn-data').style.color = (tabId === 'data-pelanggan') ? '#2563eb' : 'var(--text-muted)';
-      document.getElementById('nav-btn-pengaturan').style.color = (tabId === 'pengaturan') ? '#2563eb' : 'var(--text-muted)';
-
+      const titleEl = document.getElementById('bottom-bar-title');
+      const paginationBox = document.getElementById('pagination-box');
       const searchContainer = document.getElementById('sticky-search-container');
-      if (tabId === 'belanja') {
-        searchContainer.style.display = 'block';
-      } else {
-        searchContainer.style.display = 'none';
-      }
 
-      if (tabId === 'pengaturan' && currentCustomerPhone) {
-        db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
-          if (!snap.empty) {
-            let data = snap.docs[0].data();
-            document.getElementById('setting-cust-name').value = data.nama || "";
-            document.getElementById('setting-cust-phone').value = data.phone || "";
-            document.getElementById('setting-cust-address').value = data.alamat || "";
-          }
-        });
+      if (tabId === 'belanja') {
+        titleEl.innerText = "Belanja";
+        paginationBox.style.display = "flex";
+        searchContainer.style.display = "block";
+      } else if (tabId === 'data-pelanggan') {
+        titleEl.innerText = "Data Pelanggan";
+        paginationBox.style.display = "none";
+        searchContainer.style.display = "none";
+      } else if (tabId === 'pengaturan') {
+        titleEl.innerText = "Pengaturan";
+        paginationBox.style.display = "none";
+        searchContainer.style.display = "none";
+        
+        if (currentCustomerPhone) {
+          db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
+            if (!snap.empty) {
+              let data = snap.docs[0].data();
+              document.getElementById('setting-cust-name').value = data.nama || "";
+              document.getElementById('setting-cust-phone').value = data.phone || "";
+              document.getElementById('setting-cust-address').value = data.alamat || "";
+            }
+          });
+        }
       }
     }
 
@@ -332,9 +361,7 @@
       
       container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
 
-      // Grid = 4 item, List = 6 item per halaman
       let itemsPerPagePos = (catalogViewMode === 'list') ? 6 : 4;
-
       let searchKeyword = document.getElementById("inventory-search-input").value.toLowerCase();
       
       let matchedProducts = [];
