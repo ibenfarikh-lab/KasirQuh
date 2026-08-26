@@ -15,15 +15,15 @@
 </head>
 <body data-theme="light">
 
-  <!-- MODAL IDENTITAS PELANGGAN (MUNCUL JIKA BELUM LOGIN) -->
+  <!-- MODAL LOGIN PELANGGAN (NO. WA & SANDI) -->
   <div id="customerLoginModal" class="login-overlay" style="display: flex;">
     <div class="login-card">
       <h2>KasirQuh</h2>
-      <p>Silakan masukkan data diri untuk mulai belanja</p>
+      <p>Masukkan No. WhatsApp & Sandi untuk Masuk</p>
       <form onsubmit="prosesLoginPelanggan(event)" class="form-vertical">
-        <input type="text" id="cust-input-name" placeholder="Nama Lengkap" required>
-        <input type="text" id="cust-input-phone" placeholder="No. WhatsApp (Cth: 08123...)" required>
-        <button type="submit" style="margin-top: 10px; border-radius: 8px; padding: 12px; background: #16a34a;">Masuk & Belanja</button>
+        <input type="text" id="cust-login-phone" placeholder="No. WhatsApp (Cth: 08123...)" required>
+        <input type="password" id="cust-login-pass" placeholder="Sandi (Default: user)" required>
+        <button type="submit" style="margin-top: 10px; border-radius: 8px; padding: 12px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer;">Masuk / Daftar</button>
       </form>
     </div>
   </div>
@@ -46,7 +46,7 @@
       <div class="pos-container">
         <div class="card no-print" style="margin-bottom: 0;">
           <h3 style="margin-top: 0; font-size: 0.95rem;">📦 Katalog Produk Toko</h3>
-          <div class="product-catalog-grid" id="pos-catalog-container"></div>
+          <div id="pos-catalog-container" class="product-catalog-grid"></div>
         </div>
       </div>
 
@@ -98,6 +98,7 @@
         <div style="font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
           <div><strong>Nama:</strong> <span id="profile-name">-</span></div>
           <div><strong>No. WhatsApp:</strong> <span id="profile-phone">-</span></div>
+          <div><strong>Alamat:</strong> <span id="profile-address">-</span></div>
         </div>
       </div>
 
@@ -116,26 +117,42 @@
         <div class="form-vertical">
           <label style="font-size: 0.85rem;">Nama:</label>
           <input type="text" id="setting-cust-name">
-          <label style="font-size: 0.85rem;">No. WhatsApp:</label>
-          <input type="text" id="setting-cust-phone">
-          <button onclick="simpanProfilPelanggan()" style="border-radius: 8px; padding: 10px;">Simpan Perubahan</button>
+          <label style="font-size: 0.85rem;">No. WhatsApp (Username):</label>
+          <input type="text" id="setting-cust-phone" readonly style="background: var(--input-bg); opacity: 0.7;">
+          <label style="font-size: 0.85rem;">Alamat Pengiriman:</label>
+          <textarea id="setting-cust-address" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px;"></textarea>
+          <label style="font-size: 0.85rem;">Sandi Baru (Opsional):</label>
+          <input type="password" id="setting-cust-pass" placeholder="Kosongkan jika tidak diubah">
+          <button onclick="simpanProfilPelanggan()" style="border-radius: 8px; padding: 10px; background: #2563eb; color: white; border: none; cursor: pointer;">Simpan Perubahan</button>
         </div>
       </div>
 
       <div class="card">
-        <h3 style="margin-top: 0; font-size: 1rem;">Preferensi Tampilan</h3>
+        <h3 style="margin-top: 0; font-size: 1rem;">Preferensi Tampilan & Bahasa</h3>
         <div class="form-vertical">
           <label style="font-size: 0.85rem;">Tema Tampilan:</label>
-          <select id="setting-theme" onchange="gantiTemaPelanggan(this.value)">
+          <select id="setting-theme" onchange="gantiTemaPelanggan(this.value)" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
             <option value="light">Terang (Light)</option>
             <option value="dark">Gelap (Dark)</option>
+          </select>
+
+          <label style="font-size: 0.85rem; margin-top: 8px;">Bahasa:</label>
+          <select id="setting-lang" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+            <option value="id">Bahasa Indonesia</option>
+            <option value="en">English</option>
+          </select>
+
+          <label style="font-size: 0.85rem; margin-top: 8px;">Tampilan Katalog:</label>
+          <select id="setting-view-mode" onchange="gantiViewMode(this.value)" style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+            <option value="grid">Grid (Kotak Berjajar)</option>
+            <option value="list">List (Baris Ringkas)</option>
           </select>
         </div>
       </div>
 
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Sesi Aplikasi</h3>
-        <button class="btn-logout" onclick="logoutPelanggan()">🚪 Keluar / Ganti Akun</button>
+        <button class="btn-logout" onclick="logoutPelanggan()" style="background: #dc2626; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%;">🚪 Keluar / Ganti Akun</button>
       </div>
     </div>
 
@@ -156,7 +173,7 @@
     <button onclick="switchTabPelanggan('pengaturan')" id="nav-btn-pengaturan" style="background: none; border: none; font-weight: bold; color: var(--text-muted); cursor: pointer; font-size: 0.85rem;">⚙️ Pengaturan</button>
   </div>
 
-  <!-- INISIALISASI FIREBASE & SCRIPT UTAMA PELANGGAN -->
+  <!-- INISIALISASI FIREBASE & SCRIPT UTAMA -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
@@ -173,14 +190,16 @@
     let databaseProduk = {};
     let cart = [];
     let pengaturanToko = { nama: "TokoQuh", phone: "089" };
-    let currentCustomer = {
-      name: localStorage.getItem('cust_name_v13') || '',
-      phone: localStorage.getItem('cust_phone_v13') || ''
-    };
+    let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || '';
+    let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
 
-    // Cek Login Pelanggan saat pertama buka
     window.onload = function() {
-      if (currentCustomer.name && currentCustomer.phone) {
+      let savedTheme = localStorage.getItem('cust_theme_v13') || 'light';
+      document.body.setAttribute('data-theme', savedTheme);
+      document.getElementById('setting-theme').value = savedTheme;
+      document.getElementById('setting-view-mode').value = catalogViewMode;
+
+      if (currentCustomerPhone) {
         document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime();
       }
@@ -189,29 +208,50 @@
 
     function prosesLoginPelanggan(e) {
       e.preventDefault();
-      const name = document.getElementById('cust-input-name').value.trim();
-      const phone = document.getElementById('cust-input-phone').value.trim();
-      if (!name || !phone) return alert("Nama dan No. WhatsApp wajib diisi!");
+      const phone = document.getElementById('cust-login-phone').value.trim();
+      const pass = document.getElementById('cust-login-pass').value.trim();
+      if (!phone || !pass) return alert("Nomor WhatsApp dan Sandi wajib diisi!");
 
-      localStorage.setItem('cust_name_v13', name);
-      localStorage.setItem('cust_phone_v13', phone);
-      currentCustomer = { name, phone };
-
-      // Sinkronkan ke koleksi pelanggan Firebase
       db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
         if (snapshot.empty) {
-          db.collection("pelanggan").add({ nama: name, phone: phone, alamat: "-", catatan: [] });
+          // Jika belum terdaftar, buat akun baru otomatis dengan sandi default
+          if (pass === "user" || pass === "12345") {
+            db.collection("pelanggan").add({
+              nama: "Pelanggan Baru",
+              phone: phone,
+              alamat: "-",
+              password: pass,
+              catatan: []
+            }).then(() => {
+              localStorage.setItem('cust_phone_v13', phone);
+              currentCustomerPhone = phone;
+              document.getElementById('customerLoginModal').style.display = 'none';
+              muatDataPelangganRealtime();
+              refreshKatalogPelanggan();
+              alert("Pendaftaran berhasil! Silakan lengkapi nama dan alamat di menu Pengaturan.");
+            });
+          } else {
+            alert("Nomor belum terdaftar. Gunakan sandi default 'user' untuk pendaftaran pertama.");
+          }
+        } else {
+          // Jika sudah terdaftar, cek sandi
+          let docData = snapshot.docs[0].data();
+          let correctPass = docData.password || "user";
+          if (pass === correctPass) {
+            localStorage.setItem('cust_phone_v13', phone);
+            currentCustomerPhone = phone;
+            document.getElementById('customerLoginModal').style.display = 'none';
+            muatDataPelangganRealtime();
+            refreshKatalogPelanggan();
+          } else {
+            alert("Sandi salah! Jika lupa, silakan hubungi admin toko untuk reset sandi.");
+          }
         }
       });
-
-      document.getElementById('customerLoginModal').style.display = 'none';
-      muatDataPelangganRealtime();
-      refreshKatalogPelanggan();
     }
 
     function logoutPelanggan() {
       if (confirm("Keluar dari sesi ini?")) {
-        localStorage.removeItem('cust_name_v13');
         localStorage.removeItem('cust_phone_v13');
         location.reload();
       }
@@ -219,7 +259,11 @@
 
     function initFirebaseListeners() {
       db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
-        if (doc.exists) pengaturanToko = doc.data();
+        if (doc.exists) {
+          pengaturanToko = doc.data();
+          document.getElementById('receipt-shop-name').innerText = pengaturanToko.nama || "KasirQuh";
+          document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || "";
+        }
       });
 
       db.collection("produk").onSnapshot((snapshot) => {
@@ -237,9 +281,15 @@
       document.getElementById('nav-btn-data').style.color = (tabId === 'data-pelanggan') ? '#2563eb' : 'var(--text-muted)';
       document.getElementById('nav-btn-pengaturan').style.color = (tabId === 'pengaturan') ? '#2563eb' : 'var(--text-muted)';
 
-      if (tabId === 'pengaturan') {
-        document.getElementById('setting-cust-name').value = currentCustomer.name;
-        document.getElementById('setting-cust-phone').value = currentCustomer.phone;
+      if (tabId === 'pengaturan' && currentCustomerPhone) {
+        db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
+          if (!snap.empty) {
+            let data = snap.docs[0].data();
+            document.getElementById('setting-cust-name').value = data.nama || "";
+            document.getElementById('setting-cust-phone').value = data.phone || "";
+            document.getElementById('setting-cust-address').value = data.alamat || "";
+          }
+        });
       }
     }
 
@@ -247,6 +297,7 @@
       const container = document.getElementById("pos-catalog-container");
       if (!container) return;
       container.innerHTML = "";
+      container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
 
       let searchKeyword = document.getElementById("inventory-search-input").value.toLowerCase();
       let filterKat = document.getElementById("filter-category-pos").value;
@@ -263,23 +314,38 @@
           let isHabis = (p.stok || 0) <= 0;
           let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
           
-          container.innerHTML += `
-            <div class="inv-card">
-              <div class="inv-card-top">
-                <div style="width: 100%; margin-bottom: 4px;">
-                  <button class="btn-edit" style="width: 100%; height: 30px; background: #16a34a; color: white; border-radius: 6px;" ${isHabis ? 'disabled' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
+          if (catalogViewMode === 'list') {
+            container.innerHTML += `
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid var(--border-color); background: var(--card-bg);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <img src="${fotoSrc}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
+                  <div>
+                    <div style="font-weight: bold; font-size: 0.9rem;">${p.nama}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Rp ${(p.harga || 0).toLocaleString('id-ID')} • <span class="${p.stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${p.stok > 0 ? 'Tersedia' : 'Habis'}</span></div>
+                  </div>
                 </div>
-                <img src="${fotoSrc}" class="inv-card-img">
-                <div class="inv-card-info">
-                  <div class="inv-card-title">${p.nama}</div>
-                  <div style="margin-top: 2px;"><span class="${p.stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${p.stok > 0 ? 'Tersedia' : 'Habis'}</span></div>
+                <button class="btn-edit" style="padding: 6px 12px; background: #16a34a; color: white; border-radius: 6px; border: none;" ${isHabis ? 'disabled' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
+              </div>
+            `;
+          } else {
+            container.innerHTML += `
+              <div class="inv-card">
+                <div class="inv-card-top">
+                  <div style="width: 100%; margin-bottom: 4px;">
+                    <button class="btn-edit" style="width: 100%; height: 30px; background: #16a34a; color: white; border-radius: 6px; border: none;" ${isHabis ? 'disabled' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
+                  </div>
+                  <img src="${fotoSrc}" class="inv-card-img">
+                  <div class="inv-card-info">
+                    <div class="inv-card-title">${p.nama}</div>
+                    <div style="margin-top: 2px;"><span class="${p.stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${p.stok > 0 ? 'Tersedia' : 'Habis'}</span></div>
+                  </div>
+                </div>
+                <div class="inv-card-details">
+                  <div class="inv-card-row"><span>Harga:</span><b>Rp ${(p.harga || 0).toLocaleString('id-ID')}</b></div>
                 </div>
               </div>
-              <div class="inv-card-details">
-                <div class="inv-card-row"><span>Harga:</span><b>Rp ${(p.harga || 0).toLocaleString('id-ID')}</b></div>
-              </div>
-            </div>
-          `;
+            `;
+          }
         }
       }
       if (count === 0) container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">Produk tidak ditemukan.</div>`;
@@ -336,27 +402,35 @@
       let phoneToko = pengaturanToko.phone.replace(/[^0-9]/g, '');
       if (phoneToko.startsWith('0')) phoneToko = '62' + phoneToko.slice(1);
 
-      let text = `*PESANAN BARU DARI PELANGGAN* 🛒\n`;
-      text += `Nama : *${currentCustomer.name}*\n`;
-      text += `No WA : ${currentCustomer.phone}\n------------------------------------\n`;
-      let total = 0;
-      cart.forEach((item, idx) => {
-        text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`;
-        total += item.subtotal;
-      });
-      text += `------------------------------------\n*Total Belanja : Rp ${total.toLocaleString('id-ID')}*`;
+      db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
+        let namaCust = "Pelanggan";
+        let alamatCust = "-";
+        if (!snap.empty) {
+          let data = snap.docs[0].data();
+          namaCust = data.nama || "Pelanggan";
+          alamatCust = data.alamat || "-";
+        }
 
-      window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
-      cart = [];
-      renderCartPelanggan();
-      closeCartModal();
+        let text = `*PESANAN BARU DARI PELANGGAN* 🛒\n`;
+        text += `Nama : *${namaCust}*\n`;
+        text += `No WA : ${currentCustomerPhone}\n`;
+        text += `Alamat : ${alamatCust}\n------------------------------------\n`;
+        let total = 0;
+        cart.forEach((item, idx) => {
+          text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`;
+          total += item.subtotal;
+        });
+        text += `------------------------------------\n*Total Belanja : Rp ${total.toLocaleString('id-ID')}*`;
+
+        window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
+        cart = [];
+        renderCartPelanggan();
+        closeCartModal();
+      });
     }
 
     function muatDataPelangganRealtime() {
-      document.getElementById("profile-name").innerText = currentCustomer.name;
-      document.getElementById("profile-phone").innerText = currentCustomer.phone;
-
-      db.collection("pelanggan").where("phone", "==", currentCustomer.phone).onSnapshot((snapshot) => {
+      db.collection("pelanggan").where("phone", "==", currentCustomerPhone).onSnapshot((snapshot) => {
         const container = document.getElementById("customer-notes-container");
         container.innerHTML = "";
         let found = false;
@@ -364,6 +438,10 @@
         snapshot.forEach((doc) => {
           found = true;
           let data = doc.data();
+          document.getElementById("profile-name").innerText = data.nama || "-";
+          document.getElementById("profile-phone").innerText = data.phone || "-";
+          document.getElementById("profile-address").innerText = data.alamat || "-";
+
           if (data.catatan && data.catatan.length > 0) {
             data.catatan.forEach(note => {
               container.innerHTML += `
@@ -383,19 +461,33 @@
 
     function simpanProfilPelanggan() {
       const name = document.getElementById("setting-cust-name").value.trim();
-      const phone = document.getElementById("setting-cust-phone").value.trim();
-      if (!name || !phone) return alert("Nama dan nomor tidak boleh kosong!");
+      const alamat = document.getElementById("setting-cust-address").value.trim();
+      const newPass = document.getElementById("setting-cust-pass").value.trim();
+      if (!name) return alert("Nama tidak boleh kosong!");
 
-      localStorage.setItem('cust_name_v13', name);
-      localStorage.setItem('cust_phone_v13', phone);
-      currentCustomer = { name, phone };
-      alert("Profil berhasil diperbarui!");
-      muatDataPelangganRealtime();
+      db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snapshot) => {
+        if (!snapshot.empty) {
+          let docId = snapshot.docs[0].id;
+          let updateData = { nama: name, alamat: alamat };
+          if (newPass) updateData.password = newPass;
+
+          db.collection("pelanggan").doc(docId).update(updateData).then(() => {
+            alert("Profil berhasil diperbarui!");
+            document.getElementById("setting-cust-pass").value = "";
+          });
+        }
+      });
     }
 
     function gantiTemaPelanggan(theme) {
       document.body.setAttribute('data-theme', theme);
       localStorage.setItem('cust_theme_v13', theme);
+    }
+
+    function gantiViewMode(mode) {
+      catalogViewMode = mode;
+      localStorage.setItem('cust_view_v13', mode);
+      refreshKatalogPelanggan();
     }
   </script>
 </body>
