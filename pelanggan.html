@@ -38,7 +38,7 @@
     <!-- 1. HALAMAN BELANJA (KATALOG & KASIR) -->
     <div id="belanja" class="tab-content active">
       <div style="display: flex; margin-bottom: 12px; width: 100%;">
-        <select id="filter-category-pos" onchange="refreshKatalogPelanggan()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
+        <select id="filter-category-pos" onchange="gantiKategoriPos()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
           <option value="Semua">Semua Kategori</option>
         </select>
       </div>
@@ -46,7 +46,7 @@
       <div class="pos-container">
         <div class="card no-print" style="margin-bottom: 0;">
           <h3 style="margin-top: 0; font-size: 0.95rem;">📦 Katalog Produk Toko</h3>
-          <div id="pos-catalog-container" class="product-catalog-grid"></div>
+          <div id="pos-catalog-container"></div>
         </div>
       </div>
 
@@ -192,6 +192,10 @@
     let pengaturanToko = { nama: "TokoQuh", phone: "089" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || '';
     let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
+    
+    // Variabel Pagination POS
+    let currentPosPage = 1;
+    const itemsPerPagePos = 10;
 
     window.onload = function() {
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'light';
@@ -214,7 +218,6 @@
 
       db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
         if (snapshot.empty) {
-          // Jika belum terdaftar, buat akun baru otomatis dengan sandi default
           if (pass === "user" || pass === "12345") {
             db.collection("pelanggan").add({
               nama: "Pelanggan Baru",
@@ -234,7 +237,6 @@
             alert("Nomor belum terdaftar. Gunakan sandi default 'user' untuk pendaftaran pertama.");
           }
         } else {
-          // Jika sudah terdaftar, cek sandi
           let docData = snapshot.docs[0].data();
           let correctPass = docData.password || "user";
           if (pass === correctPass) {
@@ -269,7 +271,25 @@
       db.collection("produk").onSnapshot((snapshot) => {
         databaseProduk = {};
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); });
+        updateKategoriDropdownPelanggan();
         refreshKatalogPelanggan();
+      });
+    }
+
+    function updateKategoriDropdownPelanggan() {
+      const selectKat = document.getElementById("filter-category-pos");
+      if (!selectKat) return;
+      let currentVal = selectKat.value;
+      let categories = new Set(["Semua"]);
+
+      for (let code in databaseProduk) {
+        let p = databaseProduk[code];
+        if (p.kategori) categories.add(p.kategori);
+      }
+
+      selectKat.innerHTML = "";
+      categories.forEach(kat => {
+        selectKat.innerHTML += `<option value="${kat}" ${kat === currentVal ? 'selected' : ''}>${kat}</option>`;
       });
     }
 
@@ -296,62 +316,118 @@
     function refreshKatalogPelanggan() {
       const container = document.getElementById("pos-catalog-container");
       if (!container) return;
-      container.innerHTML = "";
+      
       container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
 
       let searchKeyword = document.getElementById("inventory-search-input").value.toLowerCase();
       let filterKat = document.getElementById("filter-category-pos").value;
-      let categories = new Set();
-      let count = 0;
-
+      
+      let matchedProducts = [];
       for (let code in databaseProduk) {
         let p = databaseProduk[code];
         let kat = p.kategori || "Umum";
-        categories.add(kat);
-
         if ((p.nama.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
-          count++;
-          let isHabis = (p.stok || 0) <= 0;
-          let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
-          
-          if (catalogViewMode === 'list') {
-            container.innerHTML += `
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid var(--border-color); background: var(--card-bg);">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <img src="${fotoSrc}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
-                  <div>
-                    <div style="font-weight: bold; font-size: 0.9rem;">${p.nama}</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted);">Rp ${(p.harga || 0).toLocaleString('id-ID')} • <span class="${p.stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${p.stok > 0 ? 'Tersedia' : 'Habis'}</span></div>
-                  </div>
-                </div>
-                <button class="btn-edit" style="padding: 6px 12px; background: #16a34a; color: white; border-radius: 6px; border: none;" ${isHabis ? 'disabled' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
-              </div>
-            `;
-          } else {
-            container.innerHTML += `
-              <div class="inv-card">
-                <div class="inv-card-top">
-                  <div style="width: 100%; margin-bottom: 4px;">
-                    <button class="btn-edit" style="width: 100%; height: 30px; background: #16a34a; color: white; border-radius: 6px; border: none;" ${isHabis ? 'disabled' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
-                  </div>
-                  <img src="${fotoSrc}" class="inv-card-img">
-                  <div class="inv-card-info">
-                    <div class="inv-card-title">${p.nama}</div>
-                    <div style="margin-top: 2px;"><span class="${p.stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${p.stok > 0 ? 'Tersedia' : 'Habis'}</span></div>
-                  </div>
-                </div>
-                <div class="inv-card-details">
-                  <div class="inv-card-row"><span>Harga:</span><b>Rp ${(p.harga || 0).toLocaleString('id-ID')}</b></div>
-                </div>
-              </div>
-            `;
-          }
+          matchedProducts.push({ code, ...p });
         }
       }
-      if (count === 0) container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">Produk tidak ditemukan.</div>`;
+
+      let totalPages = Math.ceil(matchedProducts.length / itemsPerPagePos) || 1;
+      if (currentPosPage > totalPages) currentPosPage = totalPages;
+      if (currentPosPage < 1) currentPosPage = 1;
+
+      let startIndex = (currentPosPage - 1) * itemsPerPagePos;
+      let paginatedItems = matchedProducts.slice(startIndex, startIndex + itemsPerPagePos);
+
+      container.innerHTML = "";
+      let count = matchedProducts.length;
+
+      if (count === 0) {
+        container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 20px;">Produk tidak ditemukan.</div>`;
+        renderPaginationPos(0, 1);
+        return;
+      }
+
+      paginatedItems.forEach(p => {
+        let isHabis = (p.stok || 0) <= 0;
+        let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
+        
+        if (catalogViewMode === 'list') {
+          container.innerHTML += `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid var(--border-color); background: var(--card-bg);">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="${fotoSrc}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
+                <div>
+                  <div style="font-weight: bold; font-size: 0.9rem;">${p.nama}</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">Rp ${(p.harga || 0).toLocaleString('id-ID')} • <span class="${p.stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${p.stok > 0 ? 'Tersedia' : 'Habis'}</span></div>
+                </div>
+              </div>
+              <button class="btn-edit" style="padding: 6px 12px; background: #16a34a; color: white; border-radius: 6px; border: none;" ${isHabis ? 'disabled' : ''} onclick="tambahKeKeranjangPelanggan('${p.code}')">+</button>
+            </div>
+          `;
+        } else {
+          container.innerHTML += `
+            <div class="inv-card">
+              <div class="inv-card-top">
+                <div style="width: 100%; margin-bottom: 4px;">
+                  <button class="btn-edit" style="width: 100%; height: 30px; background: #16a34a; color: white; border-radius: 6px; border: none;" ${isHabis ? 'disabled' : ''} onclick="tambahKeKeranjangPelanggan('${p.code}')">+</button>
+                </div>
+                <img src="${fotoSrc}" class="inv-card-img">
+                <div class="inv-card-info">
+                  <div class="inv-card-title">${p.nama}</div>
+                  <div style="margin-top: 2px;"><span class="${p.stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${p.stok > 0 ? 'Tersedia' : 'Habis'}</span></div>
+                </div>
+              </div>
+              <div class="inv-card-details">
+                <div class="inv-card-row"><span>Harga:</span><b>Rp ${(p.harga || 0).toLocaleString('id-ID')}</b></div>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      renderPaginationPos(totalPages, currentPosPage);
     }
 
-    function filterKatalogPelanggan(val) { refreshKatalogPelanggan(); }
+    function renderPaginationPos(totalPages, currentPage) {
+      let paginationContainer = document.getElementById("pos-pagination-container");
+      if (!paginationContainer) {
+        const posCard = document.querySelector(".pos-container .card");
+        if (posCard) {
+          paginationContainer = document.createElement("div");
+          paginationContainer.id = "pos-pagination-container";
+          paginationContainer.className = "no-print";
+          paginationContainer.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 0.85rem; width: 100%; grid-column: 1 / -1;";
+          posCard.appendChild(paginationContainer);
+        }
+      }
+      if (!paginationContainer) return;
+
+      if (totalPages <= 1) {
+        paginationContainer.innerHTML = "";
+        return;
+      }
+
+      paginationContainer.innerHTML = `
+        <button onclick="ubahHalamanPos(-1)" ${currentPage === 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : 'style="padding: 6px 12px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor:pointer;"'} >◀ Sebelum</button>
+        <span style="color: var(--text-muted); font-weight: 500;">Hal ${currentPage} dari ${totalPages}</span>
+        <button onclick="ubahHalamanPos(1)" ${currentPage === totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : 'style="padding: 6px 12px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor:pointer;"'} >Selanjutnya ▶</button>
+      `;
+    }
+
+    function ubahHalamanPos(direction) {
+      currentPosPage += direction;
+      refreshKatalogPelanggan();
+    }
+
+    function filterKatalogPelanggan(val) {
+      currentPosPage = 1;
+      refreshKatalogPelanggan();
+    }
+
+    function gantiKategoriPos() {
+      currentPosPage = 1;
+      refreshKatalogPelanggan();
+    }
 
     function tambahKeKeranjangPelanggan(code) {
       let p = databaseProduk[code];
