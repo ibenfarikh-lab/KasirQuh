@@ -406,8 +406,11 @@
       }
 
       let itemsPerPagePos = 10;
+      let searchContainer = document.getElementById("sticky-search-container");
       let searchInputEl = document.getElementById("inventory-search-input");
-      let searchKeyword = (searchInputEl && searchInputEl.style.display !== "none") ? searchInputEl.value.toLowerCase() : "";
+      
+      // FIX LOGIC: Cek apakah container pencarian benar-benar sedang aktif/terbuka
+      let searchKeyword = (searchContainer && searchContainer.style.display === "block" && searchInputEl) ? searchInputEl.value.toLowerCase() : "";
       
       let matchedProducts = [];
       for (let code in databaseProduk) {
