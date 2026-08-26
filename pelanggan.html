@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Belanja - KasirQuh</title>
   
+  <!-- Manifest Khusus Pelanggan untuk WebAPK -->
+  <link rel="manifest" href="manifest-pelanggan.json">
+  <meta name="theme-color" content="#2563eb">
+
   <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- External Stylesheet -->
   <link rel="stylesheet" href="style.css">
-  <meta name="theme-color" content="#2563eb">
 </head>
 <body data-theme="light">
 
@@ -177,7 +180,7 @@
 
   <!-- FLOATING BUTTONS (PENCARIAN DI ATAS, KERANJANG DI BAWAHNYA) -->
   <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
-    <!-- Tombol Pencarian Melayang dengan Ikon Lup Garis (Di-lock fill none !important agar tidak tertimpa CSS luar) -->
+    <!-- Tombol Pencarian Melayang dengan Ikon Lup Garis (Bagian Tengah Bolong) -->
     <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="24" height="24" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="10.5" cy="10.5" r="6.5" style="fill: none !important;"/>
@@ -213,6 +216,15 @@
 
   <!-- INISIALISASI FIREBASE & SCRIPT UTAMA -->
   <script>
+    // Registrasi Service Worker untuk PWA / WebAPK Support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker terdaftar:', reg.scope))
+          .catch(err => console.log('Service Worker gagal terdaftar:', err));
+      });
+    }
+
     const firebaseConfig = {
       apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
       authDomain: "kasirquh.firebaseapp.com",
