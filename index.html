@@ -10,8 +10,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- External Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <!-- External Stylesheet dengan Cache Busting -->
+  <link rel="stylesheet" href="style.css?v=1.0.3">
 
   <!-- PWA Configuration -->
   <link rel="manifest" href="manifest.json">
@@ -190,7 +190,7 @@
       </button>
     </div>
 
-    <!-- 4. HALAMAN LAPORAN / DATA (DITAMBAHKAN TAB PESANAN ONLINE) -->
+    <!-- 4. HALAMAN LAPORAN / DATA -->
     <div id="laporan" class="tab-content">
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap;">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')">👥 Data Pelanggan</button>
@@ -257,7 +257,7 @@
         </div>
       </div>
 
-      <!-- SUB-TAB PESANAN ONLINE (BERLANGSUNG VS SELESAI) -->
+      <!-- SUB-TAB PESANAN ONLINE -->
       <div id="sub-pesanan" class="sub-tab-content">
         <div style="display: flex; gap: 6px; margin-bottom: 12px;">
           <button id="btn-sub-berlangsung" onclick="switchOnlineTab('berlangsung')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">🟡 Sedang Berlangsung</button>
@@ -273,7 +273,7 @@
       </div>
     </div>
 
-    <!-- 5. HALAMAN CATATAN UTAMA (Dinamis & Bersih dengan Tanggal) -->
+    <!-- 5. HALAMAN CATATAN UTAMA -->
     <div id="catatan" class="tab-content">
       <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
         <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
@@ -352,6 +352,13 @@
         </div>
       </div>
 
+      <!-- KARTU TOMBOL PEMBERSIH CACHE DARURAT -->
+      <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5;">
+        <h3 style="color: #dc2626; margin-top: 0; font-size: 1rem;">Pembaruan Sistem & Cache</h3>
+        <p style="color: var(--text-muted); font-size: 0.80rem; margin-bottom: 10px;">Gunakan tombol ini jika aplikasi tersangkut versi lama atau tidak sinkron.</p>
+        <button onclick="bersihkanCacheTotal()" style="background: #dc2626; color: white; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer;">🧹 Bersihkan Cache & Muat Ulang</button>
+      </div>
+
       <div class="card" style="border: 1px solid #fca5a5;">
         <h3 style="color: #dc2626; margin-top: 0; font-size: 1rem;">Area Berbahaya (Reset Data)</h3>
         <p style="color: var(--text-muted); font-size: 0.80rem;">Tindakan di bawah ini tidak dapat dibatalkan.</p>
@@ -406,9 +413,7 @@
         <h3 id="adm-cust-modal-title">Detail Pelanggan</h3>
         <button class="btn-close-modal" onclick="closeAdminCustomerDetailModal()">&times;</button>
       </div>
-      <div id="adm-cust-modal-body" style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
-        <!-- Konten dimuat otomatis via JavaScript -->
-      </div>
+      <div id="adm-cust-modal-body" style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;"></div>
     </div>
   </div>
 
@@ -458,7 +463,6 @@
     </div>
   </div>
 
-  <!-- Firebase Configuration & External JavaScript + Fitur Pesanan Online, Edit, & Alarm 20 Ketukan -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
@@ -511,7 +515,6 @@
       renderOnlineOrdersUI();
     }
 
-    // ALARM 20 KALI BUNYI BERUNTUN
     function playNotificationSound() {
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -723,7 +726,6 @@
       if (confirm("Hapus riwayat pesanan online ini?")) db.collection("transaksi").doc(id).delete();
     }
 
-    // FITUR KLIK KARTU PELANGGAN DI ADMIN (Melihat Riwayat Belanja & Catatan)
     function initCustomerCardClickObserver() {
       const observer = new MutationObserver(() => {
         const cards = document.querySelectorAll("#customer-list-wrapper .card, #customer-list-wrapper > div");

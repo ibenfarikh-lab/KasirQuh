@@ -732,7 +732,6 @@ db.collection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapsho
 });
 
 let viewMode = localStorage.getItem('inventory_view_mode_v13') || 'grid';
-
 let stokCurrentPage = 1;
 let posCurrentPage = 1;
 let cart = [];
@@ -1504,11 +1503,9 @@ function playBeep() {
   osc.start(); osc.stop(audioCtx.currentTime + 0.1);
 }
 
-// FUNGSI ALARM 20 KALI BERUNTUN UNTUK PESANAN MASUK
 function playNotificationSound() {
   try {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
     function playBeep(delay, freq, duration) {
       setTimeout(() => {
         if (audioCtx.state === 'suspended') {
@@ -1517,7 +1514,7 @@ function playNotificationSound() {
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
         
-        oscillator.type = 'square'; // Karakter suara tegas khas alarm toko
+        oscillator.type = 'square';
         oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
         
         oscillator.connect(gainNode);
@@ -1530,14 +1527,12 @@ function playNotificationSound() {
       }, delay);
     }
 
-    // Pola 20 Kali Bunyi Beruntun Secara Otomatis
     for (let i = 0; i < 20; i++) {
-      let delay = i * 110; // Jeda antar ketukan 110ms
-      let freq = (i % 4 === 3) ? 1200 : 900; // Nada naik pada setiap ketukan ke-4
-      let duration = (i === 19) ? 0.3 : 0.08; // Ketukan terakhir lebih panjang sebagai penutup
+      let delay = i * 110;
+      let freq = (i % 4 === 3) ? 1200 : 900;
+      let duration = (i === 19) ? 0.3 : 0.08;
       playBeep(delay, freq, duration);
     }
-
   } catch (e) {
     console.log("Audio diblokir sebelum interaksi:", e);
   }
@@ -2426,6 +2421,29 @@ function showNotif(msg) {
   if(!notif) return;
   notif.innerText = msg; notif.style.display = "block";
   setTimeout(() => { notif.style.display = "none"; }, 1500);
+}
+
+// FUNGSI PEMBERSIH CACHE MANUAL SCRIPT
+function bersihkanCacheTotal() {
+  if (confirm("Bersihkan seluruh cache aplikasi dan muat ulang ke versi terbaru?")) {
+    if ('caches' in window) {
+      caches.keys().then((names) => {
+        names.forEach((name) => {
+          caches.delete(name);
+        });
+      });
+    }
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for(let registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 500);
+  }
 }
 
 setTheme(currentTheme);

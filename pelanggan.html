@@ -11,7 +11,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css">
+  <!-- External Stylesheet dengan Cache Busting -->
+  <link rel="stylesheet" href="style.css?v=1.0.3">
 </head>
 <body data-theme="light">
 
@@ -151,6 +152,13 @@
           <input type="password" id="setting-cust-pass" placeholder="Kosongkan jika tidak diubah">
           <button onclick="simpanProfilPelanggan()" style="border-radius: 8px; padding: 10px; background: #2563eb; color: white; border: none; cursor: pointer;">Simpan Perubahan</button>
         </div>
+      </div>
+
+      <!-- KARTU TOMBOL PEMBERSIH CACHE DARURAT PELANGGAN -->
+      <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5;">
+        <h3 style="color: #dc2626; margin-top: 0; font-size: 1rem;">Pembaruan Sistem & Cache</h3>
+        <p style="color: var(--text-muted); font-size: 0.80rem; margin-bottom: 10px;">Gunakan tombol ini jika aplikasi tersangkut versi lama.</p>
+        <button onclick="bersihkanCacheTotal()" style="background: #dc2626; color: white; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer;">🧹 Bersihkan Cache & Muat Ulang</button>
       </div>
 
       <div class="card">
@@ -537,7 +545,6 @@
       });
     }
 
-    // LISTENER RIWAYAT PESANAN ONLINE DI PANEL PELANGGAN
     function muatRiwayatPesananOnlinePelanggan() {
       db.collection("transaksi").where("customerPhone", "==", currentCustomerPhone).onSnapshot((snapshot) => {
         const container = document.getElementById("customer-online-orders-container");
@@ -595,6 +602,29 @@
           db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!"));
         }
       });
+    }
+
+    // FUNGSI PEMBERSIH CACHE MANUAL
+    function bersihkanCacheTotal() {
+      if (confirm("Bersihkan seluruh cache aplikasi dan muat ulang ke versi terbaru?")) {
+        if ('caches' in window) {
+          caches.keys().then((names) => {
+            names.forEach((name) => {
+              caches.delete(name);
+            });
+          });
+        }
+        if (navigator.serviceWorker) {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for(let registration of registrations) {
+              registration.unregister();
+            }
+          });
+        }
+        setTimeout(() => {
+          window.location.reload(true);
+        }, 500);
+      }
     }
   </script>
 </body>
