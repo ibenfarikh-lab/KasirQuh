@@ -114,7 +114,7 @@
       </div>
     </div>
 
-    <!-- 2. HALAMAN KASIR ONLINE (MEMISAHKAN MENJADI MENU MANDIRI) -->
+    <!-- 2. HALAMAN KASIR ONLINE -->
     <div id="kasir-online" class="tab-content">
       <div style="display: flex; gap: 6px; margin-bottom: 12px;">
         <button id="btn-sub-berlangsung" onclick="switchOnlineTab('berlangsung')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">🟡 Sedang Berlangsung</button>
@@ -615,7 +615,7 @@
     function buildOrderCardHtml(trx) {
       let statusBadge = trx.statusPesanan || "Menunggu Diproses";
       let badgeColor = statusBadge === "Selesai" ? "#16a34a" : "#d97706";
-      let buktiBtn = trx.buktiTransfer ? `<button onclick="bukaBuktiTransfer('${trx.buktiTransfer}')" style="background: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">🖼️ Bukti TF</button>` : "";
+      let buktiBtn = trx.buktiTransfer ? `<button onclick="bukaBuktiTransfer('${trx.buktiTransfer}')" title="Lihat Bukti Transfer" style="background: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">🖼️</button>` : "";
 
       let itemsHtml = "";
       if (trx.items && trx.items.length > 0) {
@@ -644,12 +644,32 @@
           
           <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
             ${buktiBtn}
-            <button onclick="bukaModalEditPesanan('${trx.id}')" style="background: #ca8a04; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">✏️ Edit Pesanan</button>
-            <button onclick="ubahStatusPesananAdmin('${trx.id}', 'Selesai')" style="background: #16a34a; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">✅ Selesai</button>
-            <button onclick="hapusPesananAdmin('${trx.id}')" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🗑️ Hapus</button>
+            <button onclick="kirimWaPesananAdmin('${trx.id}')" title="Kirim Rincian ke WhatsApp Pelanggan" style="background: #25D366; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">💬</button>
+            <button onclick="bukaModalEditPesanan('${trx.id}')" title="Edit Rincian Pesanan" style="background: #ca8a04; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">✏️</button>
+            <button onclick="ubahStatusPesananAdmin('${trx.id}', 'Selesai')" title="Tandai Selesai" style="background: #16a34a; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">✅</button>
+            <button onclick="hapusPesananAdmin('${trx.id}')" title="Hapus Pesanan" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">🗑️</button>
           </div>
         </div>
       `;
+    }
+
+    function kirimWaPesananAdmin(id) {
+      let trx = onlineOrdersDataCache.find(t => t.id === id);
+      if (!trx || !trx.customerPhone) return alert("Nomor WhatsApp pelanggan tidak tersedia!");
+      let phone = trx.customerPhone.replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+
+      let text = `*INFO PESANAN - ${pengaturanToko.nama || 'Toko'}* 📦\n`;
+      text += `Halo *${trx.customerNama || 'Pelanggan'}*, status pesanan Anda: *${trx.statusPesanan || 'Menunggu Diproses'}*\n\n`;
+      if (trx.items && trx.items.length > 0) {
+        trx.items.forEach((it, idx) => {
+          text += `${idx + 1}. ${it.nama} (${it.qty}x) = Rp ${(it.subtotal || 0).toLocaleString('id-ID')}\n`;
+        });
+      }
+      text += `------------------------------------\n*Total : Rp ${(trx.total || 0).toLocaleString('id-ID')}*\n`;
+      text += `Terima kasih telah berbelanja! 🙏`;
+
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     function bukaModalEditPesanan(id) {
