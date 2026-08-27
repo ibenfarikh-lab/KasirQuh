@@ -38,7 +38,7 @@
       <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama / kode barang..." oninput="syncAndFilterGlobal(this.value)" style="width: 100%; padding: 10px; font-size: 0.9rem;">
     </div>
 
-    <!-- 1. HALAMAN KASIR -->
+    <!-- 1. HALAMAN KASIR UTAMA -->
     <div id="penjualan" class="tab-content active">
       <div style="display: flex; margin-bottom: 12px; width: 100%;">
         <select id="filter-category-pos" onchange="refreshData()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
@@ -114,6 +114,21 @@
       </div>
     </div>
 
+    <!-- 2. HALAMAN KASIR ONLINE (MEMISAHKAN MENJADI MENU MANDIRI) -->
+    <div id="kasir-online" class="tab-content">
+      <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <button id="btn-sub-berlangsung" onclick="switchOnlineTab('berlangsung')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">🟡 Sedang Berlangsung</button>
+        <button id="btn-sub-selesai" onclick="switchOnlineTab('selesai')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">🟢 Selesai</button>
+      </div>
+
+      <div id="wrapper-pesanan-berlangsung" style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Memuat pesanan berlangsung...</div>
+      </div>
+      <div id="wrapper-pesanan-selesai" style="display: none; flex-direction: column; gap: 10px;">
+        <div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Memuat riwayat selesai...</div>
+      </div>
+    </div>
+
     <div id="scannerModal" class="fab-scanner-modal">
       <div class="scanner-fullscreen-box">
         <button class="btn-close-scanner-absolute" onclick="toggleScannerPos()">&times;</button>
@@ -126,7 +141,7 @@
       </div>
     </div>
 
-    <!-- 2. HALAMAN MANAJEMEN STOK -->
+    <!-- 3. HALAMAN MANAJEMEN STOK -->
     <div id="data-barang" class="tab-content">
       <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; gap: 6px; width: 100%;">
         <select id="filter-category" onchange="refreshData()" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); flex: 1; min-width: 0;">
@@ -143,7 +158,7 @@
       <div id="inventory-grid-wrapper" class="inventory-grid" style="display: none;"></div>
     </div>
 
-    <!-- 3. HALAMAN BELANJA STOK -->
+    <!-- 4. HALAMAN BELANJA STOK -->
     <div id="belanja-stok" class="tab-content">
       <div class="card" style="margin-bottom: 12px; background: var(--table-header); display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
         <div>
@@ -190,12 +205,11 @@
       </button>
     </div>
 
-    <!-- 4. HALAMAN LAPORAN / DATA -->
+    <!-- 5. HALAMAN LAPORAN / DATA -->
     <div id="laporan" class="tab-content">
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap;">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')">👥 Data Pelanggan</button>
         <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')">📋 Data Transaksi</button>
-        <button id="sub-btn-pesanan" class="sub-tab-btn" onclick="switchSubDataTab('sub-pesanan')">📦 Pesanan Online</button>
       </div>
 
       <div id="sub-pelanggan" class="sub-tab-content active">
@@ -256,24 +270,9 @@
           </table>
         </div>
       </div>
-
-      <!-- SUB-TAB PESANAN ONLINE -->
-      <div id="sub-pesanan" class="sub-tab-content">
-        <div style="display: flex; gap: 6px; margin-bottom: 12px;">
-          <button id="btn-sub-berlangsung" onclick="switchOnlineTab('berlangsung')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">🟡 Sedang Berlangsung</button>
-          <button id="btn-sub-selesai" onclick="switchOnlineTab('selesai')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">🟢 Selesai</button>
-        </div>
-
-        <div id="wrapper-pesanan-berlangsung" style="display: flex; flex-direction: column; gap: 10px;">
-          <div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Memuat pesanan berlangsung...</div>
-        </div>
-        <div id="wrapper-pesanan-selesai" style="display: none; flex-direction: column; gap: 10px;">
-          <div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Memuat riwayat selesai...</div>
-        </div>
-      </div>
     </div>
 
-    <!-- 5. HALAMAN CATATAN UTAMA -->
+    <!-- 6. HALAMAN CATATAN UTAMA -->
     <div id="catatan" class="tab-content">
       <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
         <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
@@ -288,7 +287,7 @@
       <div id="wrapper-content-sub-catatan"></div>
     </div>
 
-    <!-- 6. HALAMAN PENGATURAN -->
+    <!-- 7. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Identitas Toko</h3>
@@ -438,6 +437,13 @@
         <button class="popup-menu-btn" id="pop-btn-penjualan" onclick="switchTab('penjualan'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Kasir
         </button>
+        <!-- TOMBOL MENU KASIR ONLINE URUTAN KEDUA DENGAN BADGE ANGKA MERAH -->
+        <button class="popup-menu-btn" id="pop-btn-kasironline" onclick="switchTab('kasir-online'); toggleFloatingMenu();" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
+          <span style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:currentColor;"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg> Kasir Online
+          </span>
+          <span id="badge-online-count" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">0</span>
+        </button>
         <button class="popup-menu-btn" id="pop-btn-databarang" onclick="switchTab('data-barang'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></svg> Stok
         </button>
@@ -455,10 +461,12 @@
         </button>
       </div>
 
-      <button class="btn-bar-menu" onclick="toggleFloatingMenu()" title="Menu Utama">
+      <!-- TOGGLE MENU DENGAN LINGKARAN KECIL BIRU NOTIFIKASI -->
+      <button class="btn-bar-menu" onclick="toggleFloatingMenu()" title="Menu Utama" style="position: relative;">
         <span class="burger-line"></span>
         <span class="burger-line"></span>
         <span class="burger-line"></span>
+        <span id="burger-blue-dot" style="display: none; position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background-color: #2563eb; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 4px rgba(37,99,235,0.8);"></span>
       </button>
     </div>
   </div>
@@ -484,17 +492,6 @@
       initOnlineOrdersListener();
       initCustomerCardClickObserver();
     });
-
-    if (typeof window.switchSubDataTab === 'undefined') {
-      window.switchSubDataTab = function(subTabId) {
-        document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.sub-nav-tabs .sub-tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById(subTabId)?.classList.add('active');
-        if (subTabId === 'sub-pelanggan') document.getElementById('sub-btn-pelanggan')?.classList.add('active');
-        if (subTabId === 'sub-laporan') document.getElementById('sub-btn-laporan')?.classList.add('active');
-        if (subTabId === 'sub-pesanan') document.getElementById('sub-btn-pesanan')?.classList.add('active');
-      };
-    }
 
     function switchOnlineTab(tab) {
       activeOnlineTab = tab;
@@ -579,6 +576,28 @@
 
       let listBerlangsung = onlineOrdersDataCache.filter(t => (t.statusPesanan || "Menunggu Diproses") !== "Selesai");
       let listSelesai = onlineOrdersDataCache.filter(t => (t.statusPesanan || "") === "Selesai");
+
+      // LOGIKA BADGE MERAH & NOTIFIKASI BIRU
+      let activeCount = listBerlangsung.length;
+      const badgeEl = document.getElementById("badge-online-count");
+      const blueDotEl = document.getElementById("burger-blue-dot");
+
+      if (badgeEl) {
+        if (activeCount > 0) {
+          badgeEl.innerText = activeCount;
+          badgeEl.style.display = "inline-block";
+        } else {
+          badgeEl.style.display = "none";
+        }
+      }
+
+      if (blueDotEl) {
+        if (activeCount > 0) {
+          blueDotEl.style.display = "block";
+        } else {
+          blueDotEl.style.display = "none";
+        }
+      }
 
       if (listBerlangsung.length === 0) {
         containerBerlangsung.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Tidak ada pesanan sedang berlangsung.</div>`;
