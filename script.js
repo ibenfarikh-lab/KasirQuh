@@ -801,22 +801,27 @@ function toggleStickySearchBar() {
 function updateUnitLabel() {
   const unit = document.getElementById("db-unit").value;
   const rtgWrapper = document.getElementById("wrapper-db-isi-rtg");
-  let labelEl = rtgWrapper ? (rtgWrapper.querySelector("span") || rtgWrapper.querySelector("label")) : null;
   
   if (unit === 'kg') {
-    rtgWrapper.style.display = "block";
+    // Sembunyikan input jumlah ons untuk Kg karena nilainya pasti tetap 10
+    if (rtgWrapper) rtgWrapper.style.display = "none";
+    document.getElementById("db-isi-rtg").value = "10";
+    
     document.getElementById("lbl-db-stock").innerText = "Jumlah Stok (Kg):";
     document.getElementById("lbl-db-cost").innerText = "Harga Modal / Kg (Rp):";
     document.getElementById("lbl-db-price").innerText = "Harga Jual / Kg (Rp):";
-    if (labelEl) labelEl.innerText = "Jumlah Ons per 1 Kg (Biasanya 10):";
   } else if (unit === 'rtg') {
-    rtgWrapper.style.display = "block";
+    // Tampilkan kembali input jika satuan adalah Renteng (rtg)
+    if (rtgWrapper) rtgWrapper.style.display = "block";
+    
     document.getElementById("lbl-db-stock").innerText = "Jumlah Stok (Renteng):";
     document.getElementById("lbl-db-cost").innerText = "Harga Modal / Renteng (Rp):";
     document.getElementById("lbl-db-price").innerText = "Harga Jual / Renteng (Rp):";
+    let labelEl = rtgWrapper.querySelector("span") || rtgWrapper.querySelector("label");
     if (labelEl) labelEl.innerText = "Isi Pcs per Renteng:";
   } else {
-    rtgWrapper.style.display = "none";
+    if (rtgWrapper) rtgWrapper.style.display = "none";
+    document.getElementById("db-stock").value = "1";
     document.getElementById("lbl-db-stock").innerText = "Jumlah Stok (Pcs):";
     document.getElementById("lbl-db-cost").innerText = "Harga Modal (Rp):";
     document.getElementById("lbl-db-price").innerText = "Harga Jual (Rp):";
@@ -950,7 +955,7 @@ function simpanBarangLangsung() {
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
   const category = document.getElementById("db-category").value.trim() || "Umum";
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
-  const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+  const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
   
   let cost = parseRupiahToNumber(document.getElementById("db-cost").value);
@@ -985,7 +990,7 @@ function simpanEditBarang(code) {
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   const category = document.getElementById("db-category").value.trim() || "Umum";
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
-  const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+  const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
   
   let cost = parseRupiahToNumber(document.getElementById("db-cost").value);
@@ -1021,7 +1026,7 @@ function simpanEditBelanjaStok(restockId) {
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
   const category = document.getElementById("db-category").value.trim() || "Umum";
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
-  const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+  const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
   const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
   const price = parseRupiahToNumber(document.getElementById("db-price").value);
@@ -1304,7 +1309,7 @@ function tambahkanKeBelanjaStok() {
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
   const category = document.getElementById("db-category").value.trim() || "Umum";
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
-  const isiRtg = parseInt(document.getElementById("db-isi-rtg").value) || 10;
+  const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
   const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
   const price = parseRupiahToNumber(document.getElementById("db-price").value);
@@ -1642,7 +1647,7 @@ function kurangManualDariCode(barcode) {
   if (existingItem) {
     let index = cart.indexOf(existingItem);
     let sat = (existingItem.satuan || "").toLowerCase();
-    let step = (sat === 'kg') ? 0.1 : 1; // Kurangi 1 ons (0.1 kg) jika barang kg
+    let step = (sat === 'kg') ? 0.1 : 1; 
     existingItem.qty -= step;
     existingItem.qty = parseFloat(existingItem.qty.toFixed(3));
     if (existingItem.qty <= 0) cart.splice(index, 1);
@@ -1665,7 +1670,7 @@ function tambahItemKeCart(barcode, produk) {
   let modalAktif = produk.modal;
 
   if (isKg) {
-    let isiOns = produk.isiRtg || 10;
+    let isiOns = 10;
     let hargaKg = produk.hargaRtg || (produk.harga * isiOns);
     let modalKg = produk.modalRtg || (produk.modal * isiOns);
 
@@ -1722,7 +1727,7 @@ function ubahQty(index, delta) {
   let produk = databaseProduk[item.barcode];
   let stokTersedia = produk ? (produk.stok || 0) : 0;
   let sat = (item.satuan || "").toLowerCase();
-  let step = (sat === 'kg') ? 0.1 : 1; // Step 1 ons (0.1 kg) untuk barang kg
+  let step = (sat === 'kg') ? 0.1 : 1; 
   if (delta > 0 && item.qty + step > stokTersedia) return alert("Stok tidak mencukupi!");
 
   if (delta > 0) item.qty += step; else item.qty -= step;
@@ -1748,7 +1753,7 @@ function renderCart() {
     
     let sat = (item.satuan || "").toLowerCase();
     let qtyDisplay = '';
-    let isiOns = databaseProduk[item.barcode]?.isiRtg || 10;
+    let isiOns = 10;
 
     if (item.satuanJual === 'kg') {
       if (item.qty < 1) {
@@ -2200,7 +2205,7 @@ function refreshData() {
       let fotoSrc = item.foto || defaultPlaceholderImg;
       let modalVal = (sat === 'rtg' || sat === 'kg') ? (item.modalRtg || 0) : (item.modal || 0);
       let hargaVal = (sat === 'rtg' || sat === 'kg') ? (item.hargaRtg || 0) : (item.harga || 0);
-      let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + (item.isiRtg || 10) + ')' : (sat === 'kg' ? 'kg (1 kg=' + (item.isiRtg || 10) + ' ons)' : sat);
+      let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + (item.isiRtg || 10) + ')' : (sat === 'kg' ? 'kg' : sat);
 
       invList.innerHTML += `
         <div class="inv-list-item">
@@ -2254,14 +2259,14 @@ function refreshData() {
       restockListItems.forEach(item => {
         let fotoSrc = item.foto || defaultPlaceholderImg;
         let sat = (item.satuan || "").toLowerCase();
-        let satuanLabel = sat === 'rtg' ? `rtg (isi ${item.isiRtg || 10})` : (sat === 'kg' ? `kg (1 kg=${item.isiRtg || 10} ons)` : sat);
+        let satuanLabel = sat === 'rtg' ? `rtg (isi ${item.isiRtg || 10})` : (sat === 'kg' ? `kg` : sat);
         
         let detailsListHtml = '';
         let detailsGridHtml = '';
         let subtotalModal = 0;
 
         if (sat === 'kg') {
-          let isiOns = item.isiRtg || 10;
+          let isiOns = 10;
           let modalOns = item.modal || 0;
           let modalKgVal = item.modalRtg || (modalOns * isiOns);
           let jualOns = item.harga || 0;
@@ -2436,7 +2441,7 @@ function renderKatalogKasirPaginated(filteredItems) {
       let fotoSrc = p.foto || defaultPlaceholderImg;
       let isHabis = stok <= 0;
       let unitLabel = sat === 'kg' ? '/Kg' : (sat === 'rtg' ? '/pcs (rtg)' : '/Pcs');
-      let displayHarga = sat === 'kg' ? (p.hargaRtg || (p.harga * (p.isiRtg || 10))) : p.harga;
+      let displayHarga = sat === 'kg' ? (p.hargaRtg || (p.harga * 10)) : p.harga;
       let cartItem = cart.find(item => item.barcode === code);
       let currentQtyInCart = cartItem ? cartItem.qty : 0;
 
@@ -2533,7 +2538,7 @@ function ambilDariCatatan() {
         
         let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
         let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-        let isiRtg = matchedProd ? (matchedProd.isiRtg || 10) : 10;
+        let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
         
         let harga = matchedProd ? (matchedProd.harga || modalSatuanTotal) : modalSatuanTotal;
         
