@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Belanja - KasirQuh</title>
   
-  <!-- Manifest Khusus Pelanggan untuk WebAPK[span_3](start_span)[span_3](end_span) -->
+  <!-- Manifest Khusus Pelanggan untuk WebAPK -->
   <link rel="manifest" href="manifest-pelanggan.json">
   <meta name="theme-color" content="#2563eb">
 
-  <!-- Firebase SDK (Compat Version)[span_4](start_span)[span_4](end_span) -->
+  <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- External Stylesheet[span_5](start_span)[span_5](end_span) -->
+  <!-- External Stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body data-theme="light">
 
-  <!-- MODAL LOGIN PELANGGAN (NO. WA & SANDI)[span_6](start_span)[span_6](end_span) -->
+  <!-- MODAL LOGIN PELANGGAN (NO. WA & SANDI) -->
   <div id="customerLoginModal" class="login-overlay" style="display: flex;">
     <div class="login-card">
       <h2>KasirQuh</h2>
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <!-- MODAL MENU TOGGLE (DARI TOMBOL MERAH ☰)[span_7](start_span)[span_7](end_span) -->
+  <!-- MODAL MENU TOGGLE (DARI TOMBOL MERAH ☰) -->
   <div id="menuToggleModal" class="modal-backdrop" onclick="if(event.target === this) toggleMenuModal()" style="background: rgba(0,0,0,0.4);">
     <div class="modal-content" style="max-width: 240px; border-radius: 16px; padding: 8px; background: var(--card-bg); position: absolute; bottom: 70px; right: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
       <div style="display: flex; flex-direction: column; gap: 2px;">
@@ -44,7 +44,7 @@
           Data Pelanggan
         </button>
         <button onclick="switchTabPelanggan('pengaturan'); toggleMenuModal();" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; background: transparent; color: var(--text-color); border: none; text-align: left; font-weight: 500; font-size: 0.95rem; cursor: pointer;">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09A1.65 1.65 0 0 0-1.51 1z"/></svg>
           Pengaturan
         </button>
       </div>
@@ -53,7 +53,7 @@
 
   <div class="main-content" style="padding-bottom: 80px;">
     
-    <!-- KOLOM PENCARIAN STICKY[span_8](start_span)[span_8](end_span) -->
+    <!-- KOLOM PENCARIAN STICKY -->
     <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
       <div style="display: flex; gap: 8px; align-items: center;">
         <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
@@ -61,7 +61,7 @@
       </div>
     </div>
 
-    <!-- 1. HALAMAN BELANJA (KATALOG & KASIR)[span_9](start_span)[span_9](end_span) -->
+    <!-- 1. HALAMAN BELANJA (KATALOG & KASIR) -->
     <div id="belanja" class="tab-content active">
       <div class="pos-container">
         <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none;">
@@ -99,10 +99,10 @@
           <div class="summary-box">
             <div style="font-size: 1rem; font-weight: bold; margin-bottom: 8px;">Total: Rp <span id="grand-total">0</span></div>
             
-            <!-- OPSI PEMBAYARAN BARU (COD, TF, WhatsApp) -->
+            <!-- OPSI PEMBAYARAN (COD, TF, WhatsApp) -->
             <div class="no-print" style="text-align: left; margin-top: 8px;">
               <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;">Pilih Metode Pembayaran:</label>
-              <select id="pay-method-cust" onchange="togglePayMethodCust()" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; margin-bottom: 6px;">
+              <select id="pay-method-cust" onchange="togglePayMethodCust()" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; margin-bottom: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
                 <option value="COD">COD (Bayar di Tempat)</option>
                 <option value="TF">Transfer Bank (Upload Bukti)</option>
                 <option value="WhatsApp">Pesan via WhatsApp</option>
@@ -117,7 +117,7 @@
             </div>
           </div>
 
-          <!-- TOMBOL CHECKOUT UTAMA -->
+          <!-- TOMBOL CHECKOUT UTAMA YANG DIPERBARUI -->
           <button class="btn-success no-print" onclick="prosesCheckoutPelanggan()" style="background: #16a34a; margin-top: 10px;">
             <span>Selesai & Proses Pesanan</span>
           </button>
@@ -129,7 +129,7 @@
       </div>
     </div>
 
-    <!-- 2. HALAMAN DATA PELANGGAN[span_10](start_span)[span_10](end_span) -->
+    <!-- 2. HALAMAN DATA PELANGGAN -->
     <div id="data-pelanggan" class="tab-content">
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Profil Saya</h3>
@@ -148,7 +148,7 @@
       </div>
     </div>
 
-    <!-- 3. HALAMAN PENGATURAN SISTEM[span_11](start_span)[span_11](end_span) -->
+    <!-- 3. HALAMAN PENGATURAN SISTEM -->
     <div id="pengaturan" class="tab-content">
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Identitas Pelanggan</h3>
@@ -197,7 +197,7 @@
 
   </div>
 
-  <!-- FLOATING BUTTONS[span_12](start_span)[span_12](end_span) -->
+  <!-- FLOATING BUTTONS -->
   <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
     <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="24" height="24" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -211,7 +211,7 @@
     </button>
   </div>
 
-  <!-- PERMANENT BOTTOM BAR[span_13](start_span)[span_13](end_span) -->
+  <!-- PERMANENT BOTTOM BAR -->
   <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
     <span id="bottom-bar-title" style="font-weight: bold; font-size: 1rem; color: var(--text-color);">Belanja</span>
     <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 4px 10px; gap: 8px;">
@@ -224,7 +224,7 @@
     </button>
   </div>
 
-  <!-- INISIALISASI FIREBASE & SCRIPT UTAMA[span_14](start_span)[span_14](end_span) -->
+  <!-- INISIALISASI FIREBASE & SCRIPT UTAMA -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -612,7 +612,7 @@
       reader.readAsDataURL(file);
     }
 
-    // FUNGSI CHECKOUT UTAMA DENGAN 3 OPSI PEMBAYARAN DAN SINKRONISASI KE ADMIN
+    // FUNGSI CHECKOUT UTAMA DENGAN 3 OPSI PEMBAYARAN & SINKRONISASI OTOMATIS
     async function prosesCheckoutPelanggan() {
       if (cart.length === 0) return alert("Keranjang kosong!");
       const payMethod = document.getElementById("pay-method-cust").value;
@@ -640,7 +640,7 @@
         let totalQty = cart.reduce((acc, i) => acc + i.qty, 0);
 
         if (payMethod === "WhatsApp") {
-          // Opsi 3: Kirim murni via WhatsApp seperti sebelumnya[span_15](start_span)[span_15](end_span)
+          // Opsi 3: Kirim murni via WhatsApp seperti semula
           let text = `*PESANAN BARU DARI PELANGGAN* 🛒\n`;
           text += `Nama : *${namaCust}*\n`;
           text += `No WA : ${currentCustomerPhone}\n`;
@@ -660,7 +660,6 @@
 
         // Opsi 1 (COD) & Opsi 2 (TF): Sinkronisasi Otomatis ke Database Firebase Admin
         try {
-          // 1. Kurangi stok produk di Firestore secara otomatis[span_16](start_span)[span_16](end_span)[span_17](start_span)[span_17](end_span)
           let batch = db.batch();
           cart.forEach(item => {
             let prodRef = db.collection("produk").doc(item.code);
@@ -671,7 +670,6 @@
             }
           });
 
-          // 2. Simpan transaksi ke koleksi 'transaksi' agar muncul di laporan admin[span_18](start_span)[span_18](end_span)[span_19](start_span)[span_19](end_span)
           let newTrxRef = db.collection("transaksi").doc();
           batch.set(newTrxRef, {
             waktu: new Date().toLocaleString('id-ID'),
@@ -690,7 +688,6 @@
 
           await batch.commit();
 
-          // 3. Kirim notifikasi konfirmasi opsional ke WhatsApp Toko
           let textWA = `*CHECKOUT OTOMATIS (${payMethod})* 🛒\n`;
           textWA += `Pelanggan: *${namaCust}* (${currentCustomerPhone})\n`;
           textWA += `Alamat: ${alamatCust}\n------------------------------------\n`;
