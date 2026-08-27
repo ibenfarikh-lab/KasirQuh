@@ -1679,23 +1679,11 @@ function tambahItemKeCart(barcode, produk) {
     modalAktif = modalKg;
     displaySatuan = 'kg';
   } else if (isRtg) {
-    let pilihanBeli = prompt(`Beli ${produk.nama} per apa?\n1. Eceran Pcs (@Rp ${produk.harga.toLocaleString('id-ID')})\n2. Renteng / rtg (isi ${produk.isiRtg} pcs - @Rp ${(produk.hargaRtg || (produk.harga * produk.isiRtg)).toLocaleString('id-ID')})\n\nKetik angka 1 atau 2:`, "1");
-    if (pilihanBeli === "2") {
-      let jumlahRtgStr = prompt(`Masukkan jumlah Renteng (rtg) yang dibeli:`, "1");
-      if (jumlahRtgStr === null) return;
-      let jmlRtg = parseFloat(jumlahRtgStr.replace(',', '.')) || 1;
-      inputJumlah = jmlRtg * produk.isiRtg;
-      hargaAktif = produk.hargaRtg ? (produk.hargaRtg / produk.isiRtg) : produk.harga;
-      modalAktif = produk.modalRtg ? (produk.modalRtg / produk.isiRtg) : produk.modal;
-      displaySatuan = 'rtg';
-    } else if (pilihanBeli === "1") {
-      let pcsStr = prompt(`Masukkan jumlah Pcs yang dibeli:`, "1");
-      if (pcsStr === null) return;
-      inputJumlah = parseFloat(pcsStr.replace(',', '.')) || 1;
-      displaySatuan = 'pcs';
-    } else {
-      return;
-    }
+    // Langsung eceran pcs tanpa popup (dianggap pcs ecer)
+    inputJumlah = 1;
+    hargaAktif = produk.harga;
+    modalAktif = produk.modal;
+    displaySatuan = 'pcs';
   }
 
   const existingItem = cart.find(item => item.barcode === barcode && item.satuanJual === displaySatuan);
