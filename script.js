@@ -1383,14 +1383,14 @@ function switchSubDataTab(subTabId) {
   activeSubDataTab = subTabId;
   document.querySelectorAll('#laporan .sub-tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('#laporan .sub-tab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById(subTabId).classList.add('active');
+  document.getElementById(subTabId)?.classList.add('active');
   if (subTabId === 'sub-pelanggan') {
-    document.getElementById('sub-btn-pelanggan').classList.add('active');
+    document.getElementById('sub-btn-pelanggan')?.classList.add('active');
     document.getElementById('fab-add-btn').style.display = 'none';
     document.getElementById('fab-add-cust-btn').style.display = 'flex';
     document.getElementById('fab-add-catatan-btn').style.display = 'none';
-  } else {
-    document.getElementById('sub-btn-laporan').classList.add('active');
+  } else if (subTabId === 'sub-laporan') {
+    document.getElementById('sub-btn-laporan')?.classList.add('active');
     document.getElementById('fab-add-btn').style.display = 'none';
     document.getElementById('fab-add-cust-btn').style.display = 'none';
     document.getElementById('fab-add-catatan-btn').style.display = 'none';
@@ -1409,6 +1409,8 @@ function updatePermanentBarTitle() {
   if (activeTab === 'penjualan') {
     titleEl.innerText = "Kasir";
     posPag.classList.add("show");
+  } else if (activeTab === 'kasir-online') {
+    titleEl.innerText = "Kasir Online";
   } else if (activeTab === 'data-barang') {
     titleEl.innerText = "Manajemen Stok";
     stokPag.classList.add("show");
@@ -1425,6 +1427,7 @@ function updatePermanentBarTitle() {
   document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
   const activeBtnMap = {
     'penjualan': 'pop-btn-penjualan',
+    'kasir-online': 'pop-btn-kasironline',
     'data-barang': 'pop-btn-databarang',
     'belanja-stok': 'pop-btn-belanjastok',
     'laporan': 'pop-btn-laporan',
@@ -1453,6 +1456,8 @@ function switchTab(tabId, pushHistory = true) {
 
   if (tabId === 'penjualan') {
     fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
+  } else if (tabId === 'kasir-online') {
+    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
   } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
     fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'flex'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
     fabAdd.setAttribute("onclick", "openProductModal()");
@@ -1501,41 +1506,6 @@ function playBeep() {
   osc.connect(gain); osc.connect(audioCtx.destination);
   osc.type = "sine"; osc.frequency.value = 1000; gain.gain.value = 0.1;
   osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-}
-
-function playNotificationSound() {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(delay, freq, duration) {
-      setTimeout(() => {
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        
-        oscillator.type = 'square';
-        oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        
-        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
-        
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + duration);
-      }, delay);
-    }
-
-    for (let i = 0; i < 20; i++) {
-      let delay = i * 110;
-      let freq = (i % 4 === 3) ? 1200 : 900;
-      let duration = (i === 19) ? 0.3 : 0.08;
-      playBeep(delay, freq, duration);
-    }
-  } catch (e) {
-    console.log("Audio diblokir sebelum interaksi:", e);
-  }
 }
 
 function toggleScannerPos() {
