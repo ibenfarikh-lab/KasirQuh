@@ -139,7 +139,7 @@
 
     <!-- 3. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
-      <!-- 1. IDENTITAS PELANGGAN (DIPOSISIKAN PALING ATAS) -->
+      <!-- 1. IDENTITAS PELANGGAN (PALING ATAS) -->
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Identitas Pelanggan</h3>
         <div class="form-vertical">
@@ -417,24 +417,44 @@
       }
 
       paginatedItems.forEach(p => {
+        let code = p.code;
         let isHabis = (p.stok || 0) <= 0;
         let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
         let satuan = p.satuan || "Pcs";
-        
-        container.innerHTML += `
-          <div class="inv-card" style="border: 2px solid #16a34a; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card-bg);">
-            <div>
-              <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <button style="flex: 1; height: 38px; background: #16a34a; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${p.code}')">+</button>
-                <button style="flex: 1; height: 38px; background: #dc2626; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${p.code}')">-</button>
+        let cartItem = cart.find(item => item.code === code);
+        let currentQtyInCart = cartItem ? cartItem.qty : 0;
+
+        if (catalogViewMode === 'grid') {
+          container.innerHTML += `
+            <div class="inv-card" style="border: 2px solid #16a34a; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card-bg);">
+              <div>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                  <button style="flex: 1; height: 38px; background: #16a34a; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
+                  <button style="flex: 1; height: 38px; background: #dc2626; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${code}')">-</button>
+                </div>
+                <div style="text-align: center; margin-bottom: 8px;"><img src="${fotoSrc}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px;"></div>
+                <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Stok: ${p.stok || 0} ${satuan}</div>
               </div>
-              <div style="text-align: center; margin-bottom: 8px;"><img src="${fotoSrc}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px;"></div>
-              <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Stok: ${p.stok || 0} ${satuan}</div>
+              <div style="font-size: 0.95rem; font-weight: bold; color: #2563eb; margin-top: 4px;">Rp ${(p.harga || 0).toLocaleString('id-ID')} / ${satuan}</div>
             </div>
-            <div style="font-size: 0.95rem; font-weight: bold; color: #2563eb; margin-top: 4px;">Rp ${(p.harga || 0).toLocaleString('id-ID')} / ${satuan}</div>
-          </div>
-        `;
+          `;
+        } else {
+          container.innerHTML += `
+            <div class="catalog-list-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); border-radius: 8px; margin-bottom: 6px;">
+              <div style="display: flex; gap: 4px; flex-shrink: 0; align-items: center;">
+                <button style="width: 32px; height: 32px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer; font-weight: bold;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
+                <button style="width: 32px; height: 32px; border-radius: 6px; background: #dc2626; color: white; border: none; cursor: pointer; font-weight: bold;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${code}')">-</button>
+              </div>
+              <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+              <div style="min-width: 0; flex: 1;">
+                <div style="font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-color);">${p.nama}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: ${p.stok || 0} ${satuan}</div>
+                <div style="font-size: 0.85rem; font-weight: bold; color: #2563eb;">Rp ${(p.harga || 0).toLocaleString('id-ID')} / ${satuan}</div>
+              </div>
+            </div>
+          `;
+        }
       });
       document.getElementById("pos-page-indicator").innerText = `${currentPosPage}/${totalPages}`;
     }
@@ -453,6 +473,7 @@
         cart.push({ code, nama: p.nama, harga: p.harga, modal: p.modal || 0, qty: 1, subtotal: p.harga, foto: p.foto });
       }
       renderCartPelanggan();
+      refreshKatalogPelanggan();
     }
 
     function kurangiDariKeranjangPelanggan(code) {
@@ -461,6 +482,7 @@
         if (cart[idx].qty > 1) { cart[idx].qty -= 1; cart[idx].subtotal = cart[idx].qty * cart[idx].harga; }
         else { cart.splice(idx, 1); }
         renderCartPelanggan();
+        refreshKatalogPelanggan();
       }
     }
 
@@ -470,7 +492,7 @@
       let total = 0, totalQty = 0;
       cart.forEach((item, idx) => {
         total += item.subtotal; totalQty += item.qty;
-        tbody.innerHTML += `<tr><td>${item.nama}</td><td style="text-align: center;">${item.qty}</td><td style="text-align: right;">${item.subtotal.toLocaleString('id-ID')}</td><td class="no-print" style="text-align: center;"><button class="btn-danger" onclick="cart.splice(${idx},1);renderCartPelanggan();" style="padding: 2px 6px;">✕</button></td></tr>`;
+        tbody.innerHTML += `<tr><td>${item.nama}</td><td style="text-align: center;">${item.qty}</td><td style="text-align: right;">${item.subtotal.toLocaleString('id-ID')}</td><td class="no-print" style="text-align: center;"><button class="btn-danger" onclick="cart.splice(${idx},1);renderCartPelanggan();refreshKatalogPelanggan();" style="padding: 2px 6px;">✕</button></td></tr>`;
       });
       if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px;">Keranjang kosong</td></tr>`;
       document.getElementById("cart-count").innerText = totalQty;
@@ -526,7 +548,7 @@
           cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`; });
           text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*`;
           window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
-          cart = []; renderCartPelanggan(); closeCartModal();
+          cart = []; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
           return;
         }
 
@@ -556,7 +578,7 @@
 
           await batch.commit();
           alert("Pesanan berhasil dikirim dan tercatat di sistem kasir toko!");
-          cart = []; renderCartPelanggan(); closeCartModal();
+          cart = []; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
         } catch (err) {
           alert("Gagal memproses pesanan: " + err.message);
         }
