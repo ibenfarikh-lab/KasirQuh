@@ -13,6 +13,17 @@
   <!-- External Stylesheet dengan Cache Busting -->
   <link rel="stylesheet" href="style.css?v=1.0.3">
 
+  <style>
+    .popup-menu-btn svg {
+      fill: white !important;
+      width: 18px;
+      height: 18px;
+    }
+    .popup-menu-btn.active-menu svg {
+      fill: #2563eb !important;
+    }
+  </style>
+
   <!-- PWA Configuration -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2563eb">
@@ -584,7 +595,7 @@
         </button>
         <button class="popup-menu-btn" id="pop-btn-kasironline" onclick="switchTab('kasir-online'); toggleFloatingMenu();" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
           <span style="display: flex; align-items: center; gap: 8px;">
-            <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:currentColor;"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg> Kasir Online
+            <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg> Kasir Online
           </span>
           <span id="badge-online-count" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">0</span>
         </button>
