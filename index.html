@@ -192,9 +192,10 @@
 
     <!-- 4. HALAMAN LAPORAN / DATA -->
     <div id="laporan" class="tab-content">
-      <div class="sub-nav-tabs no-print">
+      <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap;">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')">👥 Data Pelanggan</button>
         <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')">📋 Data Transaksi</button>
+        <button id="sub-btn-pesanan" class="sub-tab-btn" onclick="switchSubDataTab('sub-pesanan')">📦 Pesanan Online</button>
       </div>
 
       <div id="sub-pelanggan" class="sub-tab-content active">
@@ -255,11 +256,21 @@
           </table>
         </div>
       </div>
+
+      <!-- SUB-TAB PESANAN ONLINE BARU DI ADMIN[span_1](start_span)[span_1](end_span) -->
+      <div id="sub-pesanan" class="sub-tab-content">
+        <div class="card" style="margin-bottom: 12px; background: var(--table-header); padding: 12px 16px;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">DAFTAR PESANAN ONLINE MASUK</div>
+          <div style="font-size: 0.9rem; color: var(--text-color);">Pantau dan verifikasi pesanan dari aplikasi pelanggan secara real-time.</div>
+        </div>
+        <div id="online-orders-list-wrapper" style="display: flex; flex-direction: column; gap: 10px;">
+          <div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Memuat pesanan online...</div>
+        </div>
+      </div>
     </div>
 
-    <!-- 5. HALAMAN CATATAN UTAMA (Dinamis & Bersih dengan Tanggal) -->
+    <!-- 5. HALAMAN CATATAN UTAMA -->
     <div id="catatan" class="tab-content">
-      <!-- KOTAK KALENDER / TANGGAL CATATAN (Poin 1) -->
       <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
         <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
         <input type="date" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="padding: 6px 10px; font-weight: bold; border-radius: 8px; width: auto; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
@@ -270,7 +281,6 @@
         <button onclick="tambahTabCatatanBaru()" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0;">+</button>
       </div>
 
-      <!-- Wadah Konten Sub-Tab Catatan Dinamis -->
       <div id="wrapper-content-sub-catatan"></div>
     </div>
 
@@ -357,6 +367,20 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- MODAL LIHAT BUKTI TRANSFER -->
+  <div id="proofModal" class="modal-backdrop" onclick="if(event.target === this) closeProofModal()">
+    <div class="modal-content" style="text-align: center; max-width: 350px;">
+      <div class="modal-header">
+        <h3>Bukti Transfer</h3>
+        <button class="btn-close-modal" onclick="closeProofModal()">&times;</button>
+      </div>
+      <div style="margin: 10px 0;">
+        <img id="proof-img-preview" src="" alt="Bukti Transfer" style="width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border-color);">
+      </div>
+      <button onclick="closeProofModal()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">Tutup</button>
+    </div>
   </div>
 
   <!-- PERMANENT BOTTOM BAR -->
@@ -586,6 +610,99 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+
+    // Script Tambahan untuk Mengelola Pesanan Online di Admin
+    document.addEventListener("DOMContentLoaded", function() {
+      initOnlineOrdersListener();
+    });
+
+    // Menyesuaikan fungsi switchSubDataTab agar mendukung sub-pesanan
+    if (typeof window.switchSubDataTab === 'undefined') {
+      window.switchSubDataTab = function(subTabId) {
+        document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.sub-nav-tabs .sub-tab-btn').forEach(el => el.classList.remove('active'));
+        
+        const targetContent = document.getElementById(subTabId);
+        if (targetContent) targetContent.classList.add('active');
+        
+        if (subTabId === 'sub-pelanggan') document.getElementById('sub-btn-pelanggan')?.classList.add('active');
+        if (subTabId === 'sub-laporan') document.getElementById('sub-btn-laporan')?.classList.add('active');
+        if (subTabId === 'sub-pesanan') document.getElementById('sub-btn-pesanan')?.classList.add('active');
+      };
+    }
+
+    function initOnlineOrdersListener() {
+      db.collection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapshot) => {
+        const container = document.getElementById("online-orders-list-wrapper");
+        if (!container) return;
+        container.innerHTML = "";
+        let onlineTrx = [];
+        
+        snapshot.forEach(doc => {
+          let data = doc.data();
+          if (data.customerPhone || (data.metode && data.metode.includes("Online"))) {
+            onlineTrx.push({ id: doc.id, ...data });
+          }
+        });
+
+        if (onlineTrx.length === 0) {
+          container.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada pesanan online masuk.</div>`;
+          return;
+        }
+
+        onlineTrx.forEach(trx => {
+          let statusBadge = trx.statusPesanan || "Menunggu Diproses";
+          let badgeColor = statusBadge === "Selesai" ? "#16a34a" : "#d97706";
+          
+          let buktiBtn = "";
+          if (trx.buktiTransfer) {
+            buktiBtn = `<button onclick="bukaBuktiTransfer('${trx.buktiTransfer}')" style="background: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">🖼️ Lihat Bukti TF</button>`;
+          }
+
+          container.innerHTML += `
+            <div class="card" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">${trx.waktu || '-'}</span>
+                <span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">${statusBadge}</span>
+              </div>
+              <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">👤 ${trx.customerNama || 'Pelanggan'} (${trx.customerPhone || '-'})</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">📍 ${trx.customerAlamat || '-'}</div>
+              <div style="font-size: 0.85rem; font-weight: 600; color: #2563eb; margin-bottom: 6px;">Metode: ${trx.metode || '-'}</div>
+              <div style="font-size: 0.9rem; font-weight: bold; margin-bottom: 8px;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div>
+              
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                ${buktiBtn}
+                <button onclick="ubahStatusPesananAdmin('${trx.id}', 'Selesai')" style="background: #16a34a; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">✅ Tandai Selesai</button>
+                <button onclick="hapusPesananAdmin('${trx.id}')" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;" title="Hapus Pesanan">🗑️ Hapus</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    function bukaBuktiTransfer(base64Img) {
+      document.getElementById("proof-img-preview").src = base64Img;
+      document.getElementById("proofModal").classList.add("show");
+    }
+
+    function closeProofModal() {
+      document.getElementById("proofModal").classList.remove("show");
+    }
+
+    function ubahStatusPesananAdmin(id, status) {
+      db.collection("transaksi").doc(id).update({ statusPesanan: status }).then(() => {
+        alert("Status pesanan diperbarui menjadi: " + status);
+      }).catch(err => alert("Gagal mengubah status: " + err.message));
+    }
+
+    function hapusPesananAdmin(id) {
+      if (confirm("Hapus riwayat pesanan online ini?")) {
+        db.collection("transaksi").doc(id).delete().then(() => {
+          alert("Pesanan berhasil dihapus.");
+        }).catch(err => alert("Gagal menghapus: " + err.message));
+      }
+    }
   </script>
   <script src="script.js"></script>
 </body>
