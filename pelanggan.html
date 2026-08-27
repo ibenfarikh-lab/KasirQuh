@@ -139,6 +139,25 @@
 
     <!-- 3. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
+      <!-- PENGATURAN TEMA & TAMPILAN -->
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Tampilan & Tema</h3>
+        <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
+          <label style="font-size: 0.85rem;">Tema:</label>
+          <select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+            <option value="light">Terang</option>
+            <option value="dark">Gelap</option>
+            <option value="auto">Auto (Sistem)</option>
+          </select>
+
+          <label style="font-size: 0.85rem; margin-top: 6px;">Tampilan:</label>
+          <select id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+            <option value="grid">Kotak</option>
+            <option value="list">Daftar</option>
+          </select>
+        </div>
+      </div>
+
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Identitas Pelanggan</h3>
         <div class="form-vertical">
@@ -231,6 +250,17 @@
       } else {
         document.body.setAttribute('data-theme', theme);
       }
+    }
+
+    function gantiTemaPelanggan(theme) {
+      localStorage.setItem('cust_theme_v13', theme);
+      applyThemePelanggan(theme);
+    }
+
+    function gantiViewModePelanggan(mode) {
+      catalogViewMode = mode;
+      localStorage.setItem('cust_view_v13', mode);
+      refreshKatalogPelanggan();
     }
 
     function toggleMenuModal() {
@@ -337,15 +367,20 @@
         if (cartFab) cartFab.style.display = "none";
         titleEl.innerText = tabId === 'data-pelanggan' ? "Data Pelanggan" : "Pengaturan";
         
-        if (tabId === 'pengaturan' && currentCustomerPhone) {
-          db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
-            if (!snap.empty) {
-              let data = snap.docs[0].data();
-              document.getElementById('setting-cust-name').value = data.nama || "";
-              document.getElementById('setting-cust-phone').value = data.phone || "";
-              document.getElementById('setting-cust-address').value = data.alamat || "";
-            }
-          });
+        if (tabId === 'pengaturan') {
+          document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto';
+          document.getElementById('setting-cust-view').value = catalogViewMode;
+
+          if (currentCustomerPhone) {
+            db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
+              if (!snap.empty) {
+                let data = snap.docs[0].data();
+                document.getElementById('setting-cust-name').value = data.nama || "";
+                document.getElementById('setting-cust-phone').value = data.phone || "";
+                document.getElementById('setting-cust-address').value = data.alamat || "";
+              }
+            });
+          }
         }
       }
     }
