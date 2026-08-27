@@ -191,7 +191,7 @@
         </div>
       </div>
 
-      <!-- SUB-TAB PESANAN ONLINE (AMAN DARI ERROR INDEX) -->
+      <!-- SUB-TAB PESANAN ONLINE (BERLANGSUNG VS SELESAI) -->
       <div id="sub-pesanan" class="sub-tab-content">
         <div style="display: flex; gap: 6px; margin-bottom: 12px;">
           <button id="btn-sub-berlangsung" onclick="switchOnlineTab('berlangsung')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">🟡 Sedang Berlangsung</button>
@@ -289,7 +289,7 @@
   <div id="customerModal" class="modal-backdrop"><div class="modal-content"><div class="modal-header"><h3 id="cust-modal-title">Pelanggan</h3><button class="btn-close-modal" onclick="closeCustomerModal()">&times;</button></div><div class="form-group"><input type="hidden" id="cust-id"><input type="text" id="cust-name" placeholder="Nama"><input type="text" id="cust-phone" placeholder="No WA"><input type="text" id="cust-address" placeholder="Alamat"><button onclick="simpanPelanggan()" style="width:100%;">Simpan</button></div></div></div>
   <div id="bookkeepingModal" class="modal-backdrop"><div class="modal-content"><div class="modal-header"><h3 id="bk-modal-title">Catatan Pelanggan</h3><button class="btn-close-modal" onclick="closeBookkeepingModal()">&times;</button></div><div class="form-group"><input type="hidden" id="bk-cust-id"><input type="hidden" id="bk-note-id"><input type="text" id="bk-datetime" readonly><select id="bk-type"><option value="Belanja (belum dibayar)">Belanja</option><option value="Hutang / Kasbon">Hutang</option></select><input type="text" id="bk-amount" placeholder="Nominal" oninput="formatInputRupiah(this)"><textarea id="bk-desc" rows="3" placeholder="Keterangan"></textarea><button onclick="simpanCatatanPembukuan()" style="width:100%;">Simpan</button></div></div></div>
 
-  <!-- SCRIPT ADMIN (AMAN TANPA ERROR FIRESTORE INDEX) -->
+  <!-- SCRIPT ADMIN (BERSIH & AMAN DARI ERROR INDEX FIRESTORE) -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
@@ -365,7 +365,6 @@
 
     function initOnlineOrdersListener() {
       let isInitialLoad = true;
-      // Dihapus .orderBy dari query agar tidak error index/missing field, di-sort via JS di bawah
       db.collection("transaksi").onSnapshot((snapshot) => {
         if (!isInitialLoad) {
           snapshot.docChanges().forEach((change) => {
@@ -387,7 +386,6 @@
           }
         });
 
-        // Urutkan secara lokal berdasarkan waktu terbaru secara aman
         onlineOrdersDataCache.sort((a, b) => {
           let timeA = a.waktuTimestamp?.toMillis ? a.waktuTimestamp.toMillis() : 0;
           let timeB = b.waktuTimestamp?.toMillis ? b.waktuTimestamp.toMillis() : 0;
