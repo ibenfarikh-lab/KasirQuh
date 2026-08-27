@@ -803,7 +803,6 @@ function updateUnitLabel() {
   const rtgWrapper = document.getElementById("wrapper-db-isi-rtg");
   
   if (unit === 'kg') {
-    // Sembunyikan input jumlah ons untuk Kg karena nilainya pasti tetap 10
     if (rtgWrapper) rtgWrapper.style.display = "none";
     document.getElementById("db-isi-rtg").value = "10";
     
@@ -811,7 +810,6 @@ function updateUnitLabel() {
     document.getElementById("lbl-db-cost").innerText = "Harga Modal / Kg (Rp):";
     document.getElementById("lbl-db-price").innerText = "Harga Jual / Kg (Rp):";
   } else if (unit === 'rtg') {
-    // Tampilkan kembali input jika satuan adalah Renteng (rtg)
     if (rtgWrapper) rtgWrapper.style.display = "block";
     
     document.getElementById("lbl-db-stock").innerText = "Jumlah Stok (Renteng):";
@@ -1674,7 +1672,7 @@ function tambahItemKeCart(barcode, produk) {
     let hargaKg = produk.hargaRtg || (produk.harga * isiOns);
     let modalKg = produk.modalRtg || (produk.modal * isiOns);
 
-    let kgStr = prompt(`Masukkan jumlah Kilogram (Kg) untuk ${produk.nama}\n(Contoh: 1 untuk 1 kg, 0.5 untuk setengah kg / 5 ons, 0.2 untuk 2 ons):`, "1");
+    let kgStr = prompt(`Masukkan jumlah Kilogram (Kg) untuk ${produk.nama}\n(Contoh: 1 untuk 1 kg, 0.5 untuk setengah kg / 5 ons, 0.1 untuk 1 ons):`, "1");
     if (kgStr === null) return;
     inputJumlah = parseFloat(kgStr.replace(',', '.')) || 1;
     hargaAktif = hargaKg;
