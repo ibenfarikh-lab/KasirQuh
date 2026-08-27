@@ -2562,8 +2562,8 @@ function ambilDariCatatan() {
         let satuan = parts[2].toLowerCase();
         if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
         
-        let hargaTotalInput = parseRupiahToNumber(parts[3]) || 0;
-        let modalSatuanTotal = qty > 0 ? (hargaTotalInput / qty) : hargaTotalInput;
+        let modalTotalInput = parseRupiahToNumber(parts[3]) || 0;
+        let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
 
         let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
         let matchedProd = existingCode ? databaseProduk[existingCode] : null;
@@ -2572,10 +2572,13 @@ function ambilDariCatatan() {
         let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
         let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
         
-        let harga = matchedProd ? (matchedProd.harga || modalSatuanTotal) : modalSatuanTotal;
-        
-        let modalRtg = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
-        let hargaRtg = (satuan === 'rtg' || satuan === 'kg') ? harga : harga * isiRtg;
+        let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
+        let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+
+        // Harga jual disamakan dengan harga modal, selanjutnya dapat diubah secara manual
+        let hargaRtgVal = modalRtgVal;
+        let hargaPcsVal = modalPcsVal;
+
         let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
 
         let newItem = {
@@ -2586,10 +2589,10 @@ function ambilDariCatatan() {
           satuan: satuan,
           isiRtg: isiRtg,
           qty: qty,
-          modal: (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal,
-          harga: (satuan === 'rtg' || satuan === 'kg') ? (harga / isiRtg) : harga,
-          modalRtg: modalRtg,
-          hargaRtg: hargaRtg,
+          modal: modalPcsVal,
+          harga: hargaPcsVal,
+          modalRtg: modalRtgVal,
+          hargaRtg: hargaRtgVal,
           foto: foto
         };
         
@@ -2604,7 +2607,7 @@ function ambilDariCatatan() {
     refreshData();
     showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
   } else {
-    alert("Tidak ditemukan format rincian valid (Contoh: Minyak - 2 - rtg - 30000) di catatan ini!");
+    alert("Tidak ditemukan format rincian valid (Contoh: Ayam - 4 - kg - 176.000) di catatan ini!");
   }
 }
 
