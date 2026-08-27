@@ -117,7 +117,7 @@
             </div>
           </div>
 
-          <!-- TOMBOL CHECKOUT UTAMA YANG DIPERBARUI -->
+          <!-- TOMBOL CHECKOUT UTAMA -->
           <button class="btn-success no-print" onclick="prosesCheckoutPelanggan()" style="background: #16a34a; margin-top: 10px;">
             <span>Selesai & Proses Pesanan</span>
           </button>
@@ -585,6 +585,7 @@
       }
     }
 
+    // Kompresi Gambar Bukti Transfer diatur ke 600px agar jernih terbaca admin
     function handleProofUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -596,7 +597,7 @@
           const ctx = canvas.getContext('2d');
           let width = img.width;
           let height = img.height;
-          const maxSize = 300;
+          const maxSize = 600; // Ditingkatkan ke 600px agar tajam dan jelas
           if (width > height) {
             if (width > maxSize) { height *= maxSize / width; width = maxSize; }
           } else {
@@ -605,7 +606,7 @@
           canvas.width = width;
           canvas.height = height;
           ctx.drawImage(img, 0, 0, width, height);
-          document.getElementById("cust-proof-base64").value = canvas.toDataURL('image/jpeg', 0.7);
+          document.getElementById("cust-proof-base64").value = canvas.toDataURL('image/jpeg', 0.8);
         };
         img.src = e.target.result;
       };
@@ -640,7 +641,6 @@
         let totalQty = cart.reduce((acc, i) => acc + i.qty, 0);
 
         if (payMethod === "WhatsApp") {
-          // Opsi 3: Kirim murni via WhatsApp seperti semula
           let text = `*PESANAN BARU DARI PELANGGAN* 🛒\n`;
           text += `Nama : *${namaCust}*\n`;
           text += `No WA : ${currentCustomerPhone}\n`;
@@ -658,7 +658,6 @@
           return;
         }
 
-        // Opsi 1 (COD) & Opsi 2 (TF): Sinkronisasi Otomatis ke Database Firebase Admin
         try {
           let batch = db.batch();
           cart.forEach(item => {

@@ -257,7 +257,7 @@
         </div>
       </div>
 
-      <!-- SUB-TAB PESANAN ONLINE BARU DI ADMIN[span_1](start_span)[span_1](end_span) -->
+      <!-- SUB-TAB PESANAN ONLINE DI ADMIN -->
       <div id="sub-pesanan" class="sub-tab-content">
         <div class="card" style="margin-bottom: 12px; background: var(--table-header); padding: 12px 16px;">
           <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">DAFTAR PESANAN ONLINE MASUK</div>
@@ -611,12 +611,10 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Script Tambahan untuk Mengelola Pesanan Online di Admin
     document.addEventListener("DOMContentLoaded", function() {
       initOnlineOrdersListener();
     });
 
-    // Menyesuaikan fungsi switchSubDataTab agar mendukung sub-pesanan
     if (typeof window.switchSubDataTab === 'undefined') {
       window.switchSubDataTab = function(subTabId) {
         document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.remove('active'));
@@ -631,8 +629,43 @@
       };
     }
 
+    // Fungsi Suara Alarm (Web Audio API) untuk Pesanan Masuk
+    function playNotificationSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {
+        console.log("Audio diblokir sebelum interaksi:", e);
+      }
+    }
+
     function initOnlineOrdersListener() {
+      let isInitialLoad = true;
+
       db.collection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapshot) => {
+        if (!isInitialLoad) {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+              let data = change.doc.data();
+              if (data.customerPhone || (data.metode && data.metode.includes("Online"))) {
+                playNotificationSound(); // Membunyikan alarm saat pesanan online baru masuk
+              }
+            }
+          });
+        }
+        isInitialLoad = false;
+
         const container = document.getElementById("online-orders-list-wrapper");
         if (!container) return;
         container.innerHTML = "";
