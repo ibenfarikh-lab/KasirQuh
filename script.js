@@ -2307,17 +2307,17 @@ function refreshData() {
           subtotalModal = modalRtgVal * (item.qty || 1);
           
           detailsListHtml = `
-            <div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-            <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
             <div>📑 <b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
             <div>📑 <b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
+            <div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
+            <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
           `;
           detailsGridHtml = `
             <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-              <div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-              <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
               <div><b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
               <div><b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
+              <div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
+              <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
             </div>
           `;
         }
