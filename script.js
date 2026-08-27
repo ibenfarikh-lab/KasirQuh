@@ -1504,7 +1504,7 @@ function playBeep() {
   osc.start(); osc.stop(audioCtx.currentTime + 0.1);
 }
 
-// FUNGSI ALARM 6 KALI BERUNTUN DENGAN 3 RITME UNTUK PESANAN MASUK
+// FUNGSI ALARM 12 KALI BERUNTUN DENGAN 4 SIKLUS RITME UNTUK PESANAN MASUK
 function playNotificationSound() {
   try {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1530,16 +1530,26 @@ function playNotificationSound() {
       }, delay);
     }
 
-    // Pola 6 Kali Bunyi (2 Siklus dari 3 Ritme)
-    // --- Siklus Pertama ---
-    playBeep(0, 900, 0.12);   // Beep 1
-    playBeep(150, 900, 0.12); // Beep 2
-    playBeep(300, 1100, 0.2); // Beep 3 (Nada tinggi siklus 1)
+    // Pola 12 Kali Bunyi (4 Siklus dari 3 Ketukan Berirama)
+    // --- Siklus 1 ---
+    playBeep(0, 900, 0.1);
+    playBeep(130, 900, 0.1);
+    playBeep(260, 1050, 0.15);
     
-    // --- Siklus Kedua (Pengulangan dengan puncak penutup lebih tinggi) ---
-    playBeep(550, 900, 0.12); // Beep 4
-    playBeep(700, 900, 0.12); // Beep 5
-    playBeep(850, 1200, 0.25);// Beep 6 (Puncak nada tertinggi di akhir)
+    // --- Siklus 2 ---
+    playBeep(450, 900, 0.1);
+    playBeep(580, 900, 0.1);
+    playBeep(710, 1050, 0.15);
+    
+    // --- Siklus 3 ---
+    playBeep(900, 900, 0.1);
+    playBeep(1030, 900, 0.1);
+    playBeep(1160, 1100, 0.15);
+    
+    // --- Siklus 4 (Puncak Penutup) ---
+    playBeep(1350, 950, 0.1);
+    playBeep(1480, 1050, 0.1);
+    playBeep(1610, 1300, 0.3); // Puncak nada tertinggi di akhir
 
   } catch (e) {
     console.log("Audio diblokir sebelum interaksi:", e);
