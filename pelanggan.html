@@ -139,7 +139,23 @@
 
     <!-- 3. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
-      <!-- PENGATURAN TEMA & TAMPILAN -->
+      <!-- 1. IDENTITAS PELANGGAN (DIPOSISIKAN PALING ATAS) -->
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Identitas Pelanggan</h3>
+        <div class="form-vertical">
+          <label style="font-size: 0.85rem;">Nama:</label>
+          <input type="text" id="setting-cust-name">
+          <label style="font-size: 0.85rem;">No. WhatsApp (Username):</label>
+          <input type="text" id="setting-cust-phone" readonly style="background: var(--input-bg); opacity: 0.7;">
+          <label style="font-size: 0.85rem;">Alamat Pengiriman:</label>
+          <textarea id="setting-cust-address" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px;"></textarea>
+          <label style="font-size: 0.85rem;">Sandi Baru (Opsional):</label>
+          <input type="password" id="setting-cust-pass" placeholder="Kosongkan jika tidak diubah">
+          <button onclick="simpanProfilPelanggan()" style="border-radius: 8px; padding: 10px; background: #2563eb; color: white; border: none; cursor: pointer;">Simpan Perubahan</button>
+        </div>
+      </div>
+
+      <!-- 2. TAMPILAN & TEMA -->
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Tampilan & Tema</h3>
         <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
@@ -155,21 +171,6 @@
             <option value="grid">Kotak</option>
             <option value="list">Daftar</option>
           </select>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3 style="margin-top: 0; font-size: 1rem;">Identitas Pelanggan</h3>
-        <div class="form-vertical">
-          <label style="font-size: 0.85rem;">Nama:</label>
-          <input type="text" id="setting-cust-name">
-          <label style="font-size: 0.85rem;">No. WhatsApp (Username):</label>
-          <input type="text" id="setting-cust-phone" readonly style="background: var(--input-bg); opacity: 0.7;">
-          <label style="font-size: 0.85rem;">Alamat Pengiriman:</label>
-          <textarea id="setting-cust-address" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px;"></textarea>
-          <label style="font-size: 0.85rem;">Sandi Baru (Opsional):</label>
-          <input type="password" id="setting-cust-pass" placeholder="Kosongkan jika tidak diubah">
-          <button onclick="simpanProfilPelanggan()" style="border-radius: 8px; padding: 10px; background: #2563eb; color: white; border: none; cursor: pointer;">Simpan Perubahan</button>
         </div>
       </div>
 
