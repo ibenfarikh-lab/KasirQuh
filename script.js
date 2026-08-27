@@ -2477,7 +2477,9 @@ function ambilDariCatatan() {
         let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
         let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
         let isiRtg = matchedProd ? (matchedProd.isiRtg || 10) : 10;
-        let harga = matchedProd ? (matchedProd.harga || Math.round(modal * 1.2)) : Math.round(modal * 1.2);
+        
+        // Hapus rumus margin 1.2, harga jual diset sama dengan modal (dapat diedit manual)
+        let harga = matchedProd ? (matchedProd.harga || modal) : modal;
         
         let modalRtg = satuan === 'rtg' ? modal : modal * isiRtg;
         let hargaRtg = satuan === 'rtg' ? harga : harga * isiRtg;

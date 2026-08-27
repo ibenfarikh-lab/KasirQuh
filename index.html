@@ -417,7 +417,7 @@
     </div>
   </div>
 
-  <!-- MODAL TAMBAH/EDIT CATATAN (DITAMBAHKAN AGAR IKON PENA BERFUNGSI) -->
+  <!-- MODAL TAMBAH/EDIT CATATAN -->
   <div id="catatanModal" class="modal-backdrop" onclick="if(event.target === this) closeCatatanModal()">
     <div class="modal-content" style="max-width: 400px;">
       <div class="modal-header">
@@ -434,6 +434,117 @@
         <label style="font-size: 0.85rem;">Rincian / Isi Catatan:</label>
         <textarea id="catatan-desc-input" rows="4" placeholder="Cth: Minyak - 2 - pcs - 15000" style="padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"></textarea>
         <button onclick="simpanCatatanCard()" style="background: #16a34a; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px;">Simpan Catatan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH / EDIT BARANG (PRODUCT MODAL YANG SEBELUMNYA HILANG) -->
+  <div id="productModal" class="modal-backdrop" onclick="if(event.target === this) closeProductModal()">
+    <div class="modal-content" style="max-width: 420px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h3 id="modal-title">Tambah Barang Stok Baru</h3>
+        <button class="btn-close-modal" onclick="closeProductModal()">&times;</button>
+      </div>
+      <input type="hidden" id="edit-restock-id">
+      <input type="hidden" id="db-selected-online-img">
+      <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 0.85rem;">Kode Barang / Barcode:</label>
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="db-code" placeholder="Kosongkan untuk generate otomatis" style="flex: 1;">
+          <button type="button" onclick="toggleScannerDb()" style="background: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer;">📷 Scan</button>
+        </div>
+        <div id="scanner-box-db" style="display: none; position: relative; margin-bottom: 6px;">
+          <div id="reader-db" style="width: 100%;"></div>
+        </div>
+
+        <label style="font-size: 0.85rem;">Nama Barang:</label>
+        <div style="position: relative;">
+          <input type="text" id="db-name" placeholder="Cth: Minyak Goreng" oninput="autoFillDataBarang(this.value)" style="width: 100%;">
+          <div id="autocomplete-suggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 0 0 8px 8px; z-index: 50; display: none; max-height: 150px; overflow-y: auto;"></div>
+        </div>
+
+        <label style="font-size: 0.85rem;">Kategori:</label>
+        <input type="text" id="db-category" placeholder="Cth: Sembako">
+
+        <div style="display: flex; gap: 8px;">
+          <div style="flex: 1;">
+            <label style="font-size: 0.85rem;">Satuan:</label>
+            <select id="db-unit" onchange="updateUnitLabel()" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+              <option value="pcs">Pcs / Biji</option>
+              <option value="kg">Kilogram (Kg)</option>
+              <option value="rtg">Renteng (rtg)</option>
+            </select>
+          </div>
+          <div id="wrapper-db-isi-rtg" style="flex: 1; display: none;">
+            <label style="font-size: 0.85rem;">Isi per Renteng:</label>
+            <input type="number" id="db-isi-rtg" value="10" placeholder="10">
+          </div>
+        </div>
+
+        <label id="lbl-db-stock" style="font-size: 0.85rem;">Jumlah Stok:</label>
+        <input type="text" id="db-stock" placeholder="0">
+
+        <label id="lbl-db-cost" style="font-size: 0.85rem;">Harga Modal (Rp):</label>
+        <input type="text" id="db-cost" placeholder="0" oninput="formatInputRupiah(this)">
+
+        <label id="lbl-db-price" style="font-size: 0.85rem;">Harga Jual (Rp):</label>
+        <input type="text" id="db-price" placeholder="0" oninput="formatInputRupiah(this)">
+
+        <label style="font-size: 0.85rem;">Foto Produk:</label>
+        <div style="display: flex; gap: 6px;">
+          <input type="file" id="db-image" accept="image/*" onchange="handleImageUpload(event)" style="font-size: 0.8rem; flex: 1;">
+          <button type="button" onclick="cariFotoOnline()" style="background: #107c41; color: white; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;">🔍 Cari Foto</button>
+        </div>
+        <div id="online-image-results" style="display: none; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: 140px; overflow-y: auto; margin-top: 4px;"></div>
+
+        <button id="modal-submit-btn" onclick="simpanBarangLangsung()" style="background: #16a34a; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 8px;">Simpan ke Stok</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH / EDIT PELANGGAN -->
+  <div id="customerModal" class="modal-backdrop" onclick="if(event.target === this) closeCustomerModal()">
+    <div class="modal-content" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3 id="cust-modal-title">Tambah Pelanggan Baru</h3>
+        <button class="btn-close-modal" onclick="closeCustomerModal()">&times;</button>
+      </div>
+      <input type="hidden" id="cust-id">
+      <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 0.85rem;">Nama Pelanggan:</label>
+        <input type="text" id="cust-name" placeholder="Nama Lengkap">
+        <label style="font-size: 0.85rem;">No. WhatsApp:</label>
+        <input type="text" id="cust-phone" placeholder="08123456789">
+        <label style="font-size: 0.85rem;">Alamat:</label>
+        <input type="text" id="cust-address" placeholder="Alamat Pelanggan">
+        <button onclick="simpanPelanggan()" style="background: #16a34a; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px;">Simpan Pelanggan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PEMBUKUAN / CATATAN PELANGGAN -->
+  <div id="bookkeepingModal" class="modal-backdrop" onclick="if(event.target === this) closeBookkeepingModal()">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="bk-modal-title">Catatan Pelanggan</h3>
+        <button class="btn-close-modal" onclick="closeBookkeepingModal()">&times;</button>
+      </div>
+      <input type="hidden" id="bk-cust-id">
+      <input type="hidden" id="bk-note-id">
+      <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 0.85rem;">Waktu:</label>
+        <input type="text" id="bk-datetime" readonly style="background: var(--input-bg); opacity: 0.8;">
+        <label style="font-size: 0.85rem;">Jenis Catatan:</label>
+        <select id="bk-type" style="width: 100%; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+          <option value="Belanja (belum dibayar)">Belanja (belum dibayar)</option>
+          <option value="Pembayaran / Cicilan">Pembayaran / Cicilan</option>
+          <option value="Catatan Umum">Catatan Umum</option>
+        </select>
+        <label style="font-size: 0.85rem;">Nominal (Rp):</label>
+        <input type="text" id="bk-amount" placeholder="0" oninput="formatInputRupiah(this)">
+        <label style="font-size: 0.85rem;">Keterangan / Rincian:</label>
+        <textarea id="bk-desc" rows="3" placeholder="Cth: Ambil beras 1 karung" style="padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"></textarea>
+        <button onclick="simpanCatatanPembukuan()" style="background: #16a34a; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px;">Simpan Catatan</button>
       </div>
     </div>
   </div>
