@@ -2240,6 +2240,12 @@ function refreshData() {
     } else {
       restockListItems.forEach(item => {
         let fotoSrc = item.foto || defaultPlaceholderImg;
+        
+        let modalPcs = item.satuan === 'rtg' ? item.modal : (item.modal || 0);
+        let modalRtgVal = item.satuan === 'rtg' ? item.modalRtg : ((item.modal || 0) * (item.isiRtg || 10));
+        let jualPcs = item.satuan === 'rtg' ? item.harga : (item.harga || 0);
+        let jualRtgVal = item.satuan === 'rtg' ? item.hargaRtg : ((item.harga || 0) * (item.isiRtg || 10));
+
         let subtotalModal = (item.satuan === 'rtg' ? (item.modalRtg || 0) : (item.modal || 0)) * (item.qty || 1);
         totalEstBelanja += subtotalModal;
         let satuanLabel = item.satuan === 'rtg' ? `rtg (isi ${item.isiRtg || 10})` : item.satuan;
@@ -2254,7 +2260,10 @@ function refreshData() {
             <div class="inv-list-details">
               <div class="inv-list-title">${item.nama}</div>
               <div class="inv-list-sub">Beli: ${item.qty} ${satuanLabel}</div>
-              <div class="inv-list-price">Modal: Rp ${(item.satuan === 'rtg' ? item.modalRtg : item.modal).toLocaleString('id-ID')} - Jual: Rp ${(item.satuan === 'rtg' ? item.hargaRtg : item.harga).toLocaleString('id-ID')}</div>
+              <div class="inv-list-price" style="font-size: 0.78rem; line-height: 1.3;">
+                📦 <b>Pcs:</b> Modal Rp ${modalPcs.toLocaleString('id-ID')} | Jual Rp ${jualPcs.toLocaleString('id-ID')}<br>
+                📑 <b>Rtg:</b> Modal Rp ${modalRtgVal.toLocaleString('id-ID')} | Jual Rp ${jualRtgVal.toLocaleString('id-ID')}
+              </div>
             </div>
             <div style="text-align: right; font-weight: bold; font-size: 0.85rem; color: #2563eb;">
               Rp ${subtotalModal.toLocaleString('id-ID')}
@@ -2275,9 +2284,9 @@ function refreshData() {
                 <div class="inv-card-code">Beli: ${item.qty} ${satuanLabel}</div>
               </div>
             </div>
-            <div class="inv-card-details">
-              <div class="inv-card-row"><span>Modal:</span><b>Rp ${(item.satuan === 'rtg' ? item.modalRtg : item.modal).toLocaleString('id-ID')}</b></div>
-              <div class="inv-card-row"><span>Jual:</span><b>Rp ${(item.satuan === 'rtg' ? item.hargaRtg : item.harga).toLocaleString('id-ID')}</b></div>
+            <div class="inv-card-details" style="font-size: 0.75rem;">
+              <div class="inv-card-row"><span>Pcs:</span><b>Rp ${modalPcs.toLocaleString('id-ID')}</b></div>
+              <div class="inv-card-row"><span>Rtg:</span><b>Rp ${modalRtgVal.toLocaleString('id-ID')}</b></div>
               <div class="inv-card-row" style="border-top: 1px dashed var(--border-color); padding-top: 3px; margin-top: 3px;"><span>Total:</span><b style="color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</b></div>
             </div>
           </div>
@@ -2478,7 +2487,6 @@ function ambilDariCatatan() {
         let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
         let isiRtg = matchedProd ? (matchedProd.isiRtg || 10) : 10;
         
-        // Hapus rumus margin 1.2, harga jual diset sama dengan modal (dapat diedit manual)
         let harga = matchedProd ? (matchedProd.harga || modal) : modal;
         
         let modalRtg = satuan === 'rtg' ? modal : modal * isiRtg;
