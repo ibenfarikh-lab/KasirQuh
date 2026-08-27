@@ -2416,6 +2416,68 @@ function bersihkanCacheTotal() {
   }
 }
 
+// TAMBAHAN FUNGSI: AMBIL DARI CATATAN KE BELANJA STOK
+function ambilDariCatatan() {
+  let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
+  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
+    return alert("Tidak ada catatan aktif pada tab atau tanggal ini!");
+  }
+
+  let addedCount = 0;
+  currentTabData.items.forEach(noteItem => {
+    if (!noteItem.isi) return;
+    let lines = noteItem.isi.split('\n');
+    lines.forEach(line => {
+      let parts = line.split('-').map(p => p.trim());
+      if (parts.length >= 4) {
+        let nama = parts[0];
+        let qty = parseFloat(parts[1]) || 1;
+        let satuan = parts[2].toLowerCase();
+        if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
+        let modal = parseRupiahToNumber(parts[3]) || 0;
+
+        let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
+        let matchedProd = existingCode ? databaseProduk[existingCode] : null;
+        
+        let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
+        let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
+        let isiRtg = matchedProd ? (matchedProd.isiRtg || 10) : 10;
+        let harga = matchedProd ? (matchedProd.harga || Math.round(modal * 1.2)) : Math.round(modal * 1.2);
+        
+        let modalRtg = satuan === 'rtg' ? modal : modal * isiRtg;
+        let hargaRtg = satuan === 'rtg' ? harga : harga * isiRtg;
+        let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
+
+        let newItem = {
+          id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+          code: code,
+          nama: nama,
+          kategori: kategori,
+          satuan: satuan,
+          isiRtg: isiRtg,
+          qty: qty,
+          modal: (satuan === 'rtg') ? (modal / isiRtg) : modal,
+          harga: (satuan === 'rtg') ? (harga / isiRtg) : harga,
+          modalRtg: modalRtg,
+          hargaRtg: hargaRtg,
+          foto: foto
+        };
+        
+        restockListItems.push(newItem);
+        addedCount++;
+      }
+    });
+  });
+
+  if (addedCount > 0) {
+    simpanRestockKeCloud();
+    refreshData();
+    showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
+  } else {
+    alert("Tidak ditemukan format rincian valid (Contoh: Minyak - 5 - kg - 15000) di catatan ini!");
+  }
+}
+
 setTheme(currentTheme);
 cekStatusLogin();
 updatePermanentBarTitle();
