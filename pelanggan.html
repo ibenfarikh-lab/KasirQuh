@@ -315,15 +315,18 @@
       const paginationBox = document.getElementById('pagination-box');
       const searchContainer = document.getElementById('sticky-search-container');
       const searchFab = document.getElementById('fab-search-btn');
+      const cartFab = document.getElementById('fab-cart-btn');
 
       if (tabId === 'belanja') {
         titleEl.innerText = "Belanja";
         paginationBox.style.display = "flex";
         if (searchFab) searchFab.style.display = "flex";
+        if (cartFab) cartFab.style.display = "flex";
       } else {
         paginationBox.style.display = "none";
         if (searchContainer) searchContainer.style.display = "none";
         if (searchFab) searchFab.style.display = "none";
+        if (cartFab) cartFab.style.display = "none";
         titleEl.innerText = tabId === 'data-pelanggan' ? "Data Pelanggan" : "Pengaturan";
         
         if (tabId === 'pengaturan' && currentCustomerPhone) {
@@ -534,7 +537,7 @@
       });
     }
 
-    // LISTENER RIWAYAT PESANAN ONLINE DI PANEL PELANGGAN (DIPERBAIKI)
+    // LISTENER RIWAYAT PESANAN ONLINE DI PANEL PELANGGAN
     function muatRiwayatPesananOnlinePelanggan() {
       db.collection("transaksi").where("customerPhone", "==", currentCustomerPhone).onSnapshot((snapshot) => {
         const container = document.getElementById("customer-online-orders-container");
@@ -551,7 +554,6 @@
           orders.push({ id: doc.id, ...doc.data() });
         });
 
-        // Urutkan data secara lokal berdasarkan waktu terbaru tanpa butuh composite index firebase
         orders.sort((a, b) => {
           let timeA = a.waktuTimestamp?.toMillis ? a.waktuTimestamp.toMillis() : 0;
           let timeB = b.waktuTimestamp?.toMillis ? b.waktuTimestamp.toMillis() : 0;
