@@ -1504,6 +1504,48 @@ function playBeep() {
   osc.start(); osc.stop(audioCtx.currentTime + 0.1);
 }
 
+// FUNGSI ALARM 6 KALI BERUNTUN DENGAN 3 RITME UNTUK PESANAN MASUK
+function playNotificationSound() {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playBeep(delay, freq, duration) {
+      setTimeout(() => {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        oscillator.type = 'square'; // Karakter suara tegas dan keras khas alarm toko
+        oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + duration);
+      }, delay);
+    }
+
+    // Pola 6 Kali Bunyi (2 Siklus dari 3 Ritme)
+    // --- Siklus Pertama ---
+    playBeep(0, 900, 0.12);   // Beep 1
+    playBeep(150, 900, 0.12); // Beep 2
+    playBeep(300, 1100, 0.2); // Beep 3 (Nada tinggi siklus 1)
+    
+    // --- Siklus Kedua (Pengulangan dengan puncak penutup lebih tinggi) ---
+    playBeep(550, 900, 0.12); // Beep 4
+    playBeep(700, 900, 0.12); // Beep 5
+    playBeep(850, 1200, 0.25);// Beep 6 (Puncak nada tertinggi di akhir)
+
+  } catch (e) {
+    console.log("Audio diblokir sebelum interaksi:", e);
+  }
+}
+
 function toggleScannerPos() {
   const modal = document.getElementById("scannerModal");
   if (!isScannerPosOpen) {
