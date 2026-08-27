@@ -812,9 +812,11 @@
 
     function bukaModalEditPesanan(id) {
       let trx = onlineOrdersDataCache.find(t => t.id === id);
-      if (!trx || !trx.items) return alert("Data pesanan atau rincian item tidak ditemukan!");
+      if (!trx) return alert("Data pesanan tidak ditemukan!");
+      
       document.getElementById("edit-order-id").value = id;
-      editingOrderItemsTemp = JSON.parse(JSON.stringify(trx.items));
+      // Memastikan jika items kosong, tetap diinisialisasi sebagai array kosong agar aman
+      editingOrderItemsTemp = trx.items ? JSON.parse(JSON.stringify(trx.items)) : [];
       renderEditOrderItemsModal();
       document.getElementById("editOrderModal").classList.add("show");
     }
@@ -828,19 +830,23 @@
       container.innerHTML = "";
       let grandTotal = 0;
 
+      if (editingOrderItemsTemp.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 10px; font-size: 0.8rem; font-style: italic;">Belum ada rincian barang pada pesanan ini.</div>`;
+      }
+
       editingOrderItemsTemp.forEach((it, idx) => {
-        let unitPrice = it.qty > 0 ? (it.subtotal / it.qty) : it.subtotal;
-        grandTotal += it.subtotal;
+        let unitPrice = it.qty > 0 ? (it.subtotal / it.qty) : (it.subtotal || 0);
+        grandTotal += (it.subtotal || 0);
 
         container.innerHTML += `
-          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--input-bg); padding: 8px; border-radius: 8px; font-size: 0.85rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; background: var(--input-bg); padding: 8px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 4px;">
             <div style="flex: 1;">
-              <div style="font-weight: bold;">${it.nama}</div>
+              <div style="font-weight: bold;">${it.nama || 'Barang'}</div>
               <div style="font-size: 0.75rem; color: var(--text-muted);">Rp ${unitPrice.toLocaleString('id-ID')} / item</div>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
               <button onclick="ubahQtyEditOrder(${idx}, -1)" style="width: 26px; height: 26px; background: #dc2626; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">-</button>
-              <span style="font-weight: bold; min-width: 20px; text-align: center;">${it.qty}</span>
+              <span style="font-weight: bold; min-width: 20px; text-align: center;">${it.qty || 1}</span>
               <button onclick="ubahQtyEditOrder(${idx}, 1)" style="width: 26px; height: 26px; background: #16a34a; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">+</button>
               <button onclick="hapusItemEditOrder(${idx})" style="background: transparent; border: none; color: #dc2626; cursor: pointer; font-size: 1rem; margin-left: 4px;" title="Hapus Barang">🗑️</button>
             </div>
