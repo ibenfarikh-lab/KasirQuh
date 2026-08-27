@@ -1679,7 +1679,6 @@ function tambahItemKeCart(barcode, produk) {
     modalAktif = modalKg;
     displaySatuan = 'kg';
   } else if (isRtg) {
-    // Langsung eceran pcs tanpa popup (dianggap pcs ecer)
     inputJumlah = 1;
     hargaAktif = produk.harga;
     modalAktif = produk.modal;
@@ -2189,42 +2188,115 @@ function refreshData() {
       let sat = (item.satuan || "pcs").toLowerCase();
       let stok = item.stok !== undefined ? item.stok : 0;
       let fotoSrc = item.foto || defaultPlaceholderImg;
-      let modalVal = (sat === 'rtg' || sat === 'kg') ? (item.modalRtg || 0) : (item.modal || 0);
-      let hargaVal = (sat === 'rtg' || sat === 'kg') ? (item.hargaRtg || 0) : (item.harga || 0);
-      let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + (item.isiRtg || 10) + ')' : (sat === 'kg' ? 'kg' : sat);
+      let isiRtg = item.isiRtg || 10;
+      let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + isiRtg + ')' : (sat === 'kg' ? 'kg' : sat);
+
+      let detailsListHtml = '';
+      let detailsGridHtml = '';
+
+      if (sat === 'kg') {
+        let isiOns = 10;
+        let modalOns = item.modal || 0;
+        let modalKgVal = item.modalRtg || (modalOns * isiOns);
+        let jualOns = item.harga || 0;
+        let jualKgVal = item.hargaRtg || (jualOns * isiOns);
+
+        detailsListHtml = `
+          <div>⚖️ <b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
+          <div>⚖️ <b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
+          <div>⚖️ <b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
+          <div>⚖️ <b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
+        `;
+        detailsGridHtml = `
+          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
+            <div><b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
+            <div><b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
+            <div><b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
+            <div><b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
+          </div>
+        `;
+      } else if (sat === 'pcs') {
+        let hargaPcs = item.modal || 0;
+        let jualPcs = item.harga || 0;
+        detailsListHtml = `
+          <div>📦 <b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
+          <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
+        `;
+        detailsGridHtml = `
+          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
+            <div><b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
+            <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
+          </div>
+        `;
+      } else {
+        let modalPcs = item.modal || 0;
+        let modalRtgVal = item.modalRtg || (modalPcs * isiRtg);
+        let jualPcs = item.harga || 0;
+        let jualRtgVal = item.hargaRtg || (jualPcs * isiRtg);
+        
+        detailsListHtml = `
+          <div>📑 <b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
+          <div>📑 <b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
+          <div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
+          <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
+        `;
+        detailsGridHtml = `
+          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
+            <div><b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
+            <div><b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
+            <div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
+            <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
+          </div>
+        `;
+      }
 
       invList.innerHTML += `
-        <div class="inv-list-item">
-          <div style="display: flex; gap: 4px; flex-shrink: 0;">
-            <button class="btn-edit" onclick="openProductModal('${code}')" title="Edit" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;">✏️</button>
-            <button class="btn-danger" onclick="hapusBarang('${code}')" title="Hapus" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;"><svg style="width:16px; height:16px; fill:currentColor;" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+          <div style="display: flex; align-items: flex-start; gap: 10px;">
+            <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                <div>
+                  <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">${code} • Stok: <b style="color: var(--text-color);">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b> • ${satuanLabel}</div>
+                </div>
+                <div>
+                  <span class="badge-kat">${kat}</span>
+                </div>
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px;">
+                ${detailsListHtml}
+              </div>
+            </div>
           </div>
-          <img src="${fotoSrc}" class="inv-list-img">
-          <div class="inv-list-details">
-            <div class="inv-list-title">${item.nama}</div>
-            <div class="inv-list-sub">${code} • Stok: ${stok} ${sat === 'kg' ? 'Kg' : 'pcs'} • ${satuanLabel} • ${kat}</div>
-            <div class="inv-list-price">Modal: Rp ${modalVal.toLocaleString('id-ID')} - Jual: Rp ${hargaVal.toLocaleString('id-ID')}</div>
+          <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;">
+            <button onclick="openProductModal('${code}')" title="Edit" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">✏️ Edit</button>
+            <button onclick="hapusBarang('${code}')" title="Hapus" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">🗑️ Hapus</button>
           </div>
         </div>
       `;
 
       invGrid.innerHTML += `
-        <div class="inv-card">
-          <div class="inv-card-top">
-            <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 2px;">
-              <button class="btn-edit" style="flex: 1; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem;" onclick="openProductModal('${code}')">Edit</button>
-              <button class="btn-danger" style="flex: 1; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem;" onclick="hapusBarang('${code}')">Hapus</button>
+        <div class="inv-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px;">
+          <div>
+            <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
+              <button class="btn-edit" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal('${code}')">Edit</button>
+              <button class="btn-danger" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="hapusBarang('${code}')">Hapus</button>
             </div>
-            <img src="${fotoSrc}" class="inv-card-img">
-            <div class="inv-card-info">
-              <div class="inv-card-title">${item.nama}</div>
-              <div class="inv-card-code">${code}</div>
-              <div style="margin-top: 2px;"><span class="badge-kat">${kat}</span> <span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</span></div>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;">
+              <div style="min-width: 0; flex: 1;">
+                <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: <b>${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b></div>
+              </div>
+            </div>
+            <div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; margin-bottom: 6px;">
+              ${detailsGridHtml}
             </div>
           </div>
-          <div class="inv-card-details">
-            <div class="inv-card-row"><span>Modal:</span><b>Rp ${modalVal.toLocaleString('id-ID')}</b></div>
-            <div class="inv-card-row"><span>Jual:</span><b>Rp ${hargaVal.toLocaleString('id-ID')}</b></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 0.8rem;">
+            <span style="font-weight: bold; color: var(--text-muted);">Kategori:</span>
+            <span class="badge-kat">${kat}</span>
           </div>
         </div>
       `;
@@ -2563,7 +2635,6 @@ function ambilDariCatatan() {
         let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
         let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
 
-        // Harga jual disamakan dengan harga modal, selanjutnya dapat diubah secara manual
         let hargaRtgVal = modalRtgVal;
         let hargaPcsVal = modalPcsVal;
 
