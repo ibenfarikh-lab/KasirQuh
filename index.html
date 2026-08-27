@@ -399,6 +399,19 @@
     </div>
   </div>
 
+  <!-- MODAL DETAIL PELANGGAN & RIWAYAT BELANJA DI ADMIN -->
+  <div id="adminCustomerDetailModal" class="modal-backdrop" onclick="if(event.target === this) closeAdminCustomerDetailModal()">
+    <div class="modal-content" style="max-width: 480px; max-height: 85vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h3 id="adm-cust-modal-title">Detail Pelanggan</h3>
+        <button class="btn-close-modal" onclick="closeAdminCustomerDetailModal()">&times;</button>
+      </div>
+      <div id="adm-cust-modal-body" style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
+        <!-- Konten dimuat otomatis via JavaScript -->
+      </div>
+    </div>
+  </div>
+
   <!-- PERMANENT BOTTOM BAR -->
   <div class="permanent-bottom-bar no-print">
     <h2 id="permanent-title" style="font-size: 1.05rem; margin: 0; font-weight: 700;">Halaman Kasir</h2>
@@ -445,200 +458,6 @@
     </div>
   </div>
 
-  <!-- MODAL TAMBAH/EDIT BARANG -->
-  <div id="productModal" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="modal-title">Tambah Barang Stok</h3>
-        <button class="btn-close-modal" onclick="closeProductModal()">&times;</button>
-      </div>
-      <div class="form-group">
-        <input type="hidden" id="edit-restock-id" value="">
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Nama Barang: <span style="color:red;">*</span></label>
-          <input type="text" id="db-name" placeholder="Contoh: Kopi Sachet / Gula Pasir" oninput="autoFillDataBarang(this.value)" autocomplete="off">
-          <div id="autocomplete-suggestions" style="display: none; position: absolute; background: var(--card-bg); border: 1px solid var(--input-border); border-radius: 8px; max-height: 150px; overflow-y: auto; z-index: 10002; width: calc(100% - 40px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 2px;"></div>
-        </div>
-
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Kode Barcode (Opsional):</label>
-          <div class="input-with-btn">
-            <input type="text" id="db-code" placeholder="Kosongkan jika ingin generate otomatis">
-            <button class="btn-scan-toggle" onclick="toggleScannerDb()" title="Scan Barcode Produk">
-              <svg viewBox="0 0 24 24"><path d="M2 4h2v16H2V4zm3 0h1v16H5V4zm2 0h3v16H7V4zm4 0h1v16h-1V4zm3 0h2v16h-2V4zm3 0h1v16h-1V4zm2 0h1v16h-1V4z"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <div id="scanner-box-db">
-          <div id="reader-db"></div>
-        </div>
-
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Kategori (Opsional):</label>
-          <input type="text" id="db-category" placeholder="Contoh: Sembako">
-        </div>
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 130px;">
-            <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Satuan Barang:</label>
-            <select id="db-unit" onchange="updateUnitLabel()" style="padding: 10px; border-radius: 8px;">
-              <option value="pcs">Pcs (Satuan Unit)</option>
-              <option value="kg">Kilogram / Kg (Berat)</option>
-              <option value="rtg">Renteng (rtg)</option>
-            </select>
-          </div>
-          <div style="flex: 1; min-width: 130px; display: none;" id="wrapper-db-isi-rtg">
-            <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Isi per Renteng (Pcs):</label>
-            <input type="number" id="db-isi-rtg" placeholder="10" min="1" value="10">
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 130px;">
-            <label id="lbl-db-stock" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Jumlah Stok:</label>
-            <input type="number" step="any" id="db-stock" placeholder="0" min="0">
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 130px;">
-            <label id="lbl-db-cost" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Harga Modal (Rp):</label>
-            <input type="text" id="db-cost" placeholder="0" oninput="formatInputRupiah(this)">
-          </div>
-          <div style="flex: 1; min-width: 130px;">
-            <label id="lbl-db-price" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Harga Jual (Rp):</label>
-            <input type="text" id="db-price" placeholder="0" oninput="formatInputRupiah(this)">
-          </div>
-        </div>
-        
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Foto Produk (Opsional):</label>
-          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
-            <input type="file" id="db-image" accept="image/*" capture="environment" onchange="handleImageUpload(event)" style="padding: 6px; flex: 1; font-size: 0.75rem;">
-            <button type="button" onclick="cariFotoOnline()" style="background: #2563eb; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px; white-space: nowrap;" title="Cari Foto Otomatis Online">🔍 Cari Foto Online</button>
-          </div>
-          <div id="online-image-results" style="display: none; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: 140px; overflow-y: auto; padding: 6px; background: var(--table-header); border: 1px dashed var(--input-border); border-radius: 8px;"></div>
-          <input type="hidden" id="db-selected-online-img" value="">
-        </div>
-
-        <button id="modal-submit-btn" onclick="simpanBarangLangsung()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px; background: #16a34a;">Simpan ke Stok</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL TAMBAH/EDIT CATATAN -->
-  <div id="catatanModal" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="catatan-modal-title">Tambah Catatan Baru</h3>
-        <button class="btn-close-modal" onclick="closeCatatanModal()">&times;</button>
-      </div>
-      <div class="form-group">
-        <input type="hidden" id="catatan-type-target" value="catatan">
-        <input type="hidden" id="catatan-id" value="">
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Judul Catatan: <span style="color:red;">*</span></label>
-          <input type="text" id="catatan-title-input" placeholder="Contoh: Belanja Pasar Minggu">
-        </div>
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Sub Judul:</label>
-          <input type="text" id="catatan-subtitle-input" placeholder="Contoh: Toko Haji / dibayarkan senilai" oninput="formatInputRupiah(this)">
-        </div>
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Isi Catatan (Nama barang - satuan - harga):</label>
-          <textarea id="catatan-desc-input" rows="6" placeholder="Contoh:&#10;Ayam - 1 kg - Rp 35.000&#10;Ceker - 1 kg - Rp 20.000&#10;Ati ampela - 1 kg - Rp 25.000" style="border-radius: 8px; resize: vertical;"></textarea>
-        </div>
-        <button onclick="simpanCatatanCard()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px; background: #16a34a;">Simpan Catatan</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="customerModal" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="cust-modal-title">Tambah Pelanggan Baru</h3>
-        <button class="btn-close-modal" onclick="closeCustomerModal()">&times;</button>
-      </div>
-      <div class="form-group">
-        <input type="hidden" id="cust-id">
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Nama Pelanggan: <span style="color:red;">*</span></label>
-          <input type="text" id="cust-name" placeholder="Contoh: Budi Santoso">
-        </div>
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Nomor Telepon / WA:</label>
-          <input type="text" id="cust-phone" placeholder="Contoh: 08123456789">
-        </div>
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Alamat:</label>
-          <input type="text" id="cust-address" placeholder="Contoh: Jl. Kebon Jeruk No. 10">
-        </div>
-        <button onclick="simpanPelanggan()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px;">Simpan Pelanggan</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="bookkeepingModal" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="bk-modal-title">Tambah Catatan Pelanggan</h3>
-        <button class="btn-close-modal" onclick="closeBookkeepingModal()">&times;</button>
-      </div>
-      <div class="form-group">
-        <input type="hidden" id="bk-cust-id">
-        <input type="hidden" id="bk-note-id">
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Tanggal & Waktu Catatan:</label>
-          <input type="text" id="bk-datetime" readonly style="background: var(--border-color); color: var(--text-color); font-weight: 600;">
-        </div>
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Jenis Catatan:</label>
-          <select id="bk-type" style="padding: 10px; border-radius: 8px; border: 1px solid var(--input-border);">
-            <option value="Belanja (belum dibayar)">Belanja (belum dibayar)</option>
-            <option value="Hutang / Kasbon">Hutang / Kasbon</option>
-            <option value="Catatan Umum">Catatan / Keterangan Umum</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Nominal (Rp) - Opsional:</label>
-          <input type="text" id="bk-amount" placeholder="0" oninput="formatInputRupiah(this)">
-        </div>
-        <div>
-          <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px;">Keterangan / Isi Catatan:</label>
-          <textarea id="bk-desc" rows="3" placeholder="Contoh: Pembelian 2 dus mie instan (tempo seminggu)" style="border-radius: 8px;"></textarea>
-        </div>
-        <button onclick="simpanCatatanPembukuan()" style="width: 100%; margin-top: 10px; height: 42px; font-size: 0.9rem; border-radius: 8px;">Simpan Catatan</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL BUKTI TRANSFER -->
-  <div id="proofModal" class="modal-backdrop" onclick="if(event.target === this) closeProofModal()">
-    <div class="modal-content" style="text-align: center; max-width: 350px;">
-      <div class="modal-header">
-        <h3>Bukti Transfer</h3>
-        <button class="btn-close-modal" onclick="closeProofModal()">&times;</button>
-      </div>
-      <div style="margin: 10px 0;"><img id="proof-img-preview" src="" alt="Bukti Transfer" style="width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border-color);"></div>
-      <button onclick="closeProofModal()" style="width: 100%; background: #2563eb; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">Tutup</button>
-    </div>
-  </div>
-
-  <!-- MODAL EDIT PESANAN ONLINE OLEH ADMIN -->
-  <div id="editOrderModal" class="modal-backdrop" onclick="if(event.target === this) closeEditOrderModal()">
-    <div class="modal-content" style="max-width: 450px;">
-      <div class="modal-header">
-        <h3>Edit Rincian Pesanan</h3>
-        <button class="btn-close-modal" onclick="closeEditOrderModal()">&times;</button>
-      </div>
-      <input type="hidden" id="edit-order-id">
-      <div id="edit-order-items-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px;"></div>
-      <div style="font-size: 0.95rem; font-weight: bold; margin-bottom: 12px;">Total Baru: Rp <span id="edit-order-grand-total">0</span></div>
-      <button onclick="simpanPerubahanPesananAdmin()" style="width: 100%; background: #16a34a; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer;">Simpan Perubahan Pesanan</button>
-    </div>
-  </div>
-
   <!-- Firebase Configuration & External JavaScript + Fitur Pesanan Online, Edit, & Alarm 20 Ketukan -->
   <script>
     const firebaseConfig = {
@@ -659,6 +478,7 @@
 
     document.addEventListener("DOMContentLoaded", function() {
       initOnlineOrdersListener();
+      initCustomerCardClickObserver();
     });
 
     if (typeof window.switchSubDataTab === 'undefined') {
@@ -815,7 +635,6 @@
       if (!trx) return alert("Data pesanan tidak ditemukan!");
       
       document.getElementById("edit-order-id").value = id;
-      // Memastikan jika items kosong, tetap diinisialisasi sebagai array kosong agar aman
       editingOrderItemsTemp = trx.items ? JSON.parse(JSON.stringify(trx.items)) : [];
       renderEditOrderItemsModal();
       document.getElementById("editOrderModal").classList.add("show");
@@ -902,6 +721,122 @@
     }
     function hapusPesananAdmin(id) {
       if (confirm("Hapus riwayat pesanan online ini?")) db.collection("transaksi").doc(id).delete();
+    }
+
+    // FITUR KLIK KARTU PELANGGAN DI ADMIN (Melihat Riwayat Belanja & Catatan)
+    function initCustomerCardClickObserver() {
+      const observer = new MutationObserver(() => {
+        const cards = document.querySelectorAll("#customer-list-wrapper .card, #customer-list-wrapper > div");
+        cards.forEach(card => {
+          if (card.dataset.clickableEnhanced) return;
+          card.dataset.clickableEnhanced = "true";
+          card.style.cursor = "pointer";
+          card.style.transition = "all 0.2s ease";
+          
+          card.onmouseover = () => card.style.borderColor = "#2563eb";
+          card.onmouseout = () => card.style.borderColor = "var(--border-color)";
+
+          const text = card.innerText;
+          const phoneMatch = text.match(/(?:\+62|0)[0-9\-\s]{8,}/);
+          if (phoneMatch) {
+            let cleanPhone = phoneMatch[0].replace(/[\s\-]/g, '');
+            card.onclick = (e) => {
+              if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+              bukaDetailPelangganAdminByPhone(cleanPhone);
+            };
+          }
+        });
+      });
+
+      const targetWrapper = document.getElementById("customer-list-wrapper");
+      if (targetWrapper) {
+        observer.observe(targetWrapper, { childList: true, subtree: true });
+      }
+    }
+
+    function bukaDetailPelangganAdminByPhone(phone) {
+      db.collection("pelanggan").where("phone", "==", phone).get().then(snap => {
+        if (snap.empty) {
+          db.collection("pelanggan").get().then(allSnap => {
+            let found = null;
+            allSnap.forEach(d => {
+              let p = d.data().phone || "";
+              if (p.replace(/[^0-9]/g, '') === phone.replace(/[^0-9]/g, '')) {
+                found = d.data();
+              }
+            });
+            if (found) {
+              displayCustomerDetailModal(found);
+            } else {
+              alert("Data pelanggan tidak ditemukan di database!");
+            }
+          });
+          return;
+        }
+        displayCustomerDetailModal(snap.docs[0].data());
+      });
+    }
+
+    function displayCustomerDetailModal(custData) {
+      let modalBody = document.getElementById("adm-cust-modal-body");
+      document.getElementById("adm-cust-modal-title").innerText = `👤 ${custData.nama || 'Pelanggan'}`;
+
+      let htmlInfo = `
+        <div style="background: var(--input-bg); padding: 10px; border-radius: 8px; margin-bottom: 4px;">
+          <div><strong>No. WhatsApp:</strong> ${custData.phone || '-'}</div>
+          <div><strong>Alamat:</strong> ${custData.alamat || '-'}</div>
+        </div>
+      `;
+
+      let phoneClean = (custData.phone || "").replace(/[^0-9]/g, '');
+      let custTransactions = onlineOrdersDataCache.filter(t => {
+        let tPhone = (t.customerPhone || "").replace(/[^0-9]/g, '');
+        return tPhone && phoneClean && (tPhone.includes(phoneClean) || phoneClean.includes(tPhone));
+      });
+
+      let htmlTrx = `<div style="font-weight: bold; margin-top: 4px;">📦 Riwayat Belanja / Pesanan:</div>`;
+      if (custTransactions.length === 0) {
+        htmlTrx += `<div style="color: var(--text-muted); font-style: italic; font-size: 0.8rem; margin-bottom: 6px;">Belum ada riwayat transaksi tercatat.</div>`;
+      } else {
+        htmlTrx += `<div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; max-height: 200px; overflow-y: auto;">`;
+        custTransactions.forEach(trx => {
+          let itemsStr = trx.items ? trx.items.map(i => `${i.nama} (${i.qty}x)`).join(', ') : 'Rincian kosong';
+          htmlTrx += `
+            <div style="border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; background: var(--card-bg);">
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted);">
+                <span>${trx.waktu || '-'}</span>
+                <span style="font-weight: bold; color: #16a34a;">${trx.statusPesanan || 'Selesai'}</span>
+              </div>
+              <div style="font-size: 0.8rem; margin: 2px 0;"><strong>Barang:</strong> ${itemsStr}</div>
+              <div style="font-weight: bold; color: #2563eb; font-size: 0.85rem;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')} (${trx.metode || '-'})</div>
+            </div>
+          `;
+        });
+        htmlTrx += `</div>`;
+      }
+
+      let htmlNotes = `<div style="font-weight: bold; margin-top: 4px;">📝 Catatan & Tagihan Toko:</div>`;
+      if (!custData.catatan || custData.catatan.length === 0) {
+        htmlNotes += `<div style="color: var(--text-muted); font-style: italic; font-size: 0.80rem;">Tidak ada catatan khusus.</div>`;
+      } else {
+        htmlNotes += `<div style="display: flex; flex-direction: column; gap: 4px; max-height: 150px; overflow-y: auto;">`;
+        custData.catatan.forEach(note => {
+          htmlNotes += `
+            <div style="border-bottom: 1px dashed var(--border-color); padding: 6px 0; font-size: 0.80rem;">
+              <div><b>[${note.jenis}]</b> ${note.keterangan}</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">${note.waktu}</div>
+            </div>
+          `;
+        });
+        htmlNotes += `</div>`;
+      }
+
+      modalBody.innerHTML = htmlInfo + htmlTrx + htmlNotes;
+      document.getElementById("adminCustomerDetailModal").classList.add("show");
+    }
+
+    function closeAdminCustomerDetailModal() {
+      document.getElementById("adminCustomerDetailModal").classList.remove("show");
     }
   </script>
   <script src="script.js"></script>
