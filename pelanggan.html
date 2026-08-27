@@ -231,6 +231,7 @@
     let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false;
     let currentPosPage = 1;
+    let itemsPerPagePos = 24; // Disamakan dengan kasir panel admin (24 item per halaman)[span_2](start_span)[span_2](end_span)
 
     window.onload = function() {
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
@@ -403,11 +404,11 @@
       }
       matchedProducts.sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
 
-      let totalPages = Math.ceil(matchedProducts.length / 10) || 1;
+      let totalPages = Math.ceil(matchedProducts.length / itemsPerPagePos) || 1;
       if (currentPosPage > totalPages) currentPosPage = totalPages;
       if (currentPosPage < 1) currentPosPage = 1;
 
-      let paginatedItems = matchedProducts.slice((currentPosPage - 1) * 10, currentPosPage * 10);
+      let paginatedItems = matchedProducts.slice((currentPosPage - 1) * itemsPerPagePos, currentPosPage * itemsPerPagePos);
       container.innerHTML = "";
 
       if (matchedProducts.length === 0) {
