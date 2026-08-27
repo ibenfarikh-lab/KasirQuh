@@ -2272,23 +2272,32 @@ function refreshData() {
           subtotalModal = modalKgVal * (item.qty || 1);
 
           detailsListHtml = `
-            <div>⚖️ <b>Ons:</b> Mdl Rp ${modalOns.toLocaleString('id-ID')} | Jul Rp ${jualOns.toLocaleString('id-ID')}</div>
-            <div>⚖️ <b>Kg:</b> Mdl Rp ${modalKgVal.toLocaleString('id-ID')} | Jul Rp ${jualKgVal.toLocaleString('id-ID')}</div>
+            <div>⚖️ <b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
+            <div>⚖️ <b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
+            <div>⚖️ <b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
+            <div>⚖️ <b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
           `;
           detailsGridHtml = `
-            <div class="inv-card-row"><span>Ons (M/J):</span><b>Rp ${modalOns.toLocaleString('id-ID')} / ${jualOns.toLocaleString('id-ID')}</b></div>
-            <div class="inv-card-row"><span>Kg (M/J):</span><b>Rp ${modalKgVal.toLocaleString('id-ID')} / ${jualKgVal.toLocaleString('id-ID')}</b></div>
+            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
+              <div><b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
+              <div><b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
+              <div><b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
+              <div><b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
+            </div>
           `;
         } else if (sat === 'pcs') {
           let hargaPcs = item.modal || 0;
           let jualPcs = item.harga || 0;
           subtotalModal = hargaPcs * (item.qty || 1);
           detailsListHtml = `
-            <div>📦 <b>Modal:</b> Rp ${hargaPcs.toLocaleString('id-ID')} | <b>Jual:</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
+            <div>📦 <b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
+            <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
           `;
           detailsGridHtml = `
-            <div class="inv-card-row"><span>Modal/Pcs:</span><b>Rp ${hargaPcs.toLocaleString('id-ID')}</b></div>
-            <div class="inv-card-row"><span>Jual/Pcs:</span><b>Rp ${jualPcs.toLocaleString('id-ID')}</b></div>
+            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
+              <div><b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
+              <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
+            </div>
           `;
         } else {
           let modalPcs = item.modal || 0;
@@ -2298,37 +2307,43 @@ function refreshData() {
           subtotalModal = modalRtgVal * (item.qty || 1);
           
           detailsListHtml = `
-            <div>📦 <b>Pcs:</b> Mdl Rp ${modalPcs.toLocaleString('id-ID')} | Jul Rp ${jualPcs.toLocaleString('id-ID')}</div>
-            <div>📑 <b>Rtg:</b> Mdl Rp ${modalRtgVal.toLocaleString('id-ID')} | Jul Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
+            <div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
+            <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
+            <div>📑 <b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
+            <div>📑 <b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
           `;
           detailsGridHtml = `
-            <div class="inv-card-row"><span>Pcs (M/J):</span><b>Rp ${modalPcs.toLocaleString('id-ID')} / ${jualPcs.toLocaleString('id-ID')}</b></div>
-            <div class="inv-card-row"><span>Rtg (M/J):</span><b>Rp ${modalRtgVal.toLocaleString('id-ID')} / ${jualRtgVal.toLocaleString('id-ID')}</b></div>
+            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
+              <div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
+              <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
+              <div><b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
+              <div><b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
+            </div>
           `;
         }
 
         totalEstBelanja += subtotalModal;
 
         restockListWrapper.innerHTML += `
-          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
             <div style="display: flex; align-items: flex-start; gap: 10px;">
-              <img src="${fotoSrc}" style="width: 48px; height: 48px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
+              <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
               <div style="flex: 1; min-width: 0;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
                   <div>
                     <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 1px;">Beli: <b style="color: var(--text-color);">${item.qty} ${satuanLabel}</b></div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">Beli: <b style="color: var(--text-color);">${item.qty} ${satuanLabel}</b></div>
                   </div>
                   <div style="text-align: right;">
                     <div style="font-weight: bold; font-size: 0.95rem; color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</div>
                   </div>
                 </div>
-                <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">
+                <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px;">
                   ${detailsListHtml}
                 </div>
               </div>
             </div>
-            <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 8px;">
+            <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;">
               <button onclick="openProductModal(null, '${item.id}')" title="Edit" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">✏️ Edit</button>
               <button onclick="hapusItemBelanja('${item.id}')" title="Hapus" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">🗑️ Hapus</button>
             </div>
@@ -2336,21 +2351,26 @@ function refreshData() {
         `;
 
         restockGridWrapper.innerHTML += `
-          <div class="inv-card">
-            <div class="inv-card-top">
-              <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 2px;">
+          <div class="inv-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px;">
+            <div>
+              <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
                 <button class="btn-edit" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal(null, '${item.id}')">Edit</button>
                 <button class="btn-danger" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="hapusItemBelanja('${item.id}')">Hapus</button>
               </div>
-              <img src="${fotoSrc}" class="inv-card-img">
-              <div class="inv-card-info">
-                <div class="inv-card-title">${item.nama}</div>
-                <div class="inv-card-code">Beli: ${item.qty} ${satuanLabel}</div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;">
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Beli: <b>${item.qty} ${satuanLabel}</b></div>
+                </div>
+              </div>
+              <div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; margin-bottom: 6px;">
+                ${detailsGridHtml}
               </div>
             </div>
-            <div class="inv-card-details" style="font-size: 0.75rem;">
-              ${detailsGridHtml}
-              <div class="inv-card-row" style="border-top: 1px dashed var(--border-color); padding-top: 3px; margin-top: 3px;"><span>Total:</span><b style="color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</b></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 0.8rem;">
+              <span style="font-weight: bold; color: var(--text-muted);">Total:</span>
+              <b style="color: #2563eb; font-size: 0.9rem;">Rp ${subtotalModal.toLocaleString('id-ID')}</b>
             </div>
           </div>
         `;
