@@ -2517,7 +2517,8 @@ function ambilDariCatatan() {
         let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
         let isiRtg = matchedProd ? (matchedProd.isiRtg || 10) : 10;
         
-        let harga = matchedProd ? (matchedProd.harga || modalSatuanTotal) : (modalSatuanTotal * 1.2);
+        // Harga jual disamakan persis dengan modal (tanpa margin / tanpa * 1.2)
+        let harga = matchedProd ? (matchedProd.harga || modalSatuanTotal) : modalSatuanTotal;
         
         let modalRtg = satuan === 'rtg' ? modalSatuanTotal : modalSatuanTotal * isiRtg;
         let hargaRtg = satuan === 'rtg' ? harga : harga * isiRtg;
