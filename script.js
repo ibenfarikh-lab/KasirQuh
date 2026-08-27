@@ -2478,7 +2478,10 @@ function ambilDariCatatan() {
         let qty = parseFloat(parts[1]) || 1;
         let satuan = parts[2].toLowerCase();
         if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-        let modal = parseRupiahToNumber(parts[3]) || 0;
+        
+        let hargaTotalInput = parseRupiahToNumber(parts[3]) || 0;
+        // Harga modal satuan dihitung dari total harga dibagi jumlah (qty)
+        let modalSatuanTotal = qty > 0 ? (hargaTotalInput / qty) : hargaTotalInput;
 
         let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
         let matchedProd = existingCode ? databaseProduk[existingCode] : null;
@@ -2487,9 +2490,9 @@ function ambilDariCatatan() {
         let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
         let isiRtg = matchedProd ? (matchedProd.isiRtg || 10) : 10;
         
-        let harga = matchedProd ? (matchedProd.harga || modal) : modal;
+        let harga = matchedProd ? (matchedProd.harga || modalSatuanTotal) : (modalSatuanTotal * 1.2);
         
-        let modalRtg = satuan === 'rtg' ? modal : modal * isiRtg;
+        let modalRtg = satuan === 'rtg' ? modalSatuanTotal : modalSatuanTotal * isiRtg;
         let hargaRtg = satuan === 'rtg' ? harga : harga * isiRtg;
         let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
 
@@ -2501,7 +2504,7 @@ function ambilDariCatatan() {
           satuan: satuan,
           isiRtg: isiRtg,
           qty: qty,
-          modal: (satuan === 'rtg') ? (modal / isiRtg) : modal,
+          modal: (satuan === 'rtg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal,
           harga: (satuan === 'rtg') ? (harga / isiRtg) : harga,
           modalRtg: modalRtg,
           hargaRtg: hargaRtg,
@@ -2519,7 +2522,7 @@ function ambilDariCatatan() {
     refreshData();
     showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
   } else {
-    alert("Tidak ditemukan format rincian valid (Contoh: Minyak - 5 - kg - 15000) di catatan ini!");
+    alert("Tidak ditemukan format rincian valid (Contoh: Minyak - 2 - rtg - 30000) di catatan ini!");
   }
 }
 
