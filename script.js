@@ -2472,7 +2472,7 @@ function renderKatalogKasirPaginated(filteredItems) {
       let stok = p.stok !== undefined ? p.stok : 0;
       let fotoSrc = p.foto || defaultPlaceholderImg;
       let isHabis = stok <= 0;
-      let unitLabel = sat === 'kg' ? '/Kg' : (sat === 'rtg' ? '/pcs (rtg)' : '/Pcs');
+      let unitLabel = sat === 'kg' ? '/Kg' : '/Pcs';
       let displayHarga = sat === 'kg' ? (p.hargaRtg || (p.harga * 10)) : p.harga;
       let cartItem = cart.find(item => item.barcode === code);
       let currentQtyInCart = cartItem ? cartItem.qty : 0;
