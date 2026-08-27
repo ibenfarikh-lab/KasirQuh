@@ -2254,20 +2254,18 @@ function refreshData() {
         <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
           <div style="display: flex; align-items: flex-start; gap: 10px;">
             <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
-            <div style="flex: 1; min-width: 0;">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-                <div>
-                  <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
-                  <div style="font-size: 0.78rem; color: var(--text-muted);">${code} • Stok: <b style="color: var(--text-color);">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b> • ${satuanLabel}</div>
-                </div>
-                <div>
-                  <span class="badge-kat">${kat}</span>
-                </div>
+            <div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">${code} • Stok: <b style="color: var(--text-color);">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b> • ${satuanLabel}</div>
               </div>
-              <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px;">
-                ${detailsListHtml}
+              <div>
+                <span class="badge-kat">${kat}</span>
               </div>
             </div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">
+            ${detailsListHtml}
           </div>
           <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;">
             <button onclick="openProductModal('${code}')" title="Edit" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">✏️ Edit</button>
@@ -2388,20 +2386,18 @@ function refreshData() {
           <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
             <div style="display: flex; align-items: flex-start; gap: 10px;">
               <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
-              <div style="flex: 1; min-width: 0;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
-                  <div>
-                    <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
-                    <div style="font-size: 0.78rem; color: var(--text-muted);">Beli: <b style="color: var(--text-color);">${item.qty} ${satuanLabel}</b></div>
-                  </div>
-                  <div style="text-align: right;">
-                    <div style="font-weight: bold; font-size: 0.95rem; color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</div>
-                  </div>
+              <div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);">Beli: <b style="color: var(--text-color);">${item.qty} ${satuanLabel}</b></div>
                 </div>
-                <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px;">
-                  ${detailsListHtml}
+                <div style="text-align: right;">
+                  <div style="font-weight: bold; font-size: 0.95rem; color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</div>
                 </div>
               </div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">
+              ${detailsListHtml}
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;">
               <button onclick="openProductModal(null, '${item.id}')" title="Edit" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">✏️ Edit</button>
