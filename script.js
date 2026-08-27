@@ -1504,7 +1504,7 @@ function playBeep() {
   osc.start(); osc.stop(audioCtx.currentTime + 0.1);
 }
 
-// FUNGSI ALARM 12 KALI BERUNTUN DENGAN 4 SIKLUS RITME UNTUK PESANAN MASUK
+// FUNGSI ALARM 20 KALI BERUNTUN UNTUK PESANAN MASUK
 function playNotificationSound() {
   try {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1517,7 +1517,7 @@ function playNotificationSound() {
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
         
-        oscillator.type = 'square'; // Karakter suara tegas dan keras khas alarm toko
+        oscillator.type = 'square'; // Karakter suara tegas khas alarm toko
         oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
         
         oscillator.connect(gainNode);
@@ -1530,26 +1530,13 @@ function playNotificationSound() {
       }, delay);
     }
 
-    // Pola 12 Kali Bunyi (4 Siklus dari 3 Ketukan Berirama)
-    // --- Siklus 1 ---
-    playBeep(0, 900, 0.1);
-    playBeep(130, 900, 0.1);
-    playBeep(260, 1050, 0.15);
-    
-    // --- Siklus 2 ---
-    playBeep(450, 900, 0.1);
-    playBeep(580, 900, 0.1);
-    playBeep(710, 1050, 0.15);
-    
-    // --- Siklus 3 ---
-    playBeep(900, 900, 0.1);
-    playBeep(1030, 900, 0.1);
-    playBeep(1160, 1100, 0.15);
-    
-    // --- Siklus 4 (Puncak Penutup) ---
-    playBeep(1350, 950, 0.1);
-    playBeep(1480, 1050, 0.1);
-    playBeep(1610, 1300, 0.3); // Puncak nada tertinggi di akhir
+    // Pola 20 Kali Bunyi Beruntun Secara Otomatis
+    for (let i = 0; i < 20; i++) {
+      let delay = i * 110; // Jeda antar ketukan 110ms
+      let freq = (i % 4 === 3) ? 1200 : 900; // Nada naik pada setiap ketukan ke-4
+      let duration = (i === 19) ? 0.3 : 0.08; // Ketukan terakhir lebih panjang sebagai penutup
+      playBeep(delay, freq, duration);
+    }
 
   } catch (e) {
     console.log("Audio diblokir sebelum interaksi:", e);
