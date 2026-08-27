@@ -41,24 +41,14 @@ function gantiViewModeSetting(mode) {
 }
 
 function toggleFloatingMenu() {
-  const popup = document.getElementById("floating-menu-popup");
-  if (popup) popup.classList.toggle("show");
+  const backdrop = document.getElementById("floating-menu-backdrop");
+  if (backdrop) backdrop.classList.toggle("show");
 }
 
-document.addEventListener('click', function(event) {
-  const popup = document.getElementById("floating-menu-popup");
-  const menuBtn = document.querySelector(".btn-bar-menu");
-  if (popup && popup.classList.contains('show')) {
-    if (!popup.contains(event.target) && !menuBtn.contains(event.target)) {
-      popup.classList.remove('show');
-    }
-  }
-});
-
 window.addEventListener('scroll', function() {
-  const popup = document.getElementById("floating-menu-popup");
-  if (popup && popup.classList.contains('show')) {
-    popup.classList.remove('show');
+  const backdrop = document.getElementById("floating-menu-backdrop");
+  if (backdrop && backdrop.classList.contains('show')) {
+    backdrop.classList.remove('show');
   }
 }, true);
 
