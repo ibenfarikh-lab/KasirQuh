@@ -1642,7 +1642,7 @@ function kurangManualDariCode(barcode) {
   if (existingItem) {
     let index = cart.indexOf(existingItem);
     let sat = (existingItem.satuan || "").toLowerCase();
-    let step = (sat === 'kg') ? 1 : 1; // Step kurangi 1 satuan/kg/pcs
+    let step = (sat === 'kg') ? 0.1 : 1; // Kurangi 1 ons (0.1 kg) jika barang kg
     existingItem.qty -= step;
     existingItem.qty = parseFloat(existingItem.qty.toFixed(3));
     if (existingItem.qty <= 0) cart.splice(index, 1);
@@ -1722,7 +1722,7 @@ function ubahQty(index, delta) {
   let produk = databaseProduk[item.barcode];
   let stokTersedia = produk ? (produk.stok || 0) : 0;
   let sat = (item.satuan || "").toLowerCase();
-  let step = (sat === 'kg') ? 1 : 1;
+  let step = (sat === 'kg') ? 0.1 : 1; // Step 1 ons (0.1 kg) untuk barang kg
   if (delta > 0 && item.qty + step > stokTersedia) return alert("Stok tidak mencukupi!");
 
   if (delta > 0) item.qty += step; else item.qty -= step;
@@ -1748,10 +1748,17 @@ function renderCart() {
     
     let sat = (item.satuan || "").toLowerCase();
     let qtyDisplay = '';
+    let isiOns = databaseProduk[item.barcode]?.isiRtg || 10;
+
     if (item.satuanJual === 'kg') {
-      qtyDisplay = `${item.qty} Kg`;
+      if (item.qty < 1) {
+        let jmlOns = Math.round(item.qty * isiOns);
+        qtyDisplay = `${jmlOns} Ons`;
+      } else {
+        qtyDisplay = `${item.qty} Kg`;
+      }
     } else if (item.satuanJual === 'rtg') {
-      qtyDisplay = `${(item.qty / (databaseProduk[item.barcode]?.isiRtg || 10)).toFixed(1)} rtg`;
+      qtyDisplay = `${(item.qty / isiOns).toFixed(1)} rtg`;
     } else {
       qtyDisplay = `${item.qty} Pcs`;
     }
