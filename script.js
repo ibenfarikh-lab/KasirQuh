@@ -2248,22 +2248,33 @@ function refreshData() {
 
         if (item.satuan === 'kg') {
           let hargaKg = item.modal || 0;
+          let jualKg = item.harga || 0;
           subtotalModal = hargaKg * (item.qty || 1);
-          detailsListHtml = `⚖️ <b>Harga / Kg:</b> Rp ${hargaKg.toLocaleString('id-ID')}`;
-          detailsGridHtml = `<div class="inv-card-row"><span>Harga/Kg:</span><b>Rp ${hargaKg.toLocaleString('id-ID')}</b></div>`;
+          detailsListHtml = `⚖️ <b>Modal:</b> Rp ${hargaKg.toLocaleString('id-ID')} | <b>Jual:</b> Rp ${jualKg.toLocaleString('id-ID')}`;
+          detailsGridHtml = `
+            <div class="inv-card-row"><span>Modal/Kg:</span><b>Rp ${hargaKg.toLocaleString('id-ID')}</b></div>
+            <div class="inv-card-row"><span>Jual/Kg:</span><b>Rp ${jualKg.toLocaleString('id-ID')}</b></div>
+          `;
         } else if (item.satuan === 'pcs') {
           let hargaPcs = item.modal || 0;
+          let jualPcs = item.harga || 0;
           subtotalModal = hargaPcs * (item.qty || 1);
-          detailsListHtml = `📦 <b>Harga / Pcs:</b> Rp ${hargaPcs.toLocaleString('id-ID')}`;
-          detailsGridHtml = `<div class="inv-card-row"><span>Harga/Pcs:</span><b>Rp ${hargaPcs.toLocaleString('id-ID')}</b></div>`;
+          detailsListHtml = `📦 <b>Modal:</b> Rp ${hargaPcs.toLocaleString('id-ID')} | <b>Jual:</b> Rp ${jualPcs.toLocaleString('id-ID')}`;
+          detailsGridHtml = `
+            <div class="inv-card-row"><span>Modal/Pcs:</span><b>Rp ${hargaPcs.toLocaleString('id-ID')}</b></div>
+            <div class="inv-card-row"><span>Jual/Pcs:</span><b>Rp ${jualPcs.toLocaleString('id-ID')}</b></div>
+          `;
         } else {
           let modalPcs = item.modal || 0;
           let modalRtgVal = item.modalRtg || (modalPcs * (item.isiRtg || 10));
+          let jualPcs = item.harga || 0;
+          let jualRtgVal = item.hargaRtg || (jualPcs * (item.isiRtg || 10));
           subtotalModal = modalRtgVal * (item.qty || 1);
-          detailsListHtml = `📦 <b>Pcs:</b> Modal Rp ${modalPcs.toLocaleString('id-ID')}<br>📑 <b>Rtg:</b> Modal Rp ${modalRtgVal.toLocaleString('id-ID')}`;
+          
+          detailsListHtml = `📦 <b>Pcs:</b> Mdl Rp ${modalPcs.toLocaleString('id-ID')} | Jul Rp ${jualPcs.toLocaleString('id-ID')}<br>📑 <b>Rtg:</b> Mdl Rp ${modalRtgVal.toLocaleString('id-ID')} | Jul Rp ${jualRtgVal.toLocaleString('id-ID')}`;
           detailsGridHtml = `
-            <div class="inv-card-row"><span>Pcs:</span><b>Rp ${modalPcs.toLocaleString('id-ID')}</b></div>
-            <div class="inv-card-row"><span>Rtg:</span><b>Rp ${modalRtgVal.toLocaleString('id-ID')}</b></div>
+            <div class="inv-card-row"><span>Pcs (M/J):</span><b>Rp ${modalPcs.toLocaleString('id-ID')} / ${jualPcs.toLocaleString('id-ID')}</b></div>
+            <div class="inv-card-row"><span>Rtg (M/J):</span><b>Rp ${modalRtgVal.toLocaleString('id-ID')} / ${jualRtgVal.toLocaleString('id-ID')}</b></div>
           `;
         }
 
