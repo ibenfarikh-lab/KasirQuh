@@ -528,6 +528,7 @@ function renderHalamanSubCatatan(tabKey) {
 
 function openCatatanModal(targetTabKey = activeSubCatatanTab, id = null) {
   const modal = document.getElementById("catatanModal");
+  if (!modal) return;
   document.getElementById("catatan-type-target").value = targetTabKey;
   let dataObj = databaseCatatanDinamis[targetTabKey] || { items: [] };
 
@@ -552,7 +553,8 @@ function openCatatanModal(targetTabKey = activeSubCatatanTab, id = null) {
 }
 
 function closeCatatanModal() {
-  document.getElementById("catatanModal").classList.remove("show");
+  const modal = document.getElementById("catatanModal");
+  if (modal) modal.classList.remove("show");
 }
 
 function simpanCatatanCard() {
@@ -756,7 +758,7 @@ window.addEventListener('popstate', function(event) {
   if (document.getElementById("productModal").classList.contains("show")) { closeProductModal(); history.pushState({tab: activeTab}, "", ""); return; }
   if (document.getElementById("customerModal").classList.contains("show")) { closeCustomerModal(); history.pushState({tab: activeTab}, "", ""); return; }
   if (document.getElementById("bookkeepingModal").classList.contains("show")) { closeBookkeepingModal(); history.pushState({tab: activeTab}, "", ""); return; }
-  if (document.getElementById("catatanModal").classList.contains("show")) { closeCatatanModal(); history.pushState({tab: activeTab}, "", ""); return; }
+  if (document.getElementById("catatanModal") && document.getElementById("catatanModal").classList.contains("show")) { closeCatatanModal(); history.pushState({tab: activeTab}, "", ""); return; }
   
   const searchBar = document.getElementById("sticky-search-container");
   if (searchBar && searchBar.classList.contains("show")) {
@@ -1384,16 +1386,21 @@ function switchSubDataTab(subTabId) {
   document.querySelectorAll('#laporan .sub-tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('#laporan .sub-tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById(subTabId)?.classList.add('active');
+
+  const fabAdd = document.getElementById('fab-add-btn');
+  const fabAddCust = document.getElementById('fab-add-cust-btn');
+  const fabAddCatatan = document.getElementById('fab-add-catatan-btn');
+
   if (subTabId === 'sub-pelanggan') {
     document.getElementById('sub-btn-pelanggan')?.classList.add('active');
-    document.getElementById('fab-add-btn').style.display = 'none';
-    document.getElementById('fab-add-cust-btn').style.display = 'flex';
-    document.getElementById('fab-add-catatan-btn').style.display = 'none';
+    if(fabAdd) fabAdd.style.display = 'none';
+    if(fabAddCust) fabAddCust.style.display = 'flex';
+    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
   } else if (subTabId === 'sub-laporan') {
     document.getElementById('sub-btn-laporan')?.classList.add('active');
-    document.getElementById('fab-add-btn').style.display = 'none';
-    document.getElementById('fab-add-cust-btn').style.display = 'none';
-    document.getElementById('fab-add-catatan-btn').style.display = 'none';
+    if(fabAdd) fabAdd.style.display = 'none';
+    if(fabAddCust) fabAddCust.style.display = 'none';
+    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
   }
   updatePermanentBarTitle();
 }
@@ -1455,23 +1462,53 @@ function switchTab(tabId, pushHistory = true) {
   const fabAddCatatan = document.getElementById('fab-add-catatan-btn');
 
   if (tabId === 'penjualan') {
-    fabCart.style.display = 'flex'; fabScan.style.display = 'flex'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
+    if(fabCart) fabCart.style.display = 'flex'; 
+    if(fabScan) fabScan.style.display = 'flex'; 
+    if(fabFilter) fabFilter.style.display = 'flex'; 
+    if(fabAdd) fabAdd.style.display = 'none'; 
+    if(fabAddCust) fabAddCust.style.display = 'none'; 
+    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
   } else if (tabId === 'kasir-online') {
-    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
+    if(fabCart) fabCart.style.display = 'none'; 
+    if(fabScan) fabScan.style.display = 'none'; 
+    if(fabFilter) fabFilter.style.display = 'none'; 
+    if(fabAdd) fabAdd.style.display = 'none'; 
+    if(fabAddCust) fabAddCust.style.display = 'none'; 
+    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
   } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
-    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'flex'; fabAdd.style.display = 'flex'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
-    fabAdd.setAttribute("onclick", "openProductModal()");
+    if(fabCart) fabCart.style.display = 'none'; 
+    if(fabScan) fabScan.style.display = 'none'; 
+    if(fabFilter) fabFilter.style.display = 'flex'; 
+    if(fabAdd) fabAdd.style.display = 'flex'; 
+    if(fabAddCust) fabAddCust.style.display = 'none'; 
+    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
+    if(fabAdd) fabAdd.setAttribute("onclick", "openProductModal()");
   } else if (tabId === 'laporan') {
-    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAddCatatan.style.display = 'none';
-    if (activeSubDataTab === 'sub-pelanggan') { fabAdd.style.display = 'none'; fabAddCust.style.display = 'flex'; }
-    else { fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; }
+    if(fabCart) fabCart.style.display = 'none'; 
+    if(fabScan) fabScan.style.display = 'none'; 
+    if(fabFilter) fabFilter.style.display = 'none'; 
+    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
+    if (activeSubDataTab === 'sub-pelanggan') { 
+      if(fabAdd) fabAdd.style.display = 'none'; 
+      if(fabAddCust) fabAddCust.style.display = 'flex'; 
+    } else { 
+      if(fabAdd) fabAdd.style.display = 'none'; 
+      if(fabAddCust) fabAddCust.style.display = 'none'; 
+    }
   } else if (tabId === 'catatan') {
-    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; 
-    fabAdd.style.display = 'none'; 
-    fabAddCust.style.display = 'none';
-    fabAddCatatan.style.display = 'flex';
+    if(fabCart) fabCart.style.display = 'none'; 
+    if(fabScan) fabScan.style.display = 'none'; 
+    if(fabFilter) fabFilter.style.display = 'none'; 
+    if(fabAdd) fabAdd.style.display = 'none'; 
+    if(fabAddCust) fabAddCust.style.display = 'none';
+    if(fabAddCatatan) fabAddCatatan.style.display = 'flex';
   } else {
-    fabCart.style.display = 'none'; fabScan.style.display = 'none'; fabFilter.style.display = 'none'; fabAdd.style.display = 'none'; fabAddCust.style.display = 'none'; fabAddCatatan.style.display = 'none';
+    if(fabCart) fabCart.style.display = 'none'; 
+    if(fabScan) fabScan.style.display = 'none'; 
+    if(fabFilter) fabFilter.style.display = 'none'; 
+    if(fabAdd) fabAdd.style.display = 'none'; 
+    if(fabAddCust) fabAddCust.style.display = 'none'; 
+    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
   }
   updatePermanentBarTitle();
   refreshData();
@@ -2393,7 +2430,6 @@ function showNotif(msg) {
   setTimeout(() => { notif.style.display = "none"; }, 1500);
 }
 
-// FUNGSI PEMBERSIH CACHE MANUAL SCRIPT
 function bersihkanCacheTotal() {
   if (confirm("Bersihkan seluruh cache aplikasi dan muat ulang ke versi terbaru?")) {
     if ('caches' in window) {
@@ -2416,7 +2452,6 @@ function bersihkanCacheTotal() {
   }
 }
 
-// TAMBAHAN FUNGSI: AMBIL DARI CATATAN KE BELANJA STOK
 function ambilDariCatatan() {
   let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
   if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {

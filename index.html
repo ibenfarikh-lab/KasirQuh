@@ -417,6 +417,27 @@
     </div>
   </div>
 
+  <!-- MODAL TAMBAH/EDIT CATATAN (DITAMBAHKAN AGAR IKON PENA BERFUNGSI) -->
+  <div id="catatanModal" class="modal-backdrop" onclick="if(event.target === this) closeCatatanModal()">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 id="catatan-modal-title">Tambah Catatan Baru</h3>
+        <button class="btn-close-modal" onclick="closeCatatanModal()">&times;</button>
+      </div>
+      <input type="hidden" id="catatan-id">
+      <input type="hidden" id="catatan-type-target">
+      <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 0.85rem;">Judul Catatan:</label>
+        <input type="text" id="catatan-title-input" placeholder="Cth: Catatan 1">
+        <label style="font-size: 0.85rem;">Subjudul / Pembayaran (Opsional):</label>
+        <input type="text" id="catatan-subtitle-input" placeholder="Cth: Pembayaran 50.000">
+        <label style="font-size: 0.85rem;">Rincian / Isi Catatan:</label>
+        <textarea id="catatan-desc-input" rows="4" placeholder="Cth: Minyak - 2 - pcs - 15000" style="padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"></textarea>
+        <button onclick="simpanCatatanCard()" style="background: #16a34a; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px;">Simpan Catatan</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PERMANENT BOTTOM BAR -->
   <div class="permanent-bottom-bar no-print">
     <h2 id="permanent-title" style="font-size: 1.05rem; margin: 0; font-weight: 700;">Halaman Kasir</h2>
@@ -438,7 +459,6 @@
         <button class="popup-menu-btn" id="pop-btn-penjualan" onclick="switchTab('penjualan'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Kasir
         </button>
-        <!-- TOMBOL MENU KASIR ONLINE URUTAN KEDUA DENGAN BADGE ANGKA MERAH -->
         <button class="popup-menu-btn" id="pop-btn-kasironline" onclick="switchTab('kasir-online'); toggleFloatingMenu();" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
           <span style="display: flex; align-items: center; gap: 8px;">
             <svg viewBox="0 0 24 24" style="width:18px; height:18px; fill:currentColor;"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg> Kasir Online
@@ -462,7 +482,6 @@
         </button>
       </div>
 
-      <!-- TOGGLE MENU DENGAN LINGKARAN KECIL BIRU NOTIFIKASI -->
       <button class="btn-bar-menu" onclick="toggleFloatingMenu()" title="Menu Utama" style="position: relative;">
         <span class="burger-line"></span>
         <span class="burger-line"></span>
