@@ -231,7 +231,7 @@
     let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false;
     let currentPosPage = 1;
-    let itemsPerPagePos = 24; // Disamakan dengan kasir panel admin (24 item per halaman)[span_2](start_span)[span_2](end_span)
+    let itemsPerPagePos = 24; // 24 item per halaman disamakan dengan kasir panel admin[span_1](start_span)[span_1](end_span)
 
     window.onload = function() {
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
@@ -460,7 +460,15 @@
       document.getElementById("pos-page-indicator").innerText = `${currentPosPage}/${totalPages}`;
     }
 
-    function ubahHalamanPos(d) { currentPosPage += d; refreshKatalogPelanggan(); }
+    // Fungsi perpindahan halaman dengan auto-scroll ke atas (mentok sampai ujung atas)
+    function ubahHalamanPos(d) { 
+      currentPosPage += d; 
+      refreshKatalogPelanggan(); 
+      const mainContent = document.querySelector('.main-content');
+      if (mainContent) mainContent.scrollTop = 0;
+      window.scrollTo(0, 0);
+    }
+
     function filterKatalogPelanggan(v) { currentPosPage = 1; refreshKatalogPelanggan(); }
 
     function tambahKeKeranjangPelanggan(code) {
