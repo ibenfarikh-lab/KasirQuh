@@ -110,7 +110,7 @@
       </div>
     </div>
 
-    <!-- 2. HALAMAN DATA PELANGGAN (DITAMBAH RIWAYAT PESANAN ONLINE) -->
+    <!-- 2. HALAMAN DATA PELANGGAN -->
     <div id="data-pelanggan" class="tab-content">
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Profil Saya</h3>
@@ -206,7 +206,6 @@
 
     window.onload = function() {
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
-      document.getElementById('setting-theme')?.value;
       applyThemePelanggan(savedTheme);
 
       if (currentCustomerPhone) {
@@ -535,9 +534,9 @@
       });
     }
 
-    // LISTENER RIWAYAT PESANAN ONLINE DI PANEL PELANGGAN
+    // LISTENER RIWAYAT PESANAN ONLINE DI PANEL PELANGGAN (DIPERBAIKI)
     function muatRiwayatPesananOnlinePelanggan() {
-      db.collection("transaksi").where("customerPhone", "==", currentCustomerPhone).orderBy("waktuTimestamp", "desc").onSnapshot((snapshot) => {
+      db.collection("transaksi").where("customerPhone", "==", currentCustomerPhone).onSnapshot((snapshot) => {
         const container = document.getElementById("customer-online-orders-container");
         if (!container) return;
         container.innerHTML = "";
@@ -547,8 +546,19 @@
           return;
         }
 
+        let orders = [];
         snapshot.forEach(doc => {
-          let trx = doc.data();
+          orders.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Urutkan data secara lokal berdasarkan waktu terbaru tanpa butuh composite index firebase
+        orders.sort((a, b) => {
+          let timeA = a.waktuTimestamp?.toMillis ? a.waktuTimestamp.toMillis() : 0;
+          let timeB = b.waktuTimestamp?.toMillis ? b.waktuTimestamp.toMillis() : 0;
+          return timeB - timeA;
+        });
+
+        orders.forEach(trx => {
           let statusBadge = trx.statusPesanan || "Menunggu Diproses";
           let badgeColor = statusBadge === "Selesai" ? "#16a34a" : "#d97706";
 
