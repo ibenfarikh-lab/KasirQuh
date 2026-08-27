@@ -6,10 +6,14 @@
   <title>KasirQuh</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   
+  <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+  <!-- External Stylesheet -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- PWA Configuration -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2563eb">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -106,6 +110,18 @@
       </div>
     </div>
 
+    <div id="scannerModal" class="fab-scanner-modal">
+      <div class="scanner-fullscreen-box">
+        <button class="btn-close-scanner-absolute" onclick="toggleScannerPos()">&times;</button>
+        <div class="scanner-focus-frame"></div>
+        <div class="scanner-laser-line"></div>
+        <div id="scanner-box-pos" class="scanner-wrapper" style="display: block;">
+          <div id="reader-pos"></div>
+        </div>
+        <div id="scan-notif" class="scan-status-floating"></div>
+      </div>
+    </div>
+
     <!-- 2. HALAMAN MANAJEMEN STOK -->
     <div id="data-barang" class="tab-content">
       <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; gap: 6px; width: 100%;">
@@ -131,7 +147,7 @@
           <div style="font-size: 1.25rem; font-weight: bold; color: #2563eb;">Rp <span id="restock-est-total">0</span></div>
         </div>
         <div style="display: flex; gap: 6px;">
-          <button onclick="kosongkanRestockList()" style="background: #ef4444; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px;" title="Kosongkan">🗑️ Kosongkan</button>
+          <button onclick="kosongkanRestockList()" style="background: #ef4444; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px;" title="Kosongkan Daftar">🗑️ Kosongkan</button>
           <button onclick="prosesBelanjaStok()" style="background: #16a34a; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px; font-weight: bold;">🛒 Belanja</button>
         </div>
       </div>
@@ -149,7 +165,7 @@
       <button id="fab-add-catatan-btn" class="fab-add" onclick="openCatatanModal(activeSubCatatanTab)" title="Catatan" style="display: none;"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>
     </div>
 
-    <!-- 4. HALAMAN LAPORAN / DATA -->
+    <!-- 4. HALAMAN LAPORAN / DATA (DITAMBAHKAN TAB PESANAN ONLINE & AMAN) -->
     <div id="laporan" class="tab-content">
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap;">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')">👥 Data Pelanggan</button>
@@ -289,7 +305,7 @@
   <div id="customerModal" class="modal-backdrop"><div class="modal-content"><div class="modal-header"><h3 id="cust-modal-title">Pelanggan</h3><button class="btn-close-modal" onclick="closeCustomerModal()">&times;</button></div><div class="form-group"><input type="hidden" id="cust-id"><input type="text" id="cust-name" placeholder="Nama"><input type="text" id="cust-phone" placeholder="No WA"><input type="text" id="cust-address" placeholder="Alamat"><button onclick="simpanPelanggan()" style="width:100%;">Simpan</button></div></div></div>
   <div id="bookkeepingModal" class="modal-backdrop"><div class="modal-content"><div class="modal-header"><h3 id="bk-modal-title">Catatan Pelanggan</h3><button class="btn-close-modal" onclick="closeBookkeepingModal()">&times;</button></div><div class="form-group"><input type="hidden" id="bk-cust-id"><input type="hidden" id="bk-note-id"><input type="text" id="bk-datetime" readonly><select id="bk-type"><option value="Belanja (belum dibayar)">Belanja</option><option value="Hutang / Kasbon">Hutang</option></select><input type="text" id="bk-amount" placeholder="Nominal" oninput="formatInputRupiah(this)"><textarea id="bk-desc" rows="3" placeholder="Keterangan"></textarea><button onclick="simpanCatatanPembukuan()" style="width:100%;">Simpan</button></div></div></div>
 
-  <!-- SCRIPT ADMIN (BERSIH & AMAN DARI ERROR INDEX FIRESTORE) -->
+  <!-- SCRIPT UTAMA + FITUR PESANAN ONLINE, EDIT, & ALARM 20 KETUKAN -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
