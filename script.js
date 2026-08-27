@@ -808,7 +808,7 @@ function updateUnitLabel() {
     document.getElementById("lbl-db-stock").innerText = "Jumlah Stok (Kg):";
     document.getElementById("lbl-db-cost").innerText = "Harga Modal / Kg (Rp):";
     document.getElementById("lbl-db-price").innerText = "Harga Jual / Kg (Rp):";
-    if (labelEl) labelEl.innerText = "Jumlah Ons per 1 Kg (10ons):";
+    if (labelEl) labelEl.innerText = "Jumlah 1Kg (10ons):";
   } else if (unit === 'rtg') {
     rtgWrapper.style.display = "block";
     document.getElementById("lbl-db-stock").innerText = "Jumlah Stok (Renteng):";
