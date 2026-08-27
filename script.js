@@ -2240,15 +2240,34 @@ function refreshData() {
     } else {
       restockListItems.forEach(item => {
         let fotoSrc = item.foto || defaultPlaceholderImg;
-        
-        let modalPcs = item.satuan === 'rtg' ? item.modal : (item.modal || 0);
-        let modalRtgVal = item.satuan === 'rtg' ? item.modalRtg : ((item.modal || 0) * (item.isiRtg || 10));
-        let jualPcs = item.satuan === 'rtg' ? item.harga : (item.harga || 0);
-        let jualRtgVal = item.satuan === 'rtg' ? item.hargaRtg : ((item.harga || 0) * (item.isiRtg || 10));
-
-        let subtotalModal = (item.satuan === 'rtg' ? (item.modalRtg || 0) : (item.modal || 0)) * (item.qty || 1);
-        totalEstBelanja += subtotalModal;
         let satuanLabel = item.satuan === 'rtg' ? `rtg (isi ${item.isiRtg || 10})` : item.satuan;
+        
+        let detailsListHtml = '';
+        let detailsGridHtml = '';
+        let subtotalModal = 0;
+
+        if (item.satuan === 'kg') {
+          let hargaKg = item.modal || 0;
+          subtotalModal = hargaKg * (item.qty || 1);
+          detailsListHtml = `⚖️ <b>Harga / Kg:</b> Rp ${hargaKg.toLocaleString('id-ID')}`;
+          detailsGridHtml = `<div class="inv-card-row"><span>Harga/Kg:</span><b>Rp ${hargaKg.toLocaleString('id-ID')}</b></div>`;
+        } else if (item.satuan === 'pcs') {
+          let hargaPcs = item.modal || 0;
+          subtotalModal = hargaPcs * (item.qty || 1);
+          detailsListHtml = `📦 <b>Harga / Pcs:</b> Rp ${hargaPcs.toLocaleString('id-ID')}`;
+          detailsGridHtml = `<div class="inv-card-row"><span>Harga/Pcs:</span><b>Rp ${hargaPcs.toLocaleString('id-ID')}</b></div>`;
+        } else {
+          let modalPcs = item.modal || 0;
+          let modalRtgVal = item.modalRtg || (modalPcs * (item.isiRtg || 10));
+          subtotalModal = modalRtgVal * (item.qty || 1);
+          detailsListHtml = `📦 <b>Pcs:</b> Modal Rp ${modalPcs.toLocaleString('id-ID')}<br>📑 <b>Rtg:</b> Modal Rp ${modalRtgVal.toLocaleString('id-ID')}`;
+          detailsGridHtml = `
+            <div class="inv-card-row"><span>Pcs:</span><b>Rp ${modalPcs.toLocaleString('id-ID')}</b></div>
+            <div class="inv-card-row"><span>Rtg:</span><b>Rp ${modalRtgVal.toLocaleString('id-ID')}</b></div>
+          `;
+        }
+
+        totalEstBelanja += subtotalModal;
 
         restockListWrapper.innerHTML += `
           <div class="inv-list-item">
@@ -2261,8 +2280,7 @@ function refreshData() {
               <div class="inv-list-title">${item.nama}</div>
               <div class="inv-list-sub">Beli: ${item.qty} ${satuanLabel}</div>
               <div class="inv-list-price" style="font-size: 0.78rem; line-height: 1.3;">
-                📦 <b>Pcs:</b> Modal Rp ${modalPcs.toLocaleString('id-ID')} | Jual Rp ${jualPcs.toLocaleString('id-ID')}<br>
-                📑 <b>Rtg:</b> Modal Rp ${modalRtgVal.toLocaleString('id-ID')} | Jual Rp ${jualRtgVal.toLocaleString('id-ID')}
+                ${detailsListHtml}
               </div>
             </div>
             <div style="text-align: right; font-weight: bold; font-size: 0.85rem; color: #2563eb;">
@@ -2285,8 +2303,7 @@ function refreshData() {
               </div>
             </div>
             <div class="inv-card-details" style="font-size: 0.75rem;">
-              <div class="inv-card-row"><span>Pcs:</span><b>Rp ${modalPcs.toLocaleString('id-ID')}</b></div>
-              <div class="inv-card-row"><span>Rtg:</span><b>Rp ${modalRtgVal.toLocaleString('id-ID')}</b></div>
+              ${detailsGridHtml}
               <div class="inv-card-row" style="border-top: 1px dashed var(--border-color); padding-top: 3px; margin-top: 3px;"><span>Total:</span><b style="color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</b></div>
             </div>
           </div>
@@ -2480,7 +2497,6 @@ function ambilDariCatatan() {
         if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
         
         let hargaTotalInput = parseRupiahToNumber(parts[3]) || 0;
-        // Harga modal satuan dihitung dari total harga dibagi jumlah (qty)
         let modalSatuanTotal = qty > 0 ? (hargaTotalInput / qty) : hargaTotalInput;
 
         let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
