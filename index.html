@@ -165,7 +165,8 @@
           <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">ESTIMASI TOTAL BELANJA STOK</div>
           <div style="font-size: 1.25rem; font-weight: bold; color: #2563eb;">Rp <span id="restock-est-total">0</span></div>
         </div>
-        <div style="display: flex; gap: 6px;">
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button onclick="ambilDariCatatan()" style="background: #2563eb; color: white; padding: 8px 10px; font-size: 0.75rem; border-radius: 8px; font-weight: bold;" title="Ambil dari Catatan Hari Ini">📥 Ambil Catatan</button>
           <button onclick="kosongkanRestockList()" style="background: #ef4444; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px;" title="Kosongkan Daftar">🗑️ Kosongkan</button>
           <button onclick="prosesBelanjaStok()" style="background: #16a34a; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-weight: bold;">
             🛒 Belanja
@@ -577,7 +578,6 @@
       let listBerlangsung = onlineOrdersDataCache.filter(t => (t.statusPesanan || "Menunggu Diproses") !== "Selesai");
       let listSelesai = onlineOrdersDataCache.filter(t => (t.statusPesanan || "") === "Selesai");
 
-      // LOGIKA BADGE MERAH & NOTIFIKASI BIRU
       let activeCount = listBerlangsung.length;
       const badgeEl = document.getElementById("badge-online-count");
       const blueDotEl = document.getElementById("burger-blue-dot");
