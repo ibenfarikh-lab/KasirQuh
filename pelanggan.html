@@ -57,15 +57,39 @@
     <button onclick="bukaLoginDariWelcome()" style="position: absolute; bottom: 20px; left: 20px; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.6); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;">Masuk / Daftar</button>
   </div>
 
+  <!-- Modal Login & Register Terpisah -->
   <div id="customerLoginModal" class="login-overlay" style="display: none;">
-    <div class="login-card">
-      <h2>KasirQuh</h2>
-      <p>Masukkan No. WhatsApp & Sandi untuk Masuk</p>
-      <form onsubmit="prosesLoginPelanggan(event)" class="form-vertical">
-        <input type="text" id="cust-login-phone" placeholder="No. WhatsApp (Cth: 08123...)" required>
-        <input type="password" id="cust-login-pass" placeholder="Sandi (Default: user)" required>
-        <button type="submit" style="margin-top: 10px; border-radius: 8px; padding: 12px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer;">Masuk / Daftar</button>
-      </form>
+    <div class="login-card" style="max-height: 90vh; overflow-y: auto;">
+      <h2 style="margin-top: 0; margin-bottom: 5px;">KasirQuh</h2>
+      
+      <!-- Form Login -->
+      <div id="formLoginContainer">
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Silakan masuk dengan No. WhatsApp & Sandi</p>
+        <form onsubmit="prosesLoginPelanggan(event)" class="form-vertical">
+          <input type="text" id="cust-login-phone" placeholder="No. WhatsApp (Cth: 08123...)" required>
+          <input type="password" id="cust-login-pass" placeholder="Sandi" required>
+          <button type="submit" style="margin-top: 10px; border-radius: 8px; padding: 12px; background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer;">Masuk</button>
+        </form>
+        <p style="text-align: center; margin-top: 15px; font-size: 0.85rem;">
+          Belum punya akun? <a href="javascript:void(0)" onclick="gantiFormAuth('register')" style="color: #2563eb; font-weight: bold;">Daftar di sini</a>
+        </p>
+      </div>
+
+      <!-- Form Register (Pendaftaran dengan Persetujuan Admin) -->
+      <div id="formRegisterContainer" style="display: none;">
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Daftar Akun (Menunggu Persetujuan Admin)</p>
+        <form onsubmit="prosesDaftarPelanggan(event)" class="form-vertical">
+          <input type="text" id="cust-reg-name" placeholder="Nama Lengkap" required>
+          <input type="text" id="cust-reg-phone" placeholder="No. WhatsApp (Cth: 08123...)" required>
+          <textarea id="cust-reg-address" placeholder="Alamat Pengiriman Lengkap" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px;" required></textarea>
+          <input type="password" id="cust-reg-pass" placeholder="Buat Sandi" required>
+          <button type="submit" style="margin-top: 10px; border-radius: 8px; padding: 12px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer;">Kirim Pendaftaran</button>
+        </form>
+        <p style="text-align: center; margin-top: 15px; font-size: 0.85rem;">
+          Sudah punya akun? <a href="javascript:void(0)" onclick="gantiFormAuth('login')" style="color: #2563eb; font-weight: bold;">Masuk di sini</a>
+        </p>
+      </div>
+
     </div>
   </div>
 
@@ -361,6 +385,7 @@
       tutupWelcomeScreen();
       if (!currentCustomerPhone) {
         document.getElementById('customerLoginModal').style.display = 'flex';
+        gantiFormAuth('login');
       }
     }
 
@@ -421,9 +446,9 @@
         muatRiwayatPesananOnlinePelanggan();
         initCustomerChatListener();
       } else {
-        // Jika belum login dan berada di mode standalone, langsung tampilkan modal login
         if (isStandalone) {
           document.getElementById('customerLoginModal').style.display = 'flex';
+          gantiFormAuth('login');
         } else {
           document.getElementById('customerLoginModal').style.display = 'none';
         }
@@ -536,6 +561,16 @@
       filterKatalogPelanggan("");
     }
 
+    function gantiFormAuth(type) {
+      if (type === 'register') {
+        document.getElementById('formLoginContainer').style.display = 'none';
+        document.getElementById('formRegisterContainer').style.display = 'block';
+      } else {
+        document.getElementById('formRegisterContainer').style.display = 'none';
+        document.getElementById('formLoginContainer').style.display = 'block';
+      }
+    }
+
     // --- FITUR LIVE CHAT PELANGGAN ---
     function toggleCustomerChatModal() {
       let modal = document.getElementById("customerChatModal");
@@ -634,24 +669,15 @@
 
       db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
         if (snapshot.empty) {
-          if (pass === "user" || pass === "12345") {
-            db.collection("pelanggan").add({
-              nama: "Pelanggan Baru", phone: phone, alamat: "-", password: pass, catatan: []
-            }).then(() => {
-              localStorage.setItem('cust_phone_v13', phone);
-              currentCustomerPhone = phone;
-              document.getElementById('customerLoginModal').style.display = 'none';
-              muatDataPelangganRealtime();
-              muatRiwayatPesananOnlinePelanggan();
-              initCustomerChatListener();
-              refreshKatalogPelanggan();
-              alert("Pendaftaran berhasil! Silakan lengkapi nama dan alamat di menu Pengaturan.");
-            });
-          } else {
-            alert("Nomor belum terdaftar. Gunakan sandi default 'user'.");
-          }
+          alert("Nomor WhatsApp belum terdaftar. Silakan daftar terlebih dahulu.");
         } else {
           let docData = snapshot.docs[0].data();
+          
+          // Cek apakah akun masih menunggu persetujuan admin
+          if (docData.status === "pending" || docData.disetujui === false) {
+            return alert("Akun Anda sedang menunggu persetujuan dari Admin toko. Silakan hubungi admin.");
+          }
+
           if (pass === (docData.password || "user")) {
             localStorage.setItem('cust_phone_v13', phone);
             currentCustomerPhone = phone;
@@ -668,11 +694,48 @@
       });
     }
 
+    function prosesDaftarPelanggan(e) {
+      e.preventDefault();
+      const name = document.getElementById('cust-reg-name').value.trim();
+      const phone = document.getElementById('cust-reg-phone').value.trim();
+      const address = document.getElementById('cust-reg-address').value.trim();
+      const pass = document.getElementById('cust-reg-pass').value.trim();
+
+      if (!name || !phone || !address || !pass) return alert("Semua kolom wajib diisi!");
+
+      db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
+        if (!snapshot.empty) {
+          alert("Nomor WhatsApp sudah terdaftar! Silakan langsung masuk.");
+          gantiFormAuth('login');
+        } else {
+          db.collection("pelanggan").add({
+            nama: name,
+            phone: phone,
+            alamat: address,
+            password: pass,
+            status: "pending", // Status menunggu persetujuan dari admin
+            catatan: [],
+            waktuDaftar: new Date().toLocaleString('id-ID')
+          }).then(() => {
+            alert("Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan Admin toko sebelum dapat digunakan untuk masuk.");
+            document.getElementById('cust-reg-name').value = '';
+            document.getElementById('cust-reg-phone').value = '';
+            document.getElementById('cust-reg-address').value = '';
+            document.getElementById('cust-reg-pass').value = '';
+            gantiFormAuth('login');
+          }).catch((err) => {
+            alert("Gagal mendaftar: " + err.message);
+          });
+        }
+      });
+    }
+
     function logoutPelanggan() {
       if (confirm("Keluar dari sesi ini?")) {
         localStorage.removeItem('cust_phone_v13');
         currentCustomerPhone = '';
         document.getElementById('customerLoginModal').style.display = 'flex';
+        gantiFormAuth('login');
         location.reload();
       }
     }
