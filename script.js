@@ -1,4 +1,4 @@
-// Inisialisasi Firebase (Ganti dengan konfigurasi dari Firebase Console kamu)[span_0](start_span)[span_0](end_span)
+// Inisialisasi Firebase (Ganti dengan konfigurasi dari Firebase Console kamu)
 const firebaseConfig = {
   apiKey: "MASUKKAN_API_KEY_KAMU",
   authDomain: "PROJECT_ID.firebaseapp.com",
@@ -1126,12 +1126,18 @@ function simpanPengaturanAkun() {
     .catch(err => alert("Gagal menyimpan akun: " + err.message));
 }
 
+let isProdukLoaded = false;
 let databaseProduk = {};
 db.collection("produk").onSnapshot((snapshot) => {
   databaseProduk = {};
   snapshot.forEach((doc) => {
     databaseProduk[doc.id] = doc.data();
   });
+  isProdukLoaded = true;
+  refreshData();
+}, (error) => {
+  console.error("Gagal memuat produk: ", error);
+  isProdukLoaded = true;
   refreshData();
 });
 
@@ -2618,6 +2624,18 @@ function refreshData() {
 
   const invList = document.getElementById("inventory-list-wrapper");
   const invGrid = document.getElementById("inventory-grid-wrapper");
+  const catalogGrid = document.getElementById("pos-catalog-container");
+  const catalogList = document.getElementById("pos-catalog-list-container");
+
+  if (!isProdukLoaded) {
+    const loadingMsg = `<div class="empty-state" style="grid-column: 1/-1;">⏳ Memuat data produk dari cloud...</div>`;
+    if(invList) invList.innerHTML = loadingMsg; 
+    if(invGrid) invGrid.innerHTML = loadingMsg;
+    if(catalogGrid) catalogGrid.innerHTML = loadingMsg;
+    if(catalogList) catalogList.innerHTML = loadingMsg;
+    return;
+  }
+
   invList.innerHTML = ""; invGrid.innerHTML = "";
 
   let categories = new Set();
