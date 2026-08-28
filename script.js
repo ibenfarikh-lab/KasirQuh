@@ -1193,6 +1193,7 @@ function openCustomerModal(id = null) {
       document.getElementById("cust-name").value = cust.nama;
       document.getElementById("cust-phone").value = cust.phone;
       document.getElementById("cust-address").value = cust.alamat;
+      document.getElementById("cust-password").value = ""; // kosongkan agar tidak menimpa kecuali diisi sandi baru
     }
   } else {
     title.innerText = "Tambah Pelanggan Baru";
@@ -1200,6 +1201,7 @@ function openCustomerModal(id = null) {
     document.getElementById("cust-name").value = "";
     document.getElementById("cust-phone").value = "";
     document.getElementById("cust-address").value = "";
+    document.getElementById("cust-password").value = "";
   }
   modal.classList.add("show");
   history.pushState({tab: activeTab, modal: 'customer'}, "", "");
@@ -1959,7 +1961,7 @@ function importPelangganExcel(event) {
         let alamat = cols[3].replace(/"/g, '') || "-";
         if (nama) {
           let docRef = db.collection("pelanggan").doc(custId);
-          batch.set(docRef, { nama, phone, alamat, catatan: [] });
+          batch.set(docRef, { nama, phone, alamat, password: "123456", catatan: [] });
           count++;
         }
       }
@@ -2020,10 +2022,24 @@ function simpanPelanggan() {
   const nama = document.getElementById("cust-name").value.trim();
   const phone = document.getElementById("cust-phone").value.trim() || "-";
   const alamat = document.getElementById("cust-address").value.trim() || "-";
+  const password = document.getElementById("cust-password").value.trim();
+
   if (!nama) return alert("Nama pelanggan wajib diisi!");
   let custId = id || ("CUST-" + Date.now());
-  let dataPelanggan = { nama, phone, alamat, catatan: id ? (databasePelanggan.find(c => c.id === id)?.catatan || []) : [] };
-  db.collection("pelanggan").doc(custId).set(dataPelanggan)
+  
+  let existingCust = id ? databasePelanggan.find(c => c.id === id) : null;
+  let existingCatatan = existingCust ? (existingCust.catatan || []) : [];
+  let existingPassword = existingCust ? (existingCust.password || "123456") : "123456";
+
+  let dataPelanggan = { 
+    nama, 
+    phone, 
+    alamat, 
+    catatan: existingCatatan,
+    password: password ? password : existingPassword
+  };
+
+  db.collection("pelanggan").doc(custId).set(dataPelanggan, { merge: true })
     .then(() => { closeCustomerModal(); showNotif("Pelanggan tersimpan!"); })
     .catch(err => alert("Gagal: " + err.message));
 }
@@ -2488,6 +2504,7 @@ function refreshData() {
             <div style="display: flex; gap: 4px;">
               <button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button>
               <button style="background: #25D366; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="bagikanCatatanWhatsApp('${c.id}')">💬 WA</button>
+              <button class="btn-edit" style="background: #ca8a04; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openCustomerModal('${c.id}')">Edit</button>
               <button class="btn-danger" style="padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
             </div>
           </div>
