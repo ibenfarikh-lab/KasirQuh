@@ -294,16 +294,16 @@
       return sharedAudioCtx;
     }
 
-    function playTone(freq) {
+    function playTone(freq, type = "sine") {
       try {
         const audioCtx = getSharedAudioContext();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain); 
         gain.connect(audioCtx.destination);
-        osc.type = "sine"; 
+        osc.type = type; 
         osc.frequency.value = freq; 
-        gain.gain.value = 0.1;
+        gain.gain.value = 0.3; // Volume lebih jelas dan stabil
         osc.start(); 
         osc.stop(audioCtx.currentTime + 0.1);
       } catch (e) {
@@ -311,8 +311,8 @@
       }
     }
 
-    function playBeep() { playTone(1000); }     // Nada untuk tombol +
-    function playBeepDown() { playTone(500); }  // Nada lebih rendah untuk tombol -
+    function playBeep() { playTone(1000, "sine"); }     // Nada untuk tombol + (tinggi)
+    function playBeepDown() { playTone(600, "triangle"); } // Nada berbeda untuk tombol - (lebih rendah)
 
     function applyThemePelanggan(theme) {
       if (theme === 'auto') {
