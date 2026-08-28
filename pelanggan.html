@@ -281,7 +281,7 @@
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
       applyThemePelanggan(savedTheme);
 
-      // Tampilkan welcome screen selama 1.5 detik, lalu transisi masuk ke login atau beranda
+      // Tampilkan welcome screen selama 2 detik (2000 ms)
       setTimeout(() => {
         const welcomeEl = document.getElementById('welcomeScreen');
         if (welcomeEl) {
@@ -296,7 +296,7 @@
         } else {
           document.getElementById('customerLoginModal').style.display = 'flex';
         }
-      }, 1500);
+      }, 2000);
 
       initFirebaseListeners();
     };
