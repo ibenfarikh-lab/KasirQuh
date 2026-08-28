@@ -140,6 +140,30 @@
       </div>
     </div>
 
+    <!-- HALAMAN LIVE CHAT ADMIN -->
+    <div id="live-chat-admin" class="tab-content">
+      <div style="display: flex; height: calc(100vh - 140px); gap: 10px;">
+        <!-- Daftar Kontak Chat Pelanggan -->
+        <div style="width: 35%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flexDirection: column; overflow: hidden;">
+          <div style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);">💬 Daftar Percakapan</div>
+          <div id="admin-chat-list" style="flex: 1; overflow-y: auto;">
+            <div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Memuat daftar chat...</div>
+          </div>
+        </div>
+        <!-- Ruang Obrolan Aktif -->
+        <div style="flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
+          <div id="admin-chat-header" style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);">Pilih pelanggan di samping untuk mulai chat</div>
+          <div id="admin-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
+            <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;">Belum ada ruang chat yang dipilih.</div>
+          </div>
+          <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px;">
+            <input type="text" id="admin-chat-input" placeholder="Ketik balasan..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);" disabled>
+            <button onclick="kirimPesanAdmin()" id="admin-chat-send-btn" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;" disabled>Kirim</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="scannerModal" class="fab-scanner-modal">
       <div class="scanner-fullscreen-box">
         <button class="btn-close-scanner-absolute" onclick="toggleScannerPos()">&times;</button>
@@ -599,6 +623,12 @@
           </span>
           <span id="badge-online-count" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">0</span>
         </button>
+        <button class="popup-menu-btn" id="pop-btn-livechat" onclick="switchTab('live-chat-admin'); toggleFloatingMenu();" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
+          <span style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> Live Chat
+          </span>
+          <span id="badge-chat-count" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">0</span>
+        </button>
         <button class="popup-menu-btn" id="pop-btn-databarang" onclick="switchTab('data-barang'); toggleFloatingMenu();">
           <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></svg> Stok
         </button>
@@ -634,10 +664,13 @@
     let onlineOrdersDataCache = [];
     let activeOnlineTab = 'berlangsung';
     let editingOrderItemsTemp = [];
+    let selectedChatPhone = null;
+    let chatUnsubscribe = null;
 
     document.addEventListener("DOMContentLoaded", function() {
       initOnlineOrdersListener();
       initCustomerCardClickObserver();
+      initAdminChatListener();
     });
 
     function switchOnlineTab(tab) {
@@ -710,6 +743,120 @@
         });
 
         renderOnlineOrdersUI();
+      });
+    }
+
+    // --- FITUR LIVE CHAT ADMIN ---
+    function initAdminChatListener() {
+      let isInitialChatLoad = true;
+      db.collection("chats").onSnapshot((snapshot) => {
+        if (!isInitialChatLoad) {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added" || change.type === "modified") {
+              playNotificationSound();
+            }
+          });
+        }
+        isInitialChatLoad = false;
+
+        let chatListContainer = document.getElementById("admin-chat-list");
+        if (!chatListContainer) return;
+        chatListContainer.innerHTML = "";
+
+        if (snapshot.empty) {
+          chatListContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Belum ada pesan masuk.</div>`;
+          return;
+        }
+
+        let totalUnread = 0;
+        snapshot.forEach(doc => {
+          let data = doc.data();
+          let phone = doc.id;
+          let name = data.customerNama || phone;
+          let lastMsg = data.lastMessage || "Kirim pesan...";
+          let unread = data.unreadAdmin || 0;
+          totalUnread += unread;
+
+          let activeStyle = selectedChatPhone === phone ? "background: rgba(37,99,235,0.1); border-left: 4px solid #2563eb;" : "";
+
+          chatListContainer.innerHTML += `
+            <div onclick="bukaRuangChatAdmin('${phone}', '${name}')" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; ${activeStyle}">
+              <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem;">
+                <span>👤 ${name}</span>
+                ${unread > 0 ? `<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">${unread}</span>` : ''}
+              </div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${phone}</div>
+            </div>
+          `;
+        });
+
+        const badgeChat = document.getElementById("badge-chat-count");
+        if (badgeChat) {
+          if (totalUnread > 0) {
+            badgeChat.innerText = totalUnread;
+            badgeChat.style.display = "inline-block";
+          } else {
+            badgeChat.style.display = "none";
+          }
+        }
+      });
+    }
+
+    function bukaRuangChatAdmin(phone, name) {
+      selectedChatPhone = phone;
+      document.getElementById("admin-chat-header").innerText = `Chat dengan: ${name} (${phone})`;
+      document.getElementById("admin-chat-input").removeAttribute("disabled");
+      document.getElementById("admin-chat-send-btn").removeAttribute("disabled");
+
+      // Reset unread counter for admin
+      db.collection("chats").doc(phone).update({ unreadAdmin: 0 }).catch(() => {});
+
+      if (chatUnsubscribe) chatUnsubscribe();
+
+      chatUnsubscribe = db.collection("chats").doc(phone).collection("messages")
+        .orderBy("waktuTimestamp", "asc")
+        .onSnapshot((snapshot) => {
+          let msgContainer = document.getElementById("admin-chat-messages");
+          msgContainer.innerHTML = "";
+          if (snapshot.empty) {
+            msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada percakapan.</div>`;
+            return;
+          }
+          snapshot.forEach(doc => {
+            let m = doc.data();
+            let isAdmin = m.pengirim === "admin";
+            let alignBubble = isAdmin ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
+            msgContainer.innerHTML += `
+              <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble}">
+                <div>${m.pesan}</div>
+                <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
+              </div>
+            `;
+          });
+          msgContainer.scrollTop = msgContainer.scrollHeight;
+        });
+    }
+
+    function kirimPesanAdmin() {
+      if (!selectedChatPhone) return alert("Pilih pelanggan terlebih dahulu!");
+      let inputEl = document.getElementById("admin-chat-input");
+      let pesan = inputEl.value.trim();
+      if (!pesan) return;
+
+      let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
+
+      db.collection("chats").doc(selectedChatPhone).collection("messages").add({
+        pengirim: "admin",
+        pesan: pesan,
+        waktu: nowStr,
+        waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        db.collection("chats").doc(selectedChatPhone).set({
+          lastMessage: "Admin: " + pesan,
+          lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          unreadCustomer: firebase.firestore.FieldValue.increment(1)
+        }, { merge: true });
+        inputEl.value = "";
       });
     }
 

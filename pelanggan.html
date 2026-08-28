@@ -234,7 +234,13 @@
 
   </div>
 
+  <!-- FLOATING CHAT & UTILITIES -->
   <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
+    <!-- Tombol Live Chat Pelanggan -->
+    <button id="fab-chat-btn" class="fab-main" onclick="toggleCustomerChatModal()" title="Live Chat Toko" style="position: relative; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; background: #16a34a;">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+      <span class="cart-badge" id="chat-badge-count" style="display: none; position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.75rem; min-width: 20px; height: 20px; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span>
+    </button>
     <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="24" height="24" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg>
     </button>
@@ -242,6 +248,23 @@
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
       <span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.75rem; min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span>
     </button>
+  </div>
+
+  <!-- MODAL LIVE CHAT PELANGGAN -->
+  <div id="customerChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleCustomerChatModal()">
+    <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+      <div class="modal-header" style="padding: 12px 16px; margin: 0; background: var(--table-header);">
+        <h3>💬 Live Chat dengan Toko</h3>
+        <button class="btn-close-modal" onclick="toggleCustomerChatModal()">&times;</button>
+      </div>
+      <div id="customer-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat pesan...</div>
+      </div>
+      <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px;">
+        <input type="text" id="customer-chat-input" placeholder="Tulis pesan ke toko..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);">
+        <button onclick="kirimPesanPelanggan()" style="background: #16a34a; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
+      </div>
+    </div>
   </div>
 
   <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
@@ -273,10 +296,12 @@
     let cart = [];
     let pengaturanToko = { nama: "TokoQuh", phone: "089" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || '';
+    let currentCustomerName = 'Pelanggan';
     let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false;
     let currentPosPage = 1;
     let itemsPerPagePos = 24;
+    let customerChatUnsubscribe = null;
 
     window.onload = function() {
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
@@ -285,13 +310,9 @@
       const cachedStoreName = localStorage.getItem('cust_store_name_v13');
       if (cachedStoreName) {
         const welcomeStoreNameEl = document.getElementById('welcomeStoreName');
-        if (welcomeStoreNameEl) {
-          welcomeStoreNameEl.innerText = cachedStoreName;
-        }
+        if (welcomeStoreNameEl) welcomeStoreNameEl.innerText = cachedStoreName;
         const receiptShopNameEl = document.getElementById('receipt-shop-name');
-        if (receiptShopNameEl) {
-          receiptShopNameEl.innerText = cachedStoreName;
-        }
+        if (receiptShopNameEl) receiptShopNameEl.innerText = cachedStoreName;
       }
 
       setTimeout(() => {
@@ -305,6 +326,7 @@
           document.getElementById('customerLoginModal').style.display = 'none';
           muatDataPelangganRealtime();
           muatRiwayatPesananOnlinePelanggan();
+          initCustomerChatListener();
         } else {
           document.getElementById('customerLoginModal').style.display = 'flex';
         }
@@ -383,6 +405,84 @@
       filterKatalogPelanggan("");
     }
 
+    // --- FITUR LIVE CHAT PELANGGAN ---
+    function toggleCustomerChatModal() {
+      let modal = document.getElementById("customerChatModal");
+      modal.classList.toggle("show");
+      if (modal.classList.contains("show") && currentCustomerPhone) {
+        // Reset unread for customer
+        db.collection("chats").doc(currentCustomerPhone).update({ unreadCustomer: 0 }).catch(() => {});
+      }
+    }
+
+    function initCustomerChatListener() {
+      if (!currentCustomerPhone) return;
+      db.collection("chats").doc(currentCustomerPhone).onSnapshot((doc) => {
+        if (doc.exists) {
+          let data = doc.data();
+          let unread = data.unreadCustomer || 0;
+          let badge = document.getElementById("chat-badge-count");
+          if (badge) {
+            if (unread > 0) {
+              badge.innerText = unread;
+              badge.style.display = "flex";
+            } else {
+              badge.style.display = "none";
+            }
+          }
+        }
+      });
+
+      if (customerChatUnsubscribe) customerChatUnsubscribe();
+      customerChatUnsubscribe = db.collection("chats").doc(currentCustomerPhone).collection("messages")
+        .orderBy("waktuTimestamp", "asc")
+        .onSnapshot((snapshot) => {
+          let msgContainer = document.getElementById("customer-chat-messages");
+          if (!msgContainer) return;
+          msgContainer.innerHTML = "";
+          if (snapshot.empty) {
+            msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>`;
+            return;
+          }
+          snapshot.forEach(doc => {
+            let m = doc.data();
+            let isCustomer = m.pengirim === "customer";
+            let alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
+            msgContainer.innerHTML += `
+              <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble}">
+                <div>${m.pesan}</div>
+                <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
+              </div>
+            `;
+          });
+          msgContainer.scrollTop = msgContainer.scrollHeight;
+        });
+    }
+
+    function kirimPesanPelanggan() {
+      if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu!");
+      let inputEl = document.getElementById("customer-chat-input");
+      let pesan = inputEl.value.trim();
+      if (!pesan) return;
+
+      let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
+
+      db.collection("chats").doc(currentCustomerPhone).collection("messages").add({
+        pengirim: "customer",
+        pesan: pesan,
+        waktu: nowStr,
+        waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        db.collection("chats").doc(currentCustomerPhone).set({
+          customerNama: currentCustomerName,
+          lastMessage: currentCustomerName + ": " + pesan,
+          lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          unreadAdmin: firebase.firestore.FieldValue.increment(1)
+        }, { merge: true });
+        inputEl.value = "";
+      });
+    }
+
     function prosesLoginPelanggan(e) {
       e.preventDefault();
       const phone = document.getElementById('cust-login-phone').value.trim();
@@ -400,6 +500,7 @@
               document.getElementById('customerLoginModal').style.display = 'none';
               muatDataPelangganRealtime();
               muatRiwayatPesananOnlinePelanggan();
+              initCustomerChatListener();
               refreshKatalogPelanggan();
               alert("Pendaftaran berhasil! Silakan lengkapi nama dan alamat di menu Pengaturan.");
             });
@@ -411,9 +512,11 @@
           if (pass === (docData.password || "user")) {
             localStorage.setItem('cust_phone_v13', phone);
             currentCustomerPhone = phone;
+            currentCustomerName = docData.nama || 'Pelanggan';
             document.getElementById('customerLoginModal').style.display = 'none';
             muatDataPelangganRealtime();
             muatRiwayatPesananOnlinePelanggan();
+            initCustomerChatListener();
             refreshKatalogPelanggan();
           } else {
             alert("Sandi salah!");
@@ -475,17 +578,20 @@
       const searchContainer = document.getElementById('sticky-search-container');
       const searchFab = document.getElementById('fab-search-btn');
       const cartFab = document.getElementById('fab-cart-btn');
+      const chatFab = document.getElementById('fab-chat-btn');
 
       if (tabId === 'belanja') {
         titleEl.innerText = "Belanja";
         paginationBox.style.display = "flex";
         if (searchFab) searchFab.style.display = "flex";
         if (cartFab) cartFab.style.display = "flex";
+        if (chatFab) chatFab.style.display = "flex";
       } else {
         paginationBox.style.display = "none";
         if (searchContainer) searchContainer.style.display = "none";
         if (searchFab) searchFab.style.display = "none";
         if (cartFab) cartFab.style.display = "none";
+        if (chatFab) chatFab.style.display = "flex"; // Tetap tampilkan floating chat button di tab lain
         titleEl.innerText = tabId === 'data-pelanggan' ? "Data Pelanggan" : "Pengaturan";
         
         if (tabId === 'pengaturan') {
@@ -731,7 +837,8 @@
         container.innerHTML = "";
         snapshot.forEach((doc) => {
           let data = doc.data();
-          document.getElementById("profile-name").innerText = data.nama || "-";
+          currentCustomerName = data.nama || 'Pelanggan';
+          document.getElementById("profile-name").innerText = currentCustomerName;
           document.getElementById("profile-phone").innerText = data.phone || "-";
           document.getElementById("profile-address").innerText = data.alamat || "-";
           if (data.catatan && data.catatan.length > 0) {
