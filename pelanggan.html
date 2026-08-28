@@ -223,12 +223,16 @@
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Pengaturan Nada Dering Notifikasi</h3>
         <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
-          <label style="font-size: 0.85rem;">Pilih Nada Dering:</label>
-          <select id="setting-cust-ringtone" onchange="simpanNadaPelanggan(this.value)" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+          <label style="font-size: 0.85rem;">Pilih Sumber Suara:</label>
+          <select id="setting-cust-ringtone-type" onchange="gantiTipeNada(this.value)" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
             <option value="default">Default (Beep Digital)</option>
-            <option value="bell.mp3">Bell Toko (bell.mp3)</option>
-            <option value="chime.mp3">Chime Lembut (chime.mp3)</option>
+            <option value="custom">Pilih File dari Memori HP (.mp3/.wav)</option>
           </select>
+
+          <div id="wrapper-upload-ringtone" style="display: none; margin-top: 4px;">
+            <input type="file" id="cust-ringtone-file" accept="audio/*" onchange="simpanNadaDariHP(event)" style="font-size: 0.8rem; width: 100%;">
+            <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 4px;">Pilih file audio dari penyimpanan HP Anda.</small>
+          </div>
         </div>
       </div>
 
@@ -379,10 +383,28 @@
     function playBeep() { playTone(1000, "sine"); }     
     function playBeepDown() { playTone(600, "triangle"); } 
 
-    function simpanNadaPelanggan(val) {
-      localStorage.setItem('cust_ringtone_v13', val);
-      alert("Nada dering berhasil disimpan!");
-      playCustomerNotificationSound();
+    function gantiTipeNada(val) {
+      const uploadWrapper = document.getElementById("wrapper-upload-ringtone");
+      if (val === "custom") {
+        uploadWrapper.style.display = "block";
+      } else {
+        uploadWrapper.style.display = "none";
+        localStorage.setItem('cust_ringtone_v13', 'default');
+        alert("Nada dering diatur ke Default!");
+      }
+    }
+
+    function simpanNadaDariHP(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Audio = e.target.result;
+        localStorage.setItem('cust_ringtone_v13', base64Audio);
+        alert("Nada dering dari HP berhasil disimpan!");
+        playCustomerNotificationSound();
+      };
+      reader.readAsDataURL(file);
     }
 
     function playCustomerNotificationSound() {
@@ -391,7 +413,7 @@
         playTone(1000, "sine");
       } else {
         const audio = new Audio(savedTone);
-        audio.play().catch(e => console.log("Gagal memutar audio file:", e));
+        audio.play().catch(e => console.log("Gagal memutar audio:", e));
       }
     }
 
@@ -638,7 +660,15 @@
         if (tabId === 'pengaturan') {
           document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto';
           document.getElementById('setting-cust-view').value = catalogViewMode;
-          document.getElementById('setting-cust-ringtone').value = localStorage.getItem('cust_ringtone_v13') || 'default';
+
+          let savedTone = localStorage.getItem('cust_ringtone_v13') || 'default';
+          if (savedTone === 'default') {
+            document.getElementById('setting-cust-ringtone-type').value = 'default';
+            document.getElementById('wrapper-upload-ringtone').style.display = 'none';
+          } else {
+            document.getElementById('setting-cust-ringtone-type').value = 'custom';
+            document.getElementById('wrapper-upload-ringtone').style.display = 'block';
+          }
 
           if (currentCustomerPhone) {
             db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
