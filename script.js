@@ -1,3 +1,18 @@
+// Inisialisasi Firebase (Ganti dengan konfigurasi dari Firebase Console kamu)
+const firebaseConfig = {
+  apiKey: "MASUKKAN_API_KEY_KAMU",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+
 const translations = {
   id: {
     app_title: "KasirQuh",
@@ -1111,12 +1126,18 @@ function simpanPengaturanAkun() {
     .catch(err => alert("Gagal menyimpan akun: " + err.message));
 }
 
+let isProdukLoaded = false;
 let databaseProduk = {};
 db.collection("produk").onSnapshot((snapshot) => {
   databaseProduk = {};
   snapshot.forEach((doc) => {
     databaseProduk[doc.id] = doc.data();
   });
+  isProdukLoaded = true;
+  refreshData();
+}, (error) => {
+  console.error("Gagal memuat produk: ", error);
+  isProdukLoaded = true;
   refreshData();
 });
 
@@ -2319,6 +2340,79 @@ function bagikanStrukWhatsApp() {
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
 }
 
+// --- TAMBAHAN FITUR: CETAK VIA BLUETOOTH ---
+async function cetakViaBluetooth() {
+    if (cart.length === 0) return alert("Keranjang kosong!");
+    try {
+        const device = await navigator.bluetooth.requestDevice({
+            acceptAllDevices: true,
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb', 'e7810a71-73ae-499d-8c15-faa9aef0c3f2', '49535343-fe7d-4ae5-8fa9-9fafd205e455']
+        });
+
+        const server = await device.gatt.connect();
+        const services = await server.getPrimaryServices();
+        let targetCharacteristic = null;
+
+        for (const service of services) {
+            const characteristics = await service.getCharacteristics();
+            for (const characteristic of characteristics) {
+                if (characteristic.properties.write || characteristic.properties.writeWithoutResponse) {
+                    targetCharacteristic = characteristic;
+                    break;
+                }
+            }
+            if (targetCharacteristic) break;
+        }
+
+        if (!targetCharacteristic) {
+            alert("Karakteristik write printer tidak ditemukan!");
+            return;
+        }
+
+        const encoder = new TextEncoder();
+        let commands = [];
+
+        commands.push(new Uint8Array([0x1B, 0x40])); // ESC @ (Initialize)
+        commands.push(new Uint8Array([0x1B, 0x61, 0x01])); // Center align
+
+        commands.push(encoder.encode(`\n${pengaturanToko.nama}\n`));
+        commands.push(encoder.encode(`${pengaturanToko.alamat}\n`));
+        commands.push(encoder.encode(`Telp: ${pengaturanToko.phone}\n`));
+        commands.push(encoder.encode("--------------------------------\n"));
+
+        commands.push(new Uint8Array([0x1B, 0x61, 0x00])); // Left align
+
+        cart.forEach(item => {
+            let line = `${item.nama}\n`;
+            let subLine = `  ${item.qty}x @${item.harga.toLocaleString('id-ID')} = Rp ${item.subtotal.toLocaleString('id-ID')}\n`;
+            commands.push(encoder.encode(line + subLine));
+        });
+
+        commands.push(encoder.encode("--------------------------------\n"));
+        
+        commands.push(new Uint8Array([0x1B, 0x61, 0x01]));
+        commands.push(encoder.encode(`TOTAL: Rp ${totalBelanja.toLocaleString('id-ID')}\n`));
+        commands.push(encoder.encode("Terima Kasih Atas Kunjungan Anda!\n\n\n"));
+
+        for (const cmd of commands) {
+            await targetCharacteristic.writeValue(cmd);
+        }
+
+        prosesSimpanTransaksi();
+        cart = [];
+        document.getElementById("pay-amount").value = "";
+        document.getElementById("wa-customer-phone").value = "";
+        closeCartModal();
+        renderCart();
+        refreshData();
+        showNotif("Struk berhasil dicetak via Bluetooth!");
+
+    } catch (error) {
+        console.error("Gagal mencetak via Bluetooth:", error);
+        alert("Gagal terhubung ke printer: " + error.message);
+    }
+}
+
 function hapusBarang(code) {
   if(confirm("Hapus barang ini?")) {
     db.collection("produk").doc(code).delete()
@@ -2603,6 +2697,18 @@ function refreshData() {
 
   const invList = document.getElementById("inventory-list-wrapper");
   const invGrid = document.getElementById("inventory-grid-wrapper");
+  const catalogGrid = document.getElementById("pos-catalog-container");
+  const catalogList = document.getElementById("pos-catalog-list-container");
+
+  if (!isProdukLoaded) {
+    const loadingMsg = `<div class="empty-state" style="grid-column: 1/-1;">⏳ Memuat data produk dari cloud...</div>`;
+    if(invList) invList.innerHTML = loadingMsg; 
+    if(invGrid) invGrid.innerHTML = loadingMsg;
+    if(catalogGrid) catalogGrid.innerHTML = loadingMsg;
+    if(catalogList) catalogList.innerHTML = loadingMsg;
+    return;
+  }
+
   invList.innerHTML = ""; invGrid.innerHTML = "";
 
   let categories = new Set();
