@@ -45,7 +45,13 @@
 </head>
 <body data-theme="light">
 
-  <div id="customerLoginModal" class="login-overlay" style="display: flex;">
+  <!-- Welcome / Splash Screen -->
+  <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 20px; box-sizing: border-box;">
+    <h1 style="font-size: 2.8rem; margin: 0 0 10px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
+    <p style="font-size: 1.1rem; opacity: 0.9; margin: 0;">Selamat Datang di Toko Kami</p>
+  </div>
+
+  <div id="customerLoginModal" class="login-overlay" style="display: none;">
     <div class="login-card">
       <h2>KasirQuh</h2>
       <p>Masukkan No. WhatsApp & Sandi untuk Masuk</p>
@@ -275,11 +281,23 @@
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
       applyThemePelanggan(savedTheme);
 
-      if (currentCustomerPhone) {
-        document.getElementById('customerLoginModal').style.display = 'none';
-        muatDataPelangganRealtime();
-        muatRiwayatPesananOnlinePelanggan();
-      }
+      // Tampilkan welcome screen selama 1.5 detik, lalu transisi masuk ke login atau beranda
+      setTimeout(() => {
+        const welcomeEl = document.getElementById('welcomeScreen');
+        if (welcomeEl) {
+          welcomeEl.style.opacity = '0';
+          setTimeout(() => welcomeEl.style.display = 'none', 500);
+        }
+
+        if (currentCustomerPhone) {
+          document.getElementById('customerLoginModal').style.display = 'none';
+          muatDataPelangganRealtime();
+          muatRiwayatPesananOnlinePelanggan();
+        } else {
+          document.getElementById('customerLoginModal').style.display = 'flex';
+        }
+      }, 1500);
+
       initFirebaseListeners();
     };
 
@@ -303,7 +321,7 @@
         gain.connect(audioCtx.destination);
         osc.type = type; 
         osc.frequency.value = freq; 
-        gain.gain.value = 0.3; // Volume lebih jelas dan stabil
+        gain.gain.value = 0.3; 
         osc.start(); 
         osc.stop(audioCtx.currentTime + 0.1);
       } catch (e) {
@@ -311,8 +329,8 @@
       }
     }
 
-    function playBeep() { playTone(1000, "sine"); }     // Nada untuk tombol + (tinggi)
-    function playBeepDown() { playTone(600, "triangle"); } // Nada berbeda untuk tombol - (lebih rendah)
+    function playBeep() { playTone(1000, "sine"); }     
+    function playBeepDown() { playTone(600, "triangle"); } 
 
     function applyThemePelanggan(theme) {
       if (theme === 'auto') {
@@ -420,7 +438,6 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       
-      // Mengubah warna aktif pada icon dan judul menu popup
       document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
       const activeBtnMap = {
         'belanja': 'pop-btn-belanja',
