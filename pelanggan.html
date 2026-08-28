@@ -421,7 +421,12 @@
         muatRiwayatPesananOnlinePelanggan();
         initCustomerChatListener();
       } else {
-        document.getElementById('customerLoginModal').style.display = 'none';
+        // Jika belum login dan berada di mode standalone, langsung tampilkan modal login
+        if (isStandalone) {
+          document.getElementById('customerLoginModal').style.display = 'flex';
+        } else {
+          document.getElementById('customerLoginModal').style.display = 'none';
+        }
       }
 
       initFirebaseListeners();
@@ -666,6 +671,8 @@
     function logoutPelanggan() {
       if (confirm("Keluar dari sesi ini?")) {
         localStorage.removeItem('cust_phone_v13');
+        currentCustomerPhone = '';
+        document.getElementById('customerLoginModal').style.display = 'flex';
         location.reload();
       }
     }
