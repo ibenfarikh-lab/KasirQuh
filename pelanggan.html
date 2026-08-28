@@ -219,6 +219,19 @@
         </div>
       </div>
 
+      <!-- 3. NADA DERING NOTIFIKASI -->
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Pengaturan Nada Dering Notifikasi</h3>
+        <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
+          <label style="font-size: 0.85rem;">Pilih Nada Dering:</label>
+          <select id="setting-cust-ringtone" onchange="simpanNadaPelanggan(this.value)" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+            <option value="default">Default (Beep Digital)</option>
+            <option value="bell.mp3">Bell Toko (bell.mp3)</option>
+            <option value="chime.mp3">Chime Lembut (chime.mp3)</option>
+          </select>
+        </div>
+      </div>
+
       <!-- KARTU TOMBOL PEMBERSIH CACHE DARURAT PELANGGAN -->
       <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5;">
         <h3 style="color: #dc2626; margin-top: 0; font-size: 1rem;">Pembaruan Sistem & Cache</h3>
@@ -366,6 +379,22 @@
     function playBeep() { playTone(1000, "sine"); }     
     function playBeepDown() { playTone(600, "triangle"); } 
 
+    function simpanNadaPelanggan(val) {
+      localStorage.setItem('cust_ringtone_v13', val);
+      alert("Nada dering berhasil disimpan!");
+      playCustomerNotificationSound();
+    }
+
+    function playCustomerNotificationSound() {
+      let savedTone = localStorage.getItem('cust_ringtone_v13') || 'default';
+      if (savedTone === 'default') {
+        playTone(1000, "sine");
+      } else {
+        const audio = new Audio(savedTone);
+        audio.play().catch(e => console.log("Gagal memutar audio file:", e));
+      }
+    }
+
     function applyThemePelanggan(theme) {
       if (theme === 'auto') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -410,7 +439,6 @@
       let modal = document.getElementById("customerChatModal");
       modal.classList.toggle("show");
       if (modal.classList.contains("show") && currentCustomerPhone) {
-        // Reset unread for customer
         db.collection("chats").doc(currentCustomerPhone).update({ unreadCustomer: 0 }).catch(() => {});
       }
     }
@@ -434,9 +462,22 @@
       });
 
       if (customerChatUnsubscribe) customerChatUnsubscribe();
+      let isInitialLoadChat = true;
       customerChatUnsubscribe = db.collection("chats").doc(currentCustomerPhone).collection("messages")
         .orderBy("waktuTimestamp", "asc")
         .onSnapshot((snapshot) => {
+          if (!isInitialLoadChat) {
+            snapshot.docChanges().forEach((change) => {
+              if (change.type === "added") {
+                let m = change.doc.data();
+                if (m.pengirim === "admin") {
+                  playCustomerNotificationSound();
+                }
+              }
+            });
+          }
+          isInitialLoadChat = false;
+
           let msgContainer = document.getElementById("customer-chat-messages");
           if (!msgContainer) return;
           msgContainer.innerHTML = "";
@@ -591,12 +632,13 @@
         if (searchContainer) searchContainer.style.display = "none";
         if (searchFab) searchFab.style.display = "none";
         if (cartFab) cartFab.style.display = "none";
-        if (chatFab) chatFab.style.display = "flex"; // Tetap tampilkan floating chat button di tab lain
+        if (chatFab) chatFab.style.display = "flex";
         titleEl.innerText = tabId === 'data-pelanggan' ? "Data Pelanggan" : "Pengaturan";
         
         if (tabId === 'pengaturan') {
           document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto';
           document.getElementById('setting-cust-view').value = catalogViewMode;
+          document.getElementById('setting-cust-ringtone').value = localStorage.getItem('cust_ringtone_v13') || 'default';
 
           if (currentCustomerPhone) {
             db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => {
