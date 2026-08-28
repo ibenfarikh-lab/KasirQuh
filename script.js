@@ -1170,13 +1170,7 @@ db.collection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapsho
 let viewMode = localStorage.getItem('inventory_view_mode_v13') || 'grid';
 let stokCurrentPage = 1;
 let posCurrentPage = 1;
-
-// --- LOCAL-FIRST CART PERSISTENCE ---
-let cart = JSON.parse(localStorage.getItem('kasir_cart_v13')) || [];
-function saveCartToLocal() {
-  localStorage.setItem('kasir_cart_v13', JSON.stringify(cart));
-}
-
+let cart = [];
 let isCooldown = false;
 let totalBelanja = 0;
 let activeTab = 'penjualan';
@@ -2101,7 +2095,6 @@ function kurangManualDariCode(barcode) {
       existingItem.submodal = Math.round(existingItem.qty * existingItem.modal);
     }
     renderCart();
-    saveCartToLocal();
     refreshData();
   }
 }
@@ -2152,7 +2145,6 @@ function tambahItemKeCart(barcode, produk) {
     });
   }
   renderCart();
-  saveCartToLocal();
   refreshData();
 }
 
@@ -2172,13 +2164,11 @@ function ubahQty(index, delta) {
     item.submodal = Math.round(item.qty * item.modal);
   }
   renderCart();
-  saveCartToLocal();
   refreshData();
 }
 
 function renderCart() {
   const tbody = document.getElementById("cart-body");
-  if (!tbody) return;
   tbody.innerHTML = "";
   totalBelanja = 0;
   let totalItemCount = 0;
@@ -2231,27 +2221,18 @@ function renderCart() {
   });
 
   if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px 0;">Keranjang Kosong</td></tr>`;
-  
-  const cartCountEl = document.getElementById("cart-count");
-  const grandTotalEl = document.getElementById("grand-total");
-  if (cartCountEl) cartCountEl.innerText = totalItemCount;
-  if (grandTotalEl) grandTotalEl.innerText = totalBelanja.toLocaleString('id-ID');
+  document.getElementById("cart-count").innerText = totalItemCount;
+  document.getElementById("grand-total").innerText = totalBelanja.toLocaleString('id-ID');
   hitungKembalian();
 }
 
-function hapusCart(i) { 
-  cart.splice(i, 1); 
-  renderCart(); 
-  saveCartToLocal();
-  refreshData(); 
-}
+function hapusCart(i) { cart.splice(i, 1); renderCart(); refreshData(); }
 
 function kosongkanKeranjang() {
   if (cart.length === 0) return alert("Keranjang sudah kosong!");
   if (confirm("Kosongkan isi keranjang?")) {
     cart = [];
     renderCart();
-    saveCartToLocal();
     refreshData();
     showNotif("Keranjang dikosongkan");
   }
@@ -2268,8 +2249,7 @@ function togglePayMethod() {
 function hitungKembalian() {
   const bayar = parseRupiahToNumber(document.getElementById("pay-amount").value);
   const kembalian = bayar - totalBelanja;
-  const changeTotalEl = document.getElementById("change-total");
-  if (changeTotalEl) changeTotalEl.innerText = (kembalian > 0 ? kembalian : 0).toLocaleString('id-ID');
+  document.getElementById("change-total").innerText = (kembalian > 0 ? kembalian : 0).toLocaleString('id-ID');
 }
 
 function prosesSimpanTransaksi() {
@@ -2303,7 +2283,6 @@ function selesaiTransaksi() {
   prosesSimpanTransaksi();
   window.print();
   cart = [];
-  saveCartToLocal();
   document.getElementById("pay-amount").value = "";
   document.getElementById("wa-customer-phone").value = "";
   closeCartModal();
@@ -2332,7 +2311,6 @@ function bagikanStrukWhatsApp() {
 
   prosesSimpanTransaksi();
   cart = [];
-  saveCartToLocal();
   document.getElementById("pay-amount").value = "";
   document.getElementById("wa-customer-phone").value = "";
   closeCartModal();
@@ -3211,4 +3189,3 @@ setTheme(currentTheme);
 setLanguage(currentLang);
 cekStatusLogin();
 updatePermanentBarTitle();
-renderCart();
