@@ -45,11 +45,14 @@
 </head>
 <body data-theme="light">
 
-  <!-- Welcome / Splash Screen Permanen sampai di-install -->
+  <!-- Welcome / Splash Screen Permanen dengan Tombol Masuk/Daftar di Pojok Kiri Bawah -->
   <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 20px; box-sizing: border-box;">
     <h1 id="welcomeStoreName" style="font-size: 2.8rem; margin: 0 0 10px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
     <p style="font-size: 1.1rem; opacity: 0.9; margin: 0 0 25px 0;">Selamat Datang di Toko Kami</p>
     <button id="welcomeInstallBtn" onclick="triggerInstallPWA()" style="display: none; background: white; color: #2563eb; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">📲 Install Aplikasi KasirQuh</button>
+    
+    <!-- Opsi Masuk / Daftar di Pojok Kiri Bawah -->
+    <button onclick="tutupWelcomeScreen()" style="position: absolute; bottom: 20px; left: 20px; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.6); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;">Masuk / Daftar</button>
   </div>
 
   <div id="customerLoginModal" class="login-overlay" style="display: none;">
@@ -418,7 +421,6 @@
         if (receiptShopNameEl) receiptShopNameEl.innerText = cachedStoreName;
       }
 
-      // Hapus timer 2 detik otomatis agar welcome screen permanen menunggu tombol install
       if (!isStandalone) {
         if (currentCustomerPhone) {
           document.getElementById('customerLoginModal').style.display = 'none';
