@@ -295,11 +295,6 @@
     </div>
   </div>
 
-  <!-- TOMBOL INSTALL PWA (Floating) -->
-  <button id="btnInstallApp" style="display: none; position: fixed; bottom: 85px; right: 15px; z-index: 9999; background: #2563eb; color: white; padding: 12px 18px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-    📲 Install Aplikasi KasirQuh
-  </button>
-
   <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
     <span id="bottom-bar-title" style="font-weight: bold; font-size: 1rem; color: var(--text-color);">Belanja</span>
     <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 4px 10px; gap: 8px;">
@@ -323,7 +318,6 @@
     }
 
     let deferredPrompt;
-    const btnInstallApp = document.getElementById('btnInstallApp');
     const welcomeScreen = document.getElementById('welcomeScreen');
     const welcomeInstallBtn = document.getElementById('welcomeInstallBtn');
 
@@ -335,7 +329,6 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      if (btnInstallApp) btnInstallApp.style.display = 'flex';
       if (welcomeInstallBtn) welcomeInstallBtn.style.display = 'block';
       
       const cardInstall = document.getElementById('card-install-pwa');
@@ -354,7 +347,6 @@
         tutupWelcomeScreen();
       }
       deferredPrompt = null;
-      if (btnInstallApp) btnInstallApp.style.display = 'none';
       const cardInstall = document.getElementById('card-install-pwa');
       if (cardInstall) cardInstall.style.display = 'none';
     }
@@ -373,14 +365,7 @@
       }
     }
 
-    if (btnInstallApp) {
-      btnInstallApp.addEventListener('click', () => {
-        triggerInstallPWA();
-      });
-    }
-
     window.addEventListener('appinstalled', () => {
-      if (btnInstallApp) btnInstallApp.style.display = 'none';
       const cardInstall = document.getElementById('card-install-pwa');
       if (cardInstall) cardInstall.style.display = 'none';
       tutupWelcomeScreen();
@@ -437,7 +422,6 @@
         muatRiwayatPesananOnlinePelanggan();
         initCustomerChatListener();
       } else {
-        // Pastikan modal login tertutup saat pertama kali buka sampai tombol Masuk/Daftar ditekan
         document.getElementById('customerLoginModal').style.display = 'none';
       }
 
