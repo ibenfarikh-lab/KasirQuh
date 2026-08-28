@@ -45,10 +45,11 @@
 </head>
 <body data-theme="light">
 
-  <!-- Welcome / Splash Screen -->
+  <!-- Welcome / Splash Screen Permanen sampai di-install -->
   <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 20px; box-sizing: border-box;">
     <h1 id="welcomeStoreName" style="font-size: 2.8rem; margin: 0 0 10px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
-    <p style="font-size: 1.1rem; opacity: 0.9; margin: 0;">Selamat Datang di Toko Kami</p>
+    <p style="font-size: 1.1rem; opacity: 0.9; margin: 0 0 25px 0;">Selamat Datang di Toko Kami</p>
+    <button id="welcomeInstallBtn" onclick="triggerInstallPWA()" style="display: none; background: white; color: #2563eb; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">📲 Install Aplikasi KasirQuh</button>
   </div>
 
   <div id="customerLoginModal" class="login-overlay" style="display: none;">
@@ -291,7 +292,7 @@
     </div>
   </div>
 
-  <!-- TOMBOL INSTALL PWA (Custom Install Prompt) -->
+  <!-- TOMBOL INSTALL PWA (Floating) -->
   <button id="btnInstallApp" style="display: none; position: fixed; bottom: 85px; right: 15px; z-index: 9999; background: #2563eb; color: white; padding: 12px 18px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
     📲 Install Aplikasi KasirQuh
   </button>
@@ -320,12 +321,24 @@
 
     let deferredPrompt;
     const btnInstallApp = document.getElementById('btnInstallApp');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const welcomeInstallBtn = document.getElementById('welcomeInstallBtn');
+
+    // Cek apakah sudah terinstal (Standalone mode)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isStandalone) {
+      if (welcomeScreen) welcomeScreen.style.display = 'none';
+    }
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       if (btnInstallApp) btnInstallApp.style.display = 'flex';
       
+      // Munculkan tombol install di Welcome Screen permanen
+      if (welcomeInstallBtn) welcomeInstallBtn.style.display = 'block';
+      
+      // Munculkan kartu install di menu Pengaturan
       const cardInstall = document.getElementById('card-install-pwa');
       if (cardInstall) cardInstall.style.display = 'block';
     });
@@ -339,11 +352,19 @@
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         console.log('Pengguna menyetujui instalasi PWA');
+        tutupWelcomeScreen();
       }
       deferredPrompt = null;
       if (btnInstallApp) btnInstallApp.style.display = 'none';
       const cardInstall = document.getElementById('card-install-pwa');
       if (cardInstall) cardInstall.style.display = 'none';
+    }
+
+    function tutupWelcomeScreen() {
+      if (welcomeScreen) {
+        welcomeScreen.style.opacity = '0';
+        setTimeout(() => welcomeScreen.style.display = 'none', 500);
+      }
     }
 
     if (btnInstallApp) {
@@ -356,6 +377,7 @@
       if (btnInstallApp) btnInstallApp.style.display = 'none';
       const cardInstall = document.getElementById('card-install-pwa');
       if (cardInstall) cardInstall.style.display = 'none';
+      tutupWelcomeScreen();
       console.log('PWA berhasil diinstal');
     });
   </script>
@@ -396,13 +418,8 @@
         if (receiptShopNameEl) receiptShopNameEl.innerText = cachedStoreName;
       }
 
-      setTimeout(() => {
-        const welcomeEl = document.getElementById('welcomeScreen');
-        if (welcomeEl) {
-          welcomeEl.style.opacity = '0';
-          setTimeout(() => welcomeEl.style.display = 'none', 500);
-        }
-
+      // Hapus timer 2 detik otomatis agar welcome screen permanen menunggu tombol install
+      if (!isStandalone) {
         if (currentCustomerPhone) {
           document.getElementById('customerLoginModal').style.display = 'none';
           muatDataPelangganRealtime();
@@ -411,7 +428,7 @@
         } else {
           document.getElementById('customerLoginModal').style.display = 'flex';
         }
-      }, 2000);
+      }
 
       initFirebaseListeners();
     };
