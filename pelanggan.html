@@ -184,6 +184,13 @@
 
     <!-- 3. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
+      <!-- KARTU INSTALL APLIKASI DI PENGATURAN -->
+      <div class="card" id="card-install-pwa" style="display: none; border: 1px solid #2563eb; background-color: var(--card-bg);">
+        <h3 style="color: #2563eb; margin-top: 0; font-size: 1rem;">📱 Install Aplikasi ke HP</h3>
+        <p style="color: var(--text-muted); font-size: 0.80rem; margin-bottom: 10px;">Pasang KasirQuh di layar utama HP Anda agar lebih mudah diakses seperti aplikasi biasa.</p>
+        <button onclick="triggerInstallPWA()" style="background: #2563eb; color: white; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer;">📲 Install Sekarang</button>
+      </div>
+
       <!-- 1. IDENTITAS PELANGGAN (PALING ATAS) -->
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Identitas Pelanggan</h3>
@@ -318,23 +325,37 @@
       e.preventDefault();
       deferredPrompt = e;
       if (btnInstallApp) btnInstallApp.style.display = 'flex';
+      
+      const cardInstall = document.getElementById('card-install-pwa');
+      if (cardInstall) cardInstall.style.display = 'block';
     });
 
+    async function triggerInstallPWA() {
+      if (!deferredPrompt) {
+        alert("Aplikasi sudah terinstal atau peramban sedang tidak memicu izin otomatis. Anda juga bisa menginstal lewat menu titik tiga (⋮) di pojok kanan atas Chrome.");
+        return;
+      }
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('Pengguna menyetujui instalasi PWA');
+      }
+      deferredPrompt = null;
+      if (btnInstallApp) btnInstallApp.style.display = 'none';
+      const cardInstall = document.getElementById('card-install-pwa');
+      if (cardInstall) cardInstall.style.display = 'none';
+    }
+
     if (btnInstallApp) {
-      btnInstallApp.addEventListener('click', async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          console.log('Pengguna menyetujui instalasi PWA');
-        }
-        deferredPrompt = null;
-        btnInstallApp.style.display = 'none';
+      btnInstallApp.addEventListener('click', () => {
+        triggerInstallPWA();
       });
     }
 
     window.addEventListener('appinstalled', () => {
       if (btnInstallApp) btnInstallApp.style.display = 'none';
+      const cardInstall = document.getElementById('card-install-pwa');
+      if (cardInstall) cardInstall.style.display = 'none';
       console.log('PWA berhasil diinstal');
     });
   </script>
