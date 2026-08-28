@@ -492,6 +492,7 @@
             snapshot.docChanges().forEach((change) => {
               if (change.type === "added") {
                 let m = change.doc.data();
+                // Hanya membunyikan nada jika pesan baru berasal dari ADMIN
                 if (m.pengirim === "admin") {
                   playCustomerNotificationSound();
                 }
