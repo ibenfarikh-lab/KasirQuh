@@ -2072,7 +2072,7 @@ function processBarcodeScanDb(barcode) {
   toggleScannerDb();
 }
 
-function tambahManualDariCode(barcode) {
+function tambahManualDesimalDariCode(barcode) {
   let produk = databaseProduk[barcode];
   if (produk) {
     if ((produk.stok || 0) <= 0) return alert("Stok habis!");
@@ -3034,7 +3034,7 @@ function renderKatalogKasirPaginated(filteredItems) {
         <div class="inv-card">
           <div class="inv-card-top">
             <div style="display: flex; gap: 6px; width: 100%; margin-bottom: 2px;">
-              <button class="btn-edit" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #16a34a; color: white;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">+</button>
+              <button class="btn-edit" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #16a34a; color: white;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDesimalDariCode('${code}')">+</button>
               <button class="btn-danger" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')">-</button>
             </div>
             <img src="${fotoSrc}" class="inv-card-img">
@@ -3053,7 +3053,7 @@ function renderKatalogKasirPaginated(filteredItems) {
       catalogList.innerHTML += `
         <div class="catalog-list-item">
           <div style="display: flex; gap: 4px; flex-shrink: 0; align-items: center;">
-            <button style="width: 28px; height: 28px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">+</button>
+            <button style="width: 28px; height: 28px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDesimalDariCode('${code}')">+</button>
             <button style="width: 28px; height: 28px; border-radius: 6px; background: #dc2626; color: white; border: none; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')">-</button>
           </div>
           <img src="${fotoSrc}" class="catalog-list-img">
@@ -3162,6 +3162,28 @@ function ambilDariCatatan() {
     alert("Tidak ditemukan format rincian valid (Contoh: Ayam - 4 - kg - 176.000) di catatan ini!");
   }
 }
+
+// --- FITUR PULL TO REFRESH KONTINER `.main-content` ---
+let touchstartY = 0;
+let touchendY = 0;
+
+document.addEventListener('touchstart', e => {
+  touchstartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  touchendY = e.changedTouches[0].screenY;
+  
+  let mainContentEl = document.querySelector('.main-content');
+  if (mainContentEl && mainContentEl.scrollTop === 0 && (touchendY - touchstartY > 120)) {
+    showNotif("Memuat ulang data...");
+    if (typeof refreshData === 'function') {
+      refreshData();
+    } else {
+      window.location.reload();
+    }
+  }
+}, { passive: true });
 
 setTheme(currentTheme);
 setLanguage(currentLang);
