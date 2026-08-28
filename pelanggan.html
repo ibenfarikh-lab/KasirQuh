@@ -281,7 +281,6 @@
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
       applyThemePelanggan(savedTheme);
 
-      // Muat nama toko dari cache lokal secara instan untuk mencegah kedipan teks default
       const cachedStoreName = localStorage.getItem('cust_store_name_v13');
       if (cachedStoreName) {
         const welcomeStoreNameEl = document.getElementById('welcomeStoreName');
@@ -294,7 +293,6 @@
         }
       }
 
-      // Tampilkan welcome screen selama 2 detik (2000 ms)
       setTimeout(() => {
         const welcomeEl = document.getElementById('welcomeScreen');
         if (welcomeEl) {
@@ -436,7 +434,6 @@
           pengaturanToko = doc.data();
           const namaToko = pengaturanToko.nama || "KasirQuh";
           
-          // Simpan ke localStorage agar tidak terjadi kedip nama default saat reload berikutnya
           localStorage.setItem('cust_store_name_v13', namaToko);
           
           document.getElementById('receipt-shop-name').innerText = namaToko;
@@ -684,14 +681,9 @@
         let keuntungan = totalBelanja - totalModal;
         let totalQty = cart.reduce((acc, i) => acc + i.qty, 0);
 
-        if (payMethod === "WhatsApp") {
-          let text = `*PESANAN BARU DARI PELANGGAN* 🛒\nNama : *${namaCust}*\nNo WA : ${currentCustomerPhone}\nAlamat : ${alamatCust}\n------------------------------------\n`;
-          cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`; });
-          text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*`;
-          window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
-          cart = []; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
-          return;
-        }
+        let namaMetode = "COD (Bayar di Tempat)";
+        if (payMethod === "TF") namaMetode = "Transfer Bank (Upload Bukti)";
+        if (payMethod === "WhatsApp") namaMetode = "Pesan via WhatsApp";
 
         try {
           let batch = db.batch();
@@ -707,7 +699,7 @@
             total: totalBelanja,
             modal: totalModal,
             untung: keuntungan,
-            metode: payMethod === "COD" ? "COD (Online)" : "Transfer Bank (Online)",
+            metode: namaMetode,
             qty: totalQty,
             customerNama: namaCust,
             customerPhone: currentCustomerPhone,
@@ -718,7 +710,14 @@
           });
 
           await batch.commit();
-          alert("Pesanan berhasil dikirim dan tercatat di sistem kasir toko!");
+
+          // Kirim pesan WhatsApp ke admin untuk SEMUA metode pembayaran
+          let text = `*PESANAN BARU DARI PELANGGAN* 🛒\nNama : *${namaCust}*\nNo WA : ${currentCustomerPhone}\nAlamat : ${alamatCust}\nMetode : *${namaMetode}*\n------------------------------------\n`;
+          cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`; });
+          text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*`;
+          window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
+
+          alert("Pesanan berhasil dikirim ke sistem dan diteruskan ke WhatsApp Admin!");
           cart = []; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
         } catch (err) {
           alert("Gagal memproses pesanan: " + err.message);
