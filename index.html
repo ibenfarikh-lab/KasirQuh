@@ -387,6 +387,23 @@
         </div>
       </div>
 
+      <!-- NADA DERING NOTIFIKASI -->
+      <div class="card">
+        <h3 style="margin-top: 0; font-size: 1rem;">Pengaturan Nada Dering Notifikasi</h3>
+        <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
+          <label style="font-size: 0.85rem;">Pilih Sumber Suara:</label>
+          <select id="setting-admin-ringtone-type" onchange="gantiTipeNadaAdmin(this.value)" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+            <option value="default">Default (Beep Digital)</option>
+            <option value="custom">Pilih File dari Memori HP (.mp3/.wav)</option>
+          </select>
+
+          <div id="wrapper-upload-ringtone-admin" style="display: none; margin-top: 4px;">
+            <input type="file" id="admin-ringtone-file" accept="audio/*" onchange="simpanNadaAdminDariHP(event)" style="font-size: 0.8rem; width: 100%;">
+            <small style="color: var(--text-muted); font-size: 0.75rem; display: block; margin-top: 4px;">Pilih file audio dari penyimpanan HP Anda.</small>
+          </div>
+        </div>
+      </div>
+
       <!-- KARTU TOMBOL PENGHAPUS CACHE DARURAT -->
       <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5;">
         <h3 style="color: #dc2626; margin-top: 0; font-size: 1rem;">Pembaruan Sistem & Cache</h3>
@@ -666,11 +683,25 @@
     let editingOrderItemsTemp = [];
     let selectedChatPhone = null;
     let chatUnsubscribe = null;
+    let adminChatPrevUnread = {};
 
     document.addEventListener("DOMContentLoaded", function() {
       initOnlineOrdersListener();
       initCustomerCardClickObserver();
       initAdminChatListener();
+
+      let savedAdminTone = localStorage.getItem('admin_ringtone_v13') || 'default';
+      const adminRingtoneSelect = document.getElementById('setting-admin-ringtone-type');
+      const adminUploadWrapper = document.getElementById('wrapper-upload-ringtone-admin');
+      if (adminRingtoneSelect && adminUploadWrapper) {
+        if (savedAdminTone === 'default') {
+          adminRingtoneSelect.value = 'default';
+          adminUploadWrapper.style.display = 'none';
+        } else {
+          adminRingtoneSelect.value = 'custom';
+          adminUploadWrapper.style.display = 'block';
+        }
+      }
     });
 
     function switchOnlineTab(tab) {
@@ -693,24 +724,54 @@
     }
 
     function playNotificationSound() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playBeep(delay, freq, duration) {
-          setTimeout(() => {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-            osc.start(); osc.stop(audioCtx.currentTime + duration);
-          }, delay);
-        }
-        for (let i = 0; i < 20; i++) {
-          playBeep(i * 110, (i % 4 === 3) ? 1200 : 900, (i === 19) ? 0.3 : 0.08);
-        }
-      } catch (e) { console.log("Audio diblokir:", e); }
+      let savedTone = localStorage.getItem('admin_ringtone_v13') || 'default';
+      if (savedTone === 'default') {
+        try {
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          function playBeep(delay, freq, duration) {
+            setTimeout(() => {
+              if (audioCtx.state === 'suspended') audioCtx.resume();
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.type = 'square';
+              osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+              osc.connect(gain); gain.connect(audioCtx.destination);
+              gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+              osc.start(); osc.stop(audioCtx.currentTime + duration);
+            }, delay);
+          }
+          for (let i = 0; i < 20; i++) {
+            playBeep(i * 110, (i % 4 === 3) ? 1200 : 900, (i === 19) ? 0.3 : 0.08);
+          }
+        } catch (e) { console.log("Audio diblokir:", e); }
+      } else {
+        const audio = new Audio(savedTone);
+        audio.play().catch(e => console.log("Gagal memutar audio:", e));
+      }
+    }
+
+    function gantiTipeNadaAdmin(val) {
+      const uploadWrapper = document.getElementById("wrapper-upload-ringtone-admin");
+      if (val === "custom") {
+        uploadWrapper.style.display = "block";
+      } else {
+        uploadWrapper.style.display = "none";
+        localStorage.setItem('admin_ringtone_v13', 'default');
+        alert("Nada dering diatur ke Default!");
+      }
+    }
+
+    function simpanNadaAdminDariHP(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Audio = e.target.result;
+        localStorage.setItem('admin_ringtone_v13', base64Audio);
+        alert("Nada dering dari HP berhasil disimpan!");
+        playNotificationSound();
+      };
+      reader.readAsDataURL(file);
     }
 
     function initOnlineOrdersListener() {
@@ -752,7 +813,12 @@
       db.collection("chats").onSnapshot((snapshot) => {
         if (!isInitialChatLoad) {
           snapshot.docChanges().forEach((change) => {
-            if (change.type === "added" || change.type === "modified") {
+            let data = change.doc.data();
+            let phone = change.doc.id;
+            let unread = data.unreadAdmin || 0;
+            let prevUnread = adminChatPrevUnread[phone] || 0;
+
+            if ((change.type === "added" && unread > 0) || (change.type === "modified" && unread > prevUnread)) {
               playNotificationSound();
             }
           });
@@ -776,6 +842,8 @@
           let lastMsg = data.lastMessage || "Kirim pesan...";
           let unread = data.unreadAdmin || 0;
           totalUnread += unread;
+
+          adminChatPrevUnread[phone] = unread;
 
           let activeStyle = selectedChatPhone === phone ? "background: rgba(37,99,235,0.1); border-left: 4px solid #2563eb;" : "";
 
@@ -810,6 +878,7 @@
 
       // Reset unread counter for admin
       db.collection("chats").doc(phone).update({ unreadAdmin: 0 }).catch(() => {});
+      adminChatPrevUnread[phone] = 0;
 
       if (chatUnsubscribe) chatUnsubscribe();
 
