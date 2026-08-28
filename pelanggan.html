@@ -283,6 +283,15 @@
       initFirebaseListeners();
     };
 
+    function playBeep() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); osc.connect(audioCtx.destination);
+      osc.type = "sine"; osc.frequency.value = 1000; gain.gain.value = 0.1;
+      osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
     function applyThemePelanggan(theme) {
       if (theme === 'auto') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -530,6 +539,7 @@
       } else {
         cart.push({ code, nama: p.nama, harga: p.harga, modal: p.modal || 0, qty: 1, subtotal: p.harga, foto: p.foto });
       }
+      playBeep();
       renderCartPelanggan();
       refreshKatalogPelanggan();
     }
