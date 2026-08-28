@@ -245,6 +245,7 @@
     <div id="laporan" class="tab-content">
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap;">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')">👥 Data Pelanggan</button>
+        <button id="sub-btn-persetujuan" class="sub-tab-btn" onclick="switchSubDataTab('sub-persetujuan')">⏳ Persetujuan Pelanggan</button>
         <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')">📋 Data Transaksi</button>
       </div>
 
@@ -262,6 +263,16 @@
           </label>
         </div>
         <div id="customer-list-wrapper" class="customer-list"></div>
+      </div>
+
+      <!-- TAB PERSETUJUAN PELANGGAN BARU -->
+      <div id="sub-persetujuan" class="sub-tab-content">
+        <div class="card" style="margin-bottom: 12px; background: var(--table-header); padding: 12px 16px;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">DAFTAR PELANGGAN MENUNGGU PERSETUJUAN ADMIN</div>
+        </div>
+        <div id="pending-customer-list-wrapper" style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="empty-state">Memuat data...</div>
+        </div>
       </div>
 
       <div id="sub-laporan" class="sub-tab-content">

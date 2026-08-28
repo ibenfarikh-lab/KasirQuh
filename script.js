@@ -1397,6 +1397,11 @@ function switchSubDataTab(subTabId) {
     if(fabAdd) fabAdd.style.display = 'none';
     if(fabAddCust) fabAddCust.style.display = 'flex';
     if(fabAddCatatan) fabAddCatatan.style.display = 'none';
+  } else if (subTabId === 'sub-persetujuan') {
+    document.getElementById('sub-btn-persetujuan')?.classList.add('active');
+    if(fabAdd) fabAdd.style.display = 'none';
+    if(fabAddCust) fabAddCust.style.display = 'none';
+    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
   } else if (subTabId === 'sub-laporan') {
     document.getElementById('sub-btn-laporan')?.classList.add('active');
     if(fabAdd) fabAdd.style.display = 'none';
@@ -1425,7 +1430,7 @@ function updatePermanentBarTitle() {
   } else if (activeTab === 'belanja-stok') {
     titleEl.innerText = "Belanja Stok";
   } else if (activeTab === 'laporan') {
-    titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? "Data Pelanggan" : "Data Transaksi";
+    titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? "Data Pelanggan" : ((activeSubDataTab === 'sub-persetujuan') ? "Persetujuan Pelanggan" : "Data Transaksi");
   } else if (activeTab === 'catatan') {
     titleEl.innerText = labelNamaTabCatatan[activeSubCatatanTab] || "Catatan";
   } else if (activeTab === 'pengaturan') {
@@ -2023,6 +2028,16 @@ function simpanPelanggan() {
     .catch(err => alert("Gagal: " + err.message));
 }
 
+function setujuiAkunPelanggan(docId) {
+  db.collection("pelanggan").doc(docId).update({
+    status: "aktif"
+  }).then(() => {
+    alert("Akun pelanggan berhasil disetujui! Pelanggan sekarang dapat masuk.");
+  }).catch(err => {
+    alert("Gagal menyetujui akun: " + err.message);
+  });
+}
+
 function hapusPelanggan(id) {
   if (confirm("Hapus pelanggan ini?")) {
     db.collection("pelanggan").doc(id).delete()
@@ -2482,6 +2497,32 @@ function refreshData() {
     });
   }
   document.getElementById("customer-total-financial").innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
+
+  const pendingContainer = document.getElementById("pending-customer-list-wrapper");
+  if (pendingContainer) {
+    pendingContainer.innerHTML = "";
+    let pendingList = databasePelanggan.filter(c => c.status === "pending" || c.disetujui === false);
+    
+    if (pendingList.length === 0) {
+      pendingContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Tidak ada pendaftaran baru yang menunggu persetujuan.</div>`;
+    } else {
+      pendingList.forEach(c => {
+        pendingContainer.innerHTML += `
+          <div class="card" style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
+            <div>
+              <div style="font-weight: bold; font-size: 0.95rem;">${c.nama}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat || '-'}</div>
+              <div style="font-size: 0.75rem; color: #d97706; margin-top: 2px; font-weight: bold;">Status: Menunggu Persetujuan</div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button onclick="setujuiAkunPelanggan('${c.id}')" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Setujui</button>
+              <button onclick="hapusPelanggan('${c.id}')" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Tolak</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+  }
 }
 
 function renderKatalogKasirPaginated(filteredItems) {
