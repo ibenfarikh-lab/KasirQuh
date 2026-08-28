@@ -284,6 +284,11 @@
     </div>
   </div>
 
+  <!-- TOMBOL INSTALL PWA (Custom Install Prompt) -->
+  <button id="btnInstallApp" style="display: none; position: fixed; bottom: 85px; right: 15px; z-index: 9999; background: #2563eb; color: white; padding: 12px 18px; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+    📲 Install Aplikasi KasirQuh
+  </button>
+
   <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
     <span id="bottom-bar-title" style="font-weight: bold; font-size: 1rem; color: var(--text-color);">Belanja</span>
     <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 4px 10px; gap: 8px;">
@@ -295,6 +300,44 @@
       <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
     </button>
   </div>
+
+  <!-- PWA Service Worker & Install Script -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log("Service Worker berhasil didaftarkan."))
+          .catch((err) => console.log("Gagal mendaftarkan Service Worker:", err));
+      });
+    }
+
+    let deferredPrompt;
+    const btnInstallApp = document.getElementById('btnInstallApp');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (btnInstallApp) btnInstallApp.style.display = 'flex';
+    });
+
+    if (btnInstallApp) {
+      btnInstallApp.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          console.log('Pengguna menyetujui instalasi PWA');
+        }
+        deferredPrompt = null;
+        btnInstallApp.style.display = 'none';
+      });
+    }
+
+    window.addEventListener('appinstalled', () => {
+      if (btnInstallApp) btnInstallApp.style.display = 'none';
+      console.log('PWA berhasil diinstal');
+    });
+  </script>
 
   <script>
     const firebaseConfig = {
@@ -492,7 +535,6 @@
             snapshot.docChanges().forEach((change) => {
               if (change.type === "added") {
                 let m = change.doc.data();
-                // Hanya membunyikan nada jika pesan baru berasal dari ADMIN
                 if (m.pengirim === "admin") {
                   playCustomerNotificationSound();
                 }
