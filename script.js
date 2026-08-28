@@ -1,3 +1,22 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g",
+  authDomain: "kasirquh.firebaseapp.com",
+  projectId: "kasirquh",
+  storageBucket: "kasirquh.firebasestorage.app",
+  messagingSenderId: "87320899036",
+  appId: "1:87320899036:web:592c6768ea4aca6bdbb319",
+  measurementId: "G-2BL7RJN9Z5"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let onlineOrdersDataCache = [];
+let activeOnlineTab = 'berlangsung';
+let editingOrderItemsTemp = [];
+let selectedChatPhone = null;
+let chatUnsubscribe = null;
+let adminChatPrevUnread = {};
+
 let currentLang = localStorage.getItem('setting_lang_v13') || 'id';
 let currentTheme = localStorage.getItem('setting_theme_v13') || 'light';
 
@@ -2112,591 +2131,565 @@ function resetDatabaseBarang() {
   }
 }
 
-function refreshData() {
-  document.getElementById("setting-user").value = userAuth.user;
-  document.getElementById("setting-pass").value = userAuth.pass;
-  document.getElementById("setting-shop-name").value = pengaturanToko.nama;
-  document.getElementById("setting-shop-address").value = pengaturanToko.alamat;
-  document.getElementById("setting-shop-phone").value = pengaturanToko.phone;
-  document.getElementById("setting-cooldown").value = scanCooldownDuration;
-  
-  const viewSelect = document.getElementById("setting-view-mode");
-  if (viewSelect) viewSelect.value = viewMode;
+function switchOnlineTab(tab) {
+  activeOnlineTab = tab;
+  const btnBerlangsung = document.getElementById("btn-sub-berlangsung");
+  const btnSelesai = document.getElementById("btn-sub-selesai");
+  const wrapBerlangsung = document.getElementById("wrapper-pesanan-berlangsung");
+  const wrapSelesai = document.getElementById("wrapper-pesanan-selesai");
 
-  document.getElementById("login-sub-title").innerText = pengaturanToko.nama || "TokoQuh";
-  document.getElementById("receipt-shop-name").innerText = pengaturanToko.nama;
-  document.getElementById("receipt-shop-address").innerText = pengaturanToko.alamat;
-  document.getElementById("receipt-shop-phone").innerText = "Telp: " + pengaturanToko.phone;
-
-  document.getElementById('inventory-list-wrapper').style.display = (viewMode === 'list') ? 'flex' : 'none';
-  document.getElementById('inventory-grid-wrapper').style.display = (viewMode === 'grid') ? 'grid' : 'none';
-  
-  const restockListWrapper = document.getElementById("restock-list-wrapper");
-  const restockGridWrapper = document.getElementById("restock-grid-wrapper");
-  if(restockListWrapper && restockGridWrapper) {
-    restockListWrapper.style.display = (viewMode === 'list') ? 'flex' : 'none';
-    restockGridWrapper.style.display = (viewMode === 'grid') ? 'grid' : 'none';
-  }
-
-  const invList = document.getElementById("inventory-list-wrapper");
-  const invGrid = document.getElementById("inventory-grid-wrapper");
-  invList.innerHTML = ""; invGrid.innerHTML = "";
-
-  let categories = new Set();
-  const filterKatEl = document.getElementById("filter-category");
-  const filterKat = filterKatEl ? filterKatEl.value : "Semua";
-  const filterKatPosEl = document.getElementById("filter-category-pos");
-  const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
-  const searchInputEl = document.getElementById("inventory-search-input");
-  const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
-
-  let filteredItems = [];
-  let filteredItemsPos = [];
-
-  for (let code in databaseProduk) {
-    let item = databaseProduk[code];
-    let kat = item.kategori || "Umum";
-    categories.add(kat);
-
-    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
-      filteredItems.push({ code, ...item });
-    }
-    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || kat === filterKatPos)) {
-      filteredItemsPos.push({ code, ...item });
-    }
-  }
-
-  filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
-  filteredItemsPos.sort((a, b) => a.nama.localeCompare(b.nama));
-
-  let itemsPerPageStok = 24;
-  let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
-  if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
-  if (stokCurrentPage < 1) stokCurrentPage = 1;
-
-  let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
-  let paginatedStokItems = filteredItems.slice(stokStartIndex, stokStartIndex + itemsPerPageStok);
-
-  if (filteredItems.length > 0) {
-    document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
-    document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
-    document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
-  }
-
-  if (paginatedStokItems.length === 0) {
-    const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
-    invList.innerHTML = emptyStokMsg; invGrid.innerHTML = emptyStokMsg;
+  if (tab === 'berlangsung') {
+    btnBerlangsung.style.background = "#2563eb"; btnBerlangsung.style.color = "white"; btnBerlangsung.style.border = "none";
+    btnSelesai.style.background = "var(--input-bg)"; btnSelesai.style.color = "var(--text-color)"; btnSelesai.style.border = "1px solid var(--input-border)";
+    wrapBerlangsung.style.display = "flex"; wrapSelesai.style.display = "none";
   } else {
-    paginatedStokItems.forEach(item => {
-      let code = item.code;
-      let kat = item.kategori || "Umum";
-      let sat = (item.satuan || "pcs").toLowerCase();
-      let stok = item.stok !== undefined ? item.stok : 0;
-      let fotoSrc = item.foto || defaultPlaceholderImg;
-      let isiRtg = item.isiRtg || 10;
-      let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + isiRtg + ')' : (sat === 'kg' ? 'kg' : sat);
-
-      let detailsListHtml = '';
-      let detailsGridHtml = '';
-
-      if (sat === 'kg') {
-        let isiOns = 10;
-        let modalOns = item.modal || 0;
-        let modalKgVal = item.modalRtg || (modalOns * isiOns);
-        let jualOns = item.harga || 0;
-        let jualKgVal = item.hargaRtg || (jualOns * isiOns);
-
-        detailsListHtml = `
-          <div>⚖️ <b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
-          <div>⚖️ <b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
-          <div>⚖️ <b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
-          <div>⚖️ <b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
-        `;
-        detailsGridHtml = `
-          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-            <div><b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
-            <div><b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
-            <div><b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
-            <div><b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
-          </div>
-        `;
-      } else if (sat === 'pcs') {
-        let hargaPcs = item.modal || 0;
-        let jualPcs = item.harga || 0;
-        detailsListHtml = `
-          <div>📦 <b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
-          <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-        `;
-        detailsGridHtml = `
-          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-            <div><b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
-            <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-          </div>
-        `;
-      } else {
-        let modalPcs = item.modal || 0;
-        let modalRtgVal = item.modalRtg || (modalPcs * isiRtg);
-        let jualPcs = item.harga || 0;
-        let jualRtgVal = item.hargaRtg || (jualPcs * isiRtg);
-        
-        detailsListHtml = `
-          <div>📑 <b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
-          <div>📑 <b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
-          <div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-          <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-        `;
-        detailsGridHtml = `
-          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-            <div><b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
-            <div><b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
-            <div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-            <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-          </div>
-        `;
-      }
-
-      invList.innerHTML += `
-        <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-          <div style="display: flex; align-items: flex-start; gap: 10px;">
-            <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
-            <div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
-                <div style="font-size: 0.78rem; color: var(--text-muted);">${code} • Stok: <b style="color: var(--text-color);">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b> • ${satuanLabel}</div>
-              </div>
-              <div>
-                <span class="badge-kat">${kat}</span>
-              </div>
-            </div>
-          </div>
-          <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">
-            ${detailsListHtml}
-          </div>
-          <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;">
-            <button onclick="openProductModal('${code}')" title="Edit" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">✏️ Edit</button>
-            <button onclick="hapusBarang('${code}')" title="Hapus" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">🗑️ Hapus</button>
-          </div>
-        </div>
-      `;
-
-      invGrid.innerHTML += `
-        <div class="inv-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px;">
-          <div>
-            <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
-              <button class="btn-edit" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal('${code}')">Edit</button>
-              <button class="btn-danger" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="hapusBarang('${code}')">Hapus</button>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;">
-              <div style="min-width: 0; flex: 1;">
-                <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: <b>${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b></div>
-              </div>
-            </div>
-            <div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; margin-bottom: 6px;">
-              ${detailsGridHtml}
-            </div>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 0.8rem;">
-            <span style="font-weight: bold; color: var(--text-muted);">Kategori:</span>
-            <span class="badge-kat">${kat}</span>
-          </div>
-        </div>
-      `;
-    });
+    btnSelesai.style.background = "#16a34a"; btnSelesai.style.color = "white"; btnSelesai.style.border = "none";
+    btnBerlangsung.style.background = "var(--input-bg)"; btnBerlangsung.style.color = "var(--text-color)"; btnBerlangsung.style.border = "1px solid var(--input-border)";
+    wrapSelesai.style.display = "flex"; wrapBerlangsung.style.display = "none";
   }
+  renderOnlineOrdersUI();
+}
 
-  updateDropdowns(Array.from(categories));
-  renderKatalogKasirPaginated(filteredItemsPos);
+function playNotificationSound() {
+  let savedTone = localStorage.getItem('admin_ringtone_v13') || 'default';
+  if (savedTone === 'default') {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      function playBeep(delay, freq, duration) {
+        setTimeout(() => {
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+          osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }, delay);
+      }
+      for (let i = 0; i < 20; i++) {
+        playBeep(i * 110, (i % 4 === 3) ? 1200 : 900, (i === 19) ? 0.3 : 0.08);
+      }
+    } catch (e) { console.log("Audio diblokir:", e); }
+  } else {
+    const audio = new Audio(savedTone);
+    audio.play().catch(e => console.log("Gagal memutar audio:", e));
+  }
+}
 
-  if(restockListWrapper && restockGridWrapper) {
-    restockListWrapper.innerHTML = ""; restockGridWrapper.innerHTML = "";
-    let totalEstBelanja = 0;
+function gantiTipeNadaAdmin(val) {
+  const uploadWrapper = document.getElementById("wrapper-upload-ringtone-admin");
+  if (val === "custom") {
+    uploadWrapper.style.display = "block";
+  } else {
+    uploadWrapper.style.display = "none";
+    localStorage.setItem('admin_ringtone_v13', 'default');
+    alert("Nada dering diatur ke Default!");
+  }
+}
 
-    if (restockListItems.length === 0) {
-      const emptyRestockMsg = `<div class="empty-state" style="grid-column: 1/-1;">🛒 Belum ada daftar belanja stok.<br>Tekan tombol <b>+</b> di kanan bawah untuk menambahkan barang belanjaan.</div>`;
-      restockListWrapper.innerHTML = emptyRestockMsg; restockGridWrapper.innerHTML = emptyRestockMsg;
-    } else {
-      restockListItems.forEach(item => {
-        let fotoSrc = item.foto || defaultPlaceholderImg;
-        let sat = (item.satuan || "").toLowerCase();
-        let satuanLabel = sat === 'rtg' ? `rtg (isi ${item.isiRtg || 10})` : (sat === 'kg' ? `kg` : sat);
-        
-        let detailsListHtml = '';
-        let detailsGridHtml = '';
-        let subtotalModal = 0;
+function simpanNadaAdminDariHP(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64Audio = e.target.result;
+    localStorage.setItem('admin_ringtone_v13', base64Audio);
+    alert("Nada dering dari HP berhasil disimpan!");
+    playNotificationSound();
+  };
+  reader.readAsDataURL(file);
+}
 
-        if (sat === 'kg') {
-          let isiOns = 10;
-          let modalOns = item.modal || 0;
-          let modalKgVal = item.modalRtg || (modalOns * isiOns);
-          let jualOns = item.harga || 0;
-          let jualKgVal = item.hargaRtg || (jualOns * isiOns);
-          subtotalModal = modalKgVal * (item.qty || 1);
-
-          detailsListHtml = `
-            <div>⚖️ <b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
-            <div>⚖️ <b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
-            <div>⚖️ <b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
-            <div>⚖️ <b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
-          `;
-          detailsGridHtml = `
-            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-              <div><b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
-              <div><b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
-              <div><b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
-              <div><b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        } else if (sat === 'pcs') {
-          let hargaPcs = item.modal || 0;
-          let jualPcs = item.harga || 0;
-          subtotalModal = hargaPcs * (item.qty || 1);
-          detailsListHtml = `
-            <div>📦 <b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
-            <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-          `;
-          detailsGridHtml = `
-            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-              <div><b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
-              <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        } else {
-          let modalPcs = item.modal || 0;
-          let modalRtgVal = item.modalRtg || (modalPcs * (item.isiRtg || 10));
-          let jualPcs = item.harga || 0;
-          let jualRtgVal = item.hargaRtg || (jualPcs * (item.isiRtg || 10));
-          subtotalModal = modalRtgVal * (item.qty || 1);
-          
-          detailsListHtml = `
-            <div>📑 <b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
-            <div>📑 <b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
-            <div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-            <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-          `;
-          detailsGridHtml = `
-            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-              <div><b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
-              <div><b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
-              <div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-              <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-            </div>
-          `;
+function initOnlineOrdersListener() {
+  let isInitialLoad = true;
+  db.collection("transaksi").onSnapshot((snapshot) => {
+    if (!isInitialLoad) {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          let data = change.doc.data();
+          if (data.customerPhone || (data.metode && data.metode.includes("Online"))) {
+            playNotificationSound();
+          }
         }
-
-        totalEstBelanja += subtotalModal;
-
-        restockListWrapper.innerHTML += `
-          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-            <div style="display: flex; align-items: flex-start; gap: 10px;">
-              <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
-              <div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                  <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
-                  <div style="font-size: 0.78rem; color: var(--text-muted);">Beli: <b style="color: var(--text-color);">${item.qty} ${satuanLabel}</b></div>
-                </div>
-                <div style="text-align: right;">
-                  <div style="font-weight: bold; font-size: 0.95rem; color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</div>
-                </div>
-              </div>
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">
-              ${detailsListHtml}
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;">
-              <button onclick="openProductModal(null, '${item.id}')" title="Edit" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">✏️ Edit</button>
-              <button onclick="hapusItemBelanja('${item.id}')" title="Hapus" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">🗑️ Hapus</button>
-            </div>
-          </div>
-        `;
-
-        restockGridWrapper.innerHTML += `
-          <div class="inv-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px;">
-            <div>
-              <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
-                <button class="btn-edit" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal(null, '${item.id}')">Edit</button>
-                <button class="btn-danger" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="hapusItemBelanja('${item.id}')">Hapus</button>
-              </div>
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;">
-                <div style="min-width: 0; flex: 1;">
-                  <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Beli: <b>${item.qty} ${satuanLabel}</b></div>
-                </div>
-              </div>
-              <div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; margin-bottom: 6px;">
-                ${detailsGridHtml}
-              </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 0.8rem;">
-              <span style="font-weight: bold; color: var(--text-muted);">Total:</span>
-              <b style="color: #2563eb; font-size: 0.9rem;">Rp ${subtotalModal.toLocaleString('id-ID')}</b>
-            </div>
-          </div>
-        `;
       });
     }
-    document.getElementById("restock-est-total").innerText = totalEstBelanja.toLocaleString('id-ID');
-  }
+    isInitialLoad = false;
 
-  const repBody = document.getElementById("report-body");
-  repBody.innerHTML = "";
-  let totalOmset = 0; let totalProfit = 0;
-  riwayatTransaksi.forEach(t => {
-    totalOmset += t.total; totalProfit += t.untung;
-    repBody.innerHTML += `<tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 6px;">${t.waktu}</td><td style="padding: 6px;">${t.metode}</td><td style="padding: 6px;">${t.qty}</td><td style="padding: 6px;">Rp ${t.total.toLocaleString('id-ID')}</td><td style="padding: 6px; color: #16a34a; font-weight: bold;">Rp ${t.untung.toLocaleString('id-ID')}</td></tr>`;
+    onlineOrdersDataCache = [];
+    snapshot.forEach(doc => {
+      let data = doc.data();
+      if (data.customerPhone || (data.metode && data.metode.includes("Online"))) {
+        onlineOrdersDataCache.push({ id: doc.id, ...data });
+      }
+    });
+
+    onlineOrdersDataCache.sort((a, b) => {
+      let timeA = a.waktuTimestamp?.toMillis ? a.waktuTimestamp.toMillis() : 0;
+      let timeB = b.waktuTimestamp?.toMillis ? b.waktuTimestamp.toMillis() : 0;
+      return timeB - timeA;
+    });
+
+    renderOnlineOrdersUI();
   });
-  if (riwayatTransaksi.length === 0) repBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">Belum ada riwayat transaksi.</td></tr>`;
-
-  document.getElementById("dash-omset").innerText = totalOmset.toLocaleString('id-ID');
-  document.getElementById("dash-profit").innerText = totalProfit.toLocaleString('id-ID');
-  document.getElementById("dash-trans").innerText = riwayatTransaksi.length;
-  document.getElementById("dash-items").innerText = Object.keys(databaseProduk).length;
-
-  const custContainer = document.getElementById("customer-list-wrapper");
-  custContainer.innerHTML = "";
-  let grandTotalAllCustomersFinancial = 0;
-
-  if (databasePelanggan.length === 0) {
-    custContainer.innerHTML = `<div class="empty-state">Belum ada data pelanggan.</div>`;
-  } else {
-    databasePelanggan.forEach(c => {
-      let catatanHtml = "";
-      let custTotalNominal = 0;
-
-      if (c.catatan && c.catatan.length > 0) {
-        c.catatan.forEach(note => {
-          let nom = note.nominal || 0;
-          custTotalNominal += nom;
-          catatanHtml += `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 6px 0;"><div><span style="font-weight: bold; font-size: 0.72rem;">[${note.jenis}]</span> <span style="font-size: 0.75rem;">${note.keterangan}</span> ${nom > 0 ? '<b style="color:#2563eb;">(Rp ' + nom.toLocaleString('id-ID') + ')</b>' : ''}</div><button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button></div>`;
-        });
-      } else {
-        catatanHtml = `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Belum ada catatan keuangan.</div>`;
-      }
-
-      grandTotalAllCustomersFinancial += custTotalNominal;
-
-      custContainer.innerHTML += `
-        <div class="cust-list-item">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-              <div style="font-weight: bold; font-size: 0.85rem;">${c.nama}</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat}</div>
-              <div style="font-size: 0.78rem; font-weight: 600; color: #2563eb; margin-top: 3px;">Total Nilai Catatan: Rp ${custTotalNominal.toLocaleString('id-ID')}</div>
-            </div>
-            <div style="display: flex; gap: 4px;">
-              <button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button>
-              <button style="background: #25D366; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="bagikanCatatanWhatsApp('${c.id}')">💬 WA</button>
-              <button class="btn-danger" style="padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
-            </div>
-          </div>
-          <div class="cust-bookkeeping">${catatanHtml}</div>
-        </div>
-      `;
-    });
-  }
-  document.getElementById("customer-total-financial").innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
-
-  const pendingContainer = document.getElementById("pending-customer-list-wrapper");
-  if (pendingContainer) {
-    pendingContainer.innerHTML = "";
-    let pendingList = databasePelanggan.filter(c => c.status === "pending" || c.disetujui === false);
-    
-    if (pendingList.length === 0) {
-      pendingContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Tidak ada pendaftaran baru yang menunggu persetujuan.</div>`;
-    } else {
-      pendingList.forEach(c => {
-        pendingContainer.innerHTML += `
-          <div class="card" style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
-            <div>
-              <div style="font-weight: bold; font-size: 0.95rem;">${c.nama}</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat || '-'}</div>
-              <div style="font-size: 0.75rem; color: #d97706; margin-top: 2px; font-weight: bold;">Status: Menunggu Persetujuan</div>
-            </div>
-            <div style="display: flex; gap: 6px;">
-              <button onclick="setujuiAkunPelanggan('${c.id}')" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Setujui</button>
-              <button onclick="hapusPelanggan('${c.id}')" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Tolak</button>
-            </div>
-          </div>
-        `;
-      });
-    }
-  }
 }
 
-function renderKatalogKasirPaginated(filteredItems) {
-  const catalogGrid = document.getElementById("pos-catalog-container");
-  const catalogList = document.getElementById("pos-catalog-list-container");
-  if(!catalogGrid || !catalogList) return;
-  
-  catalogGrid.style.display = (viewMode === 'grid') ? 'grid' : 'none';
-  catalogList.style.display = (viewMode === 'list') ? 'flex' : 'none';
-  catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
+function initAdminChatListener() {
+  let isInitialChatLoad = true;
+  db.collection("chats").onSnapshot((snapshot) => {
+    if (!isInitialChatLoad) {
+      snapshot.docChanges().forEach((change) => {
+        let data = change.doc.data();
+        let phone = change.doc.id;
+        let unread = data.unreadAdmin || 0;
+        let prevUnread = adminChatPrevUnread[phone] || 0;
 
-  let itemsPerPagePos = 24;
-  let totalPosPages = Math.ceil(filteredItems.length / itemsPerPagePos) || 1;
-  if (posCurrentPage > totalPosPages) posCurrentPage = totalPosPages;
-  if (posCurrentPage < 1) posCurrentPage = 1;
-
-  let posStartIndex = (posCurrentPage - 1) * itemsPerPagePos;
-  let paginatedPosItems = filteredItems.slice(posStartIndex, posStartIndex + itemsPerPagePos);
-
-  if (filteredItems.length > 0) {
-    document.getElementById("pos-page-info").innerText = `${posCurrentPage}/${totalPosPages}`;
-    document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
-    document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
-  }
-
-  if (paginatedPosItems.length === 0) {
-    const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia.</div>`;
-    catalogGrid.innerHTML = emptyMsg; catalogList.innerHTML = emptyMsg;
-  } else {
-    paginatedPosItems.forEach(p => {
-      let code = p.code;
-      let kat = p.kategori || "Umum";
-      let sat = (p.satuan || "").toLowerCase();
-      let stok = p.stok !== undefined ? p.stok : 0;
-      let fotoSrc = p.foto || defaultPlaceholderImg;
-      let isHabis = stok <= 0;
-      let unitLabel = sat === 'kg' ? '/Kg' : '/Pcs';
-      let displayHarga = sat === 'kg' ? (p.hargaRtg || (p.harga * 10)) : p.harga;
-      let cartItem = cart.find(item => item.barcode === code);
-      let currentQtyInCart = cartItem ? cartItem.qty : 0;
-
-      catalogGrid.innerHTML += `
-        <div class="inv-card">
-          <div class="inv-card-top">
-            <div style="display: flex; gap: 6px; width: 100%; margin-bottom: 2px;">
-              <button class="btn-edit" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #16a34a; color: white;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">+</button>
-              <button class="btn-danger" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')">-</button>
-            </div>
-            <img src="${fotoSrc}" class="inv-card-img">
-            <div class="inv-card-info">
-              <div class="inv-card-title">${p.nama}</div>
-              <div class="inv-card-code">${code}</div>
-              <div style="margin-top: 2px;"><span class="badge-kat">${kat}</span> <span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</span></div>
-            </div>
-          </div>
-          <div class="inv-card-details">
-            <div class="inv-card-row"><span>Harga:</span><b>Rp ${displayHarga.toLocaleString('id-ID')}${unitLabel}</b></div>
-          </div>
-        </div>
-      `;
-
-      catalogList.innerHTML += `
-        <div class="catalog-list-item">
-          <div style="display: flex; gap: 4px; flex-shrink: 0; align-items: center;">
-            <button style="width: 28px; height: 28px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDariCode('${code}')">+</button>
-            <button style="width: 28px; height: 28px; border-radius: 6px; background: #dc2626; color: white; border: none; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')">-</button>
-          </div>
-          <img src="${fotoSrc}" class="catalog-list-img">
-          <div style="min-width: 0; flex: 1;">
-            <div style="font-weight: bold; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: ${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</div>
-            <div style="font-size: 0.78rem; font-weight: bold; color: #2563eb;">Rp ${displayHarga.toLocaleString('id-ID')}${unitLabel}</div>
-          </div>
-        </div>
-      `;
-    });
-  }
-}
-
-function showNotif(msg) {
-  const notif = document.getElementById("scan-notif");
-  if(!notif) return;
-  notif.innerText = msg; notif.style.display = "block";
-  setTimeout(() => { notif.style.display = "none"; }, 1500);
-}
-
-function bersihkanCacheTotal() {
-  if (confirm("Bersihkan seluruh cache aplikasi dan muat ulang ke versi terbaru?")) {
-    if ('caches' in window) {
-      caches.keys().then((names) => {
-        names.forEach((name) => {
-          caches.delete(name);
-        });
-      });
-    }
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        for(let registration of registrations) {
-          registration.unregister();
+        if ((change.type === "added" && unread > 0) || (change.type === "modified" && unread > prevUnread)) {
+          playNotificationSound();
         }
       });
     }
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 500);
+    isInitialChatLoad = false;
+
+    let chatListContainer = document.getElementById("admin-chat-list");
+    if (!chatListContainer) return;
+    chatListContainer.innerHTML = "";
+
+    if (snapshot.empty) {
+      chatListContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">Belum ada pesan masuk.</div>`;
+      return;
+    }
+
+    let totalUnread = 0;
+    snapshot.forEach(doc => {
+      let data = doc.data();
+      let phone = doc.id;
+      let name = data.customerNama || phone;
+      let unread = data.unreadAdmin || 0;
+      totalUnread += unread;
+
+      adminChatPrevUnread[phone] = unread;
+
+      let activeStyle = selectedChatPhone === phone ? "background: rgba(37,99,235,0.1); border-left: 4px solid #2563eb;" : "";
+
+      chatListContainer.innerHTML += `
+        <div onclick="bukaRuangChatAdmin('${phone}', '${name}')" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; ${activeStyle}">
+          <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem;">
+            <span>👤 ${name}</span>
+            ${unread > 0 ? `<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">${unread}</span>` : ''}
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${phone}</div>
+        </div>
+      `;
+    });
+
+    const badgeChat = document.getElementById("badge-chat-count");
+    if (badgeChat) {
+      if (totalUnread > 0) {
+        badgeChat.innerText = totalUnread;
+        badgeChat.style.display = "inline-block";
+      } else {
+        badgeChat.style.display = "none";
+      }
+    }
+  });
+}
+
+function bukaRuangChatAdmin(phone, name) {
+  selectedChatPhone = phone;
+  document.getElementById("admin-chat-header").innerText = `Chat dengan: ${name} (${phone})`;
+  document.getElementById("admin-chat-input").removeAttribute("disabled");
+  document.getElementById("admin-chat-send-btn").removeAttribute("disabled");
+
+  db.collection("chats").doc(phone).update({ unreadAdmin: 0 }).catch(() => {});
+  adminChatPrevUnread[phone] = 0;
+
+  if (chatUnsubscribe) chatUnsubscribe();
+
+  chatUnsubscribe = db.collection("chats").doc(phone).collection("messages")
+    .orderBy("waktuTimestamp", "asc")
+    .onSnapshot((snapshot) => {
+      let msgContainer = document.getElementById("admin-chat-messages");
+      msgContainer.innerHTML = "";
+      if (snapshot.empty) {
+        msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada percakapan.</div>`;
+        return;
+      }
+      snapshot.forEach(doc => {
+        let m = doc.data();
+        let isAdmin = m.pengirim === "admin";
+        let alignBubble = isAdmin ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
+        msgContainer.innerHTML += `
+          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble}">
+            <div>${m.pesan}</div>
+            <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
+          </div>
+        `;
+      });
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    });
+}
+
+function kirimPesanAdmin() {
+  if (!selectedChatPhone) return alert("Pilih pelanggan terlebih dahulu!");
+  let inputEl = document.getElementById("admin-chat-input");
+  let pesan = inputEl.value.trim();
+  if (!pesan) return;
+
+  let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
+
+  db.collection("chats").doc(selectedChatPhone).collection("messages").add({
+    pengirim: "admin",
+    pesan: pesan,
+    waktu: nowStr,
+    waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    db.collection("chats").doc(selectedChatPhone).set({
+      lastMessage: "Admin: " + pesan,
+      lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      unreadCustomer: firebase.firestore.FieldValue.increment(1)
+    }, { merge: true });
+    inputEl.value = "";
+  });
+}
+
+function renderOnlineOrdersUI() {
+  const containerBerlangsung = document.getElementById("wrapper-pesanan-berlangsung");
+  const containerSelesai = document.getElementById("wrapper-pesanan-selesai");
+  if (!containerBerlangsung || !containerSelesai) return;
+
+  containerBerlangsung.innerHTML = "";
+  containerSelesai.innerHTML = "";
+
+  let listBerlangsung = onlineOrdersDataCache.filter(t => (t.statusPesanan || "Menunggu Diproses") !== "Selesai");
+  let listSelesai = onlineOrdersDataCache.filter(t => (t.statusPesanan || "") === "Selesai");
+
+  let activeCount = listBerlangsung.length;
+  const badgeEl = document.getElementById("badge-online-count");
+  const blueDotEl = document.getElementById("burger-blue-dot");
+
+  if (badgeEl) {
+    if (activeCount > 0) {
+      badgeEl.innerText = activeCount;
+      badgeEl.style.display = "inline-block";
+    } else {
+      badgeEl.style.display = "none";
+    }
+  }
+
+  if (blueDotEl) {
+    if (activeCount > 0) {
+      blueDotEl.style.display = "block";
+    } else {
+      blueDotEl.style.display = "none";
+    }
+  }
+
+  if (listBerlangsung.length === 0) {
+    containerBerlangsung.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Tidak ada pesanan sedang berlangsung.</div>`;
+  } else {
+    listBerlangsung.forEach(trx => containerBerlangsung.innerHTML += buildOrderCardHtml(trx));
+  }
+
+  if (listSelesai.length === 0) {
+    containerSelesai.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada riwayat pesanan selesai.</div>`;
+  } else {
+    listSelesai.forEach(trx => containerSelesai.innerHTML += buildOrderCardHtml(trx));
   }
 }
 
-function ambilDariCatatan() {
-  let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
-  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
-    return alert("Tidak ada catatan aktif pada tab atau tanggal ini!");
+function buildOrderCardHtml(trx) {
+  let statusBadge = trx.statusPesanan || "Menunggu Diproses";
+  let badgeColor = statusBadge === "Selesai" ? "#16a34a" : "#d97706";
+  let buktiBtn = trx.buktiTransfer ? `<button onclick="bukaBuktiTransfer('${trx.buktiTransfer}')" title="Lihat Bukti Transfer" style="background: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">🖼️</button>` : "";
+
+  let itemsHtml = "";
+  if (trx.items && trx.items.length > 0) {
+    itemsHtml = `<div style="margin: 8px 0; background: var(--input-bg); padding: 8px; border-radius: 8px; font-size: 0.82rem;"><strong>📦 Rincian Barang:</strong><ul style="margin: 4px 0 0 16px; padding: 0;">`;
+    trx.items.forEach(it => {
+      itemsHtml += `<li>${it.nama} — <b>(${it.qty}x)</b> = Rp ${(it.subtotal || 0).toLocaleString('id-ID')}</li>`;
+    });
+    itemsHtml += `</ul></div>`;
+  } else {
+    itemsHtml = `<div style="margin: 8px 0; font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Rincian barang kosong.</div>`;
   }
 
-  let addedCount = 0;
-  currentTabData.items.forEach(noteItem => {
-    if (!noteItem.isi) return;
-    let lines = noteItem.isi.split('\n');
-    lines.forEach(line => {
-      let parts = line.split('-').map(p => p.trim());
-      if (parts.length >= 4) {
-        let nama = parts[0];
-        let qty = parseFloat(parts[1]) || 1;
-        let satuan = parts[2].toLowerCase();
-        if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-        
-        let modalTotalInput = parseRupiahToNumber(parts[3]) || 0;
-        let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+  return `
+    <div class="card" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span style="font-size: 0.75rem; color: var(--text-muted);">${trx.waktu || '-'}</span>
+        <span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">${statusBadge}</span>
+      </div>
+      <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">👤 ${trx.customerNama || 'Pelanggan'} (${trx.customerPhone || '-'})</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px;">📍 Alamat: ${trx.customerAlamat || '-'}</div>
+      <div style="font-size: 0.85rem; font-weight: 600; color: #2563eb; margin-bottom: 4px;">Metode: ${trx.metode || '-'}</div>
+      
+      ${itemsHtml}
 
-        let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
-        let matchedProd = existingCode ? databaseProduk[existingCode] : null;
-        
-        let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
-        let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-        let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
-        
-        let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
-        let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+      <div style="font-size: 0.95rem; font-weight: bold; margin-bottom: 8px; color: #16a34a;">Total Belanja: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div>
+      
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+        ${buktiBtn}
+        <button onclick="kirimWaPesananAdmin('${trx.id}')" title="Kirim Rincian ke WhatsApp Pelanggan" style="background: #25D366; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">💬</button>
+        <button onclick="bukaModalEditPesanan('${trx.id}')" title="Edit Rincian Pesanan" style="background: #ca8a04; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">✏️</button>
+        <button onclick="ubahStatusPesananAdmin('${trx.id}', 'Selesai')" title="Tandai Selesai" style="background: #16a34a; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">✅</button>
+        <button onclick="hapusPesananAdmin('${trx.id}')" title="Hapus Pesanan" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; cursor: pointer;">🗑️</button>
+      </div>
+    </div>
+  `;
+}
 
-        let hargaRtgVal = modalRtgVal;
-        let hargaPcsVal = modalPcsVal;
+function kirimWaPesananAdmin(id) {
+  let trx = onlineOrdersDataCache.find(t => t.id === id);
+  if (!trx || !trx.customerPhone) return alert("Nomor WhatsApp pelanggan tidak tersedia!");
+  let phone = trx.customerPhone.replace(/[^0-9]/g, '');
+  if (phone.startsWith('0')) phone = '62' + phone.slice(1);
 
-        let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
+  let text = `*INFO PESANAN - ${pengaturanToko.nama || 'Toko'}* 📦\n`;
+  text += `Halo *${trx.customerNama || 'Pelanggan'}*, status pesanan Anda: *${trx.statusPesanan || 'Menunggu Diproses'}*\n\n`;
+  if (trx.items && trx.items.length > 0) {
+    trx.items.forEach((it, idx) => {
+      text += `${idx + 1}. ${it.nama} (${it.qty}x) = Rp ${(it.subtotal || 0).toLocaleString('id-ID')}\n`;
+    });
+  }
+  text += `------------------------------------\n*Total : Rp ${(trx.total || 0).toLocaleString('id-ID')}*\n`;
+  text += `Terima kasih telah berbelanja! 🙏`;
 
-        let newItem = {
-          id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
-          code: code,
-          nama: nama,
-          kategori: kategori,
-          satuan: satuan,
-          isiRtg: isiRtg,
-          qty: qty,
-          modal: modalPcsVal,
-          harga: hargaPcsVal,
-          modalRtg: modalRtgVal,
-          hargaRtg: hargaRtgVal,
-          foto: foto
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function bukaModalEditPesanan(id) {
+  let trx = onlineOrdersDataCache.find(t => t.id === id);
+  if (!trx) return alert("Data pesanan tidak ditemukan!");
+  
+  document.getElementById("edit-order-id").value = id;
+  editingOrderItemsTemp = trx.items ? JSON.parse(JSON.stringify(trx.items)) : [];
+  renderEditOrderItemsModal();
+  document.getElementById("editOrderModal").classList.add("show");
+}
+
+function closeEditOrderModal() {
+  document.getElementById("editOrderModal").classList.remove("show");
+}
+
+function renderEditOrderItemsModal() {
+  const container = document.getElementById("edit-order-items-container");
+  container.innerHTML = "";
+  let grandTotal = 0;
+
+  if (editingOrderItemsTemp.length === 0) {
+    container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 10px; font-size: 0.8rem; font-style: italic;">Belum ada rincian barang pada pesanan ini.</div>`;
+  }
+
+  editingOrderItemsTemp.forEach((it, idx) => {
+    let unitPrice = it.qty > 0 ? (it.subtotal / it.qty) : (it.subtotal || 0);
+    grandTotal += (it.subtotal || 0);
+
+    container.innerHTML += `
+      <div style="display: flex; align-items: center; justify-content: space-between; background: var(--input-bg); padding: 8px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 4px;">
+        <div style="flex: 1;">
+          <div style="font-weight: bold;">${it.nama || 'Barang'}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Rp ${unitPrice.toLocaleString('id-ID')} / item</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <button onclick="ubahQtyEditOrder(${idx}, -1)" style="width: 26px; height: 26px; background: #dc2626; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">-</button>
+          <span style="font-weight: bold; min-width: 20px; text-align: center;">${it.qty || 1}</span>
+          <button onclick="ubahQtyEditOrder(${idx}, 1)" style="width: 26px; height: 26px; background: #16a34a; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">+</button>
+          <button onclick="hapusItemEditOrder(${idx})" style="background: transparent; border: none; color: #dc2626; cursor: pointer; font-size: 1rem; margin-left: 4px;" title="Hapus Barang">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+  document.getElementById("edit-order-grand-total").innerText = grandTotal.toLocaleString('id-ID');
+}
+
+function ubahQtyEditOrder(idx, delta) {
+  let it = editingOrderItemsTemp[idx];
+  let unitPrice = it.qty > 0 ? (it.subtotal / it.qty) : 0;
+  it.qty += delta;
+  if (it.qty <= 0) {
+    editingOrderItemsTemp.splice(idx, 1);
+  } else {
+    it.subtotal = it.qty * unitPrice;
+  }
+  renderEditOrderItemsModal();
+}
+
+function hapusItemEditOrder(idx) {
+  editingOrderItemsTemp.splice(idx, 1);
+  renderEditOrderItemsModal();
+}
+
+async function simpanPerubahanPesananAdmin() {
+  let id = document.getElementById("edit-order-id").value;
+  if (!id) return;
+  let newTotal = editingOrderItemsTemp.reduce((acc, i) => acc + i.subtotal, 0);
+  let newQty = editingOrderItemsTemp.reduce((acc, i) => acc + i.qty, 0);
+
+  try {
+    await db.collection("transaksi").doc(id).update({
+      items: editingOrderItemsTemp,
+      total: newTotal,
+      qty: newQty
+    });
+    alert("Pesanan berhasil diperbarui!");
+    closeEditOrderModal();
+  } catch (err) {
+    alert("Gagal memperbarui pesanan: " + err.message);
+  }
+}
+
+function bukaBuktiTransfer(base64Img) {
+  document.getElementById("proof-img-preview").src = base64Img;
+  document.getElementById("proofModal").classList.add("show");
+}
+
+function closeProofModal() {
+  document.getElementById("proofModal").classList.remove("show");
+}
+
+function ubahStatusPesananAdmin(id, status) {
+  db.collection("transaksi").doc(id).update({ statusPesanan: status }).then(() => alert("Status diperbarui menjadi: " + status));
+}
+
+function hapusPesananAdmin(id) {
+  if (confirm("Hapus riwayat pesanan online ini?")) db.collection("transaksi").doc(id).delete();
+}
+
+function initCustomerCardClickObserver() {
+  const observer = new MutationObserver(() => {
+    const cards = document.querySelectorAll("#customer-list-wrapper .card, #customer-list-wrapper > div");
+    cards.forEach(card => {
+      if (card.dataset.clickableEnhanced) return;
+      card.dataset.clickableEnhanced = "true";
+      card.style.cursor = "pointer";
+      card.style.transition = "all 0.2s ease";
+      
+      card.onmouseover = () => card.style.borderColor = "#2563eb";
+      card.onmouseout = () => card.style.borderColor = "var(--border-color)";
+
+      const text = card.innerText;
+      const phoneMatch = text.match(/(?:\+62|0)[0-9\-\s]{8,}/);
+      if (phoneMatch) {
+        let cleanPhone = phoneMatch[0].replace(/[\s\-]/g, '');
+        card.onclick = (e) => {
+          if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+          bukaDetailPelangganAdminByPhone(cleanPhone);
         };
-        
-        restockListItems.push(newItem);
-        addedCount++;
       }
     });
   });
 
-  if (addedCount > 0) {
-    simpanRestockKeCloud();
-    refreshData();
-    showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
-  } else {
-    alert("Tidak ditemukan format rincian valid (Contoh: Ayam - 4 - kg - 176.000) di catatan ini!");
+  const targetWrapper = document.getElementById("customer-list-wrapper");
+  if (targetWrapper) {
+    observer.observe(targetWrapper, { childList: true, subtree: true });
   }
 }
 
-setTheme(currentTheme);
-cekStatusLogin();
-updatePermanentBarTitle();
+function bukaDetailPelangganAdminByPhone(phone) {
+  db.collection("pelanggan").where("phone", "==", phone).get().then(snap => {
+    if (snap.empty) {
+      db.collection("pelanggan").get().then(allSnap => {
+        let found = null;
+        allSnap.forEach(d => {
+          let p = d.data().phone || "";
+          if (p.replace(/[^0-9]/g, '') === phone.replace(/[^0-9]/g, '')) {
+            found = d.data();
+          }
+        });
+        if (found) {
+          displayCustomerDetailModal(found);
+        } else {
+          alert("Data pelanggan tidak ditemukan di database!");
+        }
+      });
+      return;
+    }
+    displayCustomerDetailModal(snap.docs[0].data());
+  });
+}
+
+function displayCustomerDetailModal(custData) {
+  let modalBody = document.getElementById("adm-cust-modal-body");
+  document.getElementById("adm-cust-modal-title").innerText = `👤 ${custData.nama || 'Pelanggan'}`;
+
+  let htmlInfo = `
+    <div style="background: var(--input-bg); padding: 10px; border-radius: 8px; margin-bottom: 4px;">
+      <div><strong>No. WhatsApp:</strong> ${custData.phone || '-'}</div>
+      <div><strong>Alamat:</strong> ${custData.alamat || '-'}</div>
+    </div>
+  `;
+
+  let phoneClean = (custData.phone || "").replace(/[^0-9]/g, '');
+  let custTransactions = onlineOrdersDataCache.filter(t => {
+    let tPhone = (t.customerPhone || "").replace(/[^0-9]/g, '');
+    return tPhone && phoneClean && (tPhone.includes(phoneClean) || phoneClean.includes(tPhone));
+  });
+
+  let htmlTrx = `<div style="font-weight: bold; margin-top: 4px;">📦 Riwayat Belanja / Pesanan:</div>`;
+  if (custTransactions.length === 0) {
+    htmlTrx += `<div style="color: var(--text-muted); font-style: italic; font-size: 0.8rem; margin-bottom: 6px;">Belum ada riwayat transaksi tercatat.</div>`;
+  } else {
+    htmlTrx += `<div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; max-height: 200px; overflow-y: auto;">`;
+    custTransactions.forEach(trx => {
+      let itemsStr = trx.items ? trx.items.map(i => `${i.nama} (${i.qty}x)`).join(', ') : 'Rincian kosong';
+      htmlTrx += `
+        <div style="border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; background: var(--card-bg);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted);">
+            <span>${trx.waktu || '-'}</span>
+            <span style="font-weight: bold; color: #16a34a;">${trx.statusPesanan || 'Selesai'}</span>
+          </div>
+          <div style="font-size: 0.8rem; margin: 2px 0;"><strong>Barang:</strong> ${itemsStr}</div>
+          <div style="font-weight: bold; color: #2563eb; font-size: 0.85rem;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')} (${trx.metode || '-'})</div>
+        </div>
+      `;
+    });
+    htmlTrx += `</div>`;
+  }
+
+  let htmlNotes = `<div style="font-weight: bold; margin-top: 4px;">📝 Catatan & Tagihan Toko:</div>`;
+  if (!custData.catatan || custData.catatan.length === 0) {
+    htmlNotes += `<div style="color: var(--text-muted); font-style: italic; font-size: 0.80rem;">Tidak ada catatan khusus.</div>`;
+  } else {
+    htmlNotes += `<div style="display: flex; flex-direction: column; gap: 4px; max-height: 150px; overflow-y: auto;">`;
+    custData.catatan.forEach(note => {
+      htmlNotes += `
+        <div style="border-bottom: 1px dashed var(--border-color); padding: 6px 0; font-size: 0.80rem;">
+          <div><b>[${note.jenis}]</b> ${note.keterangan}</div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">${note.waktu}</div>
+        </div>
+      `;
+    });
+    htmlNotes += `</div>`;
+  }
+
+  modalBody.innerHTML = htmlInfo + htmlTrx + htmlNotes;
+  document.getElementById("adminCustomerDetailModal").classList.add("show");
+}
+
+function closeAdminCustomerDetailModal() {
+  document.getElementById("adminCustomerDetailModal").classList.remove("show");
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  initOnlineOrdersListener();
+  initCustomerCardClickObserver();
+  initAdminChatListener();
+
+  let savedAdminTone = localStorage.getItem('admin_ringtone_v13') || 'default';
+  const adminRingtoneSelect = document.getElementById('setting-admin-ringtone-type');
+  const adminUploadWrapper = document.getElementById('wrapper-upload-ringtone-admin');
+  if (adminRingtoneSelect && adminUploadWrapper) {
+    if (savedAdminTone === 'default') {
+      adminRingtoneSelect.value = 'default';
+      adminUploadWrapper.style.display = 'none';
+    } else {
+      adminRingtoneSelect.value = 'custom';
+      adminUploadWrapper.style.display = 'block';
+    }
+  }
+
+  setTheme(currentTheme);
+  cekStatusLogin();
+  updatePermanentBarTitle();
+});

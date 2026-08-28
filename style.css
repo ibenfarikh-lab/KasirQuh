@@ -163,10 +163,9 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
 
 .bottom-right-menu-container { position: relative; display: flex; align-items: center; margin-right: 1px; }
 
-/* Menu Popup Admin dengan Efek Backdrop Blur dan Transparansi yang Sesuai */
 .floating-menu-popup {
   display: none; position: absolute; right: 0; bottom: 65px;
-  background: rgba(30, 41, 59, 0.85); /* Semi-transparan untuk tema gelap */
+  background: rgba(30, 41, 59, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--border-color);
@@ -176,7 +175,7 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
 }
 
 [data-theme="light"] .floating-menu-popup {
-  background: rgba(255, 255, 255, 0.85); /* Semi-transparan untuk tema terang */
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .floating-menu-popup.show { display: flex; }
