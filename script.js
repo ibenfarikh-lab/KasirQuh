@@ -1,3 +1,18 @@
+// Inisialisasi Firebase (Ganti dengan konfigurasi dari Firebase Console kamu)[span_0](start_span)[span_0](end_span)
+const firebaseConfig = {
+  apiKey: "MASUKKAN_API_KEY_KAMU",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+
 const translations = {
   id: {
     app_title: "KasirQuh",
