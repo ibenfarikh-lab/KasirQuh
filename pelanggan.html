@@ -281,6 +281,19 @@
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
       applyThemePelanggan(savedTheme);
 
+      // Muat nama toko dari cache lokal secara instan untuk mencegah kedipan teks default
+      const cachedStoreName = localStorage.getItem('cust_store_name_v13');
+      if (cachedStoreName) {
+        const welcomeStoreNameEl = document.getElementById('welcomeStoreName');
+        if (welcomeStoreNameEl) {
+          welcomeStoreNameEl.innerText = cachedStoreName;
+        }
+        const receiptShopNameEl = document.getElementById('receipt-shop-name');
+        if (receiptShopNameEl) {
+          receiptShopNameEl.innerText = cachedStoreName;
+        }
+      }
+
       // Tampilkan welcome screen selama 2 detik (2000 ms)
       setTimeout(() => {
         const welcomeEl = document.getElementById('welcomeScreen');
@@ -422,6 +435,9 @@
         if (doc.exists) {
           pengaturanToko = doc.data();
           const namaToko = pengaturanToko.nama || "KasirQuh";
+          
+          // Simpan ke localStorage agar tidak terjadi kedip nama default saat reload berikutnya
+          localStorage.setItem('cust_store_name_v13', namaToko);
           
           document.getElementById('receipt-shop-name').innerText = namaToko;
           document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || "";
