@@ -292,6 +292,15 @@
       osc.start(); osc.stop(audioCtx.currentTime + 0.1);
     }
 
+    function playBeepDown() {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); osc.connect(audioCtx.destination);
+      osc.type = "sine"; osc.frequency.value = 500; gain.gain.value = 0.1;
+      osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }
+
     function applyThemePelanggan(theme) {
       if (theme === 'auto') {
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -549,6 +558,7 @@
       if (idx > -1) {
         if (cart[idx].qty > 1) { cart[idx].qty -= 1; cart[idx].subtotal = cart[idx].qty * cart[idx].harga; }
         else { cart.splice(idx, 1); }
+        playBeepDown();
         renderCartPelanggan();
         refreshKatalogPelanggan();
       }
