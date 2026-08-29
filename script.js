@@ -882,20 +882,38 @@ function hitungRingkasanCatatanDinamis(tabKey) {
 
   if (dataObj && dataObj.items) {
     dataObj.items.forEach(item => {
-      if (item.subjudul) {
+      let itemBayar = 0;
+      let parsedFromIsi = 0;
+      let hasValidIsiItems = false;
+
+      if (item.isi) {
+        let lines = item.isi.split('\n');
+        lines.forEach(line => {
+          let parts = line.split('-').map(p => p.trim());
+          if (parts.length >= 4) {
+            let hargaBaris = parseRupiahToNumber(parts[3]) || 0;
+            parsedFromIsi += hargaBaris;
+            hasValidIsiItems = true;
+          }
+        });
+      }
+
+      if (hasValidIsiItems) {
+        itemBayar = parsedFromIsi;
+      } else if (item.subjudul) {
         let subLower = item.subjudul.toLowerCase();
         let parts = subLower.split('pembayaran');
         if (parts.length > 1) {
-          let angkaBayar = parseRupiahToNumber(parts[1]);
-          totalPembayaran += angkaBayar;
+          itemBayar = parseRupiahToNumber(parts[1]);
         } else {
           let matches = item.subjudul.match(/\b[\d\.]+\b/g);
           if (matches) {
-            let angkaTerakhir = parseRupiahToNumber(matches[matches.length - 1]);
-            totalPembayaran += angkaTerakhir;
+            itemBayar = parseRupiahToNumber(matches[matches.length - 1]);
           }
         }
       }
+
+      totalPembayaran += itemBayar;
     });
   }
 
