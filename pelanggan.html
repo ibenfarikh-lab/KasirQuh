@@ -911,6 +911,10 @@
 
         let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
         let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
+        
+        // Fix untuk nilai ons: jika satuan Kg, kalikan 10 agar jadi harga per Kg
+        let isKg = (satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram');
+        if (isKg) hargaParsed = hargaParsed * 10;
 
         if (catalogViewMode === 'grid') {
           container.innerHTML += `
@@ -978,6 +982,12 @@
 
       let valModal = p.hargaModal !== undefined ? p.hargaModal : (p.modal || 0);
       let modalParsed = typeof valModal === 'number' ? valModal : parseInt(valModal.toString().replace(/[^0-9]/g, '')) || 0;
+
+      let isKg = (satuan === "kg" || satuan === "kilogram");
+      if (isKg) {
+        hargaParsed = hargaParsed * 10;
+        modalParsed = modalParsed * 10;
+      }
 
       let item = cart.find(i => i.code === code);
       if (item) {
