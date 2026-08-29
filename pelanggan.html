@@ -673,7 +673,6 @@
         } else {
           let docData = snapshot.docs[0].data();
           
-          // Cek apakah akun masih menunggu persetujuan admin
           if (docData.status === "pending" || docData.disetujui === false) {
             return alert("Akun Anda sedang menunggu persetujuan dari Admin toko. Silakan hubungi admin.");
           }
@@ -713,7 +712,7 @@
             phone: phone,
             alamat: address,
             password: pass,
-            status: "pending", // Status menunggu persetujuan dari admin
+            status: "pending",
             catatan: [],
             waktuDaftar: new Date().toLocaleString('id-ID')
           }).then(() => {
