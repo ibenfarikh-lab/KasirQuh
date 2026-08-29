@@ -872,6 +872,67 @@ function simpanModalAwalDinamis(tabKey) {
   db.collection("pengaturan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).set(databaseCatatanDinamis[tabKey], { merge: true })
     .catch(err => console.error("Gagal simpan modal: ", err));
 }
+function parseItemLine(line) {
+  line = line.trim();
+  if (!line) return null;
+
+  let parts = line.split('-').map(p => p.trim());
+  if (parts.length >= 4) {
+    let nama = parts[0];
+    let qty = parseRupiahToNumber(parts[1]) || 1;
+    let satuan = parts[2];
+    let harga = parseRupiahToNumber(parts[3]) || 0;
+    return { nama, qty, satuan, harga };
+  }
+
+  let tokens = line.split(/\s+/);
+  if (tokens.length === 0) return null;
+
+  let harga = 0;
+  let hargaIndex = -1;
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    let cleanNum = parseRupiahToNumber(tokens[i]);
+    if (!isNaN(cleanNum) && cleanNum > 0 && /\d/.test(tokens[i])) {
+      harga = cleanNum;
+      hargaIndex = i;
+      break;
+    }
+  }
+
+  if (hargaIndex === -1) {
+    return { nama: line, qty: 1, satuan: 'pcs', harga: 0 };
+  }
+
+  let qty = 1;
+  let satuan = 'pcs';
+  let namaTokens = tokens.slice(0, hargaIndex);
+
+  if (namaTokens.length > 0) {
+    let lastToken = namaTokens[namaTokens.length - 1];
+    let possibleQty = parseRupiahToNumber(lastToken);
+    
+    if (!isNaN(possibleQty) && possibleQty > 0 && /\d/.test(lastToken)) {
+      qty = possibleQty;
+      namaTokens.pop();
+    } else {
+      satuan = lastToken;
+      namaTokens.pop();
+      if (namaTokens.length > 0) {
+        let prevToken = namaTokens[namaTokens.length - 1];
+        let possibleQty2 = parseRupiahToNumber(prevToken);
+        if (!isNaN(possibleQty2) && possibleQty2 > 0 && /\d/.test(prevToken)) {
+          qty = possibleQty2;
+          namaTokens.pop();
+        }
+      }
+    }
+  }
+
+  let nama = namaTokens.join(' ').trim();
+  if (!nama) nama = "Barang";
+
+  return { nama, qty, satuan, harga };
+}
 
 function hitungRingkasanCatatanDinamis(tabKey) {
   let inputEl = document.getElementById(`modal-awal-${tabKey}`);
