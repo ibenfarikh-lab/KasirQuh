@@ -21,12 +21,12 @@ export default async function handler(req, res) {
     const fullPrompt = `Anda adalah asisten toko online "${namaToko}".\nBerikut adalah daftar produk dan stok toko saat ini:\n${daftarProduk}\n\nJawablah pertanyaan pelanggan berikut dengan ramah, akurat berdasarkan data produk di atas, dan gunakan bahasa Indonesia: "${prompt}"`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.6-flash', // Diperbarui dari gemini-1.5-flash untuk mengatasi error 404[span_3](start_span)[span_3](end_span)
+      model: 'gemini-3.6-flash', 
       contents: fullPrompt,
     });
 
-    // Mengembalikan properti 'reply' agar sesuai dengan penangkapan di frontend
-    return res.status(200).json({ reply: response.text });
+    // Mengembalikan properti 'reply' dengan .trim() agar bersih dari spasi/baris kosong di awal
+    return res.status(200).json({ reply: response.text ? response.text.trim() : '' });
   } catch (error) {
     console.error('Error detail:', error);
     return res.status(500).json({ error: error.message || 'Terjadi kesalahan pada server.' });
