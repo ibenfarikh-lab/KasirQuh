@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const fullPrompt = `Anda adalah asisten toko online "${namaToko}".\nBerikut adalah daftar produk dan stok toko saat ini:\n${daftarProduk}\n\nJawablah pertanyaan pelanggan berikut dengan ramah, akurat berdasarkan data produk di atas, dan gunakan bahasa Indonesia: "${prompt}"`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', // Diperbarui dari gemini-1.5-flash untuk mengatasi error 404[span_3](start_span)[span_3](end_span)
+      model: 'gemini-3.6-flash', // Diperbarui dari gemini-1.5-flash untuk mengatasi error 404[span_3](start_span)[span_3](end_span)
       contents: fullPrompt,
     });
 
