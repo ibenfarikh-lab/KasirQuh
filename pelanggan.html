@@ -905,7 +905,7 @@
         let code = p.code;
         let isHabis = (p.stok || 0) <= 0;
         let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
-        let satuan = p.satuan || "Pcs";
+        let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
         let cartItem = cart.find(item => item.code === code);
         let currentQtyInCart = cartItem ? cartItem.qty : 0;
 
@@ -1077,9 +1077,17 @@
 
           await batch.commit();
 
-          let text = `*PESANAN BARU DARI PELANGGAN* 🛒\nNama : *${namaCust}*\nNo WA : ${currentCustomerPhone}\nAlamat : ${alamatCust}\nMetode : *${namaMetode}*\n------------------------------------\n`;
-          cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`; });
-          text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*`;
+          let text = `*PESANAN BARU DARI PELANGGAN* 🛒
+Nama : *${namaCust}*
+No WA : ${currentCustomerPhone}
+Alamat : ${alamatCust}
+Metode : *${namaMetode}*
+------------------------------------
+`;
+          cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}
+`; });
+          text += `------------------------------------
+*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*`;
           window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
 
           alert("Pesanan berhasil dikirim ke sistem dan diteruskan ke WhatsApp Admin!");
@@ -1194,7 +1202,9 @@
         let daftarProdukText = "";
         for (let code in databaseProduk) {
           let p = databaseProduk[code];
-          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${p.satuan||'Pcs'}\n`;
+          let s = (p.satuan||'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan||'Pcs');
+          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}
+`;
         }
 
         let response = await fetch('/api/tanya', {
@@ -1212,9 +1222,9 @@
 
         let aiReply = "Maaf, saya sedang mengalami kendala teknis. Silakan tanyakan langsung ke admin.";
         if (data.reply) {
-          aiReply = data.reply.replace(/^[\s\u00A0]+/gm, '').trim();
+          aiReply = data.reply.replace(/^[\s ]+/gm, '').trim();
         } else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-          aiReply = data.candidates[0].content.parts[0].text.replace(/^[\s\u00A0]+/gm, '').trim();
+          aiReply = data.candidates[0].content.parts[0].text.replace(/^[\s ]+/gm, '').trim();
         }
 
         msgContainer.innerHTML += `
