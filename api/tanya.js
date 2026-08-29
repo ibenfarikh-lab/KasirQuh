@@ -8,7 +8,6 @@ export default async function handler(req, res) {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     
-    // Menerima data dari frontend
     const prompt = req.body.prompt || req.body.pesan || req.body.message || req.body.text;
     const daftarProduk = req.body.daftarProduk || '';
     const namaToko = req.body.namaToko || 'KasirQuh';
@@ -17,7 +16,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Pesan tidak boleh kosong' });
     }
 
-    // Menyusun prompt lengkap dengan informasi produk dan toko di backend
     const fullPrompt = `Anda adalah asisten toko online "${namaToko}".\nBerikut adalah daftar produk dan stok toko saat ini:\n${daftarProduk}\n\nJawablah pertanyaan pelanggan berikut dengan ramah, akurat berdasarkan data produk di atas, dan gunakan bahasa Indonesia: "${prompt}"`;
 
     const response = await ai.models.generateContent({
@@ -25,9 +23,14 @@ export default async function handler(req, res) {
       contents: fullPrompt,
     });
 
-    // Membersihkan spasi/indentasi berlebih di awal setiap baris dari respons AI
     let rawReply = response.text || '';
-    let cleanedReply = rawReply.trim().replace(/^[ \t]+/gm, '');
+    
+    // Membersihkan spasi di setiap baris secara total agar rata kiri
+    let cleanedReply = rawReply
+      .split('\n')
+      .map(line => line.trim())
+      .join('\n')
+      .trim();
 
     return res.status(200).json({ reply: cleanedReply });
   } catch (error) {
