@@ -681,6 +681,8 @@
           unreadAdmin: firebase.firestore.FieldValue.increment(1)
         }, { merge: true });
         inputEl.value = "";
+      }).catch(err => {
+        alert("Gagal mengirim pesan: " + err.message);
       });
     }
 
@@ -713,6 +715,8 @@
             alert("Sandi salah!");
           }
         }
+      }).catch(err => {
+        alert("Terjadi kesalahan saat masuk: " + err.message);
       });
     }
 
@@ -749,6 +753,8 @@
             alert("Gagal mendaftar: " + err.message);
           });
         }
+      }).catch(err => {
+        alert("Terjadi kesalahan: " + err.message);
       });
     }
 
@@ -1146,9 +1152,9 @@
       if (!nama) return alert("Nama wajib diisi!");
       db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => {
         if (!snap.empty) {
-          db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!"));
+          db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!")).catch(err => alert("Gagal memperbarui profil: " + err.message));
         }
-      });
+      }).catch(err => alert("Terjadi kesalahan: " + err.message));
     }
 
     function toggleAIChatModal() {
@@ -1185,7 +1191,7 @@
           daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${p.satuan||'Pcs'}\n`;
         }
 
-        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=ISI_GOOGLE_AI_API_KEY_ANDA`, {
+        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=ISI_GOOGLE_AI_API_KEY_ANDA`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
