@@ -1163,78 +1163,71 @@
     }
 
     async function kirimPesanKeAI() {
-      let inputEl = document.getElementById("ai-chat-input");
-      let msgContainer = document.getElementById("ai-chat-messages");
-      let prompt = inputEl.value.trim();
-      if (!prompt) return;
+  let inputEl = document.getElementById("ai-chat-input");
+  let msgContainer = document.getElementById("ai-chat-messages");
+  let prompt = inputEl.value.trim();
+  if (!prompt) return;
 
-      msgContainer.innerHTML += `
-        <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-end; background: #7c3aed; color: white;">
-          ${escapeHtml(prompt)}
-        </div>
-      `;
-      inputEl.value = "";
-      msgContainer.scrollTop = msgContainer.scrollHeight;
+  msgContainer.innerHTML += `
+    <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-end; background: #7c3aed; color: white;">
+      ${escapeHtml(prompt)}
+    </div>
+  `;
+  inputEl.value = "";
+  msgContainer.scrollTop = msgContainer.scrollHeight;
 
-      let loadingId = "loading-" + Date.now();
-      msgContainer.innerHTML += `
-        <div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem;">
-          Sedang mengetik...
-        </div>
-      `;
-      msgContainer.scrollTop = msgContainer.scrollHeight;
+  let loadingId = "loading-" + Date.now();
+  msgContainer.innerHTML += `
+    <div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem;">
+      Sedang mengetik...
+    </div>
+  `;
+  msgContainer.scrollTop = msgContainer.scrollHeight;
 
-      try {
-        let daftarProdukText = "";
-        for (let code in databaseProduk) {
-          let p = databaseProduk[code];
-          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${p.satuan||'Pcs'}\n`;
-        }
-
-        let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=ISI_GOOGLE_AI_API_KEY_ANDA`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: `Anda adalah asisten toko online "${pengaturanToko.nama || 'KasirQuh'}". 
-Berikut adalah daftar produk dan stok toko saat ini:
-${daftarProdukText}
-
-Jawablah pertanyaan pelanggan berikut dengan ramah, akurat berdasarkan data produk di atas, dan gunakan bahasa Indonesia: "${prompt}"`
-                  }
-                ]
-              }
-            ]
-          })
-        });
-
-        let data = await response.json();
-        document.getElementById(loadingId)?.remove();
-
-        let aiReply = "Maaf, saya sedang mengalami kendala teknis. Silakan tanyakan langsung ke admin.";
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-          aiReply = data.candidates[0].content.parts[0].text;
-        }
-
-        msgContainer.innerHTML += `
-          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-wrap;">
-            ${escapeHtml(aiReply)}
-          </div>
-        `;
-        msgContainer.scrollTop = msgContainer.scrollHeight;
-
-      } catch (err) {
-        document.getElementById(loadingId)?.remove();
-        msgContainer.innerHTML += `
-          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">
-            Gagal terhubung ke Asisten AI.
-          </div>
-        `;
-      }
+  try {
+    let daftarProdukText = "";
+    for (let code in databaseProduk) {
+      let p = databaseProduk[code];
+      daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${p.satuan||'Pcs'}\n`;
     }
+
+    // Ubah fetch ke endpoint backend /api/tanya
+    let response = await fetch('/api/tanya', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        prompt: prompt,
+        daftarProduk: daftarProdukText,
+        namaToko: pengaturanToko.nama || 'KasirQuh'
+      })
+    });
+
+    let data = await response.json();
+    document.getElementById(loadingId)?.remove();
+
+    let aiReply = "Maaf, saya sedang mengalami kendala teknis. Silakan tanyakan langsung ke admin.";
+    if (data.reply) {
+      aiReply = data.reply;
+    } else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+      aiReply = data.candidates[0].content.parts[0].text;
+    }
+
+    msgContainer.innerHTML += `
+      <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-wrap;">
+        ${escapeHtml(aiReply)}
+      </div>
+    `;
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+
+  } catch (err) {
+    document.getElementById(loadingId)?.remove();
+    msgContainer.innerHTML += `
+      <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">
+        Gagal terhubung ke Asisten AI.
+      </div>
+    `;
+  }
+}
 
     function escapeHtml(text) {
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
