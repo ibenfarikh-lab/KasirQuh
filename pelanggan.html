@@ -957,12 +957,28 @@
     function tambahKeKeranjangPelanggan(code) {
       let p = databaseProduk[code];
       if (!p || (p.stok || 0) <= 0) return alert("Stok habis!");
+      
+      let satuan = (p.satuan || "").toLowerCase().trim();
+      let qtyToAdd = 1;
+
+      if (satuan === "kg" || satuan === "kilogram") {
+        let inputQty = prompt(`Masukkan jumlah Kilogram (Kg) untuk ${p.nama}\n(Contoh: 1 untuk 1 kg, 0.5 untuk setengah kg / 5 ons, 0.1 untuk 1 ons):`, "1");
+        if (inputQty === null || inputQty.trim() === "") return; // Dibatalkan
+        qtyToAdd = parseFloat(inputQty.replace(',', '.'));
+        if (isNaN(qtyToAdd) || qtyToAdd <= 0) {
+          return alert("Jumlah tidak valid!");
+        }
+      }
+
       let item = cart.find(i => i.code === code);
       if (item) {
-        if (item.qty + 1 > p.stok) return alert("Stok tidak mencukupi!");
-        item.qty += 1; item.subtotal = item.qty * p.harga;
+        if (item.qty + qtyToAdd > p.stok) return alert("Stok tidak mencukupi!");
+        item.qty += qtyToAdd;
+        item.qty = parseFloat(item.qty.toFixed(3)); // Menghindari error presisi desimal JS
+        item.subtotal = Math.round(item.qty * p.harga);
       } else {
-        cart.push({ code, nama: p.nama, harga: p.harga, modal: p.modal || 0, qty: 1, subtotal: p.harga, foto: p.foto });
+        if (qtyToAdd > p.stok) return alert("Stok tidak mencukupi!");
+        cart.push({ code, nama: p.nama, harga: p.harga, modal: p.modal || 0, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * p.harga), foto: p.foto });
       }
       playBeep();
       renderCartPelanggan();
@@ -972,8 +988,31 @@
     function kurangiDariKeranjangPelanggan(code) {
       let idx = cart.findIndex(i => i.code === code);
       if (idx > -1) {
-        if (cart[idx].qty > 1) { cart[idx].qty -= 1; cart[idx].subtotal = cart[idx].qty * cart[idx].harga; }
-        else { cart.splice(idx, 1); }
+        let item = cart[idx];
+        let p = databaseProduk[code];
+        let satuan = p ? (p.satuan || "").toLowerCase().trim() : "";
+
+        if (satuan === "kg" || satuan === "kilogram") {
+            let inputQty = prompt(`Kurangi jumlah untuk ${item.nama} (Saat ini: ${item.qty} Kg)\nMasukkan jumlah yang ingin dikurangi:`, item.qty);
+            if (inputQty === null || inputQty.trim() === "") return;
+            let val = parseFloat(inputQty.replace(',', '.'));
+            if (isNaN(val) || val <= 0) return alert("Jumlah tidak valid!");
+
+            if (val >= item.qty) {
+                cart.splice(idx, 1);
+            } else {
+                item.qty -= val;
+                item.qty = parseFloat(item.qty.toFixed(3));
+                item.subtotal = Math.round(item.qty * item.harga);
+            }
+        } else {
+            if (item.qty > 1) { 
+                item.qty -= 1; 
+                item.subtotal = Math.round(item.qty * item.harga); 
+            } else { 
+                cart.splice(idx, 1); 
+            }
+        }
         playBeepDown();
         renderCartPelanggan();
         refreshKatalogPelanggan();
