@@ -959,12 +959,31 @@ function renderHalamanSubCatatan(tabKey) {
     let tombolAtasDisabled = index === 0 ? 'opacity: 0.4; cursor: not-allowed;' : '';
     let tombolBawahDisabled = index === listData.length - 1 ? 'opacity: 0.4; cursor: not-allowed;' : '';
 
+    // Otomatis tampilkan total harga dari rincian ke subjudul jika subjudul kosong
+    let displaySubjudul = item.subjudul;
+    if (!displaySubjudul && item.isi) {
+      let parsedFromIsi = 0;
+      let hasValidIsiItems = false;
+      let lines = item.isi.split('\n');
+      lines.forEach(line => {
+        let parts = line.split('-').map(p => p.trim());
+        if (parts.length >= 4) {
+          let hargaBaris = parseRupiahToNumber(parts[3]) || 0;
+          parsedFromIsi += hargaBaris;
+          hasValidIsiItems = true;
+        }
+      });
+      if (hasValidIsiItems) {
+        displaySubjudul = "Rp " + parsedFromIsi.toLocaleString('id-ID');
+      }
+    }
+
     container.innerHTML += `
       <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; gap: 6px;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
           <div>
             <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.judul}</div>
-            ${item.subjudul ? `<div style="font-size: 0.8rem; font-weight: 600; color: #2563eb; margin-top: 1px;">${item.subjudul}</div>` : ''}
+            ${displaySubjudul ? `<div style="font-size: 0.8rem; font-weight: 600; color: #2563eb; margin-top: 1px;">${displaySubjudul}</div>` : ''}
             <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 2px;">${item.waktu}</div>
           </div>
           <div style="display: flex; gap: 4px; align-items: center;">
