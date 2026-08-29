@@ -311,9 +311,12 @@
   <!-- MODAL LIVE CHAT PELANGGAN -->
   <div id="customerChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleCustomerChatModal()">
     <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
-      <div class="modal-header" style="padding: 12px 16px; margin: 0; background: var(--table-header);">
-        <h3>💬 Live Chat dengan Toko</h3>
-        <button class="btn-close-modal" onclick="toggleCustomerChatModal()">&times;</button>
+      <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #16a34a; color: white; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 1rem; color: white;">💬 Live Chat dengan Toko</h3>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button onclick="beralihKeAIFromLiveChat()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">🤖 Tanya AI</button>
+          <button class="btn-close-modal" onclick="toggleCustomerChatModal()" style="color: white; background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
+        </div>
       </div>
       <div id="customer-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
         <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat pesan...</div>
@@ -328,9 +331,12 @@
   <!-- MODAL ASISTEN AI -->
   <div id="aiChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleAIChatModal()">
     <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
-      <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #7c3aed; color: white;">
+      <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
         <h3 style="margin: 0; font-size: 1rem;">🤖 Asisten Belanja AI</h3>
-        <button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white;">&times;</button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button onclick="beralihKeLiveChatFromAI()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">💬 Chat Admin</button>
+          <button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white; background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
+        </div>
       </div>
       <div id="ai-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
         <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-wrap;">
@@ -594,13 +600,28 @@
       }
     }
 
-    // --- FITUR LIVE CHAT PELANGGAN ---
+    // --- FITUR LIVE CHAT & PENGALIHAN SEAMLESS ---
     function toggleCustomerChatModal() {
       let modal = document.getElementById("customerChatModal");
       modal.classList.toggle("show");
       if (modal.classList.contains("show") && currentCustomerPhone) {
         db.collection("chats").doc(currentCustomerPhone).update({ unreadCustomer: 0 }).catch(() => {});
       }
+    }
+
+    function toggleAIChatModal() {
+      let modal = document.getElementById("aiChatModal");
+      modal.classList.toggle("show");
+    }
+
+    function beralihKeLiveChatFromAI() {
+      toggleAIChatModal();
+      toggleCustomerChatModal();
+    }
+
+    function beralihKeAIFromLiveChat() {
+      toggleCustomerChatModal();
+      toggleAIChatModal();
     }
 
     function initCustomerChatListener() {
@@ -1157,77 +1178,71 @@
       }).catch(err => alert("Terjadi kesalahan: " + err.message));
     }
 
-    function toggleAIChatModal() {
-      let modal = document.getElementById("aiChatModal");
-      modal.classList.toggle("show");
-    }
-
     async function kirimPesanKeAI() {
-  let inputEl = document.getElementById("ai-chat-input");
-  let msgContainer = document.getElementById("ai-chat-messages");
-  let prompt = inputEl.value.trim();
-  if (!prompt) return;
+      let inputEl = document.getElementById("ai-chat-input");
+      let msgContainer = document.getElementById("ai-chat-messages");
+      let prompt = inputEl.value.trim();
+      if (!prompt) return;
 
-  msgContainer.innerHTML += `
-    <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-end; background: #7c3aed; color: white;">
-      ${escapeHtml(prompt)}
-    </div>
-  `;
-  inputEl.value = "";
-  msgContainer.scrollTop = msgContainer.scrollHeight;
+      msgContainer.innerHTML += `
+        <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-end; background: #7c3aed; color: white;">
+          ${escapeHtml(prompt)}
+        </div>
+      `;
+      inputEl.value = "";
+      msgContainer.scrollTop = msgContainer.scrollHeight;
 
-  let loadingId = "loading-" + Date.now();
-  msgContainer.innerHTML += `
-    <div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem;">
-      Sedang mengetik...
-    </div>
-  `;
-  msgContainer.scrollTop = msgContainer.scrollHeight;
+      let loadingId = "loading-" + Date.now();
+      msgContainer.innerHTML += `
+        <div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem;">
+          Sedang mengetik...
+        </div>
+      `;
+      msgContainer.scrollTop = msgContainer.scrollHeight;
 
-  try {
-    let daftarProdukText = "";
-    for (let code in databaseProduk) {
-      let p = databaseProduk[code];
-      daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${p.satuan||'Pcs'}\n`;
+      try {
+        let daftarProdukText = "";
+        for (let code in databaseProduk) {
+          let p = databaseProduk[code];
+          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${p.satuan||'Pcs'}\n`;
+        }
+
+        let response = await fetch('/api/tanya', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: prompt,
+            daftarProduk: daftarProdukText,
+            namaToko: pengaturanToko.nama || 'KasirQuh'
+          })
+        });
+
+        let data = await response.json();
+        document.getElementById(loadingId)?.remove();
+
+        let aiReply = "Maaf, saya sedang mengalami kendala teknis. Silakan tanyakan langsung ke admin.";
+        if (data.reply) {
+          aiReply = data.reply;
+        } else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+          aiReply = data.candidates[0].content.parts[0].text;
+        }
+
+        msgContainer.innerHTML += `
+          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-wrap;">
+            ${escapeHtml(aiReply)}
+          </div>
+        `;
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+
+      } catch (err) {
+        document.getElementById(loadingId)?.remove();
+        msgContainer.innerHTML += `
+          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">
+            Gagal terhubung ke Asisten AI.
+          </div>
+        `;
+      }
     }
-
-    // Ubah fetch ke endpoint backend /api/tanya
-    let response = await fetch('/api/tanya', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        prompt: prompt,
-        daftarProduk: daftarProdukText,
-        namaToko: pengaturanToko.nama || 'KasirQuh'
-      })
-    });
-
-    let data = await response.json();
-    document.getElementById(loadingId)?.remove();
-
-    let aiReply = "Maaf, saya sedang mengalami kendala teknis. Silakan tanyakan langsung ke admin.";
-    if (data.reply) {
-      aiReply = data.reply;
-    } else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-      aiReply = data.candidates[0].content.parts[0].text;
-    }
-
-    msgContainer.innerHTML += `
-      <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-wrap;">
-        ${escapeHtml(aiReply)}
-      </div>
-    `;
-    msgContainer.scrollTop = msgContainer.scrollHeight;
-
-  } catch (err) {
-    document.getElementById(loadingId)?.remove();
-    msgContainer.innerHTML += `
-      <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">
-        Gagal terhubung ke Asisten AI.
-      </div>
-    `;
-  }
-}
 
     function escapeHtml(text) {
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
