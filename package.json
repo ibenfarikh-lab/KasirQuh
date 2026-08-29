@@ -1,4 +1,12 @@
 {
+  "name": "kasirquh",
+  "version": "1.0.0",
+  "description": "Asisten Belanja AI KasirQuh",
+  "main": "tanya.js",
+  "type": "module",
+  "scripts": {
+    "start": "node tanya.js"
+  },
   "dependencies": {
     "@google/genai": "latest"
   }
