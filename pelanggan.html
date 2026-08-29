@@ -909,6 +909,9 @@
         let cartItem = cart.find(item => item.code === code);
         let currentQtyInCart = cartItem ? cartItem.qty : 0;
 
+        let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+        let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
+
         if (catalogViewMode === 'grid') {
           container.innerHTML += `
             <div class="inv-card" style="border: 2px solid #16a34a; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card-bg);">
@@ -921,7 +924,7 @@
                 <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
                 <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Stok: ${p.stok || 0} ${satuan}</div>
               </div>
-              <div style="font-size: 0.95rem; font-weight: bold; color: #2563eb; margin-top: 4px;">Rp ${(p.harga || 0).toLocaleString('id-ID')} / ${satuan}</div>
+              <div style="font-size: 0.95rem; font-weight: bold; color: #2563eb; margin-top: 4px;">Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}</div>
             </div>
           `;
         } else {
@@ -935,7 +938,7 @@
               <div style="min-width: 0; flex: 1;">
                 <div style="font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-color);">${p.nama}</div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: ${p.stok || 0} ${satuan}</div>
-                <div style="font-size: 0.85rem; font-weight: bold; color: #2563eb;">Rp ${(p.harga || 0).toLocaleString('id-ID')} / ${satuan}</div>
+                <div style="font-size: 0.85rem; font-weight: bold; color: #2563eb;">Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}</div>
               </div>
             </div>
           `;
@@ -970,15 +973,21 @@
         }
       }
 
+      let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+      let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
+
+      let valModal = p.hargaModal !== undefined ? p.hargaModal : (p.modal || 0);
+      let modalParsed = typeof valModal === 'number' ? valModal : parseInt(valModal.toString().replace(/[^0-9]/g, '')) || 0;
+
       let item = cart.find(i => i.code === code);
       if (item) {
         if (item.qty + qtyToAdd > p.stok) return alert("Stok tidak mencukupi!");
         item.qty += qtyToAdd;
         item.qty = parseFloat(item.qty.toFixed(3)); // Menghindari error presisi desimal JS
-        item.subtotal = Math.round(item.qty * p.harga);
+        item.subtotal = Math.round(item.qty * hargaParsed);
       } else {
         if (qtyToAdd > p.stok) return alert("Stok tidak mencukupi!");
-        cart.push({ code, nama: p.nama, harga: p.harga, modal: p.modal || 0, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * p.harga), foto: p.foto });
+        cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto });
       }
       playBeep();
       renderCartPelanggan();
