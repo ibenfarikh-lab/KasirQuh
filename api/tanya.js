@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const { pesan } = req.body;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-1.5-flash', // Ubah dari 2.5 menjadi 1.5
       contents: pesan,
     });
 
