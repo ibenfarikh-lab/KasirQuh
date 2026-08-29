@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI } from "@google/surve"; // atau sesuaikan jika menggunakan library resmi
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -15,5 +15,8 @@ export default async function handler(req, res) {
     });
 
     return res.status(200).json({ jawaban: response.text });
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({ error: 'Terjadi kesalahan pada server.' });
   }
 }
