@@ -3108,16 +3108,15 @@ function ambilDariCatatan() {
     if (!noteItem.isi) return;
     let lines = noteItem.isi.split('\n');
     lines.forEach(line => {
-     let parts = line.trim().split(/\s+/);
-if (parts.length >= 4) {
-  let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
-  let satuan = parts[parts.length - 2].toLowerCase();
-  let qty = parseFloat(parts[parts.length - 3]) || 1;
-  let nama = parts.slice(0, parts.length - 3).join(' ');
-  
-  if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-  let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
-
+      let parts = line.split('-').map(p => p.trim());
+      if (parts.length >= 4) {
+        let nama = parts[0];
+        let qty = parseFloat(parts[1]) || 1;
+        let satuan = parts[2].toLowerCase();
+        if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
+        
+        let modalTotalInput = parseRupiahToNumber(parts[3]) || 0;
+        let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
 
         let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
         let matchedProd = existingCode ? databaseProduk[existingCode] : null;
