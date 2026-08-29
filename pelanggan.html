@@ -1212,9 +1212,9 @@
 
         let aiReply = "Maaf, saya sedang mengalami kendala teknis. Silakan tanyakan langsung ke admin.";
         if (data.reply) {
-          aiReply = data.reply;
+          aiReply = data.reply.replace(/^[\s\u00A0]+/gm, '').trim();
         } else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-          aiReply = data.candidates[0].content.parts[0].text;
+          aiReply = data.candidates[0].content.parts[0].text.replace(/^[\s\u00A0]+/gm, '').trim();
         }
 
         msgContainer.innerHTML += `
