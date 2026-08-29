@@ -517,6 +517,12 @@ function parseRupiahToNumber(stringVal) {
   return parseInt(stringVal.toString().replace(/\./g, '')) || 0;
 }
 
+function parseStockToNumber(stringVal) {
+  if (!stringVal) return 0;
+  let clean = stringVal.toString().replace(/\./g, '').replace(',', '.');
+  return parseFloat(clean) || 0;
+}
+
 let userAuth = { user: "admin", pass: "admin", updatedAt: 0 };
 db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
   if (doc.exists) {
@@ -1280,7 +1286,7 @@ function openProductModal(codeToEdit = null, restockId = null) {
       document.getElementById("db-category").value = rItem.kategori || "";
       document.getElementById("db-unit").value = sat || "pcs";
       document.getElementById("db-isi-rtg").value = rItem.isiRtg || 10;
-      document.getElementById("db-stock").value = rItem.qty !== undefined ? rItem.qty : 1;
+      document.getElementById("db-stock").value = rItem.qty !== undefined ? (rItem.qty.toString().replace('.', ',')) : "1";
       document.getElementById("db-cost").value = ((sat === 'rtg' || sat === 'kg') ? (rItem.modalRtg || 0) : (rItem.modal || 0)).toLocaleString('id-ID');
       document.getElementById("db-price").value = ((sat === 'rtg' || sat === 'kg') ? (rItem.hargaRtg || 0) : (rItem.harga || 0)).toLocaleString('id-ID');
       document.getElementById("db-selected-online-img").value = rItem.foto || "";
@@ -1297,7 +1303,7 @@ function openProductModal(codeToEdit = null, restockId = null) {
     document.getElementById("db-category").value = p.kategori || "";
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
-    document.getElementById("db-stock").value = p.stok !== undefined ? p.stok : 0;
+    document.getElementById("db-stock").value = p.stok !== undefined ? (p.stok.toString().replace('.', ',')) : "0";
     document.getElementById("db-cost").value = ((sat === 'rtg' || sat === 'kg') ? (p.modalRtg || 0) : (p.modal || 0)).toLocaleString('id-ID');
     document.getElementById("db-price").value = ((sat === 'rtg' || sat === 'kg') ? (p.hargaRtg || 0) : (p.harga || 0)).toLocaleString('id-ID');
     document.getElementById("db-selected-online-img").value = p.foto || "";
@@ -1388,7 +1394,7 @@ function simpanBarangLangsung() {
   const category = document.getElementById("db-category").value.trim() || "Umum";
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
-  let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
+  let stokVal = parseStockToNumber(document.getElementById("db-stock").value);
   
   let cost = parseRupiahToNumber(document.getElementById("db-cost").value);
   let price = parseRupiahToNumber(document.getElementById("db-price").value);
@@ -1423,7 +1429,7 @@ function simpanEditBarang(code) {
   const category = document.getElementById("db-category").value.trim() || "Umum";
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
-  let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
+  let stokVal = parseStockToNumber(document.getElementById("db-stock").value);
   
   let cost = parseRupiahToNumber(document.getElementById("db-cost").value);
   let price = parseRupiahToNumber(document.getElementById("db-price").value);
@@ -1459,7 +1465,7 @@ function simpanEditBelanjaStok(restockId) {
   const category = document.getElementById("db-category").value.trim() || "Umum";
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
-  const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
+  const qtyBeli = parseStockToNumber(document.getElementById("db-stock").value) || 1;
   const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
   const price = parseRupiahToNumber(document.getElementById("db-price").value);
   const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
@@ -1514,6 +1520,7 @@ function autoFillDataBarang(namaInput) {
         document.getElementById("db-category").value = m.kategori || "";
         document.getElementById("db-unit").value = sat || "pcs";
         document.getElementById("db-isi-rtg").value = m.isiRtg || 10;
+        document.getElementById("db-stock").value = (m.stok !== undefined ? m.stok.toString().replace('.', ',') : "0");
         document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? m.modalRtg : m.modal) || 0).toLocaleString('id-ID');
         document.getElementById("db-price").value = (((sat === 'rtg' || sat === 'kg') ? m.hargaRtg : m.harga) || 0).toLocaleString('id-ID');
         document.getElementById("db-selected-online-img").value = m.foto || "";
@@ -1534,6 +1541,7 @@ function autoFillDataBarang(namaInput) {
     document.getElementById("db-category").value = p.kategori || "";
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
+    document.getElementById("db-stock").value = (p.stok !== undefined ? p.stok.toString().replace('.', ',') : "0");
     document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? p.modalRtg : p.modal) || 0).toLocaleString('id-ID');
     document.getElementById("db-price").value = (((sat === 'rtg' || sat === 'kg') ? p.hargaRtg : p.harga) || 0).toLocaleString('id-ID');
     document.getElementById("db-selected-online-img").value = p.foto || "";
@@ -1744,7 +1752,7 @@ function tambahkanKeBelanjaStok() {
   const category = document.getElementById("db-category").value.trim() || "Umum";
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
-  const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
+  const qtyBeli = parseStockToNumber(document.getElementById("db-stock").value) || 1;
   const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
   const price = parseRupiahToNumber(document.getElementById("db-price").value);
   const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
@@ -2065,6 +2073,7 @@ function processBarcodeScanDb(barcode) {
     document.getElementById("db-category").value = p.kategori || "";
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
+    document.getElementById("db-stock").value = (p.stok !== undefined ? p.stok.toString().replace('.', ',') : "0");
     document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? p.modalRtg : p.modal) || 0).toLocaleString('id-ID');
     document.getElementById("db-price").value = (((sat === 'rtg' || sat === 'kg') ? p.hargaRtg : p.harga) || 0).toLocaleString('id-ID');
     updateUnitLabel();
