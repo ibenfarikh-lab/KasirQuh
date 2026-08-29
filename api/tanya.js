@@ -25,8 +25,11 @@ export default async function handler(req, res) {
       contents: fullPrompt,
     });
 
-    // Mengembalikan properti 'reply' dengan .trim() agar bersih dari spasi/baris kosong di awal
-    return res.status(200).json({ reply: response.text ? response.text.trim() : '' });
+    // Membersihkan spasi/indentasi berlebih di awal setiap baris dari respons AI
+    let rawReply = response.text || '';
+    let cleanedReply = rawReply.trim().replace(/^[ \t]+/gm, '');
+
+    return res.status(200).json({ reply: cleanedReply });
   } catch (error) {
     console.error('Error detail:', error);
     return res.status(500).json({ error: error.message || 'Terjadi kesalahan pada server.' });
