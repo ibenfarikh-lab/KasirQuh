@@ -1297,7 +1297,12 @@ function openProductModal(codeToEdit = null, restockId = null) {
     document.getElementById("db-category").value = p.kategori || "";
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
-    document.getElementById("db-stock").value = p.stok !== undefined ? p.stok : 0;
+    let stokTampil = p.stok !== undefined ? p.stok : 0;
+    if (sat === 'rtg') {
+      let isi = p.isiRtg || 10;
+      stokTampil = stokTampil / isi;
+    }
+    document.getElementById("db-stock").value = stokTampil;
     document.getElementById("db-cost").value = ((sat === 'rtg' || sat === 'kg') ? (p.modalRtg || 0) : (p.modal || 0)).toLocaleString('id-ID');
     document.getElementById("db-price").value = ((sat === 'rtg' || sat === 'kg') ? (p.hargaRtg || 0) : (p.harga || 0)).toLocaleString('id-ID');
     document.getElementById("db-selected-online-img").value = p.foto || "";
@@ -2362,8 +2367,9 @@ async function importStokExcel(event) {
         let harga = parseFloat(cols[6]) || 0;
         if (nama) {
           if (!code) code = "BRG-" + Date.now() + "-" + i;
+          let stokTersimpan = (sat === 'rtg') ? (stok * 10) : stok;
           let docRef = db.collection("produk").doc(code);
-          batch.set(docRef, { nama, kategori: kat, satuan: sat, isiRtg: 10, stok, modal, harga, modalRtg: modal, hargaRtg: harga, foto: "" });
+          batch.set(docRef, { nama, kategori: kat, satuan: sat, isiRtg: 10, stok: stokTersimpan, modal, harga, modalRtg: modal, hargaRtg: harga, foto: "" });
           count++;
         }
       }
@@ -3108,15 +3114,16 @@ function ambilDariCatatan() {
     if (!noteItem.isi) return;
     let lines = noteItem.isi.split('\n');
     lines.forEach(line => {
-      let parts = line.split('-').map(p => p.trim());
-      if (parts.length >= 4) {
-        let nama = parts[0];
-        let qty = parseFloat(parts[1]) || 1;
-        let satuan = parts[2].toLowerCase();
-        if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-        
-        let modalTotalInput = parseRupiahToNumber(parts[3]) || 0;
-        let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+     let parts = line.trim().split(/\s+/);
+if (parts.length >= 4) {
+  let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
+  let satuan = parts[parts.length - 2].toLowerCase();
+  let qty = parseFloat(parts[parts.length - 3]) || 1;
+  let nama = parts.slice(0, parts.length - 3).join(' ');
+  
+  if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
+  let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+
 
         let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
         let matchedProd = existingCode ? databaseProduk[existingCode] : null;
