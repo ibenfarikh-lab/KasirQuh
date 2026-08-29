@@ -333,7 +333,7 @@
         <button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white;">&times;</button>
       </div>
       <div id="ai-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
-        <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem;">
+        <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-wrap;">
           Halo! Saya asisten virtual toko ini. Ada yang bisa saya bantu cari atau tanyakan seputar produk kami?
         </div>
       </div>
@@ -1220,7 +1220,7 @@ Jawablah pertanyaan pelanggan berikut dengan ramah, akurat berdasarkan data prod
         }
 
         msgContainer.innerHTML += `
-          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-wrap;">
             ${escapeHtml(aiReply)}
           </div>
         `;
