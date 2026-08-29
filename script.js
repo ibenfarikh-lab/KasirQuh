@@ -950,10 +950,9 @@ function hitungRingkasanCatatanDinamis(tabKey) {
       if (item.isi) {
         let lines = item.isi.split('\n');
         lines.forEach(line => {
-          let parts = line.split('-').map(p => p.trim());
-          if (parts.length >= 4) {
-            let hargaBaris = parseRupiahToNumber(parts[3]) || 0;
-            parsedFromIsi += hargaBaris;
+          let parsed = parseItemLine(line);
+          if (parsed && parsed.harga > 0) {
+            parsedFromIsi += parsed.harga;
             hasValidIsiItems = true;
           }
         });
@@ -977,6 +976,17 @@ function hitungRingkasanCatatanDinamis(tabKey) {
       totalPembayaran += itemBayar;
     });
   }
+
+  let sisaModal = modalAwal - totalPembayaran;
+  let lblModal = document.getElementById(`lbl-modal-${tabKey}`);
+  let lblBayar = document.getElementById(`lbl-bayar-${tabKey}`);
+  let lblSisa = document.getElementById(`lbl-sisa-${tabKey}`);
+
+  if (lblModal) lblModal.innerText = modalAwal.toLocaleString('id-ID');
+  if (lblBayar) lblBayar.innerText = totalPembayaran.toLocaleString('id-ID');
+  if (lblSisa) lblSisa.innerText = sisaModal.toLocaleString('id-ID');
+}
+
 
   let sisaModal = modalAwal - totalPembayaran;
   let lblModal = document.getElementById(`lbl-modal-${tabKey}`);
