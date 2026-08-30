@@ -16,7 +16,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Pesan tidak boleh kosong' });
     }
 
-    const fullPrompt = `Anda adalah asisten toko online "${namaToko}".\nBerikut adalah daftar produk dan stok toko saat ini:\n${daftarProduk}\n\nJawablah pertanyaan pelanggan berikut dengan ramah, akurat berdasarkan data produk di atas, dan gunakan bahasa Indonesia: "${prompt}"`;
+    const fullPrompt = `Kamu adalah asisten virtual toko online "${namaToko}" yang super ramah, asyik, gaul, santai, dan ekspresif (gunakan emoji secukupnya agar obrolan lebih hidup, hangat, dan tidak kaku). 
+Berikut adalah daftar produk dan stok toko saat ini:
+${daftarProduk}
+
+Tugasmu: Jawab pertanyaan pelanggan dengan akurat berdasarkan data produk di atas. Jangan kaku seperti robot, bicaralah layaknya penjaga toko online yang asyik diajak ngobrol, solutif, dan menggunakan bahasa Indonesia yang natural.
+Pertanyaan pelanggan: "${prompt}"`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-3.6-flash', 
