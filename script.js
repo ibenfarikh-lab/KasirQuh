@@ -3192,6 +3192,75 @@ document.addEventListener('touchend', e => {
   }
 }, { passive: true });
 
+// --- FITUR VOICE INPUT AI CO-PILOT ---
+let recognition = null;
+let isRecording = false;
+
+function toggleVoiceInput() {
+  const micBtn = document.getElementById('ai-mic-btn');
+  const inputField = document.getElementById('ai-user-input');
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Maaf, browser Partner belum mendukung fitur voice input. Silakan gunakan Google Chrome.");
+    return;
+  }
+
+  if (!recognition) {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'id-ID';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = function() {
+      isRecording = true;
+      if (micBtn) {
+        micBtn.style.color = '#ef4444';
+        micBtn.style.transform = 'scale(1.2)';
+      }
+      if (inputField) {
+        inputField.placeholder = "🎤 Sedang mendengarkan... Silakan bicara";
+      }
+    };
+
+    recognition.onresult = function(event) {
+      const speechResult = event.results[0][0].transcript;
+      if (inputField) {
+        inputField.value = speechResult;
+      }
+    };
+
+    recognition.onerror = function(event) {
+      console.error("Speech recognition error:", event.error);
+      stopVoiceRecordingUI();
+    };
+
+    recognition.onend = function() {
+      stopVoiceRecordingUI();
+    };
+  }
+
+  if (isRecording) {
+    recognition.stop();
+  } else {
+    recognition.start();
+  }
+}
+
+function stopVoiceRecordingUI() {
+  isRecording = false;
+  const micBtn = document.getElementById('ai-mic-btn');
+  const inputField = document.getElementById('ai-user-input');
+  if (micBtn) {
+    micBtn.style.color = 'var(--text-color)';
+    micBtn.style.transform = 'scale(1)';
+  }
+  if (inputField) {
+    inputField.placeholder = "Tanya stok, saran jualan...";
+  }
+}
+// --- END FITUR VOICE INPUT ---
+
 setTheme(currentTheme);
 setLanguage(currentLang);
 cekStatusLogin();
