@@ -473,7 +473,7 @@
 
   <!-- MODAL TAMBAH/EDIT CATATAN -->
   <div id="catatanModal" class="modal-backdrop" onclick="if(event.target === this) closeCatatanModal()">
-    <div class="modal-content" style="max-width: 700px;">
+    <div class="modal-content" style="max-width: 400px;">
       <div class="modal-header">
         <h3 id="catatan-modal-title" data-i18n="add_note_title">Tambah Catatan Baru</h3>
         <button class="btn-close-modal" onclick="closeCatatanModal()">&times;</button>
@@ -486,7 +486,7 @@
         <label style="font-size: 0.85rem;" data-i18n="note_subtitle_label">Subjudul / Pembayaran (Opsional):</label>
         <input type="text" id="catatan-subtitle-input" placeholder="Cth: Pembayaran 50.000">
         <label style="font-size: 0.85rem;" data-i18n="note_desc_label">Rincian / Isi Catatan:</label>
-        <textarea id="catatan-desc-input" rows="3" placeholder="Cth: Minyak - 2 - pcs - 15000" style="padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"></textarea>
+        <textarea id="catatan-desc-input" rows="5" placeholder="Cth: Minyak - 2 - pcs - 15000" style="padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"></textarea>
         <button onclick="simpanCatatanCard()" style="background: #16a34a; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px;" data-i18n="save_note">Simpan Catatan</button>
       </div>
     </div>
