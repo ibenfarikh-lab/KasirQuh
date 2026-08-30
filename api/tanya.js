@@ -15,12 +15,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const fullPrompt = `Kamu adalah asisten virtual toko online "${namaToko || 'KasirQuh'}" yang super ramah, asyik, gaul, santai, dan ekspresif. Gunakan emoji secukupnya agar obrolan lebih hidup dan hangat.
+    const fullPrompt = `Kamu adalah asisten virtual toko online "${namaToko || 'KasirQuh'}" yang super ramah, asyik, gaul, santai, dan ekspresif. Gunakan emoji secukupnya agar obrolan lebih hidup dan hangat. 
 Berikut adalah daftar produk dan stok toko saat ini:
 ${daftarProduk || 'Tidak ada data produk'}
 
-Tugasmu: Jawab pertanyaan pelanggan dengan akurat berdasarkan data produk di atas. Jangan kaku seperti robot, bicaralah layaknya penjaga toko online yang asyik diajak ngobrol.
-Pertanyaan pelanggan: "${prompt}"`;
+Tugasmu: Jawab pertanyaan pelanggan ("${prompt}") secara interaktif, natural, dan akurat berdasarkan data produk di atas. Jangan kaku seperti robot.`;
 
     const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
@@ -36,14 +35,24 @@ Pertanyaan pelanggan: "${prompt}"`;
 
     const data = await apiResponse.json();
     
+    // Ekstraksi teks yang jauh lebih fleksibel dari berbagai struktur respons Gemini
     let rawReply = "";
-    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-      rawReply = data.candidates[0].content.parts[0].text;
-    } else if (data.text) {
-      rawReply = data.text;
-    } else {
-      console.error("Struktur respons Gemini:", JSON.stringify(data));
-      rawReply = `Halo Kak! Wah, ${namaToko || 'toko'} punya banyak produk menarik nih buat Kakak. Ada yang bisa saya bantu carikan? 😊`;
+    try {
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        rawReply = data.candidates[0].content.parts[0].text;
+      } else if (data.candidates?.[0]?.output) {
+        rawReply = data.candidates[0].output;
+      } else if (data.text) {
+        rawReply = data.text;
+      } else if (data.output) {
+        rawReply = data.output;
+      }
+    } catch (e) {
+      console.error("Parsing error:", e);
+    }
+
+    if (!rawReply) {
+      rawReply = `Halo Kak! Wah, ${namaToko || 'toko'} siap bantu jawab pertanyaan tentang "${prompt}". Ada produk spesifik yang sedang dicari? 😊`;
     }
 
     let cleanedReply = rawReply
@@ -55,6 +64,6 @@ Pertanyaan pelanggan: "${prompt}"`;
     return res.status(200).json({ reply: cleanedReply });
   } catch (error) {
     console.error('Error detail:', error);
-    return res.status(200).json({ reply: "Maaf Kak, asisten AI sedang istirahat sebentar. Silakan tanyakan langsung ke admin ya! 😊" });
+    return res.status(200).json({ reply: `Halo Kak! Terkait "${prompt}", silakan tanyakan langsung ke admin ya biar dibantu lebih cepat! 😊` });
   }
 }
