@@ -486,7 +486,7 @@
         <label style="font-size: 0.85rem;" data-i18n="note_subtitle_label">Subjudul / Pembayaran (Opsional):</label>
         <input type="text" id="catatan-subtitle-input" placeholder="Cth: Pembayaran 50.000">
         <label style="font-size: 0.85rem;" data-i18n="note_desc_label">Rincian / Isi Catatan:</label>
-        <textarea id="catatan-desc-input" rows="4" placeholder="Cth: Minyak - 2 - pcs - 15000" style="padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"></textarea>
+        <textarea id="catatan-desc-input" rows="3" placeholder="Cth: Minyak - 2 - pcs - 15000" style="padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"></textarea>
         <button onclick="simpanCatatanCard()" style="background: #16a34a; color: white; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 6px;" data-i18n="save_note">Simpan Catatan</button>
       </div>
     </div>
@@ -663,8 +663,29 @@
           <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> <span data-i18n="menu_notes">Catatan</span>
         </button>
         <button class="popup-menu-btn" id="pop-btn-pengaturan" onclick="switchTab('pengaturan'); toggleFloatingMenu();">
-          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c-.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> <span data-i18n="menu_settings">Pengaturan</span>
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c-.5.38 1.03.7 1.62.94l.36 2.54c-.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> <span data-i18n="menu_settings">Pengaturan</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING AI ADMIN CO-PILOT WIDGET -->
+  <div id="admin-ai-wrapper" style="position: fixed; bottom: 70px; right: 20px; z-index: 9998; font-family: sans-serif;">
+    <button id="ai-toggle-btn" onclick="toggleAdminAi()" style="background: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); font-weight: bold; display: flex; align-items: center; gap: 6px; font-size: 0.85rem;">
+      🤖 Tanya AI Co-Pilot
+    </button>
+
+    <div id="ai-chat-box" style="display: none; width: 320px; height: 400px; background: var(--card-bg, #fff); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); flex-direction: column; overflow: hidden; margin-bottom: 8px; border: 1px solid var(--border-color, #e5e7eb);">
+      <div style="background: #2563eb; color: white; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.9rem;">
+        <span>✨ AI Co-Pilot Admin</span>
+        <button onclick="toggleAdminAi()" style="background: none; border: none; color: white; font-size: 16px; cursor: pointer;">✕</button>
+      </div>
+      <div id="ai-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; font-size: 0.85rem; background: var(--bg-color, #f9fafb); display: flex; flex-direction: column; gap: 8px;">
+        <div style="background: var(--input-bg, #f3f4f6); color: var(--text-color, #111827); padding: 8px 12px; border-radius: 8px; max-width: 85%;">Halo Boss! Ada data stok atau laporan toko yang mau dibantu bedah hari ini? 😎🔥</div>
+      </div>
+      <div style="padding: 10px; border-top: 1px solid var(--border-color, #e5e7eb); display: flex; gap: 6px; background: var(--card-bg, #fff);">
+        <input type="text" id="ai-user-input" placeholder="Tanya stok, saran jualan..." style="flex: 1; padding: 8px; border: 1px solid var(--input-border, #d1d5db); border-radius: 6px; font-size: 0.85rem; background: var(--input-bg, #fff); color: var(--text-color, #000); outline: none;" onkeypress="handleAiKeyPress(event)">
+        <button onclick="sendAdminAiMessage()" style="background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">Kirim</button>
       </div>
     </div>
   </div>
@@ -707,6 +728,92 @@
         }
       }
     });
+
+    // --- SCRIPT AI CO-PILOT ADMIN ---
+    function toggleAdminAi() {
+      const chatBox = document.getElementById('ai-chat-box');
+      if (chatBox.style.display === 'none' || chatBox.style.display === '') {
+        chatBox.style.display = 'flex';
+      } else {
+        chatBox.style.display = 'none';
+      }
+    }
+
+    function handleAiKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendAdminAiMessage();
+      }
+    }
+
+    async function sendAdminAiMessage() {
+      const inputField = document.getElementById('ai-user-input');
+      const messageContainer = document.getElementById('ai-chat-messages');
+      const text = inputField.value.trim();
+
+      if (!text) return;
+
+      // Tampilkan pesan admin
+      messageContainer.innerHTML += `<div style="background: #2563eb; color: white; padding: 8px 12px; border-radius: 8px; max-width: 85%; align-self: flex-end;">${text}</div>`;
+      inputField.value = '';
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+
+      // Ambil data produk toko dari cache/variabel global jika ada di script.js kakak
+      let daftarProdukStr = "";
+      try {
+        if (typeof produk !== 'undefined' && Array.isArray(produk)) {
+          daftarProdukStr = JSON.stringify(produk);
+        } else if (typeof allProducts !== 'undefined') {
+          daftarProdukStr = JSON.stringify(allProducts);
+        } else {
+          daftarProdukStr = "Data produk aktif di sistem toko.";
+        }
+      } catch (e) {
+        daftarProdukStr = "Stok toko siap dipantau.";
+      }
+
+      let namaTokoVal = "KasirQuh";
+      try {
+        if (typeof pengaturanToko !== 'undefined' && pengaturanToko.nama) {
+          namaTokoVal = pengaturanToko.nama;
+        }
+      } catch (e) {}
+
+      // Tampilkan indikator loading
+      const loadingId = 'loading-' + Date.now();
+      messageContainer.innerHTML += `<div id="${loadingId}" style="background: var(--input-bg, #e5e7eb); color: var(--text-color, #374151); padding: 8px 12px; border-radius: 8px; max-width: 85%;">Lagi nge-analisis data... 🧠☕</div>`;
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+
+      try {
+        const response = await fetch('/api/admin-ai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: text,
+            daftarProduk: daftarProdukStr,
+            namaToko: namaTokoVal
+          })
+        });
+
+        const data = await response.json();
+        
+        // Hapus loading
+        const loadingEl = document.getElementById(loadingId);
+        if (loadingEl) loadingEl.remove();
+
+        if (response.ok) {
+          messageContainer.innerHTML += `<div style="background: var(--input-bg, #e5e7eb); color: var(--text-color, #111827); padding: 8px 12px; border-radius: 8px; max-width: 85%; white-space: pre-line;">${data.reply}</div>`;
+        } else {
+          messageContainer.innerHTML += `<div style="background: #fee2e2; color: #991b1b; padding: 8px 12px; border-radius: 8px; max-width: 85%;">Error: ${data.error}</div>`;
+        }
+      } catch (err) {
+        const loadingEl = document.getElementById(loadingId);
+        if (loadingEl) loadingEl.remove();
+        messageContainer.innerHTML += `<div style="background: #fee2e2; color: #991b1b; padding: 8px 12px; border-radius: 8px; max-width: 85%;">Gagal terhubung ke server AI.</div>`;
+      }
+
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+    // --- END SCRIPT AI CO-PILOT ADMIN ---
 
     function switchOnlineTab(tab) {
       activeOnlineTab = tab;
@@ -880,7 +987,6 @@
       document.getElementById("admin-chat-input").removeAttribute("disabled");
       document.getElementById("admin-chat-send-btn").removeAttribute("disabled");
 
-      // Reset unread counter for admin
       db.collection("chats").doc(phone).update({ unreadAdmin: 0 }).catch(() => {});
       adminChatPrevUnread[phone] = 0;
 
