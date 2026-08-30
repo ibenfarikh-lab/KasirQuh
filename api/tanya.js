@@ -1,3 +1,5 @@
+import { GoogleGenAI } from "@google/genai";
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ reply: 'Method not allowed' });
@@ -15,44 +17,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    const fullPrompt = `Kamu adalah asisten virtual toko online "${namaToko || 'KasirQuh'}" yang super ramah, asyik, gaul, santai, dan ekspresif. Gunakan emoji secukupnya agar obrolan lebih hidup dan hangat. 
+    const ai = new GoogleGenAI({ apiKey });
+
+    const fullPrompt = `Kamu adalah asisten virtual toko online "${namaToko || 'KasirQuh'}" yang super ramah, asyik, gaul, santai, dan ekspresif. Gunakan emoji secukupnya agar obrolan lebih hidup dan hangat.
 Berikut adalah daftar produk dan stok toko saat ini:
 ${daftarProduk || 'Tidak ada data produk'}
 
 Tugasmu: Jawab pertanyaan pelanggan ("${prompt}") secara interaktif, natural, dan akurat berdasarkan data produk di atas. Jangan kaku seperti robot.`;
 
-    const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: fullPrompt }]
-          }
-        ]
-      })
+    const response = await ai.models.generateContent({
+      model: 'gemini-1.5-flash',
+      contents: fullPrompt,
     });
 
-    const data = await apiResponse.json();
-    
-    // Ekstraksi teks yang jauh lebih fleksibel dari berbagai struktur respons Gemini
-    let rawReply = "";
-    try {
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        rawReply = data.candidates[0].content.parts[0].text;
-      } else if (data.candidates?.[0]?.output) {
-        rawReply = data.candidates[0].output;
-      } else if (data.text) {
-        rawReply = data.text;
-      } else if (data.output) {
-        rawReply = data.output;
-      }
-    } catch (e) {
-      console.error("Parsing error:", e);
-    }
+    let rawReply = response.text || '';
 
     if (!rawReply) {
-      rawReply = `Halo Kak! Wah, ${namaToko || 'toko'} siap bantu jawab pertanyaan tentang "${prompt}". Ada produk spesifik yang sedang dicari? 😊`;
+      return res.status(200).json({ reply: `Halo Kak! Wah, ${namaToko || 'toko'} siap bantu jawab tentang "${prompt}". Ada produk spesifik yang dicari? 😊` });
     }
 
     let cleanedReply = rawReply
