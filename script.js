@@ -3256,6 +3256,46 @@ function toggleVoiceInput() {
   }
 }
 
+// Fungsi untuk menghitung total dari rincian catatan
+function autoHitungSubjudul() {
+  const isi = document.getElementById("catatan-desc-input").value;
+  const lines = isi.split('\n');
+  let total = 0;
+
+  lines.forEach(line => {
+    if (line.trim() === '') return;
+    
+    // Memisahkan teks per baris berdasarkan spasi
+    const parts = line.trim().split(/\s+/);
+    
+    if (parts.length > 0) {
+      // Mengambil teks paling akhir dari baris tersebut (harga nominal)
+      const nominalText = parts[parts.length - 1];
+      
+      // Memanfaatkan fungsi parseRupiahToNumber bawaan sistem kakak
+      const nominal = parseRupiahToNumber(nominalText);
+      
+      if (nominal > 0) {
+        total += nominal;
+      }
+    }
+  });
+
+  const subjudulInput = document.getElementById("catatan-subtitle-input");
+  
+  if (total > 0) {
+    // Memasukkan hasil kalkulasi dengan format "Pembayaran X.XXX"
+    subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
+  }
+}
+
+// Global Event Listener: Memicu kalkulasi setiap kali ada ketikan (input) di dalam textarea Rincian
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.id === 'catatan-desc-input') {
+    autoHitungSubjudul();
+  }
+});
+
 function stopVoiceRecordingUI() {
   isRecording = false;
   const micBtn = document.getElementById('ai-mic-btn');
