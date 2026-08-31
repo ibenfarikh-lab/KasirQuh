@@ -794,8 +794,7 @@ function renderSubTabsCatatanUI() {
             <span style="color: #16a34a;">Rp <span id="lbl-sisa-${tabKey}">100.000</span></span>
           </div>
         </div>
-        
-        <!-- Tombol Ekspor & Impor Khusus Catatan Aktif -->
+
         <div style="display: flex; gap: 6px; align-items: center;">
           <button onclick="eksporCatatanTab('${tabKey}')" style="background: #107c41; color: white; padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;">📥 Ekspor Catatan</button>
           <label style="background: #2563eb; color: white; padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
@@ -2365,7 +2364,6 @@ function hapusBarang(code) {
 // FITUR EKSPOR & IMPOR DI TIAP HALAMAN MENU
 // ==========================================
 
-// 1. Ekspor & Impor Keranjang POS
 function eksporKeranjang() {
   if (!cart || cart.length === 0) return alert("Keranjang belanja kosong!");
   let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cart, null, 2));
@@ -2397,7 +2395,6 @@ function importKeranjang(event) {
   reader.readAsText(file);
 }
 
-// 2. Ekspor & Impor Kasir Online
 function eksporKasirOnline() {
   if (!onlineOrdersDataCache || onlineOrdersDataCache.length === 0) return alert("Belum ada data pesanan online!");
   let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(onlineOrdersDataCache, null, 2));
@@ -2434,7 +2431,6 @@ function importKasirOnline(event) {
   reader.readAsText(file);
 }
 
-// 3. Ekspor & Impor Live Chat
 function eksporChat() {
   db.collection("chats").get().then((snapshot) => {
     let chatData = {};
@@ -2468,7 +2464,6 @@ function importChat(event) {
   reader.readAsText(file);
 }
 
-// 4. Ekspor & Impor Stok (Sudah ada)
 function eksporStokExcel() {
   let csv = "data:text/csv;charset=utf-8,Kode,Nama,Kategori,Satuan,Stok,Modal,Harga\n";
   for (let code in databaseProduk) {
@@ -2519,7 +2514,6 @@ async function importStokExcel(event) {
   reader.readAsText(file);
 }
 
-// 5. Ekspor & Impor Belanja Stok
 function eksporBelanjaStok() {
   if (!restockListItems || restockListItems.length === 0) return alert("Daftar belanja stok kosong!");
   let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(restockListItems, null, 2));
@@ -2551,7 +2545,6 @@ function importBelanjaStok(event) {
   reader.readAsText(file);
 }
 
-// 6. Ekspor & Impor Data (Pelanggan & Transaksi)
 function eksporPelangganExcel() {
   let csv = "data:text/csv;charset=utf-8,ID,Nama,Telepon,Alamat\n";
   databasePelanggan.forEach(c => { csv += `"${c.id}","${c.nama}","${c.phone || '-'}","${c.alamat || '-'}"\n`; });
@@ -2637,7 +2630,6 @@ function importLaporanExcel(event) {
   reader.readAsText(file);
 }
 
-// 7. Ekspor & Impor Catatan Harian
 function eksporCatatanTab(tabKey) {
   let dataObj = databaseCatatanDinamis[tabKey];
   if (!dataObj || !dataObj.items || dataObj.items.length === 0) return alert("Belum ada catatan pada tab ini!");
@@ -2671,7 +2663,6 @@ function importCatatanTab(event, tabKey) {
   reader.readAsText(file);
 }
 
-// 8. Ekspor & Impor Full Backup (Pengaturan)
 async function eksporFullBackup() {
   try {
     let backupData = {};
@@ -2749,6 +2740,51 @@ function importFullBackup(event) {
     document.getElementById("import-full-backup-file").value = "";
   };
   reader.readAsText(file);
+}
+
+function renderRestockList() {
+  const restockList = document.getElementById("restock-list-wrapper");
+  const restockGrid = document.getElementById("restock-grid-wrapper");
+  const estTotalEl = document.getElementById("restock-est-total");
+  if (!restockList) return;
+
+  restockList.innerHTML = "";
+  if (restockGrid) restockGrid.innerHTML = "";
+  
+  let totalEst = 0;
+  if (restockListItems.length === 0) {
+    restockList.innerHTML = `<div class="empty-state">Daftar belanja stok masih kosong.</div>`;
+    if (restockGrid) restockGrid.innerHTML = `<div class="empty-state">Daftar belanja stok masih kosong.</div>`;
+    if (estTotalEl) estTotalEl.innerText = "0";
+    return;
+  }
+
+  restockListItems.forEach(item => {
+    let subtotal = (item.modalRtg || item.modal || 0) * (item.qty || 1);
+    totalEst += subtotal;
+    let fotoSrc = item.foto || defaultPlaceholderImg;
+
+    let itemHtml = `
+      <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color);">
+          <div>
+            <div style="font-weight: bold; font-size: 0.9rem;">${item.nama}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Qty: <b>${item.qty} ${item.satuan}</b> • Modal: Rp ${(item.modalRtg || item.modal || 0).toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="font-weight: bold; color: #2563eb; font-size: 0.85rem;">Rp ${subtotal.toLocaleString('id-ID')}</div>
+          <button onclick="openProductModal(null, '${item.id}')" style="background: #ca8a04; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">Edit</button>
+          <button onclick="hapusItemBelanja('${item.id}')" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">Hapus</button>
+        </div>
+      </div>
+    `;
+    restockList.innerHTML += itemHtml;
+    if (restockGrid) restockGrid.innerHTML += itemHtml;
+  });
+
+  if (estTotalEl) estTotalEl.innerText = totalEst.toLocaleString('id-ID');
 }
 
 function simpanPelanggan() {
@@ -2916,7 +2952,12 @@ function refreshData() {
     return; 
   }
 
-  if (activeTab === 'data-barang' || activeTab === 'belanja-stok') {
+  if (activeTab === 'belanja-stok') {
+    renderRestockList();
+    return;
+  }
+
+  if (activeTab === 'data-barang') {
     const invList = document.getElementById("inventory-list-wrapper");
     const invGrid = document.getElementById("inventory-grid-wrapper");
     if (invList) invList.style.display = (viewMode === 'list') ? 'flex' : 'none';
@@ -2934,7 +2975,7 @@ function refreshData() {
     }
     filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
 
-    if (activeTab === 'data-barang' && invList && invGrid) {
+    if (invList && invGrid) {
       invList.innerHTML = ""; invGrid.innerHTML = "";
       let itemsPerPageStok = 24;
       let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
