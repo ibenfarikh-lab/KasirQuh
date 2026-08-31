@@ -51,10 +51,15 @@
 
     <!-- 1. HALAMAN KASIR UTAMA -->
     <div id="penjualan" class="tab-content active">
-      <div style="display: flex; margin-bottom: 12px; width: 100%;">
-        <select id="filter-category-pos" onchange="refreshData()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); width: 100%;">
+      <div style="display: flex; gap: 6px; margin-bottom: 12px; width: 100%; align-items: center;">
+        <select id="filter-category-pos" onchange="refreshData()" style="padding: 8px 10px; font-size: 0.85rem; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); flex: 1;">
           <option value="Semua" data-i18n="all_categories">Semua Kategori</option>
         </select>
+        <button onclick="eksporKeranjangCSV()" style="background: #107c41; color: white; padding: 8px 10px; font-size: 0.75rem; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; white-space: nowrap;" title="Ekspor Keranjang">📥 Ekspor</button>
+        <label style="background: #2563eb; color: white; padding: 8px 10px; font-size: 0.75rem; border-radius: 8px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; white-space: nowrap;">
+          📤 Impor
+          <input type="file" accept=".csv" onchange="imporKeranjang(event)" style="display: none;">
+        </label>
       </div>
 
       <div class="pos-container">
@@ -127,6 +132,14 @@
 
     <!-- 2. HALAMAN KASIR ONLINE -->
     <div id="kasir-online" class="tab-content">
+      <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+        <button onclick="eksporPesananOnline()" style="flex: 1; background: #107c41; color: white; padding: 8px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; border: none; cursor: pointer;">📥 Ekspor Pesanan</button>
+        <label style="flex: 1; background: #2563eb; color: white; padding: 8px; border-radius: 8px; font-size: 0.8rem; font-weight: bold; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center;">
+          📤 Impor Pesanan
+          <input type="file" accept=".json" onchange="imporPesananOnline(event)" style="display: none;">
+        </label>
+      </div>
+
       <div style="display: flex; gap: 6px; margin-bottom: 12px;">
         <button id="btn-sub-berlangsung" onclick="switchOnlineTab('berlangsung')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;" data-i18n="ongoing">🟡 Sedang Berlangsung</button>
         <button id="btn-sub-selesai" onclick="switchOnlineTab('selesai')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;" data-i18n="completed">🟢 Selesai</button>
@@ -145,7 +158,10 @@
       <div style="display: flex; height: calc(100vh - 140px); gap: 10px;">
         <!-- Daftar Kontak Chat Pelanggan -->
         <div style="width: 35%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
-          <div style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);" data-i18n="chat_conversations">💬 Daftar Percakapan</div>
+          <div style="padding: 10px 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header); display: flex; justify-content: space-between; align-items: center;">
+            <span data-i18n="chat_conversations">💬 Percakapan</span>
+            <button onclick="eksporChatAdmin()" style="background: #107c41; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; cursor: pointer;">📥 Ekspor</button>
+          </div>
           <div id="admin-chat-list" style="flex: 1; overflow-y: auto;">
             <div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;" data-i18n="loading_chats">Memuat daftar chat...</div>
           </div>
@@ -195,17 +211,26 @@
 
     <!-- 4. HALAMAN BELANJA STOK -->
     <div id="belanja-stok" class="tab-content">
-      <div class="card" style="margin-bottom: 12px; background: var(--table-header); display: flex; justify-content: space-between; align-items: center; padding: 12px 16px;">
-        <div>
-          <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;" data-i18n="est_restock_total">ESTIMASI TOTAL BELANJA STOK</div>
-          <div style="font-size: 1.25rem; font-weight: bold; color: #2563eb;">Rp <span id="restock-est-total">0</span></div>
+      <div class="card" style="margin-bottom: 12px; background: var(--table-header); display: flex; flex-direction: column; padding: 12px 16px; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;" data-i18n="est_restock_total">ESTIMASI TOTAL BELANJA STOK</div>
+            <div style="font-size: 1.25rem; font-weight: bold; color: #2563eb;">Rp <span id="restock-est-total">0</span></div>
+          </div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button onclick="ambilDariCatatan()" style="background: #2563eb; color: white; padding: 8px 10px; font-size: 0.75rem; border-radius: 8px; font-weight: bold;" title="Ambil dari Catatan Hari Ini" data-i18n="take_notes">📥 Ambil Catatan</button>
+            <button onclick="kosongkanRestockList()" style="background: #ef4444; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px;" title="Kosongkan Daftar" data-i18n="clear">🗑️ Kosongkan</button>
+            <button onclick="prosesBelanjaStok()" style="background: #16a34a; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-weight: bold;" data-i18n="restock_btn">
+              🛒 Belanja
+            </button>
+          </div>
         </div>
-        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-          <button onclick="ambilDariCatatan()" style="background: #2563eb; color: white; padding: 8px 10px; font-size: 0.75rem; border-radius: 8px; font-weight: bold;" title="Ambil dari Catatan Hari Ini" data-i18n="take_notes">📥 Ambil Catatan</button>
-          <button onclick="kosongkanRestockList()" style="background: #ef4444; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px;" title="Kosongkan Daftar" data-i18n="clear">🗑️ Kosongkan</button>
-          <button onclick="prosesBelanjaStok()" style="background: #16a34a; padding: 8px 12px; font-size: 0.75rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-weight: bold;" data-i18n="restock_btn">
-            🛒 Belanja
-          </button>
+        <div style="display: flex; gap: 6px; width: 100%;">
+          <button onclick="eksporRestockCSV()" style="flex: 1; background: #107c41; color: white; padding: 6px; font-size: 0.72rem; border-radius: 6px; border: none; font-weight: bold;">📥 Ekspor Daftar Belanja</button>
+          <label style="flex: 1; background: #2563eb; color: white; padding: 6px; font-size: 0.72rem; border-radius: 6px; font-weight: bold; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center;">
+            📤 Impor Daftar Belanja
+            <input type="file" accept=".csv" onchange="imporRestockCSV(event)" style="display: none;">
+          </label>
         </div>
       </div>
 
@@ -326,6 +351,14 @@
         <input type="date" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="padding: 6px 10px; font-weight: bold; border-radius: 8px; width: auto; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
       </div>
 
+      <div style="display: flex; gap: 6px; margin-bottom: 10px; padding: 0 2px;">
+        <button onclick="eksporCatatanJSON()" style="background: #107c41; color: white; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: bold; border: none; cursor: pointer;">📥 Ekspor Catatan</button>
+        <label style="background: #2563eb; color: white; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center;">
+          📤 Impor Catatan
+          <input type="file" accept=".json" onchange="imporCatatanJSON(event)" style="display: none;">
+        </label>
+      </div>
+
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 6px; gap: 6px; align-items: center;">
         <div id="container-sub-tabs-catatan" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;"></div>
         <button onclick="tambahTabCatatanBaru()" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; white-space: nowrap; flex-shrink: 0;">+</button>
@@ -346,6 +379,19 @@
           <label style="font-size: 0.85rem;" data-i18n="shop_phone_label">Nomor Telepon / WA:</label>
           <input type="text" id="setting-shop-phone" placeholder="08123456789">
           <button onclick="simpanPengaturanToko()" style="border-radius: 8px; padding: 10px;" data-i18n="save_profile">Simpan Profil</button>
+        </div>
+      </div>
+
+      <!-- KARTU BACKUP & RESTORE FULL DATABASE -->
+      <div class="card" style="border: 1px solid #107c41; background-color: #f4fbf7;">
+        <h3 style="color: #107c41; margin-top: 0; font-size: 1rem;">💾 Cadangkan & Pulihkan Seluruh Toko (Backup All)</h3>
+        <p style="color: var(--text-muted); font-size: 0.80rem; margin-bottom: 10px;">Unduh file cadangan lengkap berisi seluruh produk, pelanggan, dan pengaturan toko.</p>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="backupFullDatabase()" style="flex: 1; background: #107c41; color: white; padding: 10px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;">📥 Backup Full Toko</button>
+          <label style="flex: 1; background: #2563eb; color: white; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; display: inline-flex; align-items: center; justify-content: center;">
+            📤 Restore Full Toko
+            <input type="file" accept=".json" onchange="restoreFullDatabase(event)" style="display: none;">
+          </label>
         </div>
       </div>
 
@@ -669,7 +715,7 @@
     </div>
   </div>
 
-  <!-- FLOATING AI ADMIN CO-PILOT WIDGET (Ikon Lingkaran Biru Pojok Kanan Atas dengan Tombol Mic Voice Input) -->
+  <!-- FLOATING AI ADMIN CO-PILOT WIDGET -->
   <div id="admin-ai-wrapper" style="position: fixed; top: 10px; right: 10px; z-index: 9998; font-family: sans-serif; display: flex; flex-direction: column; align-items: flex-end;">
     <button id="ai-toggle-btn" onclick="toggleAdminAi()" title="Tanya AI Co-Pilot" style="background: #2563eb; color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
       😁
@@ -730,6 +776,243 @@
       }
     });
 
+    // --- FITUR EKSPOR & IMPOR TAMBAHAN PER MENU ---
+    // 1. Ekspor & Impor Keranjang (POS)
+    function eksporKeranjangCSV() {
+      if (!cart || cart.length === 0) return alert("Keranjang belanja masih kosong!");
+      let csv = "Kode,Nama,Harga,Qty,Subtotal
+";
+      cart.forEach(item => {
+        csv += `"${item.barcode || ''}","${item.nama}",${item.harga},${item.qty},${item.subtotal}
+`;
+      });
+      let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      let url = URL.createObjectURL(blob);
+      let a = document.createElement('a');
+      a.href = url;
+      a.download = `Keranjang_Kasir_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    function imporKeranjang(event) {
+      let file = event.target.files[0];
+      if (!file) return;
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        let text = e.target.result;
+        let lines = text.split('
+');
+        cart = [];
+        for (let i = 1; i < lines.length; i++) {
+          let line = lines[i].trim();
+          if (!line) continue;
+          let cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          let code = cols[0]?.replace(/"/g, '') || '';
+          let nama = cols[1]?.replace(/"/g, '') || '';
+          let harga = parseFloat(cols[2]) || 0;
+          let qty = parseFloat(cols[3]) || 1;
+          let produkRef = databaseProduk[code] || { stok: 100, modal: 0, foto: '' };
+          cart.push({
+            barcode: code, nama, harga, qty,
+            modal: produkRef.modal || 0,
+            subtotal: harga * qty,
+            foto: produkRef.foto || defaultPlaceholderImg,
+            satuanJual: 'pcs'
+          });
+        }
+        renderCart();
+        refreshData();
+        showNotif("Keranjang berhasil diimpor!");
+      };
+      reader.readAsText(file);
+    }
+
+    // 2. Ekspor & Impor Kasir Online
+    function eksporPesananOnline() {
+      if (!onlineOrdersDataCache || onlineOrdersDataCache.length === 0) return alert("Tidak ada data pesanan online!");
+      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(onlineOrdersDataCache, null, 2));
+      let a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `Pesanan_Online_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+
+    function imporPesananOnline(event) {
+      let file = event.target.files[0];
+      if (!file) return;
+      let reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          let data = JSON.parse(e.target.result);
+          let batch = db.batch();
+          data.forEach(order => {
+            let docRef = db.collection("transaksi").doc(order.id || String(Date.now()));
+            batch.set(docRef, order);
+          });
+          await batch.commit();
+          showNotif("Pesanan online berhasil diimpor!");
+        } catch(err) {
+          alert("Format file JSON tidak valid: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // 3. Ekspor Live Chat
+    function eksporChatAdmin() {
+      db.collection("chats").get().then(async (snap) => {
+        if (snap.empty) return alert("Belum ada data chat!");
+        let allChats = {};
+        for (let doc of snap.docs) {
+          let phone = doc.id;
+          let chatData = doc.data();
+          let msgSnap = await db.collection("chats").doc(phone).collection("messages").get();
+          let messages = [];
+          msgSnap.forEach(m => messages.push(m.data()));
+          allChats[phone] = { info: chatData, messages: messages };
+        }
+        let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allChats, null, 2));
+        let a = document.createElement('a');
+        a.href = dataStr;
+        a.download = `Live_Chat_Admin_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+      }).catch(err => alert("Gagal ekspor chat: " + err.message));
+    }
+
+    // 4. Ekspor & Impor Daftar Belanja Stok
+    function eksporRestockCSV() {
+      if (!restockListItems || restockListItems.length === 0) return alert("Daftar belanja stok kosong!");
+      let csv = "Kode,Nama,Kategori,Satuan,Qty,Modal,Harga
+";
+      restockListItems.forEach(item => {
+        csv += `"${item.code || ''}","${item.nama}","${item.kategori || 'Umum'}","${item.satuan || 'pcs'}",${item.qty},${item.modalRtg || item.modal || 0},${item.hargaRtg || item.harga || 0}
+`;
+      });
+      let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      let url = URL.createObjectURL(blob);
+      let a = document.createElement('a');
+      a.href = url;
+      a.download = `Belanja_Stok_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    function imporRestockCSV(event) {
+      let file = event.target.files[0];
+      if (!file) return;
+      let reader = new FileReader();
+      reader.onload = function(e) {
+        let text = e.target.result;
+        let rows = text.split('
+');
+        restockListItems = [];
+        for (let i = 1; i < rows.length; i++) {
+          let row = rows[i].trim();
+          if (!row) continue;
+          let cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          if (cols.length >= 7) {
+            let code = cols[0]?.replace(/"/g, '') || ('BRG-' + Date.now() + i);
+            let nama = cols[1]?.replace(/"/g, '') || '';
+            let kategori = cols[2]?.replace(/"/g, '') || 'Umum';
+            let satuan = (cols[3]?.replace(/"/g, '') || 'pcs').toLowerCase();
+            let qty = parseFloat(cols[4]) || 1;
+            let modal = parseFloat(cols[5]) || 0;
+            let harga = parseFloat(cols[6]) || 0;
+            if (nama) {
+              restockListItems.push({
+                id: 'RESTOCK-' + Date.now() + i,
+                code, nama, kategori, satuan,
+                isiRtg: 10, qty,
+                modal: modal, harga: harga,
+                modalRtg: modal, hargaRtg: harga,
+                foto: defaultPlaceholderImg
+              });
+            }
+          }
+        }
+        simpanRestockKeCloud();
+        refreshData();
+        showNotif("Daftar belanja berhasil diimpor!");
+      };
+      reader.readAsText(file);
+    }
+
+    // 5. Ekspor & Impor Catatan Harian / Dinamis
+    function eksporCatatanJSON() {
+      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(databaseCatatanDinamis, null, 2));
+      let a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `Catatan_Toko_${selectedCatatanDate}.json`;
+      a.click();
+    }
+
+    function imporCatatanJSON(event) {
+      let file = event.target.files[0];
+      if (!file) return;
+      let reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          let data = JSON.parse(e.target.result);
+          let batch = db.batch();
+          for (let tabKey in data) {
+            let docId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
+            let docRef = db.collection("pengaturan").doc(docId);
+            batch.set(docRef, data[tabKey]);
+          }
+          await batch.commit();
+          showNotif("Catatan berhasil diimpor!");
+        } catch(err) {
+          alert("Gagal mengimpor catatan: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // 6. Backup & Restore Full Toko (Database Utama)
+    async function backupFullDatabase() {
+      showNotif("Menyiapkan backup full database...");
+      let fullBackup = {
+        produk: databaseProduk,
+        pelanggan: databasePelanggan,
+        pengaturanToko: pengaturanToko
+      };
+      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullBackup, null, 2));
+      let a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `Backup_Full_KasirQuh_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+
+    async function restoreFullDatabase(event) {
+      let file = event.target.files[0];
+      if (!file) return;
+      if (!confirm("PERHATIAN: Restore akan menimpa data produk dan pelanggan saat ini. Lanjutkan?")) return;
+      let reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          let data = JSON.parse(e.target.result);
+          let batch = db.batch();
+          if (data.produk) {
+            for (let code in data.produk) {
+              batch.set(db.collection("produk").doc(code), data.produk[code]);
+            }
+          }
+          if (data.pelanggan) {
+            data.pelanggan.forEach(cust => {
+              let id = cust.id || String(Date.now());
+              batch.set(db.collection("pelanggan").doc(id), cust);
+            });
+          }
+          await batch.commit();
+          alert("Restore full database berhasil! Halaman akan dimuat ulang.");
+          location.reload();
+        } catch(err) {
+          alert("Gagal melakukan restore: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+    // --- END FITUR EKSPOR & IMPOR ---
+
     // --- SCRIPT AI CO-PILOT ADMIN ---
     function toggleAdminAi() {
       const chatBox = document.getElementById('ai-chat-box');
@@ -753,12 +1036,10 @@
 
       if (!text) return;
 
-      // Tampilkan pesan admin
       messageContainer.innerHTML += `<div style="background: #2563eb; color: white; padding: 8px 12px; border-radius: 8px; max-width: 85%; align-self: flex-end;">${text}</div>`;
       inputField.value = '';
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      // Ambil data produk toko dari cache/variabel global jika ada di script.js kakak
       let daftarProdukStr = "";
       try {
         if (typeof produk !== 'undefined' && Array.isArray(produk)) {
@@ -779,7 +1060,6 @@
         }
       } catch (e) {}
 
-      // Tampilkan indikator loading
       const loadingId = 'loading-' + Date.now();
       messageContainer.innerHTML += `<div id="${loadingId}" style="background: var(--input-bg, #e5e7eb); color: var(--text-color, #374151); padding: 8px 12px; border-radius: 8px; max-width: 85%;">Lagi nge-analisis data... 🧠☕</div>`;
       messageContainer.scrollTop = messageContainer.scrollHeight;
@@ -796,8 +1076,6 @@
         });
 
         const data = await response.json();
-        
-        // Hapus loading
         const loadingEl = document.getElementById(loadingId);
         if (loadingEl) loadingEl.remove();
 
@@ -1132,14 +1410,20 @@
       let phone = trx.customerPhone.replace(/[^0-9]/g, '');
       if (phone.startsWith('0')) phone = '62' + phone.slice(1);
 
-      let text = `*INFO PESANAN - ${pengaturanToko.nama || 'Toko'}* 📦\n`;
-      text += `Halo *${trx.customerNama || 'Pelanggan'}*, status pesanan Anda: *${trx.statusPesanan || 'Menunggu Diproses'}*\n\n`;
+      let text = `*INFO PESANAN - ${pengaturanToko.nama || 'Toko'}* 📦
+`;
+      text += `Halo *${trx.customerNama || 'Pelanggan'}*, status pesanan Anda: *${trx.statusPesanan || 'Menunggu Diproses'}*
+
+`;
       if (trx.items && trx.items.length > 0) {
         trx.items.forEach((it, idx) => {
-          text += `${idx + 1}. ${it.nama} (${it.qty}x) = Rp ${(it.subtotal || 0).toLocaleString('id-ID')}\n`;
+          text += `${idx + 1}. ${it.nama} (${it.qty}x) = Rp ${(it.subtotal || 0).toLocaleString('id-ID')}
+`;
         });
       }
-      text += `------------------------------------\n*Total : Rp ${(trx.total || 0).toLocaleString('id-ID')}*\n`;
+      text += `------------------------------------
+*Total : Rp ${(trx.total || 0).toLocaleString('id-ID')}*
+`;
       text += `Terima kasih telah berbelanja! 🙏`;
 
       window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
