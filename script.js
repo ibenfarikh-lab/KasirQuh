@@ -1985,10 +1985,15 @@ function switchTab(tabId, pushHistory = true) {
   refreshData();
 }
 
+let searchDebounceTimer = null;
+
 function syncAndFilterGlobal(val) { 
-  stokCurrentPage = 1;
-  posCurrentPage = 1;
-  refreshData(); 
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    stokCurrentPage = 1;
+    posCurrentPage = 1;
+    refreshData(); 
+  }, 300);
 }
 
 function changeStokPage(delta) { 
