@@ -49,9 +49,9 @@ export default async function handler(req, res) {
       reply = "Yen wis karuan ngantuk lan mager, mending gogoleran disit, Ka. Rebahan iku seni, tapi tugas utawa pegawean aja nganti kelalen ya! 🛏️💤";
     } else if (text.includes('canda') || text.includes('lucu') || text.includes('pantun') || text.includes('joke') || text.includes('ketawa')) {
       reply = "Tuku terasi ning Jagasatru, bot lokal kiye pinter ngerayu. Senajan gratis ora butuh kuota token mahal, tapi obrolan tetep nyambung lan menyala abangku! 🤭🔥";
-    } else if (text.includes('capek') || text.includes('lelah') || text.includes('semangat') || text.includes('stress') || text.includes('puyeng')) {
+    } else if (text.includes('pegel') || text.includes('lelah') || text.includes('semangat') || text.includes('stress') || text.includes('puyeng')) {
       reply = "Tarik napas sing dawa, Ka. Urip emang kadang munggah mudhun kaya nanjak di Plangon, tapi tetep semangat merga sukses nunggu ning ngarep! 💪✨";
-    } else if (text.includes('makanan') || text.includes('kuliner') || text.includes('lapar') || text.includes('makan') || text.includes('pedes')) {
+    } else if (text.includes('mangan') || text.includes('kuliner') || text.includes('lapar') || text.includes('makan') || text.includes('pedes')) {
       reply = "Duh dadi ngiler, paling enak nembak Empal Gentong, Nasi Jamblang, utawa Tahu Gejrot pedes nikmat. Sing wis wareg aja lali bersyukur ya Ka! 🍲😋";
     } else if (text.includes('cuaca') || text.includes('hujan') || text.includes('panas') || text.includes('adem')) {
       reply = "Cuaca apa bae sing penting ati tetep adem, Ka. Yen udan siapna kopi hangat, yen panas, sing akeh nginum banyu putih ya! ☀️🌧️";
