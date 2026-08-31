@@ -12,7 +12,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Pesan tidak boleh kosong' });
     }
 
-    // Menggunakan Groq API dengan native fetch (tanpa install package tambahan)
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -20,7 +19,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile', // Model super pintar & gratis di Groq
+        model: 'llama-3.1-70b-versatile',
         messages: [
           {
             role: 'system',
