@@ -504,7 +504,6 @@ function formatTeksDanAngka(input) {
   input.value = formatted;
 }
 
-
 function formatInputRupiah(input) {
   let angka = input.value.replace(/[^,\d]/g, '').toString();
   let split = angka.split(',');
@@ -795,6 +794,16 @@ function renderSubTabsCatatanUI() {
             <span style="color: #16a34a;">Rp <span id="lbl-sisa-${tabKey}">100.000</span></span>
           </div>
         </div>
+        
+        <!-- Tombol Ekspor & Impor Khusus Catatan Aktif -->
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button onclick="eksporCatatanTab('${tabKey}')" style="background: #107c41; color: white; padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; border: none; font-weight: bold; cursor: pointer;">📥 Ekspor Catatan</button>
+          <label style="background: #2563eb; color: white; padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center;">
+            <span>📤 Impor Catatan</span>
+            <input type="file" id="import-catatan-${tabKey}" accept=".json" onchange="importCatatanTab(event, '${tabKey}')" style="display: none;">
+          </label>
+        </div>
+
         <div id="container-list-${tabKey}" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
     `;
@@ -1236,24 +1245,23 @@ function toggleStickySearchBar() {
       history.pushState({tab: activeTab, floating: 'search'}, "", "");
     } else {
       document.getElementById("inventory-search-input").value = "";
-              syncAndFilterGlobal("");
-      }
+      syncAndFilterGlobal("");
     }
   }
+}
 
-  let searchDebounceTimer = null;
+let searchDebounceTimer = null;
 
-  function syncAndFilterGlobal(val) { 
-    clearTimeout(searchDebounceTimer);
-    searchDebounceTimer = setTimeout(() => {
-      stokCurrentPage = 1;
-      posCurrentPage = 1;
-      refreshData(); 
-    }, 300);
-  }
+function syncAndFilterGlobal(val) { 
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    stokCurrentPage = 1;
+    posCurrentPage = 1;
+    refreshData(); 
+  }, 300);
+}
 
-  function updateUnitLabel() {
-
+function updateUnitLabel() {
   const unit = document.getElementById("db-unit").value;
   const rtgWrapper = document.getElementById("wrapper-db-isi-rtg");
   
@@ -2353,6 +2361,114 @@ function hapusBarang(code) {
   }
 }
 
+// ==========================================
+// FITUR EKSPOR & IMPOR DI TIAP HALAMAN MENU
+// ==========================================
+
+// 1. Ekspor & Impor Keranjang POS
+function eksporKeranjang() {
+  if (!cart || cart.length === 0) return alert("Keranjang belanja kosong!");
+  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cart, null, 2));
+  let link = document.createElement("a");
+  link.setAttribute("href", dataStr);
+  link.setAttribute("download", `Keranjang_POS_${new Date().toISOString().slice(0,10)}.json`);
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+function importKeranjang(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        cart = imported;
+        renderCart();
+        alert("Berhasil mengimpor keranjang belanja!");
+      } else {
+        alert("Format file tidak valid.");
+      }
+    } catch(err) {
+      alert("Gagal membaca file: " + err.message);
+    }
+    document.getElementById("import-pos-file").value = "";
+  };
+  reader.readAsText(file);
+}
+
+// 2. Ekspor & Impor Kasir Online
+function eksporKasirOnline() {
+  if (!onlineOrdersDataCache || onlineOrdersDataCache.length === 0) return alert("Belum ada data pesanan online!");
+  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(onlineOrdersDataCache, null, 2));
+  let link = document.createElement("a");
+  link.setAttribute("href", dataStr);
+  link.setAttribute("download", `KasirOnline_${new Date().toISOString().slice(0,10)}.json`);
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+function importKasirOnline(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      let imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        let batch = db.batch();
+        imported.forEach(ord => {
+          let id = ord.id || ("ONLINE-" + Date.now());
+          delete ord.id;
+          batch.set(db.collection("transaksi").doc(id), ord, { merge: true });
+        });
+        await batch.commit();
+        alert("Berhasil mengimpor data kasir online!");
+      } else {
+        alert("Format file tidak valid.");
+      }
+    } catch(err) {
+      alert("Gagal mengimpor: " + err.message);
+    }
+    document.getElementById("import-online-file").value = "";
+  };
+  reader.readAsText(file);
+}
+
+// 3. Ekspor & Impor Live Chat
+function eksporChat() {
+  db.collection("chats").get().then((snapshot) => {
+    let chatData = {};
+    snapshot.forEach(doc => { chatData[doc.id] = doc.data(); });
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatData, null, 2));
+    let link = document.createElement("a");
+    link.setAttribute("href", dataStr);
+    link.setAttribute("download", `LiveChat_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  }).catch(err => alert("Gagal ekspor chat: " + err.message));
+}
+
+function importChat(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      let chatData = JSON.parse(e.target.result);
+      let batch = db.batch();
+      for (let phone in chatData) {
+        batch.set(db.collection("chats").doc(phone), chatData[phone], { merge: true });
+      }
+      await batch.commit();
+      alert("Berhasil mengimpor data chat!");
+    } catch(err) {
+      alert("Gagal impor chat: " + err.message);
+    }
+    document.getElementById("import-chat-file").value = "";
+  };
+  reader.readAsText(file);
+}
+
+// 4. Ekspor & Impor Stok (Sudah ada)
 function eksporStokExcel() {
   let csv = "data:text/csv;charset=utf-8,Kode,Nama,Kategori,Satuan,Stok,Modal,Harga\n";
   for (let code in databaseProduk) {
@@ -2403,6 +2519,39 @@ async function importStokExcel(event) {
   reader.readAsText(file);
 }
 
+// 5. Ekspor & Impor Belanja Stok
+function eksporBelanjaStok() {
+  if (!restockListItems || restockListItems.length === 0) return alert("Daftar belanja stok kosong!");
+  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(restockListItems, null, 2));
+  let link = document.createElement("a");
+  link.setAttribute("href", dataStr);
+  link.setAttribute("download", `BelanjaStok_${new Date().toISOString().slice(0,10)}.json`);
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+function importBelanjaStok(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        restockListItems = imported;
+        simpanRestockKeCloud();
+        alert("Berhasil mengimpor daftar belanja stok!");
+      } else {
+        alert("Format file tidak valid.");
+      }
+    } catch(err) {
+      alert("Gagal membaca file: " + err.message);
+    }
+    document.getElementById("import-restock-file").value = "";
+  };
+  reader.readAsText(file);
+}
+
+// 6. Ekspor & Impor Data (Pelanggan & Transaksi)
 function eksporPelangganExcel() {
   let csv = "data:text/csv;charset=utf-8,ID,Nama,Telepon,Alamat\n";
   databasePelanggan.forEach(c => { csv += `"${c.id}","${c.nama}","${c.phone || '-'}","${c.alamat || '-'}"\n`; });
@@ -2484,6 +2633,120 @@ function importLaporanExcel(event) {
     await batch.commit();
     alert(`Berhasil mengimpor ${count} riwayat ke cloud!`);
     refreshData();
+  };
+  reader.readAsText(file);
+}
+
+// 7. Ekspor & Impor Catatan Harian
+function eksporCatatanTab(tabKey) {
+  let dataObj = databaseCatatanDinamis[tabKey];
+  if (!dataObj || !dataObj.items || dataObj.items.length === 0) return alert("Belum ada catatan pada tab ini!");
+  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataObj, null, 2));
+  let link = document.createElement("a");
+  link.setAttribute("href", dataStr);
+  link.setAttribute("download", `Catatan_${tabKey}_${selectedCatatanDate}.json`);
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+function importCatatanTab(event, tabKey) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      let imported = JSON.parse(e.target.result);
+      if (imported && imported.items) {
+        await db.collection("pengaturan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).set(imported);
+        databaseCatatanDinamis[tabKey] = imported;
+        renderHalamanSubCatatan(tabKey);
+        alert("Berhasil mengimpor catatan!");
+      } else {
+        alert("Format file catatan tidak valid.");
+      }
+    } catch(err) {
+      alert("Gagal membaca file: " + err.message);
+    }
+    document.getElementById(`import-catatan-${tabKey}`).value = "";
+  };
+  reader.readAsText(file);
+}
+
+// 8. Ekspor & Impor Full Backup (Pengaturan)
+async function eksporFullBackup() {
+  try {
+    let backupData = {};
+    let produkSnap = await db.collection("produk").get();
+    backupData.produk = {};
+    produkSnap.forEach(doc => backupData.produk[doc.id] = doc.data());
+
+    let custSnap = await db.collection("pelanggan").get();
+    backupData.pelanggan = [];
+    custSnap.forEach(doc => backupData.pelanggan.push({ id: doc.id, ...doc.data() }));
+
+    let trxSnap = await db.collection("transaksi").get();
+    backupData.transaksi = [];
+    trxSnap.forEach(doc => backupData.transaksi.push({ id: doc.id, ...doc.data() }));
+
+    let settingSnap = await db.collection("pengaturan").get();
+    backupData.pengaturan = {};
+    settingSnap.forEach(doc => backupData.pengaturan[doc.id] = doc.data());
+
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+    let link = document.createElement("a");
+    link.setAttribute("href", dataStr);
+    link.setAttribute("download", `KasirQuh_FullBackup_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    alert("Full backup berhasil diunduh!");
+  } catch (err) {
+    alert("Gagal membuat backup: " + err.message);
+  }
+}
+
+function importFullBackup(event) {
+  let file = event.target.files[0];
+  if (!file) return;
+  if (!confirm("PERINGATAN: Memulihkan full backup akan menggantikan data saat ini di database. Lanjutkan?")) {
+    document.getElementById("import-full-backup-file").value = "";
+    return;
+  }
+  let reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      let data = JSON.parse(e.target.result);
+      let batch = db.batch();
+
+      if (data.produk) {
+        for (let code in data.produk) {
+          batch.set(db.collection("produk").doc(code), data.produk[code]);
+        }
+      }
+      if (data.pelanggan) {
+        data.pelanggan.forEach(c => {
+          let id = c.id || ("CUST-" + Date.now());
+          delete c.id;
+          batch.set(db.collection("pelanggan").doc(id), c);
+        });
+      }
+      if (data.transaksi) {
+        data.transaksi.forEach(t => {
+          let id = t.id || ("TRX-" + Date.now());
+          delete t.id;
+          batch.set(db.collection("transaksi").doc(id), t);
+        });
+      }
+      if (data.pengaturan) {
+        for (let key in data.pengaturan) {
+          batch.set(db.collection("pengaturan").doc(key), data.pengaturan[key]);
+        }
+      }
+
+      await batch.commit();
+      alert("Pemulihan data (Restore) berhasil! Halaman akan dimuat ulang.");
+      location.reload();
+    } catch (err) {
+      alert("Gagal memulihkan data: " + err.message);
+    }
+    document.getElementById("import-full-backup-file").value = "";
   };
   reader.readAsText(file);
 }
@@ -2600,7 +2863,6 @@ function resetDatabaseBarang() {
 }
 
 function refreshData() {
-  // 1. Update data input pengaturan dasar (hanya jika elemennya ada)
   const setUsr = document.getElementById("setting-user");
   if (setUsr) setUsr.value = userAuth.user;
   const setPass = document.getElementById("setting-pass");
@@ -2628,15 +2890,11 @@ function refreshData() {
   const rcptPhone = document.getElementById("receipt-shop-phone");
   if (rcptPhone) rcptPhone.innerText = "Telp: " + pengaturanToko.phone;
 
-  // Ambil keyword pencarian global
   const searchInputEl = document.getElementById("inventory-search-input");
   const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
   let categories = new Set();
 
-  // ==========================================================
-  // 2. KHUSUS TAB KASIR / PENJUALAN (Paling sering diakses & dicari)
-  // ==========================================================
   const filterKatPosEl = document.getElementById("filter-category-pos");
   const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
 
@@ -2658,9 +2916,6 @@ function refreshData() {
     return; 
   }
 
-  // ==========================================================
-  // 3. KHUSUS TAB STOK & BELANJA STOK
-  // ==========================================================
   if (activeTab === 'data-barang' || activeTab === 'belanja-stok') {
     const invList = document.getElementById("inventory-list-wrapper");
     const invGrid = document.getElementById("inventory-grid-wrapper");
@@ -2739,9 +2994,6 @@ function refreshData() {
     return;
   }
 
-  // ==========================================================
-  // 4. KHUSUS TAB LAPORAN & PELANGGAN
-  // ==========================================================
   if (activeTab === 'laporan') {
     let totalOmset = 0; let totalProfit = 0;
     const repBody = document.getElementById("report-body");
@@ -2906,16 +3158,15 @@ function ambilDariCatatan() {
     if (!noteItem.isi) return;
     let lines = noteItem.isi.split('\n');
     lines.forEach(line => {
-     let parts = line.trim().split(/\s+/);
-if (parts.length >= 4) {
-  let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
-  let satuan = parts[parts.length - 2].toLowerCase();
-  let qty = parseFloat(parts[parts.length - 3]) || 1;
-  let nama = parts.slice(0, parts.length - 3).join(' ');
-  
-  if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-  let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
-
+      let parts = line.trim().split(/\s+/);
+      if (parts.length >= 4) {
+        let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
+        let satuan = parts[parts.length - 2].toLowerCase();
+        let qty = parseFloat(parts[parts.length - 3]) || 1;
+        let nama = parts.slice(0, parts.length - 3).join(' ');
+        
+        if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
+        let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
 
         let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
         let matchedProd = existingCode ? databaseProduk[existingCode] : null;
