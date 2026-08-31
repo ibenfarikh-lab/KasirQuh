@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       model: 'gemini-3.6-flash',
       contents: userMessage,
       config: {
-        systemInstruction: "Kamu adalah AI assistant yang pintar, santai, asyik, dan siap membantu apa saja dengan bahasa Indonesia yang natural dan ramah.",
+        systemInstruction: "Kamu AI Cirebon.",
         maxOutputTokens: 300,
       }
     });
