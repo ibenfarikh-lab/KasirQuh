@@ -315,7 +315,7 @@
       <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #16a34a; color: white; display: flex; justify-content: space-between; align-items: center;">
         <h3 style="margin: 0; font-size: 1rem; color: white;">💬 Live Chat dengan Toko</h3>
         <div style="display: flex; gap: 8px; align-items: center;">
-          <button onclick="beralihKeAIFromLiveChat()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">🤖 Tanya AI</button>
+          <button onclick="beralihKeAIFromLiveChat()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">😁 Tanya AI</button>
           <button class="btn-close-modal" onclick="toggleCustomerChatModal()" style="color: white; background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
         </div>
       </div>
@@ -333,14 +333,14 @@
   <div id="aiChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleAIChatModal()">
     <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
       <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0; font-size: 1rem;">🤖 Asisten Belanja AI</h3>
+        <h3 style="margin: 0; font-size: 1rem;">😁 Asisten Belanja AI</h3>
         <div style="display: flex; gap: 8px; align-items: center;">
           <button onclick="beralihKeLiveChatFromAI()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">💬 Chat Admin</button>
           <button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white; background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
         </div>
       </div>
       <div id="ai-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
-        <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-wrap;">Halo! Saya asisten virtual toko ini. Ada yang bisa saya bantu cari atau tanyakan seputar produk kami?</div>
+        <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-line;">HALOOOO BESTIE! Selamat datang di **Warunge Mimi**! Toko serba ada paling hits, tempat nongkrongnya bumbu dapur lengkap, sayuran seger, kopi sachet penolak kantuk, sampe bahan masakan harian kamu! Kenalin, aku asisten kece dari Warunge Mimi yang siap nemenin belanjaan kamu biar makin gampang dan cepet. Pokoknya dari Bumbu Racik, Indomie, Bawang Merah, Kopi Good Day, ampe Ayam & Ikan seger... Mimi punya semuanya, harga ramah di kantong pulak! Mau saya bantuin apa nih? Mau Ngobrol atau Tanya-tanya dulu juga boleh... 😁 yuk gas shoping... 🛒🛒🛒😁😁😁</div>
       </div>
       <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px;">
         <input type="text" id="ai-chat-input" placeholder="Tanya stok, harga, dll..." onkeypress="if(event.key==='Enter') kirimPesanKeAI()" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.85rem;">
@@ -918,7 +918,6 @@
         let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
         let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
         
-        // Fix untuk nilai ons: jika satuan Kg, kalikan 10 agar jadi harga per Kg
         let isKg = (satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram');
         if (isKg) hargaParsed = hargaParsed * 10;
 
@@ -976,7 +975,7 @@
 
       if (satuan === "kg" || satuan === "kilogram") {
         let inputQty = prompt(`Masukkan jumlah Kilogram (Kg) untuk ${p.nama}\n(Contoh: 1 untuk 1 kg, 0.5 untuk setengah kg / 5 ons, 0.1 untuk 1 ons):`, "1");
-        if (inputQty === null || inputQty.trim() === "") return; // Dibatalkan
+        if (inputQty === null || inputQty.trim() === "") return;
         qtyToAdd = parseFloat(inputQty.replace(',', '.'));
         if (isNaN(qtyToAdd) || qtyToAdd <= 0) {
           return alert("Jumlah tidak valid!");
@@ -999,7 +998,7 @@
       if (item) {
         if (item.qty + qtyToAdd > p.stok) return alert("Stok tidak mencukupi!");
         item.qty += qtyToAdd;
-        item.qty = parseFloat(item.qty.toFixed(3)); // Menghindari error presisi desimal JS
+        item.qty = parseFloat(item.qty.toFixed(3));
         item.subtotal = Math.round(item.qty * hargaParsed);
       } else {
         if (qtyToAdd > p.stok) return alert("Stok tidak mencukupi!");
@@ -1143,12 +1142,7 @@
 
           await batch.commit();
 
-          let text = `*PESANAN BARU DARI PELANGGAN* 🛒
-Nama : *${namaCust}*
-No WA : ${currentCustomerPhone}
-Alamat : ${alamatCust}
-Metode : *${namaMetode}*
-`;
+          let text = `*PESANAN BARU DARI PELANGGAN* 🛒\nNama : *${namaCust}*\nNo WA : ${currentCustomerPhone}\nAlamat : ${alamatCust}\nMetode : *${namaMetode}*\n`;
           if (catatanPelanggan) { text += `Catatan : _${catatanPelanggan}_\n`; }
           text += `------------------------------------\n`;
           cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`; });
@@ -1273,8 +1267,7 @@ Metode : *${namaMetode}*
         for (let code in databaseProduk) {
           let p = databaseProduk[code];
           let s = (p.satuan||'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan||'Pcs');
-          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}
-`;
+          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}\n`;
         }
 
         let response = await fetch('/api/tanya', {
@@ -1292,13 +1285,13 @@ Metode : *${namaMetode}*
 
         let aiReply = "Maaf, saya sedang mengalami kendala teknis. Silakan tanyakan langsung ke admin.";
         if (data.reply) {
-          aiReply = data.reply.replace(/^[\s ]+/gm, '').trim();
+          aiReply = data.reply.split('\n').map(line => line.trim()).join('\n').trim();
         } else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-          aiReply = data.candidates[0].content.parts[0].text.replace(/^[\s ]+/gm, '').trim();
+          aiReply = data.candidates[0].content.parts[0].text.split('\n').map(line => line.trim()).join('\n').trim();
         }
 
         msgContainer.innerHTML += `
-          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-wrap;">
+          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">
             ${escapeHtml(aiReply)}
           </div>
         `;
