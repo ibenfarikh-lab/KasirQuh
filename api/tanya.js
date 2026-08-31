@@ -19,45 +19,48 @@ export default async function handler(req, res) {
       try { body = JSON.parse(body); } catch (e) { body = {}; }
     }
     body = body || {};
-
     promptText = body.prompt || body.pesan || body.message || body.text || '';
 
     if (!promptText) {
-      return sendJson(200, { reply: "Pesane ora olih kosong, Ka." });
+      return sendJson(200, { reply: "Pesane ora olih kosong, Ka. Mau takon utawa curhat apa bae bebas pol!" });
     }
 
     const text = promptText.toLowerCase();
     let reply = "";
 
-    // Sistem pencocokan kata kunci lokal basa Cirebon komplit (Stok, Harga, Jam Buka, Lokasi, Pembayaran, Promo, & Candaan Gaul)[span_0](start_span)[span_0](end_span)
-    if (text.includes('halo') || text.includes('hai') || text.includes('pagi') || text.includes('siang') || text.includes('malam')) {
-      reply = "Hai, Ka! Ana sing bisa dibantu? 😊";
-    } else if (text.includes('stok') || text.includes('barang')) {
-      reply = "Nggo ngecek detail stok barang, kakanbisa langsung deleng ning menu daftar produk ya! Supaya datane luwih pas. 📦✨";
-    } else if (text.includes('harga') || text.includes('jual') || text.includes('beli')) {
-      reply = "Soal rega lan produk, kabeh wis kecatet rapi ning sistem kasir ya Ka. Ana maning sing pan dicek? 💰";
-    } else if (text.includes('jam') || text.includes('buka') || text.includes('tutup') || text.includes('operasional')) {
-      reply = "Toko buka saben dina, Ka, wiwit jam 07.00 esuk nganti jam 05.00 sore. Silaturahmi bae ning toko ya! ⏰";
-    } else if (text.includes('lokasi') || text.includes('alamat') || text.includes('toko') || text.includes('dimana')) {
-      reply = "Lokasi tokone gampang dijangkau tur strategis pisan. Yen bingung, bisa langsung takon admin utawa cek maps ya, Ka! 🗺️";
-    } else if (text.includes('bayar') || text.includes('qris') || text.includes('transfer') || text.includes('cash') || text.includes('tunai')) {
-      reply = "Masalah pembayaran gampang gawe, bisa cash utawa scan QRIS langsung. Sing penting lunas lan lancar barokah! 💳💸";
-    } else if (text.includes('promo') || text.includes('diskon') || text.includes('murah') || text.includes('potongan')) {
-      reply = "Sabar, Ka! Promo menarik lan diskon khusus biasane ana saben akhir pekan. Pantengin teros info terbarune ya! 🔥";
-    } else if (text.includes('kabar') || text.includes('gimana') || text.includes('lagi apa')) {
-      reply = "Aman jaya sentosa, Ka! Siap ngancani operasional toko ben tambah sat-set. ⚡";
-    } else if (text.includes('canda') || text.includes('lucu') || text.includes('pantun') || text.includes('joke')) {
-      reply = "Tuku trasi ning Jagasatru, bot lokal kiye pancen paling seru. Pan dibikinin pantun apa malem kiye, Ka? 🤭";
-    } else if (text.includes('mantap') || text.includes('keren') || text.includes('kece') || text.includes('menyala') || text.includes('gokil') || text.includes('sabi')) {
-      reply = "Jelas bae, abangku! Deweke kan sefrekuensi, tambah menyala abangku 🔥😎";
-    } else if (text.includes('capek') || text.includes('lelah') || text.includes('semangat') || text.includes('stress')) {
-      reply = "Tarik napas disit, Ka. Eling, rebahan iku seni, tapi cuan iku pasti! Semangat teross! 💪🔥";
-    } else if (text.includes('terima kasih') || text.includes('makasih') || text.includes('thanks')) {
-      reply = "Sama-sama, Ka! Moga-moga laris manis teros dagangane ya! 💪🚀";
-    } else if (text.includes('siapa kamu') || text.includes('kamu siapa')) {
-      reply = "Kita asisten digital lokal KasirQuh sing setia ngancani tanpa wedi kuota token entek! 😎";
+    // Sistem Q/A Super Lengkap, Bebas, Gaul, & Bahasa Cirebon Asik
+    if (text.includes('halo') || text.includes('hai') || text.includes('pagi') || text.includes('siang') || text.includes('malam') || text.includes('salam')) {
+      reply = "Tabe, Ka! Mau takon apa bae bebas, curhat masalah urip, atau ngobrol ngalor-ngidul juga oleh banget, santai bae ora kaku! 😊☕";
+    } else if (text.includes('stok') || text.includes('barang') || text.includes('harga') || text.includes('jual') || text.includes('toko')) {
+      reply = "Soal barang dagangan utawa rega toko, kabeh aman terkendali ning sistem kasir. Tapi yen mau takon hal liyane sing bebas banget, mangga ditunggu pitakonane! 📦💰";
+    } else if (text.includes('cinta') || text.includes('jomblo') || text.includes('pacar') || text.includes('gebetan') || text.includes('galau') || text.includes('putus')) {
+      reply = "Wah, mlebu jalur percintaan lan kegalauan kiye! Sing sabar ya Ka, jomblo iku dudu nasib tapi strategi nunda keborosan. Sing penting dompet kandel, ati aman sentosa! 😅💔";
+    } else if (text.includes('game') || text.includes('main game') || text.includes('ml') || text.includes('ff') || text.includes('pubg') || text.includes('mabar')) {
+      reply = "Ngomongin game, Rika biasane tipe player sing jago atau beban tim nih? Sing penting aja ngamuk-ngamuk bae pas kalah rank ya, Ka! 🎮🔥";
+    } else if (text.includes('musik') || text.includes('lagu') || text.includes('nyanyi') || text.includes('konser') || text.includes('dengerin')) {
+      reply = "Musik emang dadi pelebur penat sing paling mujarab. Mangga pasang headset, setel lagu favorit, ben urip ora pati tegang! 🎧🎶";
+    } else if (text.includes('film') || text.includes('nonton') || text.includes('drakor') || text.includes('bioskop') || text.includes('series')) {
+      reply = "Nonton film utawa drakor emang pelarian paling asik pas weekend. Tapi eling waktu istirahat ya Ka, aja nganti maring subuh melek terus! 🍿🎬";
+    } else if (text.includes('ai') || text.includes('robot') || text.includes('teknologi') || text.includes('coding') || text.includes('web') || text.includes('internet')) {
+      reply = "Ngomongin teknologi, jaman saiki kabeh kudu sat-set! Bot lokal kiye senajan tanpa server awan sing ribet, tapi siap mbantu ngobrol lan gawe urusan dadi luwih asik. 💻🤖";
+    } else if (text.includes('kerja') || text.includes('kantor') || text.includes('gaji') || text.includes('bisnis') || text.includes('usaha') || text.includes('cuan')) {
+      reply = "Urusan golet cuan lan bisnis emang butuh mental waja. Sing penting niat tulus, gaweyan tekun, insya Allah rezeki lancar barokah mengalir terus! 💸📈";
+    } else if (text.includes('tidur') || text.includes('ngantuk') || text.includes('mager') || text.includes('istirahat') || text.includes('malas')) {
+      reply = "Yen wis karuan ngantuk lan mager, mending gogoleran disit, Ka. Rebahan iku seni, tapi tugas utawa pegawean aja nganti kelalen ya! 🛏️💤";
+    } else if (text.includes('canda') || text.includes('lucu') || text.includes('pantun') || text.includes('joke') || text.includes('ketawa')) {
+      reply = "Tuku terasi ning Jagasatru, bot lokal kiye pinter ngerayu. Senajan gratis ora butuh kuota token mahal, tapi obrolan tetep nyambung lan menyala abangku! 🤭🔥";
+    } else if (text.includes('capek') || text.includes('lelah') || text.includes('semangat') || text.includes('stress') || text.includes('puyeng')) {
+      reply = "Tarik napas sing dawa, Ka. Urip emang kadang munggah mudhun kaya nanjak di Plangon, tapi tetep semangat merga sukses nunggu ning ngarep! 💪✨";
+    } else if (text.includes('makanan') || text.includes('kuliner') || text.includes('lapar') || text.includes('makan') || text.includes('pedes')) {
+      reply = "Duh dadi ngiler, paling enak nembak Empal Gentong, Nasi Jamblang, utawa Tahu Gejrot pedes nikmat. Sing wis wareg aja lali bersyukur ya Ka! 🍲😋";
+    } else if (text.includes('cuaca') || text.includes('hujan') || text.includes('panas') || text.includes('adem')) {
+      reply = "Cuaca apa bae sing penting ati tetep adem, Ka. Yen udan siapna kopi hangat, yen panas, sing akeh nginum banyu putih ya! ☀️🌧️";
+    } else if (text.includes('terima kasih') || text.includes('makasih') || text.includes('thanks') || text.includes('atur nuhun')) {
+      reply = "Sama-sama, Ka! Kapan bae butuh kanca ngobrol utawa takon-takon bab apa bae, bot lokal kiye siap siaga 24 jam. Atur nuhun bali! 🚀";
+    } else if (text.includes('siapa kamu') || text.includes('kamu siapa') || text.includes('nama')) {
+      reply = "Kita asisten digital lokal paling gaul sak-Cirebon, bebas ditakoni apa bae tanpa wedi kuota entek utawa puyeng mikir server! 😎";
     } else {
-      reply = `Wah, seru temen iku! Tapi kita bot lokal versi santai nih Ka, dadi jawabane seputar sapa-sapaan, info toko, utawa obrolan seru disit ya! 😉 Boleh langsung chat admin toko bari ngopi yen butuh info jero mah ka 😁`;
+      reply = `Pitakonan sing bener-bener mantap lan out of the box iku, Ka! Intine kabeh topik sing Rika takonaken ditampung dadi energi positif. Pokokmah bebas mau takon apa bae, sing penting obrolan tetep nyambung lan asik. Ana hal séjé sing pan diobrolaken, Ka? 😁🔥`;
     }
 
     return sendJson(200, { reply });
