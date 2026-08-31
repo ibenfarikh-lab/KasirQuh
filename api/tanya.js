@@ -1,76 +1,31 @@
-export default async function handler(req, res) {
-  const sendJson = (statusCode, data) => {
-    if (typeof res.status === 'function') {
-      return res.status(statusCode).json(data);
-    }
-    res.statusCode = statusCode;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(data));
-  };
+import { GoogleGenAI } from "@google/genai";
 
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return sendJson(405, { reply: 'Method not allowed' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  let promptText = '';
   try {
-    let body = req.body;
-    if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch (e) { body = {}; }
-    }
-    body = body || {};
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const userMessage = req.body.prompt || req.body.pesan || req.body.message || req.body.text;
 
-    promptText = body.prompt || body.pesan || body.message || body.text || '';
-    const daftarProduk = body.daftarProduk || '';
-    const namaToko = body.namaToko || 'KasirQuh';
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      return sendJson(200, { reply: "API Key Gemini belum diatur di Environment Variables Vercel." });
+    if (!userMessage) {
+      return res.status(400).json({ error: 'Pesan kosong' });
     }
 
-    if (!promptText) {
-      return sendJson(200, { reply: "Pesan tidak boleh kosong." });
-    }
-
-    const fullPrompt = `Kamu adalah asisten virtual toko online "${namaToko}" yang super ramah, asyik, gaul, santai, dan ekspresif. Gunakan emoji secukupnya agar obrolan lebih hidup dan hangat.
-Berikut adalah daftar produk dan stok toko saat ini:
-${daftarProduk}
-
-Tugasmu: Jawab pertanyaan pelanggan ("${promptText}") secara interaktif, natural, dan akurat berdasarkan data produk di atas. Jangan kaku seperti robot.`;
-
-    const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: fullPrompt }]
-        }]
-      })
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.6-flash',
+      contents: userMessage,
+      config: {
+        systemInstruction: "Kamu adalah AI assistant yang pintar, santai, asyik, dan siap membantu apa saja dengan bahasa cirebon.",
+        maxOutputTokens: 300,
+      }
     });
 
-    const data = await apiResponse.json();
-
-    if (data.error) {
-      console.error("Gemini API Error:", data.error);
-      return sendJson(200, { reply: `Maaf Kak, kendala sistem AI: ${data.error.message || 'Kesalahan'}` });
-    }
-
-    let rawReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-
-    if (!rawReply) {
-      return sendJson(200, { reply: `Halo Kak! Wah, ${namaToko} siap bantu jawab pertanyaan tentang "${promptText}". Ada produk spesifik yang dicari? 😊` });
-    }
-
-    let cleanedReply = rawReply
-      .split('\n')
-      .map(line => line.trim())
-      .join('\n')
-      .trim();
-
-    return sendJson(200, { reply: cleanedReply });
+    const reply = (response.text || '').split('\n').map(l => l.trim()).join('\n').trim();
+    return res.status(200).json({ reply });
   } catch (error) {
-    console.error('CRITICAL CATCH ERROR:', error.message, error.stack);
-    return sendJson(200, { reply: `Maaf Kak, terjadi kendala teknis: ${error.message}` });
+    console.error('Error detail:', error);
+    return res.status(500).json({ error: error.message || 'Server error' });
   }
 }
