@@ -1236,12 +1236,24 @@ function toggleStickySearchBar() {
       history.pushState({tab: activeTab, floating: 'search'}, "", "");
     } else {
       document.getElementById("inventory-search-input").value = "";
-      syncAndFilterGlobal("");
+              syncAndFilterGlobal("");
+      }
     }
   }
-}
 
-function updateUnitLabel() {
+  let searchDebounceTimer = null;
+
+  function syncAndFilterGlobal(val) { 
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+      stokCurrentPage = 1;
+      posCurrentPage = 1;
+      refreshData(); 
+    }, 300);
+  }
+
+  function updateUnitLabel() {
+
   const unit = document.getElementById("db-unit").value;
   const rtgWrapper = document.getElementById("wrapper-db-isi-rtg");
   
@@ -3002,9 +3014,6 @@ function refreshData() {
       });
     }
   }
-  
-  applyTranslations();
-}
 
 function renderKatalogKasirPaginated(filteredItems) {
   const catalogGrid = document.getElementById("pos-catalog-container");
