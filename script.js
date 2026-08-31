@@ -2896,69 +2896,70 @@ function bersihkanCacheTotal() {
 }
 
 function ambilDariCatatan() {
-  let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
-  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
-    return alert("Tidak ada catatan aktif pada tab atau tanggal ini!");
-  }
-
   let addedCount = 0;
-  currentTabData.items.forEach(noteItem => {
-    if (!noteItem.isi) return;
-    let lines = noteItem.isi.split('\n');
-    lines.forEach(line => {
-     let parts = line.trim().split(/\s+/);
-if (parts.length >= 4) {
-  let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
-  let satuan = parts[parts.length - 2].toLowerCase();
-  let qty = parseFloat(parts[parts.length - 3]) || 1;
-  let nama = parts.slice(0, parts.length - 3).join(' ');
   
-  if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-  let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+  // Cek dan tarik data dari seluruh tab catatan yang ada
+  for (let tabKey in databaseCatatanDinamis) {
+    let currentTabData = databaseCatatanDinamis[tabKey];
+    if (!currentTabData || !currentTabData.items) continue;
+    
+    currentTabData.items.forEach(noteItem => {
+      if (!noteItem.isi) return;
+      let lines = noteItem.isi.split('\n');
+      lines.forEach(line => {
+        let parts = line.trim().split(/\s+/);
+        if (parts.length >= 4) {
+          let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
+          let satuan = parts[parts.length - 2].toLowerCase();
+          let qty = parseFloat(parts[parts.length - 3]) || 1;
+          let nama = parts.slice(0, parts.length - 3).join(' ');
+          
+          if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
+          let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
 
+          let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
+          let matchedProd = existingCode ? databaseProduk[existingCode] : null;
+          
+          let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
+          let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
+          let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
+          
+          let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
+          let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
 
-        let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
-        let matchedProd = existingCode ? databaseProduk[existingCode] : null;
-        
-        let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
-        let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-        let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
-        
-        let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
-        let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+          let hargaRtgVal = modalRtgVal;
+          let hargaPcsVal = modalPcsVal;
 
-        let hargaRtgVal = modalRtgVal;
-        let hargaPcsVal = modalPcsVal;
+          let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
 
-        let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
-
-        let newItem = {
-          id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
-          code: code,
-          nama: nama,
-          kategori: kategori,
-          satuan: satuan,
-          isiRtg: isiRtg,
-          qty: qty,
-          modal: modalPcsVal,
-          harga: hargaPcsVal,
-          modalRtg: modalRtgVal,
-          hargaRtg: hargaRtgVal,
-          foto: foto
-        };
-        
-        restockListItems.push(newItem);
-        addedCount++;
-      }
+          let newItem = {
+            id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+            code: code,
+            nama: nama,
+            kategori: kategori,
+            satuan: satuan,
+            isiRtg: isiRtg,
+            qty: qty,
+            modal: modalPcsVal,
+            harga: hargaPcsVal,
+            modalRtg: modalRtgVal,
+            hargaRtg: hargaRtgVal,
+            foto: foto
+          };
+          
+          restockListItems.push(newItem);
+          addedCount++;
+        }
+      });
     });
-  });
+  }
 
   if (addedCount > 0) {
     simpanRestockKeCloud();
     refreshData();
     showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
   } else {
-    alert("Tidak ditemukan format rincian valid (Contoh: Ayam - 4 - kg - 176.000) di catatan ini!");
+    alert("Tidak ditemukan format rincian valid (Contoh: Ayam - 4 - kg - 176.000) di catatan tanggal ini!");
   }
 }
 
