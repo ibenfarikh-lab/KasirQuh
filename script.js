@@ -993,11 +993,6 @@ function openCatatanModal(targetTabKey = activeSubCatatanTab, id = null) {
   }
   modal.classList.add("show");
   history.pushState({tab: activeTab, modal: 'catatan'}, "", "");
-  
-  // PERBAIKAN: Memaksa fungsi kalkulasi untuk berjalan begitu catatan lama terbuka di layar Edit
-  if (typeof autoHitungSubjudul === "function") {
-    autoHitungSubjudul();
-  }
 }
 
 function closeCatatanModal() {
@@ -1241,12 +1236,24 @@ function toggleStickySearchBar() {
       history.pushState({tab: activeTab, floating: 'search'}, "", "");
     } else {
       document.getElementById("inventory-search-input").value = "";
-      syncAndFilterGlobal("");
+              syncAndFilterGlobal("");
+      }
     }
   }
-}
 
-function updateUnitLabel() {
+  let searchDebounceTimer = null;
+
+  function syncAndFilterGlobal(val) { 
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+      stokCurrentPage = 1;
+      posCurrentPage = 1;
+      refreshData(); 
+    }, 300);
+  }
+
+  function updateUnitLabel() {
+
   const unit = document.getElementById("db-unit").value;
   const rtgWrapper = document.getElementById("wrapper-db-isi-rtg");
   
@@ -2593,422 +2600,193 @@ function resetDatabaseBarang() {
 }
 
 function refreshData() {
-  document.getElementById("setting-user").value = userAuth.user;
-  document.getElementById("setting-pass").value = userAuth.pass;
-  document.getElementById("setting-shop-name").value = pengaturanToko.nama;
-  document.getElementById("setting-shop-address").value = pengaturanToko.alamat;
-  document.getElementById("setting-shop-phone").value = pengaturanToko.phone;
-  document.getElementById("setting-cooldown").value = scanCooldownDuration;
+  // 1. Update data input pengaturan dasar (hanya jika elemennya ada)
+  const setUsr = document.getElementById("setting-user");
+  if (setUsr) setUsr.value = userAuth.user;
+  const setPass = document.getElementById("setting-pass");
+  if (setPass) setPass.value = userAuth.pass;
+  const setShopName = document.getElementById("setting-shop-name");
+  if (setShopName) setShopName.value = pengaturanToko.nama;
+  const setShopAddr = document.getElementById("setting-shop-address");
+  if (setShopAddr) setShopAddr.value = pengaturanToko.alamat;
+  const setShopPhone = document.getElementById("setting-shop-phone");
+  if (setShopPhone) setShopPhone.value = pengaturanToko.phone;
+  const setCooldown = document.getElementById("setting-cooldown");
+  if (setCooldown) setCooldown.value = scanCooldownDuration;
   
   const viewSelect = document.getElementById("setting-view-mode");
   if (viewSelect) viewSelect.value = viewMode;
-
   const langSelect = document.getElementById("setting-language");
   if (langSelect) langSelect.value = currentLang;
 
-  document.getElementById("login-sub-title").innerText = pengaturanToko.nama || "TokoQuh";
-  document.getElementById("receipt-shop-name").innerText = pengaturanToko.nama;
-  document.getElementById("receipt-shop-address").innerText = pengaturanToko.alamat;
-  document.getElementById("receipt-shop-phone").innerText = "Telp: " + pengaturanToko.phone;
+  const loginSub = document.getElementById("login-sub-title");
+  if (loginSub) loginSub.innerText = pengaturanToko.nama || "TokoQuh";
+  const rcptName = document.getElementById("receipt-shop-name");
+  if (rcptName) rcptName.innerText = pengaturanToko.nama;
+  const rcptAddr = document.getElementById("receipt-shop-address");
+  if (rcptAddr) rcptAddr.innerText = pengaturanToko.alamat;
+  const rcptPhone = document.getElementById("receipt-shop-phone");
+  if (rcptPhone) rcptPhone.innerText = "Telp: " + pengaturanToko.phone;
 
-  document.getElementById('inventory-list-wrapper').style.display = (viewMode === 'list') ? 'flex' : 'none';
-  document.getElementById('inventory-grid-wrapper').style.display = (viewMode === 'grid') ? 'grid' : 'none';
-  
-  const restockListWrapper = document.getElementById("restock-list-wrapper");
-  const restockGridWrapper = document.getElementById("restock-grid-wrapper");
-  if(restockListWrapper && restockGridWrapper) {
-    restockListWrapper.style.display = (viewMode === 'list') ? 'flex' : 'none';
-    restockGridWrapper.style.display = (viewMode === 'grid') ? 'grid' : 'none';
-  }
-
-  const invList = document.getElementById("inventory-list-wrapper");
-  const invGrid = document.getElementById("inventory-grid-wrapper");
-  invList.innerHTML = ""; invGrid.innerHTML = "";
-
-  let categories = new Set();
-  const filterKatEl = document.getElementById("filter-category");
-  const filterKat = filterKatEl ? filterKatEl.value : "Semua";
-  const filterKatPosEl = document.getElementById("filter-category-pos");
-  const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
+  // Ambil keyword pencarian global
   const searchInputEl = document.getElementById("inventory-search-input");
   const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
-  let filteredItems = [];
-  let filteredItemsPos = [];
+  let categories = new Set();
 
+  // ==========================================================
+  // 2. KHUSUS TAB KASIR / PENJUALAN (Paling sering diakses & dicari)
+  // ==========================================================
+  const filterKatPosEl = document.getElementById("filter-category-pos");
+  const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
+
+  let filteredItemsPos = [];
   for (let code in databaseProduk) {
     let item = databaseProduk[code];
     let kat = item.kategori || "Umum";
     categories.add(kat);
 
-    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
-      filteredItems.push({ code, ...item });
-    }
     if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || kat === filterKatPos)) {
       filteredItemsPos.push({ code, ...item });
     }
   }
-
-  filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
   filteredItemsPos.sort((a, b) => a.nama.localeCompare(b.nama));
-
-  let itemsPerPageStok = 24;
-  let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
-  if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
-  if (stokCurrentPage < 1) stokCurrentPage = 1;
-
-  let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
-  let paginatedStokItems = filteredItems.slice(stokStartIndex, stokStartIndex + itemsPerPageStok);
-
-  if (filteredItems.length > 0) {
-    document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
-    document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
-    document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
-  }
-
-  if (paginatedStokItems.length === 0) {
-    const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
-    invList.innerHTML = emptyStokMsg; invGrid.innerHTML = emptyStokMsg;
-  } else {
-    paginatedStokItems.forEach(item => {
-      let code = item.code;
-      let kat = item.kategori || "Umum";
-      let sat = (item.satuan || "pcs").toLowerCase();
-      let stok = item.stok !== undefined ? item.stok : 0;
-      let fotoSrc = item.foto || defaultPlaceholderImg;
-      let isiRtg = item.isiRtg || 10;
-      let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + isiRtg + ')' : (sat === 'kg' ? 'kg' : sat);
-
-      let detailsListHtml = '';
-      let detailsGridHtml = '';
-
-      if (sat === 'kg') {
-        let isiOns = 10;
-        let modalOns = item.modal || 0;
-        let modalKgVal = item.modalRtg || (modalOns * isiOns);
-        let jualOns = item.harga || 0;
-        let jualKgVal = item.hargaRtg || (jualOns * isiOns);
-
-        detailsListHtml = `
-          <div>⚖️ <b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
-          <div>⚖️ <b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
-          <div>⚖️ <b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
-          <div>⚖️ <b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
-        `;
-        detailsGridHtml = `
-          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-            <div><b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
-            <div><b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
-            <div><b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
-            <div><b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
-          </div>
-        `;
-      } else if (sat === 'pcs') {
-        let hargaPcs = item.modal || 0;
-        let jualPcs = item.harga || 0;
-        detailsListHtml = `
-          <div>📦 <b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
-          <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-        `;
-        detailsGridHtml = `
-          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-            <div><b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
-            <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-          </div>
-        `;
-      } else {
-        let modalPcs = item.modal || 0;
-        let modalRtgVal = item.modalRtg || (modalPcs * isiRtg);
-        let jualPcs = item.harga || 0;
-        let jualRtgVal = item.hargaRtg || (jualPcs * isiRtg);
-        
-        detailsListHtml = `
-          <div>📑 <b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
-          <div>📑 <b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
-          <div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-          <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-        `;
-        detailsGridHtml = `
-          <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-            <div><b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
-            <div><b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
-            <div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-            <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-          </div>
-        `;
-      }
-
-      invList.innerHTML += `
-        <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-          <div style="display: flex; align-items: flex-start; gap: 10px;">
-            <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
-            <div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
-                <div style="font-size: 0.78rem; color: var(--text-muted);">${code} • Stok: <b style="color: var(--text-color);">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b> • ${satuanLabel}</div>
-              </div>
-              <div>
-                <span class="badge-kat">${kat}</span>
-              </div>
-            </div>
-          </div>
-          <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">
-            ${detailsListHtml}
-          </div>
-          <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;">
-            <button onclick="openProductModal('${code}')" title="Edit" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">✏️ Edit</button>
-            <button onclick="hapusBarang('${code}')" title="Hapus" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">🗑️ Hapus</button>
-          </div>
-        </div>
-      `;
-
-      invGrid.innerHTML += `
-        <div class="inv-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px;">
-          <div>
-            <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
-              <button class="btn-edit" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal('${code}')">Edit</button>
-              <button class="btn-danger" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="hapusBarang('${code}')">Hapus</button>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;">
-              <div style="min-width: 0; flex: 1;">
-                <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: <b>${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b></div>
-              </div>
-            </div>
-            <div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; margin-bottom: 6px;">
-              ${detailsGridHtml}
-            </div>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 0.8rem;">
-            <span style="font-weight: bold; color: var(--text-muted);">Kategori:</span>
-            <span class="badge-kat">${kat}</span>
-          </div>
-        </div>
-      `;
-    });
-  }
-
   updateDropdowns(Array.from(categories));
-  renderKatalogKasirPaginated(filteredItemsPos);
 
-  if(restockListWrapper && restockGridWrapper) {
-    restockListWrapper.innerHTML = ""; restockGridWrapper.innerHTML = "";
-    let totalEstBelanja = 0;
-
-    if (restockListItems.length === 0) {
-      const emptyRestockMsg = `<div class="empty-state" style="grid-column: 1/-1;">🛒 Belum ada daftar belanja stok.<br>Tekan tombol <b>+</b> di kanan bawah untuk menambahkan barang belanjaan.</div>`;
-      restockListWrapper.innerHTML = emptyRestockMsg; restockGridWrapper.innerHTML = emptyRestockMsg;
-    } else {
-      restockListItems.forEach(item => {
-        let fotoSrc = item.foto || defaultPlaceholderImg;
-        let sat = (item.satuan || "").toLowerCase();
-        let satuanLabel = sat === 'rtg' ? `rtg (isi ${item.isiRtg || 10})` : (sat === 'kg' ? `kg` : sat);
-        
-        let detailsListHtml = '';
-        let detailsGridHtml = '';
-        let subtotalModal = 0;
-
-        if (sat === 'kg') {
-          let isiOns = 10;
-          let modalOns = item.modal || 0;
-          let modalKgVal = item.modalRtg || (modalOns * isiOns);
-          let jualOns = item.harga || 0;
-          let jualKgVal = item.hargaRtg || (jualOns * isiOns);
-          subtotalModal = modalKgVal * (item.qty || 1);
-
-          detailsListHtml = `
-            <div>⚖️ <b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
-            <div>⚖️ <b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
-            <div>⚖️ <b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
-            <div>⚖️ <b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
-          `;
-          detailsGridHtml = `
-            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-              <div><b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div>
-              <div><b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div>
-              <div><b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div>
-              <div><b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        } else if (sat === 'pcs') {
-          let hargaPcs = item.modal || 0;
-          let jualPcs = item.harga || 0;
-          subtotalModal = hargaPcs * (item.qty || 1);
-          detailsListHtml = `
-            <div>📦 <b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
-            <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-          `;
-          detailsGridHtml = `
-            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-              <div><b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div>
-              <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        } else {
-          let modalPcs = item.modal || 0;
-          let modalRtgVal = item.modalRtg || (modalPcs * (item.isiRtg || 10));
-          let jualPcs = item.harga || 0;
-          let jualRtgVal = item.hargaRtg || (jualPcs * (item.isiRtg || 10));
-          subtotalModal = modalRtgVal * (item.qty || 1);
-          
-          detailsListHtml = `
-            <div>📑 <b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
-            <div>📑 <b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
-            <div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-            <div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-          `;
-          detailsGridHtml = `
-            <div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;">
-              <div><b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div>
-              <div><b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div>
-              <div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div>
-              <div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>
-            </div>
-          `;
-        }
-
-        totalEstBelanja += subtotalModal;
-
-        restockListWrapper.innerHTML += `
-          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-            <div style="display: flex; align-items: flex-start; gap: 10px;">
-              <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);">
-              <div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                  <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div>
-                  <div style="font-size: 0.78rem; color: var(--text-muted);">Beli: <b style="color: var(--text-color);">${item.qty} ${satuanLabel}</b></div>
-                </div>
-                <div style="text-align: right;">
-                  <div style="font-weight: bold; font-size: 0.95rem; color: #2563eb;">Rp ${subtotalModal.toLocaleString('id-ID')}</div>
-                </div>
-              </div>
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">
-              ${detailsListHtml}
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;">
-              <button onclick="openProductModal(null, '${item.id}')" title="Edit" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">✏️ Edit</button>
-              <button onclick="hapusItemBelanja('${item.id}')" title="Hapus" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">🗑️ Hapus</button>
-            </div>
-          </div>
-        `;
-
-        restockGridWrapper.innerHTML += `
-          <div class="inv-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px;">
-            <div>
-              <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
-                <button class="btn-edit" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal(null, '${item.id}')">Edit</button>
-                <button class="btn-danger" style="flex: 1; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.72rem;" onclick="hapusItemBelanja('${item.id}')">Hapus</button>
-              </div>
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;">
-                <div style="min-width: 0; flex: 1;">
-                  <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">Beli: <b>${item.qty} ${satuanLabel}</b></div>
-                </div>
-              </div>
-              <div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; margin-bottom: 6px;">
-                ${detailsGridHtml}
-              </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 0.8rem;">
-              <span style="font-weight: bold; color: var(--text-muted);">Total:</span>
-              <b style="color: #2563eb; font-size: 0.9rem;">Rp ${subtotalModal.toLocaleString('id-ID')}</b>
-            </div>
-          </div>
-        `;
-      });
-    }
-    document.getElementById("restock-est-total").innerText = totalEstBelanja.toLocaleString('id-ID');
+  if (activeTab === 'penjualan') {
+    renderKatalogKasirPaginated(filteredItemsPos);
+    return; 
   }
 
-  const repBody = document.getElementById("report-body");
-  repBody.innerHTML = "";
-  let totalOmset = 0; let totalProfit = 0;
-  riwayatTransaksi.forEach(t => {
-    totalOmset += t.total; totalProfit += t.untung;
-    repBody.innerHTML += `<tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 6px;">${t.waktu}</td><td style="padding: 6px;">${t.metode}</td><td style="padding: 6px;">${t.qty}</td><td style="padding: 6px;">Rp ${t.total.toLocaleString('id-ID')}</td><td style="padding: 6px; color: #16a34a; font-weight: bold;">Rp ${t.untung.toLocaleString('id-ID')}</td></tr>`;
-  });
-  if (riwayatTransaksi.length === 0) repBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">Belum ada riwayat transaksi.</td></tr>`;
-
-  document.getElementById("dash-omset").innerText = totalOmset.toLocaleString('id-ID');
-  document.getElementById("dash-profit").innerText = totalProfit.toLocaleString('id-ID');
-  document.getElementById("dash-trans").innerText = riwayatTransaksi.length;
-  document.getElementById("dash-items").innerText = Object.keys(databaseProduk).length;
-
-  const custContainer = document.getElementById("customer-list-wrapper");
-  custContainer.innerHTML = "";
-  let grandTotalAllCustomersFinancial = 0;
-
-  if (databasePelanggan.length === 0) {
-    custContainer.innerHTML = `<div class="empty-state">Belum ada data pelanggan.</div>`;
-  } else {
-    databasePelanggan.forEach(c => {
-      let catatanHtml = "";
-      let custTotalNominal = 0;
-
-      if (c.catatan && c.catatan.length > 0) {
-        c.catatan.forEach(note => {
-          let nom = note.nominal || 0;
-          custTotalNominal += nom;
-          catatanHtml += `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 6px 0;"><div><span style="font-weight: bold; font-size: 0.72rem;">[${note.jenis}]</span> <span style="font-size: 0.75rem;">${note.keterangan}</span> ${nom > 0 ? '<b style="color:#2563eb;">(Rp ' + nom.toLocaleString('id-ID') + ')</b>' : ''}</div><button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button></div>`;
-        });
-      } else {
-        catatanHtml = `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Belum ada catatan keuangan.</div>`;
-      }
-
-      grandTotalAllCustomersFinancial += custTotalNominal;
-
-      custContainer.innerHTML += `
-        <div class="cust-list-item">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-              <div style="font-weight: bold; font-size: 0.85rem;">${c.nama}</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat}</div>
-              <div style="font-size: 0.78rem; font-weight: 600; color: #2563eb; margin-top: 3px;">Total Nilai Catatan: Rp ${custTotalNominal.toLocaleString('id-ID')}</div>
-            </div>
-            <div style="display: flex; gap: 4px;">
-              <button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button>
-              <button style="background: #25D366; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="bagikanCatatanWhatsApp('${c.id}')">💬 WA</button>
-              <button class="btn-edit" style="background: #ca8a04; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openCustomerModal('${c.id}')">Edit</button>
-              <button class="btn-danger" style="padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button>
-            </div>
-          </div>
-          <div class="cust-bookkeeping">${catatanHtml}</div>
-        </div>
-      `;
-    });
-  }
-  document.getElementById("customer-total-financial").innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
-
-  const pendingContainer = document.getElementById("pending-customer-list-wrapper");
-  if (pendingContainer) {
-    pendingContainer.innerHTML = "";
-    let pendingList = databasePelanggan.filter(c => c.status === "pending" || c.disetujui === false);
+  // ==========================================================
+  // 3. KHUSUS TAB STOK & BELANJA STOK
+  // ==========================================================
+  if (activeTab === 'data-barang' || activeTab === 'belanja-stok') {
+    const invList = document.getElementById("inventory-list-wrapper");
+    const invGrid = document.getElementById("inventory-grid-wrapper");
+    if (invList) invList.style.display = (viewMode === 'list') ? 'flex' : 'none';
+    if (invGrid) invGrid.style.display = (viewMode === 'grid') ? 'grid' : 'none';
     
-    if (pendingList.length === 0) {
-      pendingContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Tidak ada pendaftaran baru yang menunggu persetujuan.</div>`;
-    } else {
-      pendingList.forEach(c => {
-        pendingContainer.innerHTML += `
-          <div class="card" style="display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
-            <div>
-              <div style="font-weight: bold; font-size: 0.95rem;">${c.nama}</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat || '-'}</div>
-              <div style="font-size: 0.75rem; color: #d97706; margin-top: 2px; font-weight: bold;">Status: Menunggu Persetujuan</div>
-            </div>
-            <div style="display: flex; gap: 6px;">
-              <button onclick="setujuiAkunPelanggan('${c.id}')" style="background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Setujui</button>
-              <button onclick="hapusPelanggan('${c.id}')" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Tolak</button>
-            </div>
-          </div>
-        `;
-      });
+    const filterKatEl = document.getElementById("filter-category");
+    const filterKat = filterKatEl ? filterKatEl.value : "Semua";
+    let filteredItems = [];
+    for (let code in databaseProduk) {
+      let item = databaseProduk[code];
+      let kat = item.kategori || "Umum";
+      if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
+        filteredItems.push({ code, ...item });
+      }
     }
+    filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
+
+    if (activeTab === 'data-barang' && invList && invGrid) {
+      invList.innerHTML = ""; invGrid.innerHTML = "";
+      let itemsPerPageStok = 24;
+      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
+      if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
+      if (stokCurrentPage < 1) stokCurrentPage = 1;
+
+      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
+      let paginatedStokItems = filteredItems.slice(stokStartIndex, stokStartIndex + itemsPerPageStok);
+
+      document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
+      document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
+      document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
+
+      if (paginatedStokItems.length === 0) {
+        const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
+        invList.innerHTML = emptyStokMsg; invGrid.innerHTML = emptyStokMsg;
+      } else {
+        paginatedStokItems.forEach(item => {
+          let code = item.code;
+          let kat = item.kategori || "Umum";
+          let sat = (item.satuan || "pcs").toLowerCase();
+          let stok = item.stok !== undefined ? item.stok : 0;
+          let fotoSrc = item.foto || defaultPlaceholderImg;
+          let isiRtg = item.isiRtg || 10;
+          let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + isiRtg + ')' : (sat === 'kg' ? 'kg' : sat);
+
+          let detailsListHtml = '';
+          let detailsGridHtml = '';
+
+          if (sat === 'kg') {
+            let isiOns = 10;
+            let modalOns = item.modal || 0;
+            let modalKgVal = item.modalRtg || (modalOns * isiOns);
+            let jualOns = item.harga || 0;
+            let jualKgVal = item.hargaRtg || (jualOns * isiOns);
+            detailsListHtml = `<div>⚖️ <b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div><div>⚖️ <b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div><div>⚖️ <b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div><div>⚖️ <b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>`;
+            detailsGridHtml = `<div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;"><div><b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div><div><b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div><div><b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div><div><b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div></div>`;
+          } else if (sat === 'pcs') {
+            let hargaPcs = item.modal || 0;
+            let jualPcs = item.harga || 0;
+            detailsListHtml = `<div>📦 <b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div><div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>`;
+            detailsGridHtml = `<div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;"><div><b>Pcs Modal :</b> Rp ${hargaPcs.toLocaleString('id-ID')}</div><div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div></div>`;
+          } else {
+            let modalPcs = item.modal || 0;
+            let modalRtgVal = item.modalRtg || (modalPcs * isiRtg);
+            let jualPcs = item.harga || 0;
+            let jualRtgVal = item.hargaRtg || (jualPcs * isiRtg);
+            detailsListHtml = `<div>📑 <b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div><div>📑 <b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div><div>📦 <b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div><div>📦 <b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div>`;
+            detailsGridHtml = `<div style="font-size: 0.72rem; line-height: 1.3; display: flex; flex-direction: column; gap: 2px;"><div><b>Rtg Modal :</b> Rp ${modalRtgVal.toLocaleString('id-ID')}</div><div><b>Rtg Jual :</b> Rp ${jualRtgVal.toLocaleString('id-ID')}</div><div><b>Pcs Modal :</b> Rp ${modalPcs.toLocaleString('id-ID')}</div><div><b>Pcs Jual :</b> Rp ${jualPcs.toLocaleString('id-ID')}</div></div>`;
+          }
+
+          invList.innerHTML += `<div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px;"><div style="display: flex; align-items: flex-start; gap: 10px;"><img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);"><div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div><div style="font-size: 0.78rem; color: var(--text-muted);">${code} • Stok: <b style="color: var(--text-color);">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b> • ${satuanLabel}</div></div><div><span class="badge-kat">${kat}</span></div></div></div><div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">${detailsListHtml}</div><div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;"><button onclick="openProductModal('${code}')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">✏️ Edit</button><button onclick="hapusBarang('${code}')" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">🗑️ Hapus</button></div></div>`;
+          invGrid.innerHTML += `<div class="inv-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px;"><div><div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;"><button class="btn-edit" style="flex: 1; height: 26px; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal('${code}')">Edit</button><button class="btn-danger" style="flex: 1; height: 26px; border-radius: 6px; font-size: 0.72rem;" onclick="hapusBarang('${code}')">Hapus</button></div><div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;"><img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;"><div style="min-width: 0; flex: 1;"><div style="font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div><div style="font-size: 0.75rem; color: var(--text-muted);">Stok: <b>${stok}</b></div></div></div><div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; margin-bottom: 6px;">${detailsGridHtml}</div></div><div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 0.8rem;"><span style="font-weight: bold; color: var(--text-muted);">Kategori:</span><span class="badge-kat">${kat}</span></div></div>`;
+        });
+      }
+    }
+    return;
   }
-  
-  applyTranslations();
+
+  // ==========================================================
+  // 4. KHUSUS TAB LAPORAN & PELANGGAN
+  // ==========================================================
+  if (activeTab === 'laporan') {
+    let totalOmset = 0; let totalProfit = 0;
+    const repBody = document.getElementById("report-body");
+    if (repBody) {
+      repBody.innerHTML = "";
+      riwayatTransaksi.forEach(t => {
+        totalOmset += t.total; totalProfit += t.untung;
+        repBody.innerHTML += `<tr style="border-bottom: 1px solid var(--border-color);"><td style="padding: 6px;">${t.waktu}</td><td style="padding: 6px;">${t.metode}</td><td style="padding: 6px;">${t.qty}</td><td style="padding: 6px;">Rp ${t.total.toLocaleString('id-ID')}</td><td style="padding: 6px; color: #16a34a; font-weight: bold;">Rp ${t.untung.toLocaleString('id-ID')}</td></tr>`;
+      });
+      if (riwayatTransaksi.length === 0) repBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 15px;">Belum ada riwayat transaksi.</td></tr>`;
+    }
+
+    const dashOmset = document.getElementById("dash-omset");
+    if (dashOmset) dashOmset.innerText = totalOmset.toLocaleString('id-ID');
+    const dashProfit = document.getElementById("dash-profit");
+    if (dashProfit) dashProfit.innerText = totalProfit.toLocaleString('id-ID');
+    const dashTrans = document.getElementById("dash-trans");
+    if (dashTrans) dashTrans.innerText = riwayatTransaksi.length;
+    const dashItems = document.getElementById("dash-items");
+    if (dashItems) dashItems.innerText = Object.keys(databaseProduk).length;
+
+    const custContainer = document.getElementById("customer-list-wrapper");
+    if (custContainer) {
+      custContainer.innerHTML = "";
+      let grandTotalAllCustomersFinancial = 0;
+      databasePelanggan.forEach(c => {
+        let catatanHtml = "";
+        let custTotalNominal = 0;
+        if (c.catatan && c.catatan.length > 0) {
+          c.catatan.forEach(note => {
+            let nom = note.nominal || 0;
+            custTotalNominal += nom;
+            catatanHtml += `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 6px 0;"><div><span style="font-weight: bold; font-size: 0.72rem;">[${note.jenis}]</span> <span style="font-size: 0.75rem;">${note.keterangan}</span> ${nom > 0 ? '<b style="color:#2563eb;">(Rp ' + nom.toLocaleString('id-ID') + ')</b>' : ''}</div><button class="btn-danger" style="padding: 2px 5px; font-size: 0.65rem;" onclick="hapusCatatanPembukuan('${c.id}', '${note.id}')">✕</button></div>`;
+          });
+        } else {
+          catatanHtml = `<div style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Belum ada catatan keuangan.</div>`;
+        }
+        grandTotalAllCustomersFinancial += custTotalNominal;
+        custContainer.innerHTML += `<div class="cust-list-item"><div style="display: flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-weight: bold; font-size: 0.85rem;">${c.nama}</div><div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone} • 📍 ${c.alamat}</div><div style="font-size: 0.78rem; font-weight: 600; color: #2563eb; margin-top: 3px;">Total Nilai Catatan: Rp ${custTotalNominal.toLocaleString('id-ID')}</div></div><div style="display: flex; gap: 4px;"><button style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openBookkeepingModal('${c.id}')">+ Catat</button><button style="background: #25D366; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="bagikanCatatanWhatsApp('${c.id}')">💬 WA</button><button class="btn-edit" style="background: #ca8a04; color: white; padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="openCustomerModal('${c.id}')">Edit</button><button class="btn-danger" style="padding: 4px 8px; font-size: 0.72rem; border-radius: 6px;" onclick="hapusPelanggan('${c.id}')">Hapus</button></div></div><div class="cust-bookkeeping">${catatanHtml}</div></div>`;
+      });
+      const custTotalFin = document.getElementById("customer-total-financial");
+      if (custTotalFin) custTotalFin.innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
+    }
+    return;
+  }
 }
 
 function renderKatalogKasirPaginated(filteredItems) {
@@ -3184,7 +2962,6 @@ if (parts.length >= 4) {
   }
 }
 
-// --- FITUR PULL TO REFRESH KONTINER `.main-content` ---
 let touchstartY = 0;
 let touchendY = 0;
 
@@ -3206,7 +2983,6 @@ document.addEventListener('touchend', e => {
   }
 }, { passive: true });
 
-// --- FITUR VOICE INPUT AI CO-PILOT ---
 let recognition = null;
 let isRecording = false;
 
@@ -3273,56 +3049,6 @@ function stopVoiceRecordingUI() {
     inputField.placeholder = "Tanya stok, saran jualan...";
   }
 }
-// --- END FITUR VOICE INPUT ---
-
-
-// --- FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
-function autoHitungSubjudul() {
-  const inputEl = document.getElementById("catatan-desc-input");
-  if (!inputEl) return;
-  const isi = inputEl.value;
-  const lines = isi.split('\n');
-  let total = 0;
-
-  lines.forEach(line => {
-    if (line.trim() === '') return;
-    
-    // Memisahkan teks per baris berdasarkan spasi
-    const parts = line.trim().split(/\s+/);
-    
-    if (parts.length > 0) {
-      // Mengambil teks paling akhir dari baris tersebut (harga nominal)
-      const nominalText = parts[parts.length - 1];
-      
-      // Murni mengambil HANYA ANGKA. Mengabaikan titik, koma, huruf dll.
-      const angkaBersih = nominalText.replace(/[^0-9]/g, '');
-      const nominal = parseInt(angkaBersih) || 0;
-      
-      if (nominal > 0) {
-        total += nominal;
-      }
-    }
-  });
-
-  const subjudulInput = document.getElementById("catatan-subtitle-input");
-  if (!subjudulInput) return;
-  
-  if (total > 0) {
-    subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
-  } else {
-    // Kosongkan kembali jika total 0 atau rincian dihapus semua
-    subjudulInput.value = "";
-  }
-}
-
-// Global Event Listener: Memicu kalkulasi setiap kali ada ketikan (input) di dalam textarea Rincian
-document.addEventListener('input', function(e) {
-  if (e.target && e.target.id === 'catatan-desc-input') {
-    autoHitungSubjudul();
-  }
-});
-// --- END FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
-
 
 setTheme(currentTheme);
 setLanguage(currentLang);
