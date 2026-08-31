@@ -2898,7 +2898,6 @@ function bersihkanCacheTotal() {
 function ambilDariCatatan() {
   let addedCount = 0;
   
-  // Cek dan tarik data dari seluruh tab catatan yang ada
   for (let tabKey in databaseCatatanDinamis) {
     let currentTabData = databaseCatatanDinamis[tabKey];
     if (!currentTabData || !currentTabData.items) continue;
@@ -2906,50 +2905,80 @@ function ambilDariCatatan() {
     currentTabData.items.forEach(noteItem => {
       if (!noteItem.isi) return;
       let lines = noteItem.isi.split('\n');
+      
       lines.forEach(line => {
-        let parts = line.trim().split(/\s+/);
-        if (parts.length >= 4) {
-          let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
-          let satuan = parts[parts.length - 2].toLowerCase();
-          let qty = parseFloat(parts[parts.length - 3]) || 1;
-          let nama = parts.slice(0, parts.length - 3).join(' ');
-          
-          if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-          let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+        let cleanLine = line.trim();
+        if (!cleanLine) return;
 
-          let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
-          let matchedProd = existingCode ? databaseProduk[existingCode] : null;
-          
-          let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
-          let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-          let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
-          
-          let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
-          let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+        // Pisahkan kata-kata berdasarkan spasi
+        let parts = cleanLine.split(/\s+/);
+        if (parts.length < 2) return; // Baris terlalu pendek
 
-          let hargaRtgVal = modalRtgVal;
-          let hargaPcsVal = modalPcsVal;
+        let nama = "";
+        let qty = 1;
+        let satuan = "pcs";
+        let modalTotalInput = 0;
 
-          let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
+        // Ambil elemen terakhir sebagai harga (bersihkan dari 'rb', 'Rp', titik, dll)
+        let lastPart = parts[parts.length - 1].toLowerCase();
+        let parsedHarga = parseRupiahToNumber(lastPart);
 
-          let newItem = {
-            id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
-            code: code,
-            nama: nama,
-            kategori: kategori,
-            satuan: satuan,
-            isiRtg: isiRtg,
-            qty: qty,
-            modal: modalPcsVal,
-            harga: hargaPcsVal,
-            modalRtg: modalRtgVal,
-            hargaRtg: hargaRtgVal,
-            foto: foto
-          };
+        if (parsedHarga > 0 && parts.length >= 3) {
+          // Format standar: [Nama] [Qty] [Satuan] [Harga] (Cth: kacang panjang 2 kg 30.000)
+          modalTotalInput = parsedHarga;
+          satuan = parts[parts.length - 2].toLowerCase();
           
-          restockListItems.push(newItem);
-          addedCount++;
+          let potentialQty = parseFloat(parts[parts.length - 3].replace(',', '.'));
+          if (!isNaN(potentialQty)) {
+            qty = potentialQty;
+            nama = parts.slice(0, parts.length - 3).join(' ');
+          } else {
+            qty = 1;
+            nama = parts.slice(0, parts.length - 2).join(' ');
+          }
+
+          if (!['pcs', 'kg', 'rtg'].includes(satuan)) {
+            satuan = 'pcs';
+            qty = 1;
+            // Jika satuan ternyata bagian dari nama
+            nama = parts.slice(0, parts.length - 2).join(' ');
+          }
+        } else {
+          // Format bebas / sederhana (Cth: timun 2 kg, atau Lontong 10rb)
+          nama = cleanLine;
         }
+
+        if (!nama) return;
+
+        let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+
+        let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
+        let matchedProd = existingCode ? databaseProduk[existingCode] : null;
+        
+        let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
+        let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
+        let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
+        
+        let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
+        let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+
+        let newItem = {
+          id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+          code: code,
+          nama: nama,
+          kategori: kategori,
+          satuan: satuan,
+          isiRtg: isiRtg,
+          qty: qty,
+          modal: modalPcsVal,
+          harga: modalPcsVal,
+          modalRtg: modalRtgVal,
+          hargaRtg: modalRtgVal,
+          foto: matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg
+        };
+        
+        restockListItems.push(newItem);
+        addedCount++;
       });
     });
   }
@@ -2959,7 +2988,7 @@ function ambilDariCatatan() {
     refreshData();
     showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
   } else {
-    alert("Tidak ditemukan format rincian valid (Contoh: Ayam - 4 - kg - 176.000) di catatan tanggal ini!");
+    alert("Tidak ada baris catatan yang dapat dibaca. Pastikan format catatan memiliki nama barang!");
   }
 }
 
