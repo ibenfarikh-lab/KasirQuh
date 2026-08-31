@@ -496,6 +496,15 @@ window.addEventListener('scroll', function() {
   }
 }, true);
 
+function formatTeksDanAngka(input) {
+  let val = input.value;
+  let formatted = val.replace(/(\d+)/g, (match) => {
+    let cleanNum = match.replace(/\./g, '');
+    return cleanNum.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  });
+  input.value = formatted;
+}
+
 function formatInputRupiah(input) {
   let angka = input.value.replace(/[^,\d]/g, '').toString();
   let split = angka.split(',');
