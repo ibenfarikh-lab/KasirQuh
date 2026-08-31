@@ -3002,8 +3002,6 @@ function refreshData() {
       });
     }
   }
-  
-  applyTranslations();
 }
 
 function renderKatalogKasirPaginated(filteredItems) {
