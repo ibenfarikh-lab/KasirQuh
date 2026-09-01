@@ -3054,3 +3054,97 @@ setTheme(currentTheme);
 setLanguage(currentLang);
 cekStatusLogin();
 updatePermanentBarTitle();
+
+// ==========================================================
+// FITUR BACKUP & RESTORE LOKAL (JSON) - AMAN & GRATIS
+// ==========================================================
+
+async function eksporSeluruhData() {
+  try {
+    showNotif("Menyiapkan file backup...");
+    
+    const allData = {
+      produk: databaseProduk || {},
+      pelanggan: databasePelanggan || [],
+      transaksi: riwayatTransaksi || [],
+      pengaturanToko: pengaturanToko || {},
+      restock: restockListItems || []
+    };
+
+    const dataStr = JSON.stringify(allData, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement("a");
+    link.href = url;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    link.download = `Backup_KasirQuh_${dateStr}.json`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showNotif("Backup berhasil diunduh ke HP!");
+  } catch (err) {
+    alert("Gagal mengekspor data: " + err.message);
+  }
+}
+
+async function imporSeluruhData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!confirm("⚠️ PERINGATAN: Memulihkan data akan mengganti data toko saat ini dengan data dari file backup. Lanjutkan?")) {
+    event.target.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      showNotif("Membaca file backup...");
+      const importedData = JSON.parse(e.target.result);
+      
+      let batch = db.batch();
+      let count = 0;
+      let commitPromises = [];
+
+      if (importedData.produk) {
+        for (let code in importedData.produk) {
+          let ref = db.collection("produk").doc(code);
+          batch.set(ref, importedData.produk[code], { merge: true });
+          count++;
+          if (count >= 400) { commitPromises.push(batch.commit()); batch = db.batch(); count = 0; }
+        }
+      }
+
+      if (Array.isArray(importedData.pelanggan)) {
+        importedData.pelanggan.forEach((c, idx) => {
+          let id = c.id || ("CUST-" + Date.now() + "-" + idx);
+          let ref = db.collection("pelanggan").doc(id);
+          batch.set(ref, c, { merge: true });
+          count++;
+          if (count >= 400) { commitPromises.push(batch.commit()); batch = db.batch(); count = 0; }
+        });
+      }
+
+      if (count > 0) {
+        commitPromises.push(batch.commit());
+      }
+
+      showNotif("Menyimpan ke Cloud...");
+      await Promise.all(commitPromises);
+      
+      alert("🎉 Berhasil merestore data toko! Halaman akan dimuat ulang.");
+      event.target.value = "";
+      window.location.reload();
+      
+    } catch (err) {
+      alert("❌ Gagal membaca file backup. Pastikan format file .json valid. Error: " + err.message);
+      event.target.value = "";
+    }
+  };
+  
+  reader.readAsText(file);
+}
+
