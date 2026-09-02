@@ -626,13 +626,13 @@ function getPreviousDateStr(dateStr) {
   return `${y}-${m}-${day}`;
 }
 
-db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
+db.collection("catatan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
   if (doc.exists) {
     let data = doc.data();
     if (data.list && data.list.length > 0) daftarNamaTabCatatan = data.list;
     if (data.labels) labelNamaTabCatatan = data.labels;
   } else {
-    db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+    db.collection("catatan").doc("daftar_tab_catatan_v13").set({
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     });
@@ -647,12 +647,12 @@ async function findLatestPreviousData(tabKey, targetDateStr) {
     currDate = getPreviousDateStr(currDate);
     if (currDate < "2026-08-22") break;
     let checkDocId = `catatan_data_${tabKey}_${currDate}_v13`;
-    let snap = await db.collection("pengaturan").doc(checkDocId).get();
+    let snap = await db.collection("catatan").doc(checkDocId).get();
     if (snap.exists && snap.data().items && snap.data().items.length > 0) {
       return snap.data();
     }
   }
-  let legacySnap = await db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).get();
+  let legacySnap = await db.collection("catatan").doc(`catatan_data_${tabKey}_v13`).get();
   if (legacySnap.exists) return legacySnap.data();
   return null;
 }
@@ -661,14 +661,14 @@ function setupCatatanListener(tabKey) {
   const docId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
   const legacyDocId = `catatan_data_${tabKey}_v13`;
 
-  db.collection("pengaturan").doc(docId).get().then(async (docSnap) => {
+  db.collection("catatan").doc(docId).get().then(async (docSnap) => {
     let targetData = null;
 
     if (selectedCatatanDate === "2026-08-22") {
-      let legacySnap = await db.collection("pengaturan").doc(legacyDocId).get();
+      let legacySnap = await db.collection("catatan").doc(legacyDocId).get();
       if (legacySnap.exists && legacySnap.data().items && legacySnap.data().items.length > 0) {
         targetData = legacySnap.data();
-        await db.collection("pengaturan").doc(docId).set(targetData);
+        await db.collection("catatan").doc(docId).set(targetData);
       }
     }
 
@@ -697,7 +697,7 @@ function setupCatatanListener(tabKey) {
             if (parts.length > 1) {
               prevTotalBayar += parseRupiahToNumber(parts[1]);
             } else {
-              let matches = item.subjudul.match(/\b[\d\.]+\b/g);
+              let matches = item.subjudul.match(/[\d\.]+/g);
               if (matches) {
                 prevTotalBayar += parseRupiahToNumber(matches[matches.length - 1]);
               }
@@ -726,12 +726,12 @@ function setupCatatanListener(tabKey) {
         items: baseItems
       };
 
-      await db.collection("pengaturan").doc(docId).set(targetData);
+      await db.collection("catatan").doc(docId).set(targetData);
     } else if (!targetData) {
       targetData = docSnap.exists ? docSnap.data() : { modalAwal: "100.000", items: [] };
     }
 
-    db.collection("pengaturan").doc(docId).onSnapshot((snap) => {
+    db.collection("catatan").doc(docId).onSnapshot((snap) => {
       if (snap.exists) {
         databaseCatatanDinamis[tabKey] = snap.data();
       }
@@ -823,7 +823,7 @@ function tambahTabCatatanBaru() {
   daftarNamaTabCatatan.push(newKey);
   labelNamaTabCatatan[newKey] = newLabel;
 
-  db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+  db.collection("catatan").doc("daftar_tab_catatan_v13").set({
     list: daftarNamaTabCatatan,
     labels: labelNamaTabCatatan
   }).then(() => {
@@ -837,7 +837,7 @@ function ubahNamaTabDinamis(tabKey) {
   let labelBaru = prompt(`Masukkan nama baru untuk "${labelLama}":`, labelLama);
   if (labelBaru !== null && labelBaru.trim() !== "") {
     labelNamaTabCatatan[tabKey] = labelBaru.trim();
-    db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+    db.collection("catatan").doc("daftar_tab_catatan_v13").set({
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
@@ -855,11 +855,11 @@ function hapusTabCatatanDinamis(tabKey) {
     daftarNamaTabCatatan = daftarNamaTabCatatan.filter(k => k !== tabKey);
     delete labelNamaTabCatatan[tabKey];
 
-    db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+    db.collection("catatan").doc("daftar_tab_catatan_v13").set({
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
-      db.collection("pengaturan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).delete().catch(e => {});
+      db.collection("catatan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).delete().catch(e => {});
       activeSubCatatanTab = daftarNamaTabCatatan[0];
       renderSubTabsCatatanUI();
       showNotif("Tab catatan dihapus!");
@@ -872,7 +872,7 @@ function simpanModalAwalDinamis(tabKey) {
   if (!inputEl || !databaseCatatanDinamis[tabKey]) return;
   databaseCatatanDinamis[tabKey].modalAwal = inputEl.value;
 
-  db.collection("pengaturan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).set(databaseCatatanDinamis[tabKey], { merge: true })
+  db.collection("catatan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).set(databaseCatatanDinamis[tabKey], { merge: true })
     .catch(err => console.error("Gagal simpan modal: ", err));
 }
 
@@ -892,7 +892,7 @@ function hitungRingkasanCatatanDinamis(tabKey) {
           let angkaBayar = parseRupiahToNumber(parts[1]);
           totalPembayaran += angkaBayar;
         } else {
-          let matches = item.subjudul.match(/\b[\d\.]+\b/g);
+          let matches = item.subjudul.match(/[\d\.]+/g);
           if (matches) {
             let angkaTerakhir = parseRupiahToNumber(matches[matches.length - 1]);
             totalPembayaran += angkaTerakhir;
@@ -935,7 +935,8 @@ function renderHalamanSubCatatan(tabKey) {
   listData.forEach((item, index) => {
     let formattedIsi = "(Tidak ada rincian)";
     if (item.isi) {
-      let lines = item.isi.split('\n');
+      let lines = item.isi.split('
+');
       formattedIsi = lines.map(line => {
         return `<div style="display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px dashed var(--border-color);"><span>${line}</span></div>`;
       }).join('');
@@ -1029,7 +1030,7 @@ function simpanCatatanCard() {
   }
 
   dataObj.items = targetList;
-  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
+  db.collection("catatan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
     .then(() => {
       databaseCatatanDinamis[targetTabKey] = dataObj;
       closeCatatanModal();
@@ -1045,7 +1046,7 @@ function hapusCatatanCardDinamis(targetTabKey, id) {
     if (!dataObj) return;
     dataObj.items = (dataObj.items || []).filter(c => c.id !== id);
 
-    db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
+    db.collection("catatan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
       .then(() => {
         renderHalamanSubCatatan(targetTabKey);
         showNotif("Catatan dihapus!");
@@ -1067,7 +1068,7 @@ function pindahCatatanUrutanDinamis(targetTabKey, index, direction) {
   targetList[targetIndex] = temp;
 
   dataObj.items = targetList;
-  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
+  db.collection("catatan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
     .then(() => {
       renderHalamanSubCatatan(targetTabKey);
       showNotif("Urutan diperbarui!");
@@ -1755,10 +1756,14 @@ function bagikanCatatanWhatsApp(custId) {
   let phone = rawPhone.replace(/[^0-9]/g, '');
   if (phone.startsWith('0')) phone = '62' + phone.slice(1);
 
-  let text = `*BUKU CATATAN - ${pengaturanToko.nama}* 📖\n`;
-  text += `Nama Pelanggan : *${cust.nama}*\n\n`;
+  let text = `*BUKU CATATAN - ${pengaturanToko.nama}* 📖
+`;
+  text += `Nama Pelanggan : *${cust.nama}*
+
+`;
   cust.catatan.forEach((note, idx) => {
-    text += `${idx + 1}. [${note.jenis}] ${note.keterangan} ${note.nominal > 0 ? '(Rp ' + note.nominal.toLocaleString('id-ID') + ')' : ''}\n`;
+    text += `${idx + 1}. [${note.jenis}] ${note.keterangan} ${note.nominal > 0 ? '(Rp ' + note.nominal.toLocaleString('id-ID') + ')' : ''}
+`;
   });
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
 }
@@ -2139,7 +2144,8 @@ function tambahItemKeCart(barcode, produk) {
     let hargaKg = produk.hargaRtg || (produk.harga * isiOns);
     let modalKg = produk.modalRtg || (produk.modal * isiOns);
 
-    let kgStr = prompt(`Masukkan jumlah Kilogram (Kg) untuk ${produk.nama}\n(Contoh: 1 untuk 1 kg, 0.5 untuk setengah kg / 5 ons, 0.1 untuk 1 ons):`, "1");
+    let kgStr = prompt(`Masukkan jumlah Kilogram (Kg) untuk ${produk.nama}
+(Contoh: 1 untuk 1 kg, 0.5 untuk setengah kg / 5 ons, 0.1 untuk 1 ons):`, "1");
     if (kgStr === null) return;
     inputJumlah = parseFloat(kgStr.replace(',', '.')) || 1;
     hargaAktif = hargaKg;
@@ -2327,12 +2333,18 @@ function bagikanStrukWhatsApp() {
   let phone = rawPhone.replace(/[^0-9]/g, '');
   if (phone.startsWith('0')) phone = '62' + phone.slice(1);
 
-  let text = `*STRUK PEMBELIAN - ${pengaturanToko.nama}*📦\n`;
-  text += `📅 ${new Date().toLocaleString('id-ID')}\n------------------------------------\n`;
+  let text = `*STRUK PEMBELIAN - ${pengaturanToko.nama}*📦
+`;
+  text += `📅 ${new Date().toLocaleString('id-ID')}
+------------------------------------
+`;
   cart.forEach((item, idx) => {
-    text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`;
+    text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}
+`;
   });
-  text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*\n`;
+  text += `------------------------------------
+*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*
+`;
   text += `_Terima kasih!_ 🙏`;
 
   prosesSimpanTransaksi();
@@ -2354,10 +2366,12 @@ function hapusBarang(code) {
 }
 
 function eksporStokExcel() {
-  let csv = "data:text/csv;charset=utf-8,Kode,Nama,Kategori,Satuan,Stok,Modal,Harga\n";
+  let csv = "data:text/csv;charset=utf-8,Kode,Nama,Kategori,Satuan,Stok,Modal,Harga
+";
   for (let code in databaseProduk) {
     let p = databaseProduk[code];
-    csv += `"${code}","${p.nama}","${p.kategori || 'Umum'}","${p.satuan || 'pcs'}",${p.stok || 0},${p.modal || 0},${p.harga || 0}\n`;
+    csv += `"${code}","${p.nama}","${p.kategori || 'Umum'}","${p.satuan || 'pcs'}",${p.stok || 0},${p.modal || 0},${p.harga || 0}
+`;
   }
   const link = document.createElement("a");
   link.setAttribute("href", encodeURI(csv));
@@ -2404,8 +2418,10 @@ async function importStokExcel(event) {
 }
 
 function eksporPelangganExcel() {
-  let csv = "data:text/csv;charset=utf-8,ID,Nama,Telepon,Alamat\n";
-  databasePelanggan.forEach(c => { csv += `"${c.id}","${c.nama}","${c.phone || '-'}","${c.alamat || '-'}"\n`; });
+  let csv = "data:text/csv;charset=utf-8,ID,Nama,Telepon,Alamat
+";
+  databasePelanggan.forEach(c => { csv += `"${c.id}","${c.nama}","${c.phone || '-'}","${c.alamat || '-'}"
+`; });
   const link = document.createElement("a");
   link.setAttribute("href", encodeURI(csv));
   link.setAttribute("download", `Pelanggan_${new Date().toISOString().slice(0,10)}.csv`);
@@ -2447,8 +2463,10 @@ function importPelangganExcel(event) {
 
 function eksporExcel() {
   if (riwayatTransaksi.length === 0) return alert("Belum ada transaksi!");
-  let csv = "data:text/csv;charset=utf-8,Waktu,Metode,Qty,Omset,Modal,Untung\n";
-  riwayatTransaksi.forEach(t => { csv += `"${t.waktu}","${t.metode}",${t.qty},${t.total},${t.modal},${t.untung}\n`; });
+  let csv = "data:text/csv;charset=utf-8,Waktu,Metode,Qty,Omset,Modal,Untung
+";
+  riwayatTransaksi.forEach(t => { csv += `"${t.waktu}","${t.metode}",${t.qty},${t.total},${t.modal},${t.untung}
+`; });
   const link = document.createElement("a");
   link.setAttribute("href", encodeURI(csv));
   link.setAttribute("download", `Laporan_${new Date().toISOString().slice(0,10)}.csv`);
