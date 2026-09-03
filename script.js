@@ -3050,6 +3050,54 @@ function stopVoiceRecordingUI() {
   }
 }
 
+// --- FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
+function autoHitungSubjudul() {
+  const inputEl = document.getElementById("catatan-desc-input");
+  if (!inputEl) return;
+  const isi = inputEl.value;
+  const lines = isi.split('\n');
+  let total = 0;
+
+  lines.forEach(line => {
+    if (line.trim() === '') return;
+    
+    // Memisahkan teks per baris berdasarkan spasi
+    const parts = line.trim().split(/\s+/);
+    
+    if (parts.length > 0) {
+      // Mengambil teks paling akhir dari baris tersebut (harga nominal)
+      const nominalText = parts[parts.length - 1];
+      
+      // Murni mengambil HANYA ANGKA. Mengabaikan titik, koma, huruf dll.
+      const angkaBersih = nominalText.replace(/[^0-9]/g, '');
+      const nominal = parseInt(angkaBersih) || 0;
+      
+      if (nominal > 0) {
+        total += nominal;
+      }
+    }
+  });
+
+  const subjudulInput = document.getElementById("catatan-subtitle-input");
+  if (!subjudulInput) return;
+  
+  if (total > 0) {
+    subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
+  } else {
+    // Kosongkan kembali jika total 0 atau rincian dihapus semua
+    subjudulInput.value = "";
+  }
+}
+
+// Global Event Listener: Memicu kalkulasi setiap kali ada ketikan (input) di dalam textarea Rincian
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.id === 'catatan-desc-input') {
+    autoHitungSubjudul();
+  }
+});
+// --- END FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
+
+
 setTheme(currentTheme);
 setLanguage(currentLang);
 cekStatusLogin();
