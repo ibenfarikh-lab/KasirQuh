@@ -1236,23 +1236,24 @@ function toggleStickySearchBar() {
       history.pushState({tab: activeTab, floating: 'search'}, "", "");
     } else {
       document.getElementById("inventory-search-input").value = "";
-      syncAndFilterGlobal("");
+              syncAndFilterGlobal("");
+      }
     }
   }
-}
 
-let searchDebounceTimer = null;
+  let searchDebounceTimer = null;
 
-function syncAndFilterGlobal(val) { 
-  clearTimeout(searchDebounceTimer);
-  searchDebounceTimer = setTimeout(() => {
-    stokCurrentPage = 1;
-    posCurrentPage = 1;
-    refreshData(); 
-  }, 300);
-}
+  function syncAndFilterGlobal(val) { 
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+      stokCurrentPage = 1;
+      posCurrentPage = 1;
+      refreshData(); 
+    }, 300);
+  }
 
-function updateUnitLabel() {
+  function updateUnitLabel() {
+
   const unit = document.getElementById("db-unit").value;
   const rtgWrapper = document.getElementById("wrapper-db-isi-rtg");
   
@@ -1991,6 +1992,12 @@ function switchTab(tabId, pushHistory = true) {
   refreshData();
 }
 
+function syncAndFilterGlobal(val) { 
+  stokCurrentPage = 1;
+  posCurrentPage = 1;
+  refreshData(); 
+}
+
 function changeStokPage(delta) { 
   stokCurrentPage += delta; 
   refreshData(); 
@@ -2593,6 +2600,7 @@ function resetDatabaseBarang() {
 }
 
 function refreshData() {
+  // 1. Update data input pengaturan dasar (hanya jika elemennya ada)
   const setUsr = document.getElementById("setting-user");
   if (setUsr) setUsr.value = userAuth.user;
   const setPass = document.getElementById("setting-pass");
@@ -2620,11 +2628,15 @@ function refreshData() {
   const rcptPhone = document.getElementById("receipt-shop-phone");
   if (rcptPhone) rcptPhone.innerText = "Telp: " + pengaturanToko.phone;
 
+  // Ambil keyword pencarian global
   const searchInputEl = document.getElementById("inventory-search-input");
   const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
   let categories = new Set();
 
+  // ==========================================================
+  // 2. KHUSUS TAB KASIR / PENJUALAN (Paling sering diakses & dicari)
+  // ==========================================================
   const filterKatPosEl = document.getElementById("filter-category-pos");
   const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
 
@@ -2646,60 +2658,12 @@ function refreshData() {
     return; 
   }
 
-  // KHUSUS TAB STOK & BELANJA STOK
+  // ==========================================================
+  // 3. KHUSUS TAB STOK & BELANJA STOK
+  // ==========================================================
   if (activeTab === 'data-barang' || activeTab === 'belanja-stok') {
     const invList = document.getElementById("inventory-list-wrapper");
     const invGrid = document.getElementById("inventory-grid-wrapper");
-    
-    if (activeTab === 'belanja-stok') {
-      if (invList) invList.style.display = 'flex';
-      if (invGrid) invGrid.style.display = 'none';
-      if (invList) {
-        invList.innerHTML = "";
-        let totalEst = 0;
-        if (restockListItems.length === 0) {
-          invList.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-muted);">Belum ada barang di daftar belanja stok. Silakan ambil dari catatan atau tambahkan manual.</div>`;
-        } else {
-          restockListItems.forEach((item) => {
-            let subtotal = (item.modalRtg || (item.modal * (item.isiRtg || 10))) * item.qty;
-            totalEst += subtotal;
-            invList.innerHTML += `
-              <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <img src="${item.foto || defaultPlaceholderImg}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color);">
-                  <div>
-                    <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color);">${item.nama}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Qty: <b>${item.qty} ${item.satuan}</b> • Modal: Rp ${(item.modalRtg || 0).toLocaleString('id-ID')}</div>
-                  </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <div style="font-weight: bold; font-size: 0.85rem; color: #2563eb;">Rp ${subtotal.toLocaleString('id-ID')}</div>
-                  <button onclick="openProductModal(null, '${item.id}')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 6px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;" title="Edit">✏️</button>
-                  <button onclick="hapusItemBelanja('${item.id}')" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 6px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;" title="Hapus">🗑️</button>
-                </div>
-              </div>
-            `;
-          });
-        }
-
-        const restockTab = document.getElementById("belanja-stok");
-        if (restockTab) {
-          restockTab.querySelectorAll("div, span").forEach(el => {
-            if (el.innerText && el.innerText.includes("ESTIMASI TOTAL")) {
-              let parent = el.closest("div");
-              if (parent) {
-                let priceEl = parent.querySelector("div:last-child, span:last-child") || parent.nextElementSibling;
-                if (priceEl) {
-                  priceEl.innerText = "Rp " + totalEst.toLocaleString('id-ID');
-                }
-              }
-            }
-          });
-        }
-      }
-      return;
-    }
-
     if (invList) invList.style.display = (viewMode === 'list') ? 'flex' : 'none';
     if (invGrid) invGrid.style.display = (viewMode === 'grid') ? 'grid' : 'none';
     
@@ -2775,7 +2739,9 @@ function refreshData() {
     return;
   }
 
-  // KHUSUS TAB LAPORAN & PELANGGAN
+  // ==========================================================
+  // 4. KHUSUS TAB LAPORAN & PELANGGAN
+  // ==========================================================
   if (activeTab === 'laporan') {
     let totalOmset = 0; let totalProfit = 0;
     const repBody = document.getElementById("report-body");
@@ -2940,15 +2906,16 @@ function ambilDariCatatan() {
     if (!noteItem.isi) return;
     let lines = noteItem.isi.split('\n');
     lines.forEach(line => {
-      let parts = line.trim().split(/\s+/);
-      if (parts.length >= 4) {
-        let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
-        let satuan = parts[parts.length - 2].toLowerCase();
-        let qty = parseFloat(parts[parts.length - 3]) || 1;
-        let nama = parts.slice(0, parts.length - 3).join(' ');
-        
-        if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-        let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+     let parts = line.trim().split(/\s+/);
+if (parts.length >= 4) {
+  let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
+  let satuan = parts[parts.length - 2].toLowerCase();
+  let qty = parseFloat(parts[parts.length - 3]) || 1;
+  let nama = parts.slice(0, parts.length - 3).join(' ');
+  
+  if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
+  let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+
 
         let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
         let matchedProd = existingCode ? databaseProduk[existingCode] : null;
@@ -3083,6 +3050,7 @@ function stopVoiceRecordingUI() {
   }
 }
 
+// --- FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
 function autoHitungSubjudul() {
   const inputEl = document.getElementById("catatan-desc-input");
   if (!inputEl) return;
@@ -3092,11 +3060,18 @@ function autoHitungSubjudul() {
 
   lines.forEach(line => {
     if (line.trim() === '') return;
+    
+    // Memisahkan teks per baris berdasarkan spasi
     const parts = line.trim().split(/\s+/);
+    
     if (parts.length > 0) {
+      // Mengambil teks paling akhir dari baris tersebut (harga nominal)
       const nominalText = parts[parts.length - 1];
+      
+      // Murni mengambil HANYA ANGKA. Mengabaikan titik, koma, huruf dll.
       const angkaBersih = nominalText.replace(/[^0-9]/g, '');
       const nominal = parseInt(angkaBersih) || 0;
+      
       if (nominal > 0) {
         total += nominal;
       }
@@ -3109,15 +3084,19 @@ function autoHitungSubjudul() {
   if (total > 0) {
     subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
   } else {
+    // Kosongkan kembali jika total 0 atau rincian dihapus semua
     subjudulInput.value = "";
   }
 }
 
+// Global Event Listener: Memicu kalkulasi setiap kali ada ketikan (input) di dalam textarea Rincian
 document.addEventListener('input', function(e) {
   if (e.target && e.target.id === 'catatan-desc-input') {
     autoHitungSubjudul();
   }
 });
+// --- END FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
+
 
 setTheme(currentTheme);
 setLanguage(currentLang);
