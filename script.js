@@ -2958,7 +2958,7 @@ if (parts.length >= 4) {
     refreshData();
     showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
   } else {
-    alert("Tidak ditemukan format rincian valid (Contoh: Ayam - 4 - kg - 176.000) di catatan ini!");
+    alert("Tidak ditemukan format rincian valid (Contoh: Ayam 4 kg 176.000) di catatan ini!");
   }
 }
 
