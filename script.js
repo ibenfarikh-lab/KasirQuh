@@ -2713,6 +2713,109 @@ function refreshData() {
             let isiOns = 10;
             let modalOns = item.modal || 0;
             let modalKgVal = item.modalRtg || (modalOns * isiOns);
+  // ==========================================================
+  // 3. KHUSUS TAB BELANJA STOK
+  // ==========================================================
+  if (activeTab === 'belanja-stok') {
+    const invList = document.getElementById("inventory-list-wrapper");
+    const invGrid = document.getElementById("inventory-grid-wrapper");
+    if (invList) invList.style.display = 'flex';
+    if (invGrid) invGrid.style.display = 'none';
+    if (invList) invList.innerHTML = "";
+
+    let totalEstRestock = 0;
+
+    if (restockListItems.length === 0) {
+      invList.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">🛒 Daftar belanja stok masih kosong. Silakan ambil dari catatan atau tambahkan manual.</div>`;
+    } else {
+      restockListItems.forEach((item) => {
+        let subtotalItem = item.qty * ((item.satuan === 'rtg' || item.satuan === 'kg') ? (item.modalRtg || 0) : (item.modal || 0));
+        totalEstRestock += subtotalItem;
+        let fotoSrc = item.foto || defaultPlaceholderImg;
+        let satuanLabel = item.satuan === 'rtg' ? 'Renteng' : (item.satuan === 'kg' ? 'Kg' : 'Pcs');
+
+        invList.innerHTML += `
+          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px;">
+            <img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color);">${item.nama}</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted);">Beli: <b>${item.qty} ${satuanLabel}</b> • Modal: Rp ${(((item.satuan === 'rtg' || item.satuan === 'kg') ? item.modalRtg : item.modal) || 0).toLocaleString('id-ID')}</div>
+              <div style="font-size: 0.8rem; font-weight: bold; color: #2563eb; margin-top: 2px;">Subtotal: Rp ${subtotalItem.toLocaleString('id-ID')}</div>
+            </div>
+            <div style="display: flex; gap: 4px; flex-shrink: 0;">
+              <button onclick="openProductModal(null, '${item.id}')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">✏️</button>
+              <button onclick="hapusItemBelanja('${item.id}')" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">🗑️</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    document.querySelectorAll('.card').forEach(card => {
+      if (card.innerText.includes("ESTIMASI TOTAL BELANJA STOK")) {
+        let valDiv = card.querySelector("div:nth-child(2)") || card.querySelector("div:last-child");
+        if (valDiv) valDiv.innerText = `Rp ${totalEstRestock.toLocaleString('id-ID')}`;
+      }
+    });
+
+    return;
+  }
+
+  // ==========================================================
+  // KHUSUS TAB DATA BARANG (STOK)
+  // ==========================================================
+  if (activeTab === 'data-barang') {
+    const invList = document.getElementById("inventory-list-wrapper");
+    const invGrid = document.getElementById("inventory-grid-wrapper");
+    if (invList) invList.style.display = (viewMode === 'list') ? 'flex' : 'none';
+    if (invGrid) invGrid.style.display = (viewMode === 'grid') ? 'grid' : 'none';
+    
+    const filterKatEl = document.getElementById("filter-category");
+    const filterKat = filterKatEl ? filterKatEl.value : "Semua";
+    let filteredItems = [];
+    for (let code in databaseProduk) {
+      let item = databaseProduk[code];
+      let kat = item.kategori || "Umum";
+      if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
+        filteredItems.push({ code, ...item });
+      }
+    }
+    filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
+
+    if (invList && invGrid) {
+      invList.innerHTML = ""; invGrid.innerHTML = "";
+      let itemsPerPageStok = 24;
+      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
+      if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
+      if (stokCurrentPage < 1) stokCurrentPage = 1;
+
+      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
+      let paginatedStokItems = filteredItems.slice(stokStartIndex, stokStartIndex + itemsPerPageStok);
+
+      document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
+      document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
+      document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
+
+      if (paginatedStokItems.length === 0) {
+        const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
+        invList.innerHTML = emptyStokMsg; invGrid.innerHTML = emptyStokMsg;
+      } else {
+        paginatedStokItems.forEach(item => {
+          let code = item.code;
+          let kat = item.kategori || "Umum";
+          let sat = (item.satuan || "pcs").toLowerCase();
+          let stok = item.stok !== undefined ? item.stok : 0;
+          let fotoSrc = item.foto || defaultPlaceholderImg;
+          let isiRtg = item.isiRtg || 10;
+          let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + isiRtg + ')' : (sat === 'kg' ? 'kg' : sat);
+
+          let detailsListHtml = '';
+          let detailsGridHtml = '';
+
+          if (sat === 'kg') {
+            let isiOns = 10;
+            let modalOns = item.modal || 0;
+            let modalKgVal = item.modalRtg || (modalOns * isiOns);
             let jualOns = item.harga || 0;
             let jualKgVal = item.hargaRtg || (jualOns * isiOns);
             detailsListHtml = `<div>⚖️ <b>1 Kg Modal :</b> Rp ${modalKgVal.toLocaleString('id-ID')}</div><div>⚖️ <b>1 Ons Modal :</b> Rp ${modalOns.toLocaleString('id-ID')}</div><div>⚖️ <b>1 Kg Jual :</b> Rp ${jualKgVal.toLocaleString('id-ID')}</div><div>⚖️ <b>1 Ons Jual :</b> Rp ${jualOns.toLocaleString('id-ID')}</div>`;
@@ -2738,6 +2841,7 @@ function refreshData() {
     }
     return;
   }
+
 
   // ==========================================================
   // 4. KHUSUS TAB LAPORAN & PELANGGAN
