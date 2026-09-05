@@ -3137,9 +3137,12 @@ function stopVoiceRecordingUI() {
   }
 }
 
+let autoHitungTimer = null;
+
 function autoHitungSubjudul() {
   const inputEl = document.getElementById("catatan-desc-input");
-  if (!inputEl) return;
+  const subjudulInput = document.getElementById("catatan-subtitle-input");
+  if (!inputEl || !subjudulInput) return;
 
   const isi = inputEl.value;
   const lines = isi.split('\n');
@@ -3153,26 +3156,26 @@ function autoHitungSubjudul() {
       const angkaBersih = nominalText.replace(/[^0-9]/g, '');
       const nominal = parseInt(angkaBersih) || 0;
       
-      // Hanya hitung jika nominal di atas 100 agar angka kuantitas (1, 2, dll) terabaikan
       if (nominal >= 100) {
         total += nominal;
       }
     }
   });
 
-  const subjudulInput = document.getElementById("catatan-subtitle-input");
-  if (subjudulInput) {
-    if (total > 0) {
-      subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
-    } else {
-      subjudulInput.value = "";
-    }
+  const newSubjudul = total > 0 ? "Pembayaran " + total.toLocaleString('id-ID') : "";
+
+  if (subjudulInput.value !== newSubjudul) {
+    subjudulInput.value = newSubjudul;
   }
 }
 
 document.addEventListener('input', function(e) {
   if (e.target && e.target.id === 'catatan-desc-input') {
-    autoHitungSubjudul();
+    if (e.isComposing) return;
+    clearTimeout(autoHitungTimer);
+    autoHitungTimer = setTimeout(() => {
+      autoHitungSubjudul();
+    }, 300);
   }
 });
 
