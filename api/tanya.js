@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     Jawablah pertanyaan pelanggan dengan singkat, jelas, dan ramah berdasarkan data di atas jika mereka bertanya soal stok atau harga. Jika di luar itu, jawab dengan santai ala anak muda.`;
 
     const payload = {
-      model: 'llama-3.1-8b-instant', // Model aktif terbaru yang super cepat
+      model: 'openai/gpt-oss-20b', // Menggunakan model yang tersedia di daftar akunmu
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: promptText }
