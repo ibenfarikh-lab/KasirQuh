@@ -160,6 +160,7 @@ const translations = {
     clear_cart_btn: "🗑️ Clear Cart",
     ongoing: "🟡 Ongoing",
     completed: "🟢 Completed",
+    loading_loading: "Loading orders...",
     loading_ongoing: "Loading ongoing orders...",
     loading_completed: "Loading completed history...",
     chat_conversations: "💬 Conversations",
@@ -504,7 +505,6 @@ function formatTeksDanAngka(input) {
   input.value = formatted;
 }
 
-
 function formatInputRupiah(input) {
   let angka = input.value.replace(/[^,\d]/g, '').toString();
   let split = angka.split(',');
@@ -616,16 +616,6 @@ function updateDateDisplayUI() {
   }
 }
 
-function getPreviousDateStr(dateStr) {
-  const parts = dateStr.split('-');
-  let d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-  d.setDate(d.getDate() - 1);
-  let y = d.getFullYear();
-  let m = String(d.getMonth() + 1).padStart(2, '0');
-  let day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
 db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
   if (doc.exists) {
     let data = doc.data();
@@ -641,103 +631,54 @@ db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
   renderSubTabsCatatanUI();
 });
 
-async function findLatestPreviousData(tabKey, targetDateStr) {
-  let currDate = targetDateStr;
-  for (let i = 0; i < 30; i++) {
-    currDate = getPreviousDateStr(currDate);
-    if (currDate < "2026-08-22") break;
-    let checkDocId = `catatan_data_${tabKey}_${currDate}_v13`;
-    let snap = await db.collection("pengaturan").doc(checkDocId).get();
-    if (snap.exists && snap.data().items && snap.data().items.length > 0) {
-      return snap.data();
-    }
-  }
-  let legacySnap = await db.collection("pengaturan").doc(`catatan_data_${tabKey}_v13`).get();
-  if (legacySnap.exists) return legacySnap.data();
-  return null;
-}
-
 function setupCatatanListener(tabKey) {
-  const docId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
-  const legacyDocId = `catatan_data_${tabKey}_v13`;
+  const docId = `${tabKey}_${selectedCatatanDate}`;
 
-  db.collection("pengaturan").doc(docId).get().then(async (docSnap) => {
-    let targetData = null;
+  db.collection("catatan").doc(docId).onSnapshot(async (docSnap) => {
+    let oldDocId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
+    let oldDocSnap = await db.collection("pengaturan").doc(oldDocId).get();
 
-    if (selectedCatatanDate === "2026-08-22") {
-      let legacySnap = await db.collection("pengaturan").doc(legacyDocId).get();
-      if (legacySnap.exists && legacySnap.data().items && legacySnap.data().items.length > 0) {
-        targetData = legacySnap.data();
-        await db.collection("pengaturan").doc(docId).set(targetData);
-      }
-    }
+    if (oldDocSnap.exists) {
+      let targetData = oldDocSnap.data();
+      await db.collection("catatan").doc(docId).set(targetData, { merge: true });
+      databaseCatatanDinamis[tabKey] = targetData;
+      renderHalamanSubCatatan(tabKey);
+    } else if (docSnap.exists) {
+      databaseCatatanDinamis[tabKey] = docSnap.data();
+      renderHalamanSubCatatan(tabKey);
+    } else {
+      let currDate = new Date(selectedCatatanDate + "T00:00:00");
+      currDate.setDate(currDate.getDate() - 1);
+      let prevDateStr = currDate.getFullYear() + '-' + String(currDate.getMonth() + 1).padStart(2, '0') + '-' + String(currDate.getDate()).padStart(2, '0');
+      let prevDocId = `${tabKey}_${prevDateStr}`;
+      
+      let prevDocSnap = await db.collection("catatan").doc(prevDocId).get();
+      let targetItems = [];
 
-    let needsRollOver = !docSnap.exists;
-    if (docSnap.exists && docSnap.data().items) {
-      let dData = docSnap.data();
-      let isEffectivelyEmpty = dData.items.length === 0 || dData.items.every(it => !it.subjudul && !it.isi);
-      if (isEffectivelyEmpty && selectedCatatanDate !== "2026-08-22") {
-        needsRollOver = true;
-      }
-    }
-
-    if (!targetData && needsRollOver && selectedCatatanDate !== "2026-08-22") {
-      let prevData = await findLatestPreviousData(tabKey, selectedCatatanDate);
-
-      let baseModal = "100.000";
-      let baseItems = [];
-
-      if (prevData && prevData.items) {
-        let prevModalAwal = parseRupiahToNumber(prevData.modalAwal || "0");
-        let prevTotalBayar = 0;
-        prevData.items.forEach(item => {
-          if (item.subjudul) {
-            let subLower = item.subjudul.toLowerCase();
-            let parts = subLower.split('pembayaran');
-            if (parts.length > 1) {
-              prevTotalBayar += parseRupiahToNumber(parts[1]);
-            } else {
-              let matches = item.subjudul.match(/\b[\d\.]+\b/g);
-              if (matches) {
-                prevTotalBayar += parseRupiahToNumber(matches[matches.length - 1]);
-              }
-            }
-          }
-        });
-        let prevSisa = prevModalAwal - prevTotalBayar;
-        baseModal = prevSisa > 0 ? prevSisa.toLocaleString('id-ID') : "0";
-
-        baseItems = prevData.items.map(it => ({
-          id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 4),
-          judul: it.judul || "Catatan",
+      if (prevDocSnap.exists && prevDocSnap.data().items) {
+        targetItems = prevDocSnap.data().items.map(item => ({
+          id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 3),
+          judul: item.judul || "",
           subjudul: "",
           isi: "",
           waktu: new Date().toLocaleString('id-ID')
         }));
       } else {
         let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
-        baseItems = [
+        targetItems = [
           { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
         ];
       }
 
-      targetData = {
-        modalAwal: baseModal,
-        items: baseItems
+      let targetData = {
+        tabKey: tabKey,
+        tanggal: selectedCatatanDate,
+        modalAwal: "0",
+        items: targetItems
       };
-
-      await db.collection("pengaturan").doc(docId).set(targetData);
-    } else if (!targetData) {
-      targetData = docSnap.exists ? docSnap.data() : { modalAwal: "100.000", items: [] };
+      await db.collection("catatan").doc(docId).set(targetData);
     }
-
-    db.collection("pengaturan").doc(docId).onSnapshot((snap) => {
-      if (snap.exists) {
-        databaseCatatanDinamis[tabKey] = snap.data();
-      }
-      renderHalamanSubCatatan(tabKey);
-    });
-  }).catch(err => {
+  }, err => {
     console.error("Gagal memuat catatan: ", err);
   });
 }
@@ -769,8 +710,6 @@ function renderSubTabsCatatanUI() {
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
 
-    setupCatatanListener(tabKey);
-
     let contentDiv = document.createElement("div");
     contentDiv.id = `sub-content-${tabKey}`;
     contentDiv.className = `sub-tab-content ${isActive ? 'active' : ''}`;
@@ -781,7 +720,7 @@ function renderSubTabsCatatanUI() {
             <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">UANG MODAL AWAL:</span>
             <div style="display: flex; align-items: center; gap: 4px;">
               <span style="font-size: 0.9rem; font-weight: bold;">Rp</span>
-              <input type="text" id="modal-awal-${tabKey}" value="100.000" oninput="formatInputRupiah(this); hitungRingkasanCatatanDinamis('${tabKey}'); simpanModalAwalDinamis('${tabKey}');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
+              <input type="text" id="modal-awal-${tabKey}" value="0" oninput="formatInputRupiah(this); hitungRingkasanCatatanDinamis('${tabKey}'); simpanModalAwalDinamis('${tabKey}');" style="width: 130px; padding: 4px 8px; font-size: 0.9rem; font-weight: bold; text-align: right;">
             </div>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 6px;">
@@ -790,16 +729,17 @@ function renderSubTabsCatatanUI() {
             <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted);">Sisa Modal</span>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold;">
-            <span style="color: #2563eb;">Rp <span id="lbl-modal-${tabKey}">100.000</span></span>
+            <span style="color: #2563eb;">Rp <span id="lbl-modal-${tabKey}">0</span></span>
             <span style="color: #ea580c;">Rp <span id="lbl-bayar-${tabKey}">0</span></span>
-            <span style="color: #16a34a;">Rp <span id="lbl-sisa-${tabKey}">100.000</span></span>
+            <span style="color: #16a34a;">Rp <span id="lbl-sisa-${tabKey}">0</span></span>
           </div>
         </div>
         <div id="container-list-${tabKey}" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
     `;
     containerContent.appendChild(contentDiv);
-    renderHalamanSubCatatan(tabKey);
+    
+    setupCatatanListener(tabKey);
   });
   updatePermanentBarTitle();
 }
@@ -859,7 +799,7 @@ function hapusTabCatatanDinamis(tabKey) {
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
-      db.collection("pengaturan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).delete().catch(e => {});
+      db.collection("catatan").doc(`${tabKey}_${selectedCatatanDate}`).delete().catch(e => {});
       activeSubCatatanTab = daftarNamaTabCatatan[0];
       renderSubTabsCatatanUI();
       showNotif("Tab catatan dihapus!");
@@ -871,8 +811,10 @@ function simpanModalAwalDinamis(tabKey) {
   let inputEl = document.getElementById(`modal-awal-${tabKey}`);
   if (!inputEl || !databaseCatatanDinamis[tabKey]) return;
   databaseCatatanDinamis[tabKey].modalAwal = inputEl.value;
+  databaseCatatanDinamis[tabKey].tabKey = tabKey;
+  databaseCatatanDinamis[tabKey].tanggal = selectedCatatanDate;
 
-  db.collection("pengaturan").doc(`catatan_data_${tabKey}_${selectedCatatanDate}_v13`).set(databaseCatatanDinamis[tabKey], { merge: true })
+  db.collection("catatan").doc(`${tabKey}_${selectedCatatanDate}`).set(databaseCatatanDinamis[tabKey], { merge: true })
     .catch(err => console.error("Gagal simpan modal: ", err));
 }
 
@@ -917,7 +859,7 @@ function renderHalamanSubCatatan(tabKey) {
   if (!dataObj) return;
 
   let inputEl = document.getElementById(`modal-awal-${tabKey}`);
-  if (inputEl && dataObj.modalAwal) {
+  if (inputEl && dataObj.modalAwal !== undefined) {
     inputEl.value = dataObj.modalAwal;
   }
 
@@ -1009,7 +951,11 @@ function simpanCatatanCard() {
 
   if (!judul) return alert("Judul catatan wajib diisi!");
 
-  let dataObj = databaseCatatanDinamis[targetTabKey] || { modalAwal: "100.000", items: [] };
+  let dataObj = databaseCatatanDinamis[targetTabKey] || { tabKey: targetTabKey, tanggal: selectedCatatanDate, modalAwal: "0", items: [] };
+  dataObj.tabKey = targetTabKey;
+  dataObj.tanggal = selectedCatatanDate;
+  if (!dataObj.modalAwal) dataObj.modalAwal = "0";
+
   let targetList = [...(dataObj.items || [])];
 
   if (id) {
@@ -1029,7 +975,7 @@ function simpanCatatanCard() {
   }
 
   dataObj.items = targetList;
-  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
+  db.collection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
     .then(() => {
       databaseCatatanDinamis[targetTabKey] = dataObj;
       closeCatatanModal();
@@ -1045,7 +991,7 @@ function hapusCatatanCardDinamis(targetTabKey, id) {
     if (!dataObj) return;
     dataObj.items = (dataObj.items || []).filter(c => c.id !== id);
 
-    db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
+    db.collection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
       .then(() => {
         renderHalamanSubCatatan(targetTabKey);
         showNotif("Catatan dihapus!");
@@ -1067,7 +1013,7 @@ function pindahCatatanUrutanDinamis(targetTabKey, index, direction) {
   targetList[targetIndex] = temp;
 
   dataObj.items = targetList;
-  db.collection("pengaturan").doc(`catatan_data_${targetTabKey}_${selectedCatatanDate}_v13`).set(dataObj)
+  db.collection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
     .then(() => {
       renderHalamanSubCatatan(targetTabKey);
       showNotif("Urutan diperbarui!");
@@ -1236,24 +1182,23 @@ function toggleStickySearchBar() {
       history.pushState({tab: activeTab, floating: 'search'}, "", "");
     } else {
       document.getElementById("inventory-search-input").value = "";
-              syncAndFilterGlobal("");
-      }
+      syncAndFilterGlobal("");
     }
   }
+}
 
-  let searchDebounceTimer = null;
+let searchDebounceTimer = null;
 
-  function syncAndFilterGlobal(val) { 
-    clearTimeout(searchDebounceTimer);
-    searchDebounceTimer = setTimeout(() => {
-      stokCurrentPage = 1;
-      posCurrentPage = 1;
-      refreshData(); 
-    }, 300);
-  }
+function syncAndFilterGlobal(val) { 
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    stokCurrentPage = 1;
+    posCurrentPage = 1;
+    refreshData(); 
+  }, 300);
+}
 
-  function updateUnitLabel() {
-
+function updateUnitLabel() {
   const unit = document.getElementById("db-unit").value;
   const rtgWrapper = document.getElementById("wrapper-db-isi-rtg");
   
@@ -1854,6 +1799,173 @@ async function prosesBelanjaStok() {
   switchTab('data-barang', false);
 }
 
+function renderRestockList() {
+  const listWrapper = document.getElementById("restock-list-wrapper");
+  const estTotalEl = document.getElementById("restock-est-total");
+  
+  if (!listWrapper) return;
+
+  let estTotal = 0;
+  if (!restockListItems || restockListItems.length === 0) {
+    listWrapper.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada barang di daftar belanja stok.</div>`;
+    if (estTotalEl) estTotalEl.innerText = "0";
+    return;
+  }
+
+  let htmlContent = "";
+  restockListItems.forEach((item) => {
+    let subtotal = (item.qty || 1) * (item.modalRtg || item.modal || 0);
+    estTotal += subtotal;
+    let fotoSrc = item.foto || defaultPlaceholderImg;
+    let satuanLabel = item.satuan === 'rtg' ? 'rtg' : (item.satuan === 'kg' ? 'Kg' : 'pcs');
+
+    htmlContent += `
+      <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+          <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); background: #fff; flex-shrink: 0;">
+          <div style="min-width: 0; flex: 1;">
+            <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Qty: <b>${item.qty} ${satuanLabel}</b> • Modal: Rp ${(item.modalRtg || item.modal || 0).toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="font-weight: bold; color: #2563eb; font-size: 0.9rem; white-space: nowrap;">Rp ${subtotal.toLocaleString('id-ID')}</div>
+          <button onclick="openProductModal(null, '${item.id}')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">✏️</button>
+          <button onclick="hapusItemBelanja('${item.id}')" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+
+  listWrapper.innerHTML = htmlContent;
+  if (estTotalEl) estTotalEl.innerText = estTotal.toLocaleString('id-ID');
+}
+
+function ambilDariCatatan() {
+  let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
+  
+  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
+    for (let key in databaseCatatanDinamis) {
+      if (databaseCatatanDinamis[key] && databaseCatatanDinamis[key].items && databaseCatatanDinamis[key].items.length > 0) {
+        currentTabData = databaseCatatanDinamis[key];
+        break;
+      }
+    }
+  }
+
+  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
+    return alert("Tidak ada data catatan yang ditemukan di memori! Pastikan Anda sudah mengisi teks di menu Catatan.");
+  }
+
+  let addedCount = 0;
+  const unitList = ['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak', 'liter', 'ltr'];
+
+  currentTabData.items.forEach(noteItem => {
+    if (!noteItem || !noteItem.isi) return;
+    let lines = noteItem.isi.split('\n');
+    
+    lines.forEach(line => {
+      let lineStr = line.trim();
+      if (!lineStr) return;
+
+      let cleanLine = lineStr.replace(/Rp\.?/gi, '').trim();
+      let parts = cleanLine.split(/\s+/);
+      
+      if (parts.length < 2) return;
+
+      let rawHarga = parts[parts.length - 1];
+      let modalTotalInput = parseRupiahToNumber(rawHarga);
+      if (modalTotalInput <= 0) return;
+
+      let remParts = parts.slice(0, parts.length - 1);
+      let qty = 1;
+      let satuan = 'pcs';
+      let namaParts = remParts;
+
+      if (remParts.length >= 2) {
+        let lastToken = remParts[remParts.length - 1].toLowerCase();
+        let secondLastToken = remParts[remParts.length - 2].toLowerCase();
+        let cleanSecond = secondLastToken.replace(',', '.');
+
+        if (unitList.includes(lastToken) && !isNaN(cleanSecond)) {
+          satuan = lastToken;
+          qty = parseFloat(cleanSecond) || 1;
+          namaParts = remParts.slice(0, remParts.length - 2);
+        } else {
+          let match = lastToken.match(/^([\d\.,]+)([a-zA-Z]*)$/);
+          let cleanNum = match ? match[1].replace(',', '.') : '';
+          if (match && !isNaN(cleanNum)) {
+            qty = parseFloat(cleanNum) || 1;
+            if (match[2]) satuan = match[2].toLowerCase();
+            namaParts = remParts.slice(0, remParts.length - 1);
+          } else if (!isNaN(lastToken.replace(',', '.'))) {
+            qty = parseFloat(lastToken.replace(',', '.')) || 1;
+            satuan = 'pcs';
+            namaParts = remParts.slice(0, remParts.length - 1);
+          }
+        }
+      } else if (remParts.length === 1) {
+        let lastToken = remParts[0].toLowerCase();
+        let match = lastToken.match(/^([\d\.,]+)([a-zA-Z]+)$/);
+        let cleanNum = match ? match[1].replace(',', '.') : '';
+        if (match && !isNaN(cleanNum)) {
+          qty = parseFloat(cleanNum) || 1;
+          satuan = match[2].toLowerCase();
+          namaParts = [];
+        } else if (!isNaN(lastToken.replace(',', '.'))) {
+          qty = parseFloat(lastToken.replace(',', '.')) || 1;
+          satuan = 'pcs';
+          namaParts = [];
+        }
+      }
+
+      let nama = namaParts.join(' ').trim();
+      if (!nama) nama = remParts.join(' ') || "Barang Catatan";
+
+      if (!unitList.includes(satuan)) satuan = 'pcs';
+
+      let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+
+      let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
+      let matchedProd = existingCode ? databaseProduk[existingCode] : null;
+      
+      let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
+      let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
+      let isiRtg = (satuan === 'kg' || satuan === 'ons' || satuan === 'liter' || satuan === 'ltr') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
+      
+      let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
+      let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+
+      let newItem = {
+        id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+        code: code,
+        nama: nama,
+        kategori: kategori,
+        satuan: satuan,
+        isiRtg: isiRtg,
+        qty: qty,
+        modal: modalPcsVal,
+        harga: modalPcsVal,
+        modalRtg: modalRtgVal,
+        hargaRtg: modalRtgVal,
+        foto: matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg
+      };
+      
+      restockListItems.push(newItem);
+      addedCount++;
+    });
+  });
+
+  if (addedCount > 0) {
+    simpanRestockKeCloud();
+    renderRestockList();
+    showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
+    switchTab('belanja-stok', false);
+  } else {
+    alert("Gagal membaca catatan! Pastikan format baris catatan benar (Cth: Minyak 2 kg 15.000).");
+  }
+}
+
 function switchSubDataTab(subTabId) {
   activeSubDataTab = subTabId;
   document.querySelectorAll('#laporan .sub-tab-content').forEach(el => el.classList.remove('active'));
@@ -1990,12 +2102,6 @@ function switchTab(tabId, pushHistory = true) {
   }
   updatePermanentBarTitle();
   refreshData();
-}
-
-function syncAndFilterGlobal(val) { 
-  stokCurrentPage = 1;
-  posCurrentPage = 1;
-  refreshData(); 
 }
 
 function changeStokPage(delta) { 
@@ -2600,7 +2706,6 @@ function resetDatabaseBarang() {
 }
 
 function refreshData() {
-  // 1. Update data input pengaturan dasar (hanya jika elemennya ada)
   const setUsr = document.getElementById("setting-user");
   if (setUsr) setUsr.value = userAuth.user;
   const setPass = document.getElementById("setting-pass");
@@ -2628,15 +2733,11 @@ function refreshData() {
   const rcptPhone = document.getElementById("receipt-shop-phone");
   if (rcptPhone) rcptPhone.innerText = "Telp: " + pengaturanToko.phone;
 
-  // Ambil keyword pencarian global
   const searchInputEl = document.getElementById("inventory-search-input");
   const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
   let categories = new Set();
 
-  // ==========================================================
-  // 2. KHUSUS TAB KASIR / PENJUALAN (Paling sering diakses & dicari)
-  // ==========================================================
   const filterKatPosEl = document.getElementById("filter-category-pos");
   const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
 
@@ -2658,10 +2759,12 @@ function refreshData() {
     return; 
   }
 
-  // ==========================================================
-  // 3. KHUSUS TAB STOK & BELANJA STOK
-  // ==========================================================
-  if (activeTab === 'data-barang' || activeTab === 'belanja-stok') {
+  if (activeTab === 'belanja-stok') {
+    renderRestockList();
+    return;
+  }
+
+  if (activeTab === 'data-barang') {
     const invList = document.getElementById("inventory-list-wrapper");
     const invGrid = document.getElementById("inventory-grid-wrapper");
     if (invList) invList.style.display = (viewMode === 'list') ? 'flex' : 'none';
@@ -2679,7 +2782,7 @@ function refreshData() {
     }
     filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
 
-    if (activeTab === 'data-barang' && invList && invGrid) {
+    if (invList && invGrid) {
       invList.innerHTML = ""; invGrid.innerHTML = "";
       let itemsPerPageStok = 24;
       let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
@@ -2739,9 +2842,6 @@ function refreshData() {
     return;
   }
 
-  // ==========================================================
-  // 4. KHUSUS TAB LAPORAN & PELANGGAN
-  // ==========================================================
   if (activeTab === 'laporan') {
     let totalOmset = 0; let totalProfit = 0;
     const repBody = document.getElementById("report-body");
@@ -2895,73 +2995,6 @@ function bersihkanCacheTotal() {
   }
 }
 
-function ambilDariCatatan() {
-  let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
-  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
-    return alert("Tidak ada catatan aktif pada tab atau tanggal ini!");
-  }
-
-  let addedCount = 0;
-  currentTabData.items.forEach(noteItem => {
-    if (!noteItem.isi) return;
-    let lines = noteItem.isi.split('\n');
-    lines.forEach(line => {
-     let parts = line.trim().split(/\s+/);
-if (parts.length >= 4) {
-  let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
-  let satuan = parts[parts.length - 2].toLowerCase();
-  let qty = parseFloat(parts[parts.length - 3]) || 1;
-  let nama = parts.slice(0, parts.length - 3).join(' ');
-  
-  if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-  let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
-
-
-        let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
-        let matchedProd = existingCode ? databaseProduk[existingCode] : null;
-        
-        let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
-        let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-        let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
-        
-        let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
-        let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
-
-        let hargaRtgVal = modalRtgVal;
-        let hargaPcsVal = modalPcsVal;
-
-        let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
-
-        let newItem = {
-          id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
-          code: code,
-          nama: nama,
-          kategori: kategori,
-          satuan: satuan,
-          isiRtg: isiRtg,
-          qty: qty,
-          modal: modalPcsVal,
-          harga: hargaPcsVal,
-          modalRtg: modalRtgVal,
-          hargaRtg: hargaRtgVal,
-          foto: foto
-        };
-        
-        restockListItems.push(newItem);
-        addedCount++;
-      }
-    });
-  });
-
-  if (addedCount > 0) {
-    simpanRestockKeCloud();
-    refreshData();
-    showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
-  } else {
-    alert("Tidak ditemukan format rincian valid (Contoh: Ayam 4 kg 176.000) di catatan ini!");
-  }
-}
-
 let touchstartY = 0;
 let touchendY = 0;
 
@@ -3050,53 +3083,61 @@ function stopVoiceRecordingUI() {
   }
 }
 
-// --- FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
+let autoHitungTimer = null;
+
 function autoHitungSubjudul() {
   const inputEl = document.getElementById("catatan-desc-input");
-  if (!inputEl) return;
+  const subjudulInput = document.getElementById("catatan-subtitle-input");
+  if (!inputEl || !subjudulInput) return;
+
   const isi = inputEl.value;
   const lines = isi.split('\n');
   let total = 0;
 
   lines.forEach(line => {
-    if (line.trim() === '') return;
+    const trimmed = line.trim();
+    if (trimmed === '') return;
     
-    // Memisahkan teks per baris berdasarkan spasi
-    const parts = line.trim().split(/\s+/);
+    const parts = trimmed.split(/\s+/);
+    let nominalBaris = 0;
     
-    if (parts.length > 0) {
-      // Mengambil teks paling akhir dari baris tersebut (harga nominal)
-      const nominalText = parts[parts.length - 1];
-      
-      // Murni mengambil HANYA ANGKA. Mengabaikan titik, koma, huruf dll.
-      const angkaBersih = nominalText.replace(/[^0-9]/g, '');
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const angkaBersih = parts[i].replace(/[^0-9]/g, '');
       const nominal = parseInt(angkaBersih) || 0;
       
-      if (nominal > 0) {
-        total += nominal;
+      if (nominal >= 100) {
+        nominalBaris = nominal;
+        break;
       }
     }
+    
+    total += nominalBaris;
   });
 
-  const subjudulInput = document.getElementById("catatan-subtitle-input");
-  if (!subjudulInput) return;
-  
-  if (total > 0) {
-    subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
-  } else {
-    // Kosongkan kembali jika total 0 atau rincian dihapus semua
-    subjudulInput.value = "";
+  const newSubjudul = total > 0 ? "Pembayaran " + total.toLocaleString('id-ID') : "";
+
+  if (subjudulInput.value !== newSubjudul) {
+    const cursorPosStart = inputEl.selectionStart;
+    const cursorPosEnd = inputEl.selectionEnd;
+    const isFocused = document.activeElement === inputEl;
+
+    subjudulInput.value = newSubjudul;
+
+    if (isFocused) {
+      inputEl.setSelectionRange(cursorPosStart, cursorPosEnd);
+    }
   }
 }
 
-// Global Event Listener: Memicu kalkulasi setiap kali ada ketikan (input) di dalam textarea Rincian
 document.addEventListener('input', function(e) {
   if (e.target && e.target.id === 'catatan-desc-input') {
-    autoHitungSubjudul();
+    if (e.isComposing) return;
+    clearTimeout(autoHitungTimer);
+    autoHitungTimer = setTimeout(() => {
+      autoHitungSubjudul();
+    }, 300);
   }
 });
-// --- END FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
-
 
 setTheme(currentTheme);
 setLanguage(currentLang);
