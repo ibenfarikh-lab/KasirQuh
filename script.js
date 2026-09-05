@@ -2897,49 +2897,68 @@ function bersihkanCacheTotal() {
 
 function ambilDariCatatan() {
   let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
-  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
-    return alert("Tidak ada catatan aktif pada tab atau tanggal ini!");
+  if (!currentTabData || !currentTabData.items || !Array.isArray(currentTabData.items) || currentTabData.items.length === 0) {
+    return alert("Tidak ada catatan aktif atau data item kosong pada tab ini!");
   }
 
   let addedCount = 0;
   currentTabData.items.forEach(noteItem => {
-    if (!noteItem.isi) return;
+    if (!noteItem || !noteItem.isi) return;
     let lines = noteItem.isi.split('\n');
+    
     lines.forEach(line => {
       let lineStr = line.trim();
       if (!lineStr) return;
 
-      let parts = lineStr.split(/\s+/);
-      if (parts.length < 3) return; // Minimal butuh Nama, Qty/Satuan, Harga
+      // Bersihkan teks dari kata "Rp" atau simbol mata uang agar mudah dibaca sistem
+      let cleanLine = lineStr.replace(/Rp\.?/gi, '').trim();
+      let parts = cleanLine.split(/\s+/);
+      
+      if (parts.length < 2) return; // Minimal ada nama barang dan harga/jumlah
 
-      let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
-      let secondLast = parts[parts.length - 2].toLowerCase();
+      // Ambil token paling belakang sebagai total harga
+      let rawHarga = parts[parts.length - 1];
+      let modalTotalInput = parseRupiahToNumber(rawHarga) || 0;
+      
+      if (modalTotalInput <= 0) return;
 
       let qty = 1;
       let satuan = 'pcs';
-      let nama = '';
+      let namaParts = [];
 
-      // Cek apakah satuan menyatu dengan angka (misal: "5kg", "2pcs") atau terpisah
-      let matchQtyUnit = secondLast.match(/^([\d\.,]+)([a-zA-Z]*)$/);
+      if (parts.length >= 3) {
+        let secondLast = parts[parts.length - 2].toLowerCase();
+        let matchQty = secondLast.match(/^([\d\.,]+)([a-zA-Z]*)$/);
 
-      if (parts.length >= 4 && !['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak'].includes(secondLast) && isNaN(secondLast)) {
-        // Format: Nama ... Qty Satuan Harga (Cth: Minyak Goreng 2 kg 30000)
-        satuan = secondLast;
-        qty = parseFloat(parts[parts.length - 3].replace(',', '.')) || 1;
-        nama = parts.slice(0, parts.length - 3).join(' ');
-      } else if (matchQtyUnit && matchQtyUnit[2]) {
-        // Format: Nama ... QtySatuan Harga (Cth: Beras 5kg 60000)
-        qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
-        satuan = matchQtyUnit[2].toLowerCase();
-        nama = parts.slice(0, parts.length - 2).join(' ');
+        if (matchQty && !isNaN(matchQty[1].replace(',', '.'))) {
+          // Format seperti: Minyak 2kg 30000
+          qty = parseFloat(matchQty[1].replace(',', '.')) || 1;
+          if (matchQty[2]) satuan = matchQty[2].toLowerCase();
+          namaParts = parts.slice(0, parts.length - 2);
+        } else if (!isNaN(secondLast.replace(',', '.'))) {
+          // Format seperti: Minyak 2 kg 30000
+          qty = parseFloat(secondLast.replace(',', '.')) || 1;
+          if (parts.length >= 4) {
+            satuan = parts[parts.length - 3].toLowerCase();
+            namaParts = parts.slice(0, parts.length - 3);
+          } else {
+            namaParts = parts.slice(0, parts.length - 2);
+          }
+        } else {
+          // Jika tidak ada angka jelas di belakang, anggap qty 1
+          namaParts = parts.slice(0, parts.length - 1);
+        }
       } else {
-        // Format: Nama ... Qty Harga (Tanpa satuan eksplisit, Cth: Gula 2 24000)
-        qty = parseFloat(secondLast.replace(',', '.')) || 1;
-        satuan = 'pcs';
-        nama = parts.slice(0, parts.length - 2).join(' ');
+        namaParts = [parts[0]];
       }
 
-      if (!['pcs', 'kg', 'rtg', 'ons'].includes(satuan)) satuan = 'pcs';
+      let nama = namaParts.join(' ').trim();
+      if (!nama) return;
+
+      if (!['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak', 'liter', 'ltr'].includes(satuan)) {
+        satuan = 'pcs';
+      }
+
       let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
 
       let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
@@ -2947,15 +2966,10 @@ function ambilDariCatatan() {
       
       let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
       let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-      let isiRtg = (satuan === 'kg' || satuan === 'ons') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
+      let isiRtg = (satuan === 'kg' || satuan === 'ons' || satuan === 'liter' || satuan === 'ltr') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
       
       let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
       let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
-
-      let hargaRtgVal = modalRtgVal;
-      let hargaPcsVal = modalPcsVal;
-
-      let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
 
       let newItem = {
         id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
@@ -2966,10 +2980,10 @@ function ambilDariCatatan() {
         isiRtg: isiRtg,
         qty: qty,
         modal: modalPcsVal,
-        harga: hargaPcsVal,
+        harga: modalPcsVal,
         modalRtg: modalRtgVal,
-        hargaRtg: hargaRtgVal,
-        foto: foto
+        hargaRtg: modalRtgVal,
+        foto: matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg
       };
       
       restockListItems.push(newItem);
@@ -2981,11 +2995,11 @@ function ambilDariCatatan() {
     simpanRestockKeCloud();
     refreshData();
     showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
+    switchTab('belanja-stok', false); // Otomatis pindah ke halaman Belanja Stok agar langsung terlihat
   } else {
-    alert("Tidak ditemukan format rincian valid! Pastikan format baris catatan seperti: Minyak 2 kg 30.000 atau Beras 5kg 60.000");
+    alert("Gagal membaca catatan! Pastikan baris rincian berisi nama dan nominal harga di bagian akhir (Contoh: Minyak 2 kg 30000).");
   }
 }
-
 
 let touchstartY = 0;
 let touchendY = 0;
