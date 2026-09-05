@@ -1,4 +1,4 @@
-// Tanya.js - Groq API Integration (Ultimate Cool & Conversational Companion)
+// Tanya.js - Groq API Integration (Cool, Conversational & Regional Support without Time)
 export default async function handler(req, res) {
   const sendJson = (statusCode, data) => {
     if (typeof res.status === 'function') {
@@ -33,20 +33,17 @@ export default async function handler(req, res) {
       return sendJson(200, { reply: "Duh, API Key Groq di environment variables belum diset, Ka!" });
     }
 
-    const now = new Date();
-    const opsiWaktu = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' };
-    const waktuSekarang = now.toLocaleDateString('id-ID', opsiWaktu);
-
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
-    // Prompt khusus: Teman ngobrol seru, gaul, sopan, dan tetap jago info toko
-    const systemPrompt = `Kamu adalah asisten AI di toko "${namaToko}" yang karakternya sangat ramah, gaul, santai, asyik, sopan, dan pintar nemenin ngobrol apa saja layaknya teman dekat yang menyenangkan, Berbahasa Cirebon.
+    // Prompt bersih dari jam/hari, fokus ke gaya gaul, bahasa daerah, dan info produk toko
+    const systemPrompt = `Kamu adalah asisten AI di toko "${namaToko}" yang karakternya sangat ramah, gaul, santai, asyik, sopan, dan pintar nemenin ngobrol apa saja layaknya teman dekat yang menyenangkan. 
     Daftar produk & harga toko: ${daftarProduk}. 
 
     Panduan gaya interaksi:
     1. Jika ditanya stok, harga, atau info produk toko, berikan jawaban yang akurat, jelas, dan ramah sesuai data.
-    2. Jika diajak ngobrol santai, bercanda, tanya kabar ("sudah makan belum?", dll), curhat ringan, atau topik umum apa saja, tanggapi dengan luwes, natural, hangat, dan manusiawi layaknya teman ngobrol yang asyik. 
-    3. Tetap jaga kesopanan, ramah, dan jangan pernah kaku atau bersikap seperti bot ensiklopedia.`;
+    2. Jika pelanggan mengajak ngobrol menggunakan bahasa daerah (seperti Bahasa Jawa, Sunda, atau bahasa daerah lainnya), tanggapi dengan bahasa daerah yang senada secara natural, akrab, dan sopan.
+    3. Jika diajak ngobrol santai, bercanda, tanya kabar ("sudah makan belum?", dll), curhat ringan, atau topik umum apa saja, tanggapi dengan luwes, natural, hangat, dan berikan rayuan gombalan kekiniam layaknya teman ngobrol yang asyik. 
+    4. Tetap jaga kesopanan, ramah, dan jangan pernah kaku atau bersikap seperti bot ensiklopedia.`;
 
     const payload = {
       model: 'openai/gpt-oss-20b',
