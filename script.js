@@ -2902,6 +2902,8 @@ function ambilDariCatatan() {
   }
 
   let addedCount = 0;
+  const unitList = ['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak', 'liter', 'ltr'];
+
   currentTabData.items.forEach(noteItem => {
     if (!noteItem || !noteItem.isi) return;
     let lines = noteItem.isi.split('\n');
@@ -2910,54 +2912,63 @@ function ambilDariCatatan() {
       let lineStr = line.trim();
       if (!lineStr) return;
 
-      // Bersihkan teks dari kata "Rp" atau simbol mata uang agar mudah dibaca sistem
       let cleanLine = lineStr.replace(/Rp\.?/gi, '').trim();
       let parts = cleanLine.split(/\s+/);
       
-      if (parts.length < 2) return; // Minimal ada nama barang dan harga/jumlah
+      if (parts.length < 2) return;
 
-      // Ambil token paling belakang sebagai total harga
+      // Harga selalu berada di token paling akhir
       let rawHarga = parts[parts.length - 1];
       let modalTotalInput = parseRupiahToNumber(rawHarga) || 0;
-      
       if (modalTotalInput <= 0) return;
 
+      let remParts = parts.slice(0, parts.length - 1);
       let qty = 1;
       let satuan = 'pcs';
-      let namaParts = [];
+      let namaParts = remParts;
 
-      if (parts.length >= 3) {
-        let secondLast = parts[parts.length - 2].toLowerCase();
-        let matchQty = secondLast.match(/^([\d\.,]+)([a-zA-Z]*)$/);
+      if (remParts.length >= 2) {
+        let lastRem = remParts[remParts.length - 1].toLowerCase();
+        let secondLastRem = remParts[remParts.length - 2].toLowerCase();
 
-        if (matchQty && !isNaN(matchQty[1].replace(',', '.'))) {
-          // Format seperti: Minyak 2kg 30000
-          qty = parseFloat(matchQty[1].replace(',', '.')) || 1;
-          if (matchQty[2]) satuan = matchQty[2].toLowerCase();
-          namaParts = parts.slice(0, parts.length - 2);
-        } else if (!isNaN(secondLast.replace(',', '.'))) {
-          // Format seperti: Minyak 2 kg 30000
-          qty = parseFloat(secondLast.replace(',', '.')) || 1;
-          if (parts.length >= 4) {
-            satuan = parts[parts.length - 3].toLowerCase();
-            namaParts = parts.slice(0, parts.length - 3);
-          } else {
-            namaParts = parts.slice(0, parts.length - 2);
-          }
+        // Format terpisah (Cth: Minyak 2 kg)
+        if (unitList.includes(lastRem) && !isNaN(secondLastRem.replace(',', '.'))) {
+          satuan = lastRem;
+          qty = parseFloat(secondLastRem.replace(',', '.')) || 1;
+          namaParts = remParts.slice(0, remParts.length - 2);
         } else {
-          // Jika tidak ada angka jelas di belakang, anggap qty 1
-          namaParts = parts.slice(0, parts.length - 1);
+          // Format gabungan atau angka di belakang (Cth: Beras 5kg atau Gula 2)
+          let matchQtyUnit = lastRem.match(/^([\d\.,]+)([a-zA-Z]*)$/);
+          if (matchQtyUnit && !isNaN(matchQtyUnit[1].replace(',', '.'))) {
+            qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
+            if (matchQtyUnit[2]) satuan = matchQtyUnit[2].toLowerCase();
+            namaParts = remParts.slice(0, remParts.length - 1);
+          } else if (!isNaN(lastRem.replace(',', '.'))) {
+            qty = parseFloat(lastRem.replace(',', '.')) || 1;
+            satuan = 'pcs';
+            namaParts = remParts.slice(0, remParts.length - 1);
+          }
         }
-      } else {
-        namaParts = [parts[0]];
+      } else if (remParts.length === 1) {
+        let lastRem = remParts[0].toLowerCase();
+        let matchQtyUnit = lastRem.match(/^([\d\.,]+)([a-zA-Z]+)$/);
+        if (matchQtyUnit && !isNaN(matchQtyUnit[1].replace(',', '.'))) {
+          qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
+          satuan = matchQtyUnit[2].toLowerCase();
+          namaParts = [];
+        } else if (!isNaN(lastRem.replace(',', '.'))) {
+          qty = parseFloat(lastRem.replace(',', '.')) || 1;
+          satuan = 'pcs';
+          namaParts = [];
+        }
       }
 
       let nama = namaParts.join(' ').trim();
-      if (!nama) return;
-
-      if (!['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak', 'liter', 'ltr'].includes(satuan)) {
-        satuan = 'pcs';
+      if (!nama) {
+        nama = remParts.join(' ') || "Barang Catatan";
       }
+
+      if (!unitList.includes(satuan)) satuan = 'pcs';
 
       let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
 
@@ -2995,9 +3006,9 @@ function ambilDariCatatan() {
     simpanRestockKeCloud();
     refreshData();
     showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
-    switchTab('belanja-stok', false); // Otomatis pindah ke halaman Belanja Stok agar langsung terlihat
+    switchTab('belanja-stok', false);
   } else {
-    alert("Gagal membaca catatan! Pastikan baris rincian berisi nama dan nominal harga di bagian akhir (Contoh: Minyak 2 kg 30000).");
+    alert("Gagal membaca catatan! Pastikan format baris catatan benar (Cth: Minyak 2 kg 15.000).");
   }
 }
 
