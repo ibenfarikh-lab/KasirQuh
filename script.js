@@ -3149,23 +3149,37 @@ function autoHitungSubjudul() {
   let total = 0;
 
   lines.forEach(line => {
-    if (line.trim() === '') return;
-    const parts = line.trim().split(/\s+/);
-    if (parts.length > 0) {
-      const nominalText = parts[parts.length - 1];
-      const angkaBersih = nominalText.replace(/[^0-9]/g, '');
+    const trimmed = line.trim();
+    if (trimmed === '') return;
+    
+    const parts = trimmed.split(/\s+/);
+    let nominalBaris = 0;
+    
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const angkaBersih = parts[i].replace(/[^0-9]/g, '');
       const nominal = parseInt(angkaBersih) || 0;
       
       if (nominal >= 100) {
-        total += nominal;
+        nominalBaris = nominal;
+        break;
       }
     }
+    
+    total += nominalBaris;
   });
 
   const newSubjudul = total > 0 ? "Pembayaran " + total.toLocaleString('id-ID') : "";
 
   if (subjudulInput.value !== newSubjudul) {
+    const cursorPosStart = inputEl.selectionStart;
+    const cursorPosEnd = inputEl.selectionEnd;
+    const isFocused = document.activeElement === inputEl;
+
     subjudulInput.value = newSubjudul;
+
+    if (isFocused) {
+      inputEl.setSelectionRange(cursorPosStart, cursorPosEnd);
+    }
   }
 }
 
