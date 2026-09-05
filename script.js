@@ -635,28 +635,48 @@ function setupCatatanListener(tabKey) {
   const docId = `${tabKey}_${selectedCatatanDate}`;
 
   db.collection("catatan").doc(docId).onSnapshot(async (docSnap) => {
-    if (docSnap.exists) {
+    let oldDocId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
+    let oldDocSnap = await db.collection("pengaturan").doc(oldDocId).get();
+
+    if (oldDocSnap.exists) {
+      let targetData = oldDocSnap.data();
+      await db.collection("catatan").doc(docId).set(targetData, { merge: true });
+      databaseCatatanDinamis[tabKey] = targetData;
+      renderHalamanSubCatatan(tabKey);
+    } else if (docSnap.exists) {
       databaseCatatanDinamis[tabKey] = docSnap.data();
       renderHalamanSubCatatan(tabKey);
     } else {
-      let oldDocId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
-      let oldDocSnap = await db.collection("pengaturan").doc(oldDocId).get();
+      let currDate = new Date(selectedCatatanDate + "T00:00:00");
+      currDate.setDate(currDate.getDate() - 1);
+      let prevDateStr = currDate.getFullYear() + '-' + String(currDate.getMonth() + 1).padStart(2, '0') + '-' + String(currDate.getDate()).padStart(2, '0');
+      let prevDocId = `${tabKey}_${prevDateStr}`;
+      
+      let prevDocSnap = await db.collection("catatan").doc(prevDocId).get();
+      let targetItems = [];
 
-      if (oldDocSnap.exists) {
-        let targetData = oldDocSnap.data();
-        await db.collection("catatan").doc(docId).set(targetData);
+      if (prevDocSnap.exists && prevDocSnap.data().items) {
+        targetItems = prevDocSnap.data().items.map(item => ({
+          id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 3),
+          judul: item.judul || "",
+          subjudul: "",
+          isi: "",
+          waktu: new Date().toLocaleString('id-ID')
+        }));
       } else {
         let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
-        let targetData = {
-          tabKey: tabKey,
-          tanggal: selectedCatatanDate,
-          modalAwal: "0",
-          items: [
-            { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
-          ]
-        };
-        await db.collection("catatan").doc(docId).set(targetData);
+        targetItems = [
+          { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
+        ];
       }
+
+      let targetData = {
+        tabKey: tabKey,
+        tanggal: selectedCatatanDate,
+        modalAwal: "0",
+        items: targetItems
+      };
+      await db.collection("catatan").doc(docId).set(targetData);
     }
   }, err => {
     console.error("Gagal memuat catatan: ", err);
