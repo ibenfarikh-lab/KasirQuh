@@ -2906,50 +2906,74 @@ function ambilDariCatatan() {
     if (!noteItem.isi) return;
     let lines = noteItem.isi.split('\n');
     lines.forEach(line => {
-     let parts = line.trim().split(/\s+/);
-if (parts.length >= 4) {
-  let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
-  let satuan = parts[parts.length - 2].toLowerCase();
-  let qty = parseFloat(parts[parts.length - 3]) || 1;
-  let nama = parts.slice(0, parts.length - 3).join(' ');
-  
-  if (!['pcs', 'kg', 'rtg'].includes(satuan)) satuan = 'pcs';
-  let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+      let lineStr = line.trim();
+      if (!lineStr) return;
 
+      let parts = lineStr.split(/\s+/);
+      if (parts.length < 3) return; // Minimal butuh Nama, Qty/Satuan, Harga
 
-        let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
-        let matchedProd = existingCode ? databaseProduk[existingCode] : null;
-        
-        let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
-        let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-        let isiRtg = (satuan === 'kg') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
-        
-        let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
-        let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+      let modalTotalInput = parseRupiahToNumber(parts[parts.length - 1]) || 0;
+      let secondLast = parts[parts.length - 2].toLowerCase();
 
-        let hargaRtgVal = modalRtgVal;
-        let hargaPcsVal = modalPcsVal;
+      let qty = 1;
+      let satuan = 'pcs';
+      let nama = '';
 
-        let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
+      // Cek apakah satuan menyatu dengan angka (misal: "5kg", "2pcs") atau terpisah
+      let matchQtyUnit = secondLast.match(/^([\d\.,]+)([a-zA-Z]*)$/);
 
-        let newItem = {
-          id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
-          code: code,
-          nama: nama,
-          kategori: kategori,
-          satuan: satuan,
-          isiRtg: isiRtg,
-          qty: qty,
-          modal: modalPcsVal,
-          harga: hargaPcsVal,
-          modalRtg: modalRtgVal,
-          hargaRtg: hargaRtgVal,
-          foto: foto
-        };
-        
-        restockListItems.push(newItem);
-        addedCount++;
+      if (parts.length >= 4 && !['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak'].includes(secondLast) && isNaN(secondLast)) {
+        // Format: Nama ... Qty Satuan Harga (Cth: Minyak Goreng 2 kg 30000)
+        satuan = secondLast;
+        qty = parseFloat(parts[parts.length - 3].replace(',', '.')) || 1;
+        nama = parts.slice(0, parts.length - 3).join(' ');
+      } else if (matchQtyUnit && matchQtyUnit[2]) {
+        // Format: Nama ... QtySatuan Harga (Cth: Beras 5kg 60000)
+        qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
+        satuan = matchQtyUnit[2].toLowerCase();
+        nama = parts.slice(0, parts.length - 2).join(' ');
+      } else {
+        // Format: Nama ... Qty Harga (Tanpa satuan eksplisit, Cth: Gula 2 24000)
+        qty = parseFloat(secondLast.replace(',', '.')) || 1;
+        satuan = 'pcs';
+        nama = parts.slice(0, parts.length - 2).join(' ');
       }
+
+      if (!['pcs', 'kg', 'rtg', 'ons'].includes(satuan)) satuan = 'pcs';
+      let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+
+      let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
+      let matchedProd = existingCode ? databaseProduk[existingCode] : null;
+      
+      let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
+      let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
+      let isiRtg = (satuan === 'kg' || satuan === 'ons') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
+      
+      let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
+      let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+
+      let hargaRtgVal = modalRtgVal;
+      let hargaPcsVal = modalPcsVal;
+
+      let foto = matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg;
+
+      let newItem = {
+        id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+        code: code,
+        nama: nama,
+        kategori: kategori,
+        satuan: satuan,
+        isiRtg: isiRtg,
+        qty: qty,
+        modal: modalPcsVal,
+        harga: hargaPcsVal,
+        modalRtg: modalRtgVal,
+        hargaRtg: hargaRtgVal,
+        foto: foto
+      };
+      
+      restockListItems.push(newItem);
+      addedCount++;
     });
   });
 
@@ -2958,9 +2982,10 @@ if (parts.length >= 4) {
     refreshData();
     showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
   } else {
-    alert("Tidak ditemukan format rincian valid (Contoh: Ayam 4 kg 176.000) di catatan ini!");
+    alert("Tidak ditemukan format rincian valid! Pastikan format baris catatan seperti: Minyak 2 kg 30.000 atau Beras 5kg 60.000");
   }
 }
+
 
 let touchstartY = 0;
 let touchendY = 0;
