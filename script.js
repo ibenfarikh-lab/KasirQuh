@@ -1855,31 +1855,25 @@ async function prosesBelanjaStok() {
 
 function renderRestockList() {
   const listWrapper = document.getElementById("restock-list-wrapper");
-  const gridWrapper = document.getElementById("restock-grid-wrapper");
   const estTotalEl = document.getElementById("restock-est-total");
   
   if (!listWrapper) return;
 
-  listWrapper.innerHTML = "";
-  if (gridWrapper) gridWrapper.innerHTML = "";
-
   let estTotal = 0;
-
   if (!restockListItems || restockListItems.length === 0) {
-    const emptyHtml = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-muted);">Belum ada barang di daftar belanja stok.</div>`;
-    listWrapper.innerHTML = emptyHtml;
-    if (gridWrapper) gridWrapper.innerHTML = emptyHtml;
+    listWrapper.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Belum ada barang di daftar belanja stok.</div>`;
     if (estTotalEl) estTotalEl.innerText = "0";
     return;
   }
 
+  let htmlContent = "";
   restockListItems.forEach((item) => {
     let subtotal = (item.qty || 1) * (item.modalRtg || item.modal || 0);
     estTotal += subtotal;
     let fotoSrc = item.foto || defaultPlaceholderImg;
     let satuanLabel = item.satuan === 'rtg' ? 'rtg' : (item.satuan === 'kg' ? 'Kg' : 'pcs');
 
-    listWrapper.innerHTML += `
+    htmlContent += `
       <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;">
         <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
           <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); background: #fff; flex-shrink: 0;">
@@ -1897,130 +1891,132 @@ function renderRestockList() {
     `;
   });
 
+  listWrapper.innerHTML = htmlContent;
   if (estTotalEl) estTotalEl.innerText = estTotal.toLocaleString('id-ID');
 }
 
-// --- FUNGSI AMBIL DARI CATATAN ASINKRON TERHUBUNG LANGSUNG KE FIRESTORE ---
-async function ambilDariCatatan() {
-  let tabKey = activeSubCatatanTab || "catatan1";
-  let docId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
+function ambilDariCatatan() {
+  let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
   
-  try {
-    let docSnap = await db.collection("pengaturan").doc(docId).get();
-    let currentTabData = docSnap.exists ? docSnap.data() : databaseCatatanDinamis[tabKey];
-    
-    if (!currentTabData || !currentTabData.items || !Array.isArray(currentTabData.items) || currentTabData.items.length === 0) {
-      return alert(`Tidak ada data catatan pada tab ini untuk tanggal ${selectedCatatanDate}!`);
+  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
+    for (let key in databaseCatatanDinamis) {
+      if (databaseCatatanDinamis[key] && databaseCatatanDinamis[key].items && databaseCatatanDinamis[key].items.length > 0) {
+        currentTabData = databaseCatatanDinamis[key];
+        break;
+      }
     }
+  }
 
-    let addedCount = 0;
-    const unitList = ['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak', 'liter', 'ltr'];
+  if (!currentTabData || !currentTabData.items || currentTabData.items.length === 0) {
+    return alert("Tidak ada data catatan yang ditemukan di memori! Pastikan Anda sudah mengisi teks di menu Catatan.");
+  }
 
-    currentTabData.items.forEach(noteItem => {
-      if (!noteItem || !noteItem.isi) return;
-      let lines = noteItem.isi.split('\n');
+  let addedCount = 0;
+  const unitList = ['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak', 'liter', 'ltr'];
+
+  currentTabData.items.forEach(noteItem => {
+    if (!noteItem || !noteItem.isi) return;
+    let lines = noteItem.isi.split('\n');
+    
+    lines.forEach(line => {
+      let lineStr = line.trim();
+      if (!lineStr) return;
+
+      let cleanLine = lineStr.replace(/Rp\.?/gi, '').trim();
+      let parts = cleanLine.split(/\s+/);
       
-      lines.forEach(line => {
-        let lineStr = line.trim();
-        if (!lineStr) return;
+      if (parts.length < 2) return;
 
-        let cleanLine = lineStr.replace(/Rp\.?/gi, '').trim();
-        let parts = cleanLine.split(/\s+/);
-        
-        if (parts.length < 2) return;
+      let rawHarga = parts[parts.length - 1];
+      let modalTotalInput = parseRupiahToNumber(rawHarga);
+      if (modalTotalInput <= 0) return;
 
-        let rawHarga = parts[parts.length - 1];
-        let modalTotalInput = parseRupiahToNumber(rawHarga) || 0;
-        if (modalTotalInput <= 0) return;
+      let remParts = parts.slice(0, parts.length - 1);
+      let qty = 1;
+      let satuan = 'pcs';
+      let namaParts = remParts;
 
-        let remParts = parts.slice(0, parts.length - 1);
-        let qty = 1;
-        let satuan = 'pcs';
-        let namaParts = remParts;
+      if (remParts.length >= 2) {
+        let lastToken = remParts[remParts.length - 1].toLowerCase();
+        let secondLastToken = remParts[remParts.length - 2].toLowerCase();
+        let cleanSecond = secondLastToken.replace(',', '.');
 
-        if (remParts.length >= 2) {
-          let lastRem = remParts[remParts.length - 1].toLowerCase();
-          let secondLastRem = remParts[remParts.length - 2].toLowerCase();
-
-          if (unitList.includes(lastRem) && !isNaN(secondLastRem.replace(',', '.'))) {
-            satuan = lastRem;
-            qty = parseFloat(secondLastRem.replace(',', '.')) || 1;
-            namaParts = remParts.slice(0, remParts.length - 2);
-          } else {
-            let matchQtyUnit = lastRem.match(/^([\d\.,]+)([a-zA-Z]*)$/);
-            if (matchQtyUnit && !isNaN(matchQtyUnit[1].replace(',', '.'))) {
-              qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
-              if (matchQtyUnit[2]) satuan = matchQtyUnit[2].toLowerCase();
-              namaParts = remParts.slice(0, remParts.length - 1);
-            } else if (!isNaN(lastRem.replace(',', '.'))) {
-              qty = parseFloat(lastRem.replace(',', '.')) || 1;
-              satuan = 'pcs';
-              namaParts = remParts.slice(0, remParts.length - 1);
-            }
-          }
-        } else if (remParts.length === 1) {
-          let lastRem = remParts[0].toLowerCase();
-          let matchQtyUnit = lastRem.match(/^([\d\.,]+)([a-zA-Z]+)$/);
-          if (matchQtyUnit && !isNaN(matchQtyUnit[1].replace(',', '.'))) {
-            qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
-            satuan = matchQtyUnit[2].toLowerCase();
-            namaParts = [];
-          } else if (!isNaN(lastRem.replace(',', '.'))) {
-            qty = parseFloat(lastRem.replace(',', '.')) || 1;
+        if (unitList.includes(lastToken) && !isNaN(cleanSecond)) {
+          satuan = lastToken;
+          qty = parseFloat(cleanSecond) || 1;
+          namaParts = remParts.slice(0, remParts.length - 2);
+        } else {
+          let match = lastToken.match(/^([\d\.,]+)([a-zA-Z]*)$/);
+          let cleanNum = match ? match[1].replace(',', '.') : '';
+          if (match && !isNaN(cleanNum)) {
+            qty = parseFloat(cleanNum) || 1;
+            if (match[2]) satuan = match[2].toLowerCase();
+            namaParts = remParts.slice(0, remParts.length - 1);
+          } else if (!isNaN(lastToken.replace(',', '.'))) {
+            qty = parseFloat(lastToken.replace(',', '.')) || 1;
             satuan = 'pcs';
-            namaParts = [];
+            namaParts = remParts.slice(0, remParts.length - 1);
           }
         }
+      } else if (remParts.length === 1) {
+        let lastToken = remParts[0].toLowerCase();
+        let match = lastToken.match(/^([\d\.,]+)([a-zA-Z]+)$/);
+        let cleanNum = match ? match[1].replace(',', '.') : '';
+        if (match && !isNaN(cleanNum)) {
+          qty = parseFloat(cleanNum) || 1;
+          satuan = match[2].toLowerCase();
+          namaParts = [];
+        } else if (!isNaN(lastToken.replace(',', '.'))) {
+          qty = parseFloat(lastToken.replace(',', '.')) || 1;
+          satuan = 'pcs';
+          namaParts = [];
+        }
+      }
 
-        let nama = namaParts.join(' ').trim();
-        if (!nama) nama = remParts.join(' ') || "Barang Catatan";
+      let nama = namaParts.join(' ').trim();
+      if (!nama) nama = remParts.join(' ') || "Barang Catatan";
 
-        if (!unitList.includes(satuan)) satuan = 'pcs';
+      if (!unitList.includes(satuan)) satuan = 'pcs';
 
-        let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+      let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
 
-        let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
-        let matchedProd = existingCode ? databaseProduk[existingCode] : null;
-        
-        let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
-        let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-        let isiRtg = (satuan === 'kg' || satuan === 'ons' || satuan === 'liter' || satuan === 'ltr') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
-        
-        let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
-        let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+      let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
+      let matchedProd = existingCode ? databaseProduk[existingCode] : null;
+      
+      let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
+      let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
+      let isiRtg = (satuan === 'kg' || satuan === 'ons' || satuan === 'liter' || satuan === 'ltr') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
+      
+      let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
+      let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
 
-        let newItem = {
-          id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
-          code: code,
-          nama: nama,
-          kategori: kategori,
-          satuan: satuan,
-          isiRtg: isiRtg,
-          qty: qty,
-          modal: modalPcsVal,
-          harga: modalPcsVal,
-          modalRtg: modalRtgVal,
-          hargaRtg: modalRtgVal,
-          foto: matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg
-        };
-        
-        restockListItems.push(newItem);
-        addedCount++;
-      });
+      let newItem = {
+        id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+        code: code,
+        nama: nama,
+        kategori: kategori,
+        satuan: satuan,
+        isiRtg: isiRtg,
+        qty: qty,
+        modal: modalPcsVal,
+        harga: modalPcsVal,
+        modalRtg: modalRtgVal,
+        hargaRtg: modalRtgVal,
+        foto: matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg
+      };
+      
+      restockListItems.push(newItem);
+      addedCount++;
     });
+  });
 
-    if (addedCount > 0) {
-      simpanRestockKeCloud();
-      renderRestockList();
-      refreshData();
-      switchTab('belanja-stok', false);
-      showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
-    } else {
-      alert("Gagal membaca catatan! Pastikan format baris catatan benar (Cth: Minyak 2 kg 15.000).");
-    }
-  } catch (err) {
-    console.error(err);
-    alert("Terjadi kesalahan saat mengambil catatan: " + err.message);
+  if (addedCount > 0) {
+    simpanRestockKeCloud();
+    renderRestockList();
+    showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
+    switchTab('belanja-stok', false);
+  } else {
+    alert("Gagal membaca catatan! Pastikan format baris catatan benar (Cth: Minyak 2 kg 15.000).");
   }
 }
 
