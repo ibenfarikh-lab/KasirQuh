@@ -1,4 +1,4 @@
-// Tanya.js - Groq API Integration (Token Optimized)
+// Tanya.js - Groq API Integration (Gaul Error Handler)
 export default async function handler(req, res) {
   const sendJson = (statusCode, data) => {
     if (typeof res.status === 'function') {
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
         { role: 'user', content: promptText }
       ],
       temperature: 0.7,
-      max_tokens: 150 // Diturunkan agar hemat token per menit
+      max_tokens: 150
     };
 
     const response = await fetch(endpoint, {
@@ -58,6 +58,14 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errText = await response.text();
+      
+      // Khusus kalau kena limit token (Error 429)
+      if (response.status === 429) {
+        return sendJson(200, { 
+          reply: "Waduh, asisten ai kurang ngopi, enteni 10 detik ya, Ka, terus oli takon takon maning. ☕" 
+        });
+      }
+
       throw new Error(`Groq API Error (${response.status}): ${errText}`);
     }
 
