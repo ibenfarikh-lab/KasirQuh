@@ -631,19 +631,18 @@ db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
   renderSubTabsCatatanUI();
 });
 
+let catatanListeners = {};
+
 function setupCatatanListener(tabKey) {
   const docId = `${tabKey}_${selectedCatatanDate}`;
 
-  db.collection("catatan").doc(docId).onSnapshot(async (docSnap) => {
-    let oldDocId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
-    let oldDocSnap = await db.collection("pengaturan").doc(oldDocId).get();
+  if (catatanListeners[tabKey]) {
+    catatanListeners[tabKey]();
+    catatanListeners[tabKey] = null;
+  }
 
-    if (oldDocSnap.exists) {
-      let targetData = oldDocSnap.data();
-      await db.collection("catatan").doc(docId).set(targetData, { merge: true });
-      databaseCatatanDinamis[tabKey] = targetData;
-      renderHalamanSubCatatan(tabKey);
-    } else if (docSnap.exists) {
+  catatanListeners[tabKey] = db.collection("catatan").doc(docId).onSnapshot(async (docSnap) => {
+    if (docSnap.exists) {
       databaseCatatanDinamis[tabKey] = docSnap.data();
       renderHalamanSubCatatan(tabKey);
     } else {
