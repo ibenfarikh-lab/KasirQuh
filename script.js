@@ -638,16 +638,24 @@ function setupCatatanListener(tabKey) {
     let targetData = null;
 
     if (!docSnap.exists) {
-      let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
-      targetData = {
-        tabKey: tabKey,
-        tanggal: selectedCatatanDate,
-        modalAwal: "0",
-        items: [
-          { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
-        ]
-      };
-      await db.collection("catatan").doc(docId).set(targetData);
+      let oldDocId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
+      let oldDocSnap = await db.collection("pengaturan").doc(oldDocId).get();
+
+      if (oldDocSnap.exists) {
+        targetData = oldDocSnap.data();
+        await db.collection("catatan").doc(docId).set(targetData);
+      } else {
+        let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
+        targetData = {
+          tabKey: tabKey,
+          tanggal: selectedCatatanDate,
+          modalAwal: "0",
+          items: [
+            { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
+          ]
+        };
+        await db.collection("catatan").doc(docId).set(targetData);
+      }
     } else {
       targetData = docSnap.data();
     }
