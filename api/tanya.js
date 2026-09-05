@@ -33,7 +33,6 @@ export default async function handler(req, res) {
       return sendJson(200, { reply: "Duh, API Key Groq di environment variables belum diset, Ka!" });
     }
 
-    // Endpoint resmi Groq (menggunakan /openai/v1/chat/completions)
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
     const systemPrompt = `Kamu adalah asisten belanja online yang ramah, gaul, dan membantu di toko "${namaToko}". 
@@ -43,7 +42,7 @@ export default async function handler(req, res) {
     Jawablah pertanyaan pelanggan dengan singkat, jelas, dan ramah berdasarkan data di atas jika mereka bertanya soal stok atau harga. Jika di luar itu, jawab dengan santai ala anak muda.`;
 
     const payload = {
-      model: 'llama-3.1-8b-instant',
+      model: 'llama3-8b-8192', // Menggunakan model yang stabil dan tersedia
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: promptText }
