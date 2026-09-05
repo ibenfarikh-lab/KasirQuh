@@ -634,19 +634,20 @@ db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
 function setupCatatanListener(tabKey) {
   const docId = `${tabKey}_${selectedCatatanDate}`;
 
-  db.collection("catatan").doc(docId).get().then(async (docSnap) => {
-    let targetData = null;
-
-    if (!docSnap.exists) {
+  db.collection("catatan").doc(docId).onSnapshot(async (docSnap) => {
+    if (docSnap.exists) {
+      databaseCatatanDinamis[tabKey] = docSnap.data();
+      renderHalamanSubCatatan(tabKey);
+    } else {
       let oldDocId = `catatan_data_${tabKey}_${selectedCatatanDate}_v13`;
       let oldDocSnap = await db.collection("pengaturan").doc(oldDocId).get();
 
       if (oldDocSnap.exists) {
-        targetData = oldDocSnap.data();
+        let targetData = oldDocSnap.data();
         await db.collection("catatan").doc(docId).set(targetData);
       } else {
         let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
-        targetData = {
+        let targetData = {
           tabKey: tabKey,
           tanggal: selectedCatatanDate,
           modalAwal: "0",
@@ -656,17 +657,8 @@ function setupCatatanListener(tabKey) {
         };
         await db.collection("catatan").doc(docId).set(targetData);
       }
-    } else {
-      targetData = docSnap.data();
     }
-
-    db.collection("catatan").doc(docId).onSnapshot((snap) => {
-      if (snap.exists) {
-        databaseCatatanDinamis[tabKey] = snap.data();
-      }
-      renderHalamanSubCatatan(tabKey);
-    });
-  }).catch(err => {
+  }, err => {
     console.error("Gagal memuat catatan: ", err);
   });
 }
@@ -698,8 +690,6 @@ function renderSubTabsCatatanUI() {
     btn.onclick = () => switchSubCatatanTab(tabKey);
     containerTabs.appendChild(btn);
 
-    setupCatatanListener(tabKey);
-
     let contentDiv = document.createElement("div");
     contentDiv.id = `sub-content-${tabKey}`;
     contentDiv.className = `sub-tab-content ${isActive ? 'active' : ''}`;
@@ -728,7 +718,8 @@ function renderSubTabsCatatanUI() {
       </div>
     `;
     containerContent.appendChild(contentDiv);
-    renderHalamanSubCatatan(tabKey);
+    
+    setupCatatanListener(tabKey);
   });
   updatePermanentBarTitle();
 }
