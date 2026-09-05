@@ -3140,9 +3140,6 @@ function stopVoiceRecordingUI() {
 function autoHitungSubjudul() {
   const inputEl = document.getElementById("catatan-desc-input");
   if (!inputEl) return;
-  
-  const cursorPosStart = inputEl.selectionStart;
-  const cursorPosEnd = inputEl.selectionEnd;
 
   const isi = inputEl.value;
   const lines = isi.split('\n');
@@ -3155,7 +3152,9 @@ function autoHitungSubjudul() {
       const nominalText = parts[parts.length - 1];
       const angkaBersih = nominalText.replace(/[^0-9]/g, '');
       const nominal = parseInt(angkaBersih) || 0;
-      if (nominal > 0) {
+      
+      // Hanya hitung jika nominal di atas 100 agar angka kuantitas (1, 2, dll) terabaikan
+      if (nominal >= 100) {
         total += nominal;
       }
     }
@@ -3169,10 +3168,6 @@ function autoHitungSubjudul() {
       subjudulInput.value = "";
     }
   }
-
-  try {
-    inputEl.setSelectionRange(cursorPosStart, cursorPosEnd);
-  } catch (e) {}
 }
 
 document.addEventListener('input', function(e) {
