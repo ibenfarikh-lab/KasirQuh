@@ -33,6 +33,7 @@ export default async function handler(req, res) {
       return sendJson(200, { reply: "Duh, API Key Groq di environment variables belum diset, Ka!" });
     }
 
+    // Endpoint resmi Groq (menggunakan /openai/v1/chat/completions)
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
     const systemPrompt = `Kamu adalah asisten belanja online yang ramah, gaul, dan membantu di toko "${namaToko}". 
@@ -61,7 +62,8 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      throw new Error(`Gagal menghubungi server Groq: ${response.status}`);
+      const errText = await response.text();
+      throw new Error(`Groq API Error (${response.status}): ${errText}`);
     }
 
     const data = await response.json();
