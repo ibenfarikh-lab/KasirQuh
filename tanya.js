@@ -1,4 +1,4 @@
-// Tanya.js - Groq API Integration for Vercel Serverless Function
+// Tanya.js - Groq API Integration (Token Optimized)
 export default async function handler(req, res) {
   const sendJson = (statusCode, data) => {
     if (typeof res.status === 'function') {
@@ -33,23 +33,18 @@ export default async function handler(req, res) {
       return sendJson(200, { reply: "Duh, API Key Groq di environment variables belum diset, Ka!" });
     }
 
-    // Endpoint resmi Groq (menggunakan /openai/v1/chat/completions)
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
-    const systemPrompt = `Kamu adalah asisten belanja online yang ramah, gaul, dan membantu di toko "${namaToko}". 
-    Berikut adalah daftar stok dan harga barang di toko saat ini:
-    ${daftarProduk}
-    
-    Jawablah pertanyaan pelanggan dengan singkat, jelas, dan ramah berdasarkan data di atas jika mereka bertanya soal stok atau harga. Jika di luar itu, jawab dengan santai ala anak muda.`;
+    const systemPrompt = `Asisten "${namaToko}". Stok/Harga: ${daftarProduk}. Jawab singkat, jelas, ramah.`;
 
     const payload = {
-      model: 'llama-3.1-8b-instant',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: promptText }
       ],
       temperature: 0.7,
-      max_tokens: 300
+      max_tokens: 150 // Diturunkan agar hemat token per menit
     };
 
     const response = await fetch(endpoint, {
