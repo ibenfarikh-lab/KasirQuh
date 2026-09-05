@@ -1,4 +1,4 @@
-// Tanya.js - Groq API Integration (Gaul Error Handler)
+// Tanya.js - Groq API Integration (Persona Fix)
 export default async function handler(req, res) {
   const sendJson = (statusCode, data) => {
     if (typeof res.status === 'function') {
@@ -35,7 +35,10 @@ export default async function handler(req, res) {
 
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
-    const systemPrompt = `Asisten "${namaToko}". Stok/Harga: ${daftarProduk}. Jawab singkat, jelas, ramah.`;
+    // System prompt dibuat lebih tegas agar karakternya tetap santai & tidak kaku
+    const systemPrompt = `Kamu adalah asisten toko "${namaToko}" yang super ramah, gaul, dan asyik diajak ngobrol. 
+    Daftar produk & harga: ${daftarProduk}. 
+    Aturan: Jika ditanya stok/harga, jawab akurat sesuai data. Jika ditanya di luar itu (seperti jam atau hari), jawab dengan santai, jenaka, dan akrab ala anak muda, jangan pakai bahasa robot yang kaku!`;
 
     const payload = {
       model: 'openai/gpt-oss-20b',
@@ -43,7 +46,7 @@ export default async function handler(req, res) {
         { role: 'system', content: systemPrompt },
         { role: 'user', content: promptText }
       ],
-      temperature: 0.7,
+      temperature: 0.8,
       max_tokens: 150
     };
 
@@ -59,10 +62,9 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const errText = await response.text();
       
-      // Khusus kalau kena limit token (Error 429)
       if (response.status === 429) {
         return sendJson(200, { 
-          reply: "Waduh, asisten ai kurang ngopi, enteni 10 detik ya, Ka, terus oli takon takon maning. ☕" 
+          reply: "Waduh, asisten tokonya kecapekan kebanyakan ngobrol! Istirahat bentar 10 detik ya, Ka. ☕" 
         });
       }
 
@@ -70,7 +72,7 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    const aiReply = data.choices[0]?.message?.content || "Maaf, AI sedang tidak bisa merespons.";
+    const aiReply = data.choices[0]?.message?.content || "Maaf, AI lagi sariawan nih, nggak bisa jawab.";
 
     return sendJson(200, { reply: aiReply });
 
