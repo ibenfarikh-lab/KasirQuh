@@ -160,6 +160,7 @@ const translations = {
     clear_cart_btn: "🗑️ Clear Cart",
     ongoing: "🟡 Ongoing",
     completed: "🟢 Completed",
+    loading_loading: "Loading orders...",
     loading_ongoing: "Loading ongoing orders...",
     loading_completed: "Loading completed history...",
     chat_conversations: "💬 Conversations",
@@ -503,7 +504,6 @@ function formatTeksDanAngka(input) {
   });
   input.value = formatted;
 }
-
 
 function formatInputRupiah(input) {
   let angka = input.value.replace(/[^,\d]/g, '').toString();
@@ -1236,24 +1236,23 @@ function toggleStickySearchBar() {
       history.pushState({tab: activeTab, floating: 'search'}, "", "");
     } else {
       document.getElementById("inventory-search-input").value = "";
-              syncAndFilterGlobal("");
-      }
+      syncAndFilterGlobal("");
     }
   }
+}
 
-  let searchDebounceTimer = null;
+let searchDebounceTimer = null;
 
-  function syncAndFilterGlobal(val) { 
-    clearTimeout(searchDebounceTimer);
-    searchDebounceTimer = setTimeout(() => {
-      stokCurrentPage = 1;
-      posCurrentPage = 1;
-      refreshData(); 
-    }, 300);
-  }
+function syncAndFilterGlobal(val) { 
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    stokCurrentPage = 1;
+    posCurrentPage = 1;
+    refreshData(); 
+  }, 300);
+}
 
-  function updateUnitLabel() {
-
+function updateUnitLabel() {
   const unit = document.getElementById("db-unit").value;
   const rtgWrapper = document.getElementById("wrapper-db-isi-rtg");
   
@@ -1854,6 +1853,168 @@ async function prosesBelanjaStok() {
   switchTab('data-barang', false);
 }
 
+// --- FUNGSI RENDER HALAMAN BELANJA STOK (DITAMBAHKAN UNTUK PERBAIKAN) ---
+function renderRestockList() {
+  const listWrapper = document.getElementById("restock-list-wrapper");
+  const gridWrapper = document.getElementById("restock-grid-wrapper");
+  const estTotalEl = document.getElementById("restock-est-total");
+  
+  if (!listWrapper) return;
+
+  listWrapper.innerHTML = "";
+  if (gridWrapper) gridWrapper.innerHTML = "";
+
+  let estTotal = 0;
+
+  if (!restockListItems || restockListItems.length === 0) {
+    const emptyHtml = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-muted);">Belum ada barang di daftar belanja stok.</div>`;
+    listWrapper.innerHTML = emptyHtml;
+    if (gridWrapper) gridWrapper.innerHTML = emptyHtml;
+    if (estTotalEl) estTotalEl.innerText = "0";
+    return;
+  }
+
+  restockListItems.forEach((item) => {
+    let subtotal = (item.qty || 1) * (item.modalRtg || item.modal || 0);
+    estTotal += subtotal;
+    let fotoSrc = item.foto || defaultPlaceholderImg;
+    let satuanLabel = item.satuan === 'rtg' ? 'rtg' : (item.satuan === 'kg' ? 'Kg' : 'pcs');
+
+    listWrapper.innerHTML += `
+      <div class="card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+          <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: contain; border-radius: 6px; border: 1px solid var(--border-color); background: #fff; flex-shrink: 0;">
+          <div style="min-width: 0; flex: 1;">
+            <div style="font-weight: bold; font-size: 0.9rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Qty: <b>${item.qty} ${satuanLabel}</b> • Modal: Rp ${(item.modalRtg || item.modal || 0).toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="font-weight: bold; color: #2563eb; font-size: 0.9rem; white-space: nowrap;">Rp ${subtotal.toLocaleString('id-ID')}</div>
+          <button onclick="openProductModal(null, '${item.id}')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">✏️</button>
+          <button onclick="hapusItemBelanja('${item.id}')" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+
+  if (estTotalEl) estTotalEl.innerText = estTotal.toLocaleString('id-ID');
+}
+
+// --- FUNGSI AMBIL DARI CATATAN YANG DIPERBAIKI SECARA MENYELURUH ---
+function ambilDariCatatan() {
+  let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
+  if (!currentTabData || !currentTabData.items || !Array.isArray(currentTabData.items) || currentTabData.items.length === 0) {
+    return alert("Tidak ada catatan aktif atau data item kosong pada tab ini!");
+  }
+
+  let addedCount = 0;
+  const unitList = ['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak', 'liter', 'ltr'];
+
+  currentTabData.items.forEach(noteItem => {
+    if (!noteItem || !noteItem.isi) return;
+    let lines = noteItem.isi.split('\n');
+    
+    lines.forEach(line => {
+      let lineStr = line.trim();
+      if (!lineStr) return;
+
+      let cleanLine = lineStr.replace(/Rp\.?/gi, '').trim();
+      let parts = cleanLine.split(/\s+/);
+      
+      if (parts.length < 2) return;
+
+      let rawHarga = parts[parts.length - 1];
+      let modalTotalInput = parseRupiahToNumber(rawHarga) || 0;
+      if (modalTotalInput <= 0) return;
+
+      let remParts = parts.slice(0, parts.length - 1);
+      let qty = 1;
+      let satuan = 'pcs';
+      let namaParts = remParts;
+
+      if (remParts.length >= 2) {
+        let lastRem = remParts[remParts.length - 1].toLowerCase();
+        let secondLastRem = remParts[remParts.length - 2].toLowerCase();
+
+        if (unitList.includes(lastRem) && !isNaN(secondLastRem.replace(',', '.'))) {
+          satuan = lastRem;
+          qty = parseFloat(secondLastRem.replace(',', '.')) || 1;
+          namaParts = remParts.slice(0, remParts.length - 2);
+        } else {
+          let matchQtyUnit = lastRem.match(/^([\d\.,]+)([a-zA-Z]*)$/);
+          if (matchQtyUnit && !isNaN(matchQtyUnit[1].replace(',', '.'))) {
+            qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
+            if (matchQtyUnit[2]) satuan = matchQtyUnit[2].toLowerCase();
+            namaParts = remParts.slice(0, remParts.length - 1);
+          } else if (!isNaN(lastRem.replace(',', '.'))) {
+            qty = parseFloat(lastRem.replace(',', '.')) || 1;
+            satuan = 'pcs';
+            namaParts = remParts.slice(0, remParts.length - 1);
+          }
+        }
+      } else if (remParts.length === 1) {
+        let lastRem = remParts[0].toLowerCase();
+        let matchQtyUnit = lastRem.match(/^([\d\.,]+)([a-zA-Z]+)$/);
+        if (matchQtyUnit && !isNaN(matchQtyUnit[1].replace(',', '.'))) {
+          qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
+          satuan = matchQtyUnit[2].toLowerCase();
+          namaParts = [];
+        } else if (!isNaN(lastRem.replace(',', '.'))) {
+          qty = parseFloat(lastRem.replace(',', '.')) || 1;
+          satuan = 'pcs';
+          namaParts = [];
+        }
+      }
+
+      let nama = namaParts.join(' ').trim();
+      if (!nama) nama = remParts.join(' ') || "Barang Catatan";
+
+      if (!unitList.includes(satuan)) satuan = 'pcs';
+
+      let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
+
+      let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
+      let matchedProd = existingCode ? databaseProduk[existingCode] : null;
+      
+      let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
+      let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
+      let isiRtg = (satuan === 'kg' || satuan === 'ons' || satuan === 'liter' || satuan === 'ltr') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
+      
+      let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
+      let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
+
+      let newItem = {
+        id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
+        code: code,
+        nama: nama,
+        kategori: kategori,
+        satuan: satuan,
+        isiRtg: isiRtg,
+        qty: qty,
+        modal: modalPcsVal,
+        harga: modalPcsVal,
+        modalRtg: modalRtgVal,
+        hargaRtg: modalRtgVal,
+        foto: matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg
+      };
+      
+      restockListItems.push(newItem);
+      addedCount++;
+    });
+  });
+
+  if (addedCount > 0) {
+    simpanRestockKeCloud();
+    renderRestockList();
+    refreshData();
+    switchTab('belanja-stok', false);
+    showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
+  } else {
+    alert("Gagal membaca catatan! Pastikan format baris catatan benar (Cth: Minyak 2 kg 15.000).");
+  }
+}
+
 function switchSubDataTab(subTabId) {
   activeSubDataTab = subTabId;
   document.querySelectorAll('#laporan .sub-tab-content').forEach(el => el.classList.remove('active'));
@@ -1990,12 +2151,6 @@ function switchTab(tabId, pushHistory = true) {
   }
   updatePermanentBarTitle();
   refreshData();
-}
-
-function syncAndFilterGlobal(val) { 
-  stokCurrentPage = 1;
-  posCurrentPage = 1;
-  refreshData(); 
 }
 
 function changeStokPage(delta) { 
@@ -2600,7 +2755,6 @@ function resetDatabaseBarang() {
 }
 
 function refreshData() {
-  // 1. Update data input pengaturan dasar (hanya jika elemennya ada)
   const setUsr = document.getElementById("setting-user");
   if (setUsr) setUsr.value = userAuth.user;
   const setPass = document.getElementById("setting-pass");
@@ -2628,15 +2782,11 @@ function refreshData() {
   const rcptPhone = document.getElementById("receipt-shop-phone");
   if (rcptPhone) rcptPhone.innerText = "Telp: " + pengaturanToko.phone;
 
-  // Ambil keyword pencarian global
   const searchInputEl = document.getElementById("inventory-search-input");
   const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
   let categories = new Set();
 
-  // ==========================================================
-  // 2. KHUSUS TAB KASIR / PENJUALAN (Paling sering diakses & dicari)
-  // ==========================================================
   const filterKatPosEl = document.getElementById("filter-category-pos");
   const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
 
@@ -2658,10 +2808,12 @@ function refreshData() {
     return; 
   }
 
-  // ==========================================================
-  // 3. KHUSUS TAB STOK & BELANJA STOK
-  // ==========================================================
-  if (activeTab === 'data-barang' || activeTab === 'belanja-stok') {
+  if (activeTab === 'belanja-stok') {
+    renderRestockList();
+    return;
+  }
+
+  if (activeTab === 'data-barang') {
     const invList = document.getElementById("inventory-list-wrapper");
     const invGrid = document.getElementById("inventory-grid-wrapper");
     if (invList) invList.style.display = (viewMode === 'list') ? 'flex' : 'none';
@@ -2679,7 +2831,7 @@ function refreshData() {
     }
     filteredItems.sort((a, b) => a.nama.localeCompare(b.nama));
 
-    if (activeTab === 'data-barang' && invList && invGrid) {
+    if (invList && invGrid) {
       invList.innerHTML = ""; invGrid.innerHTML = "";
       let itemsPerPageStok = 24;
       let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
@@ -2739,9 +2891,6 @@ function refreshData() {
     return;
   }
 
-  // ==========================================================
-  // 4. KHUSUS TAB LAPORAN & PELANGGAN
-  // ==========================================================
   if (activeTab === 'laporan') {
     let totalOmset = 0; let totalProfit = 0;
     const repBody = document.getElementById("report-body");
@@ -2895,123 +3044,6 @@ function bersihkanCacheTotal() {
   }
 }
 
-function ambilDariCatatan() {
-  let currentTabData = databaseCatatanDinamis[activeSubCatatanTab];
-  if (!currentTabData || !currentTabData.items || !Array.isArray(currentTabData.items) || currentTabData.items.length === 0) {
-    return alert("Tidak ada catatan aktif atau data item kosong pada tab ini!");
-  }
-
-  let addedCount = 0;
-  const unitList = ['pcs', 'kg', 'rtg', 'ons', 'bks', 'pak', 'liter', 'ltr'];
-
-  currentTabData.items.forEach(noteItem => {
-    if (!noteItem || !noteItem.isi) return;
-    let lines = noteItem.isi.split('\n');
-    
-    lines.forEach(line => {
-      let lineStr = line.trim();
-      if (!lineStr) return;
-
-      let cleanLine = lineStr.replace(/Rp\.?/gi, '').trim();
-      let parts = cleanLine.split(/\s+/);
-      
-      if (parts.length < 2) return;
-
-      // Harga selalu berada di token paling akhir
-      let rawHarga = parts[parts.length - 1];
-      let modalTotalInput = parseRupiahToNumber(rawHarga) || 0;
-      if (modalTotalInput <= 0) return;
-
-      let remParts = parts.slice(0, parts.length - 1);
-      let qty = 1;
-      let satuan = 'pcs';
-      let namaParts = remParts;
-
-      if (remParts.length >= 2) {
-        let lastRem = remParts[remParts.length - 1].toLowerCase();
-        let secondLastRem = remParts[remParts.length - 2].toLowerCase();
-
-        // Format terpisah (Cth: Minyak 2 kg)
-        if (unitList.includes(lastRem) && !isNaN(secondLastRem.replace(',', '.'))) {
-          satuan = lastRem;
-          qty = parseFloat(secondLastRem.replace(',', '.')) || 1;
-          namaParts = remParts.slice(0, remParts.length - 2);
-        } else {
-          // Format gabungan atau angka di belakang (Cth: Beras 5kg atau Gula 2)
-          let matchQtyUnit = lastRem.match(/^([\d\.,]+)([a-zA-Z]*)$/);
-          if (matchQtyUnit && !isNaN(matchQtyUnit[1].replace(',', '.'))) {
-            qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
-            if (matchQtyUnit[2]) satuan = matchQtyUnit[2].toLowerCase();
-            namaParts = remParts.slice(0, remParts.length - 1);
-          } else if (!isNaN(lastRem.replace(',', '.'))) {
-            qty = parseFloat(lastRem.replace(',', '.')) || 1;
-            satuan = 'pcs';
-            namaParts = remParts.slice(0, remParts.length - 1);
-          }
-        }
-      } else if (remParts.length === 1) {
-        let lastRem = remParts[0].toLowerCase();
-        let matchQtyUnit = lastRem.match(/^([\d\.,]+)([a-zA-Z]+)$/);
-        if (matchQtyUnit && !isNaN(matchQtyUnit[1].replace(',', '.'))) {
-          qty = parseFloat(matchQtyUnit[1].replace(',', '.')) || 1;
-          satuan = matchQtyUnit[2].toLowerCase();
-          namaParts = [];
-        } else if (!isNaN(lastRem.replace(',', '.'))) {
-          qty = parseFloat(lastRem.replace(',', '.')) || 1;
-          satuan = 'pcs';
-          namaParts = [];
-        }
-      }
-
-      let nama = namaParts.join(' ').trim();
-      if (!nama) {
-        nama = remParts.join(' ') || "Barang Catatan";
-      }
-
-      if (!unitList.includes(satuan)) satuan = 'pcs';
-
-      let modalSatuanTotal = qty > 0 ? (modalTotalInput / qty) : modalTotalInput;
-
-      let existingCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase() === nama.toLowerCase());
-      let matchedProd = existingCode ? databaseProduk[existingCode] : null;
-      
-      let code = existingCode || ("BRG-" + Date.now() + Math.random().toString(36).substr(2, 4));
-      let kategori = matchedProd ? (matchedProd.kategori || "Umum") : "Umum";
-      let isiRtg = (satuan === 'kg' || satuan === 'ons' || satuan === 'liter' || satuan === 'ltr') ? 10 : (matchedProd ? (matchedProd.isiRtg || 10) : 10);
-      
-      let modalRtgVal = (satuan === 'rtg' || satuan === 'kg') ? modalSatuanTotal : modalSatuanTotal * isiRtg;
-      let modalPcsVal = (satuan === 'rtg' || satuan === 'kg') ? (modalSatuanTotal / isiRtg) : modalSatuanTotal;
-
-      let newItem = {
-        id: "RESTOCK-" + Date.now() + Math.random().toString(36).substr(2, 4),
-        code: code,
-        nama: nama,
-        kategori: kategori,
-        satuan: satuan,
-        isiRtg: isiRtg,
-        qty: qty,
-        modal: modalPcsVal,
-        harga: modalPcsVal,
-        modalRtg: modalRtgVal,
-        hargaRtg: modalRtgVal,
-        foto: matchedProd ? (matchedProd.foto || defaultPlaceholderImg) : defaultPlaceholderImg
-      };
-      
-      restockListItems.push(newItem);
-      addedCount++;
-    });
-  });
-
-  if (addedCount > 0) {
-    simpanRestockKeCloud();
-    refreshData();
-    showNotif(`Berhasil menarik ${addedCount} item dari catatan!`);
-    switchTab('belanja-stok', false);
-  } else {
-    alert("Gagal membaca catatan! Pastikan format baris catatan benar (Cth: Minyak 2 kg 15.000).");
-  }
-}
-
 let touchstartY = 0;
 let touchendY = 0;
 
@@ -3100,7 +3132,6 @@ function stopVoiceRecordingUI() {
   }
 }
 
-// --- FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
 function autoHitungSubjudul() {
   const inputEl = document.getElementById("catatan-desc-input");
   if (!inputEl) return;
@@ -3110,18 +3141,11 @@ function autoHitungSubjudul() {
 
   lines.forEach(line => {
     if (line.trim() === '') return;
-    
-    // Memisahkan teks per baris berdasarkan spasi
     const parts = line.trim().split(/\s+/);
-    
     if (parts.length > 0) {
-      // Mengambil teks paling akhir dari baris tersebut (harga nominal)
       const nominalText = parts[parts.length - 1];
-      
-      // Murni mengambil HANYA ANGKA. Mengabaikan titik, koma, huruf dll.
       const angkaBersih = nominalText.replace(/[^0-9]/g, '');
       const nominal = parseInt(angkaBersih) || 0;
-      
       if (nominal > 0) {
         total += nominal;
       }
@@ -3134,19 +3158,15 @@ function autoHitungSubjudul() {
   if (total > 0) {
     subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
   } else {
-    // Kosongkan kembali jika total 0 atau rincian dihapus semua
     subjudulInput.value = "";
   }
 }
 
-// Global Event Listener: Memicu kalkulasi setiap kali ada ketikan (input) di dalam textarea Rincian
 document.addEventListener('input', function(e) {
   if (e.target && e.target.id === 'catatan-desc-input') {
     autoHitungSubjudul();
   }
 });
-// --- END FITUR PERHITUNGAN OTOMATIS SUBJUDUL ---
-
 
 setTheme(currentTheme);
 setLanguage(currentLang);
