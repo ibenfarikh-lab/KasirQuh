@@ -3140,6 +3140,10 @@ function stopVoiceRecordingUI() {
 function autoHitungSubjudul() {
   const inputEl = document.getElementById("catatan-desc-input");
   if (!inputEl) return;
+  
+  const cursorPosStart = inputEl.selectionStart;
+  const cursorPosEnd = inputEl.selectionEnd;
+
   const isi = inputEl.value;
   const lines = isi.split('\n');
   let total = 0;
@@ -3158,13 +3162,17 @@ function autoHitungSubjudul() {
   });
 
   const subjudulInput = document.getElementById("catatan-subtitle-input");
-  if (!subjudulInput) return;
-  
-  if (total > 0) {
-    subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
-  } else {
-    subjudulInput.value = "";
+  if (subjudulInput) {
+    if (total > 0) {
+      subjudulInput.value = "Pembayaran " + total.toLocaleString('id-ID');
+    } else {
+      subjudulInput.value = "";
+    }
   }
+
+  try {
+    inputEl.setSelectionRange(cursorPosStart, cursorPosEnd);
+  } catch (e) {}
 }
 
 document.addEventListener('input', function(e) {
