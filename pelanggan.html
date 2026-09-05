@@ -50,10 +50,8 @@
     <h1 id="welcomeStoreName" style="font-size: 2.8rem; margin: 0 0 10px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
     <p style="font-size: 1.1rem; opacity: 0.9; margin: 0 0 25px 0;">Selamat Datang di Toko Kami</p>
     
-    <!-- Tombol Install di Welcome Screen (Selalu Tampil) -->
     <button id="welcomeInstallBtn" onclick="triggerInstallPWA()" style="background: white; color: #2563eb; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">📲 Install Aplikasi KasirQuh</button>
     
-    <!-- Opsi Masuk / Daftar di Pojok Kiri Bawah -->
     <button onclick="bukaLoginDariWelcome()" style="position: absolute; bottom: 20px; left: 20px; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.6); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;">Masuk / Daftar</button>
   </div>
 
@@ -75,7 +73,7 @@
         </p>
       </div>
 
-      <!-- Form Register (Pendaftaran dengan Persetujuan Admin) -->
+      <!-- Form Register -->
       <div id="formRegisterContainer" style="display: none;">
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Daftar Akun (Menunggu Persetujuan Admin)</p>
         <form onsubmit="prosesDaftarPelanggan(event)" class="form-vertical">
@@ -172,7 +170,6 @@
                 <input type="hidden" id="cust-proof-base64" value="">
               </div>
 
-              <!-- KOLOM CATATAN PELANGGAN -->
               <div style="margin-top: 8px; margin-bottom: 6px;">
                 <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 4px;">Catatan untuk Toko (Opsional):</label>
                 <textarea id="cust-order-note" rows="2" placeholder="Cth: Ayamnya tolong dipotong 8 bagian, pilih bawang yang besar..." style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;"></textarea>
@@ -220,14 +217,12 @@
 
     <!-- 3. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
-      <!-- KARTU INSTALL APLIKASI DI PENGATURAN -->
       <div class="card" id="card-install-pwa" style="display: none; border: 1px solid #2563eb; background-color: var(--card-bg);">
         <h3 style="color: #2563eb; margin-top: 0; font-size: 1rem;">📱 Install Aplikasi ke HP</h3>
         <p style="color: var(--text-muted); font-size: 0.80rem; margin-bottom: 10px;">Pasang KasirQuh di layar utama HP Anda agar lebih mudah diakses seperti aplikasi biasa.</p>
         <button onclick="triggerInstallPWA()" style="background: #2563eb; color: white; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer;">📲 Install Sekarang</button>
       </div>
 
-      <!-- 1. IDENTITAS PELANGGAN (PALING ATAS) -->
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Identitas Pelanggan</h3>
         <div class="form-vertical">
@@ -243,7 +238,6 @@
         </div>
       </div>
 
-      <!-- 2. TAMPILAN & TEMA -->
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Tampilan & Tema</h3>
         <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
@@ -262,7 +256,6 @@
         </div>
       </div>
 
-      <!-- 3. NADA DERING NOTIFIKASI -->
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Pengaturan Nada Dering Notifikasi</h3>
         <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
@@ -279,7 +272,6 @@
         </div>
       </div>
 
-      <!-- KARTU TOMBOL PEMBERSIH CACHE DARURAT PELANGGAN -->
       <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5;">
         <h3 style="color: #dc2626; margin-top: 0; font-size: 1rem;">Pembaruan Sistem & Cache</h3>
         <p style="color: var(--text-muted); font-size: 0.80rem; margin-bottom: 10px;">Gunakan tombol ini jika aplikasi tersangkut versi lama.</p>
@@ -296,7 +288,6 @@
 
   <!-- FLOATING CHAT & UTILITIES -->
   <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
-    <!-- Tombol Floating AI Assistant (Diubah menjadi ikon Chat & Warna Biru) -->
     <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten AI Toko" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
     </button>
@@ -329,21 +320,30 @@
     </div>
   </div>
 
-  <!-- MODAL ASISTEN AI -->
+  <!-- MODAL ASISTEN AI DENGAN FITUR SUARA (TTS & SPEECH RECOGNITION) -->
   <div id="aiChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleAIChatModal()">
     <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
       <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0; font-size: 1rem;">😁 Asisten Belanja AI</h3>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <h3 style="margin: 0; font-size: 1rem;">😁 Asisten Belanja AI</h3>
+          <button id="aiSoundToggle" onclick="toggleAISound()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">🔊 Suara: ON</button>
+        </div>
         <div style="display: flex; gap: 8px; align-items: center;">
           <button onclick="beralihKeLiveChatFromAI()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">💬 Chat Admin</button>
           <button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white; background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
         </div>
       </div>
+      
       <div id="ai-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
-        <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-line;">HALOOOO BESTIE! WELCOME... di **Warunge Mimi**! Toko serba ana paling hits, tempat nongkronge bumbu dapur lengkap, sayuran, kopi sachet ambir aja ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalaken kula asisten kece dari Warunge Mimi sing siap baturi belanja bestie biar makin gampang dan cepet. Pokoknya dari Bumbu Racik, Indomie, Bawang Merah, Kopi Good Day, ampe Ayam & Ikan seger... Mimi ana kabeh, harga ramah di kantong pulak! Mau saya bantuin apa nih? Mau Ngobrol atau Tanya-tanya dulu juga boleh... 😁 yuk gas shoping... 🛒🛒🛒😁😁😁</div>
+        <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-line;">HALOOOO BESTIE! WELCOME... di **Warunge Mimi**! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari Warunge Mimi siap baturi belanja biar makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget! 😁🛒</div>
       </div>
-      <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px;">
-        <input type="text" id="ai-chat-input" placeholder="Tanya stok, harga, dll..." onkeypress="if(event.key==='Enter') kirimPesanKeAI()" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.85rem;">
+
+      <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px; align-items: center;">
+        <input type="text" id="ai-chat-input" placeholder="Tanya stok, harga, atau ngobrol..." onkeypress="if(event.key==='Enter') kirimPesanKeAI()" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.85rem;">
+        
+        <!-- Tombol Mikrofon untuk Pelanggan (Speech-to-Text) -->
+        <button id="aiMicButton" onclick="toggleAISpeechRecognition()" title="Ngomong pakai suara" style="background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;">🎤</button>
+        
         <button onclick="kirimPesanKeAI()" style="background: #7c3aed; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
       </div>
     </div>
@@ -361,7 +361,7 @@
     </button>
   </div>
 
-  <!-- PWA Service Worker & Install Script -->
+  <!-- PWA & Integrasi Voice (TTS & Speech Recognition) -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -394,7 +394,6 @@
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
-        console.log('Pengguna menyetujui instalasi PWA');
         tutupWelcomeScreen();
       }
       deferredPrompt = null;
@@ -417,12 +416,83 @@
       }
     }
 
-    window.addEventListener('appinstalled', () => {
-      const cardInstall = document.getElementById('card-install-pwa');
-      if (cardInstall) cardInstall.style.display = 'none';
-      tutupWelcomeScreen();
-      console.log('PWA berhasil diinstal');
-    });
+    // --- VARIABEL & FITUR VOICE (SPEECH TO TEXT & TEXT TO SPEECH) ---
+    let isAiSoundOn = true;
+    let aiRecognition = null;
+    let isAiListening = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      aiRecognition = new SpeechRecognition();
+      aiRecognition.lang = 'id-ID';
+      aiRecognition.continuous = false;
+      aiRecognition.interimResults = false;
+
+      aiRecognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('ai-chat-input').value = transcript;
+        stopAiListeningState();
+        kirimPesanKeAI();
+      };
+
+      aiRecognition.onerror = function(event) {
+        console.error("Speech recognition error", event.error);
+        stopAiListeningState();
+      };
+
+      aiRecognition.onend = function() {
+        stopAiListeningState();
+      };
+    }
+
+    function toggleAISpeechRecognition() {
+      if (!aiRecognition) {
+        alert("Maaf, browser kamu belum mendukung fitur pengenalan suara, Ka.");
+        return;
+      }
+      if (isAiListening) {
+        aiRecognition.stop();
+        stopAiListeningState();
+      } else {
+        aiRecognition.start();
+        startAiListeningState();
+      }
+    }
+
+    function startAiListeningState() {
+      isAiListening = true;
+      const micBtn = document.getElementById('aiMicButton');
+      micBtn.style.background = '#dc2626';
+      micBtn.innerText = "🛑";
+      document.getElementById('ai-chat-input').placeholder = "Mendengarkan... Silakan ngomong, Ka!";
+    }
+
+    function stopAiListeningState() {
+      isAiListening = false;
+      const micBtn = document.getElementById('aiMicButton');
+      micBtn.style.background = '#374151';
+      micBtn.innerText = "🎤";
+      document.getElementById('ai-chat-input').placeholder = "Tanya stok, harga, atau ngobrol...";
+    }
+
+    function toggleAISound() {
+      isAiSoundOn = !isAiSoundOn;
+      const btn = document.getElementById('aiSoundToggle');
+      btn.innerText = isAiSoundOn ? "🔊 Suara: ON" : "🔇 Suara: OFF";
+      if (!isAiSoundOn && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function speakAiText(text) {
+      if (!isAiSoundOn || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'id-ID';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
   </script>
 
   <script>
@@ -599,7 +669,6 @@
       }
     }
 
-    // --- FITUR LIVE CHAT & PENGALIHAN SEAMLESS ---
     function toggleCustomerChatModal() {
       let modal = document.getElementById("customerChatModal");
       modal.classList.toggle("show");
@@ -1296,6 +1365,9 @@
           </div>
         `;
         msgContainer.scrollTop = msgContainer.scrollHeight;
+
+        // Panggil Text-to-Speech otomatis
+        speakAiText(aiReply);
 
       } catch (err) {
         document.getElementById(loadingId)?.remove();
