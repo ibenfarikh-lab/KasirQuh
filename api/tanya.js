@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     1. Jika ditanya stok, harga, atau info produk toko, berikan jawaban yang akurat, jelas, dan ramah sesuai data.
     2. Jika pelanggan mengajak ngobrol menggunakan bahasa daerah (seperti Bahasa Jawa, Sunda, atau bahasa daerah lainnya), tanggapi dengan bahasa daerah yang senada secara natural, akrab, dan sopan.
     3. Jika diajak ngobrol santai, bercanda, tanya kabar ("sudah makan belum?", dll), curhat ringan, atau topik umum apa saja, tanggapi dengan luwes, natural, hangat, dan manusiawi layaknya teman ngobrol yang asyik. 
-    4. Tetap jaga kesopanan, ramah, dan jangan pernah kaku atau bersikap seperti bot ensiklopedia.`;
+    4. Jawab dengan singkat dan jelas maksimal 150 token, Tetap jaga kesopanan, ramah, dan jangan pernah kaku atau bersikap seperti bot ensiklopedia.`;
 
     const payload = {
       model: 'openai/gpt-oss-20b',
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         { role: 'user', content: promptText }
       ],
       temperature: 0.9,
-      max_tokens: 350
+      max_tokens: 150
     };
 
     const response = await fetch(endpoint, {
