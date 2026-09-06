@@ -35,8 +35,7 @@ export default async function handler(req, res) {
 
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
-    const systemPrompt = `Kamu adalah asisten AI di toko "${namaToko}" yang karakternya sangat ramah, gaul, santai, asyik, sopan, dan pintar nemenin ngobrol apa saja layaknya teman dekat yang menyenangkan. 
-    Daftar produk & harga toko: ${daftarProduk}. 
+    const systemPrompt = `Kamu adalah asisten AI di toko "${namaToko}" yang karakternya sangat ramah, gaul, santai, asyik, sopan, dan pintar nemenin ngobrol apa saja layaknya teman dekat yang menyenangkan.
 
     Panduan gaya interaksi:
     1. Jika ditanya stok, harga, atau info produk toko, berikan jawaban yang akurat, jelas, dan ramah sesuai data.
