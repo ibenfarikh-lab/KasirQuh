@@ -484,14 +484,32 @@
       }
     }
 
-    function speakAiText(text) {
-      if (!isAiSoundOn || !('speechSynthesis' in window)) return;
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'id-ID';
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
+    // FITUR TTS TERBARU MENGGUNAKAN API EDGE-TTS
+    async function speakAiText(text) {
+      if (!isAiSoundOn) return; 
+      
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+      try {
+        const response = await fetch(`/api/tts?text=${encodeURIComponent(text)}`);
+        if (!response.ok) throw new Error("Gagal mengambil audio TTS");
+        
+        const blob = await response.blob();
+        const audioUrl = URL.createObjectURL(blob);
+        
+        const audio = new Audio(audioUrl);
+        audio.play();
+      } catch (err) {
+        console.error("Gagal menggunakan Edge-TTS, beralih ke suara bawaan:", err);
+        
+        if ('speechSynthesis' in window) {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'id-ID';
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          window.speechSynthesis.speak(utterance);
+        }
+      }
     }
   </script>
 
@@ -1366,7 +1384,7 @@
         `;
         msgContainer.scrollTop = msgContainer.scrollHeight;
 
-        // Panggil Text-to-Speech otomatis
+        // Panggil Text-to-Speech otomatis menggunakan Edge-TTS
         speakAiText(aiReply);
 
       } catch (err) {
