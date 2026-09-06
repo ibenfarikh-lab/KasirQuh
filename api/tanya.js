@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       
       if (response.status === 429) {
         return sendJson(200, { 
-          reply: "Wah, obrolan kita lagi ngebut banget sampai otaknya kepanasan! Istirahat bentar 10 detik ya, Ka. ☕" 
+          reply: "Wah, obrolan kita lagi ngebut banget sampai otaknya kepanasan! Istirahat bentar 10 detik ya, Ka... atau chat admin toko langsung ya ka... ☕" 
         });
       }
 
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    const aiReply = data.choices[0]?.message?.content || "Maaf, pikirannya lagi nge-lag dikit, coba ngomong lagi ya, Ka.";
+    const aiReply = data.choices[0]?.message?.content || "Maaf, pikirannya lagi nge-lag dikit, coba ngomong lagi ya, Ka...";
 
     return sendJson(200, { reply: aiReply });
 
