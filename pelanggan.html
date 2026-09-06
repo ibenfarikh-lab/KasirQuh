@@ -484,7 +484,6 @@
       }
     }
 
-    // Fungsi placeholder kosong agar fungsi pemanggilan aman (audio di-handle langsung saat pre-load di kirimPesanKeAI)
     function speakAiText(text) {
       // Ditangani secara pre-load di dalam fungsi kirimPesanKeAI
     }
@@ -1329,25 +1328,57 @@
       try {
         let daftarProdukText = "";
         let keywordLower = prompt.toLowerCase();
-        let matchedCount = 0;
+        
+        // 1. Deteksi kata kunci pertanyaan belanja/produk
+        let shoppingKeywords = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"];
+        let isAskingProduct = shoppingKeywords.some(kw => keywordLower.includes(kw));
 
-        let isAskingProduct = keywordLower.includes("stok") || 
-                              keywordLower.includes("harga") || 
-                              keywordLower.includes("jual") || 
-                              keywordLower.includes("ada") || 
-                              keywordLower.includes("beli") || 
-                              keywordLower.includes("minta");
+        // 2. Cek apakah ada nama produk di database yang cocok dengan ketikan user
+        let matchedProducts = [];
+        for (let code in databaseProduk) {
+          let p = databaseProduk[code];
+          let pNamaLower = p.nama.toLowerCase();
+          
+          let words = pNamaLower.split(' ').filter(w => w.length > 2);
+          let isNameMatched = keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w));
 
-        if (isAskingProduct) {
-          for (let code in databaseProduk) {
-            let p = databaseProduk[code];
-            if (keywordLower.includes(p.nama.toLowerCase()) || matchedCount < 3) {
-              if (matchedCount >= 3) break;
-              let s = (p.satuan||'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan||'Pcs');
-              daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}\n`;
-              matchedCount++;
+          if (isNameMatched) {
+            matchedProducts.push(p);
+          }
+        }
+
+        // 3. Logika pemilahan data (Hemat Token: Maksimal 3 produk)
+        if (isAskingProduct || matchedProducts.length > 0) {
+          if (matchedProducts.length > 0) {
+            matchedProducts.slice(0, 3).forEach(p => {
+              let s = (p.satuan || 'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan || 'Pcs');
+              let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+              daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${s}\n`;
+            });
+          } else if (keywordLower.includes("semua") || keywordLower.includes("list") || keywordLower.includes("menu") || keywordLower.includes("apa saja")) {
+            let count = 0;
+            for (let code in databaseProduk) {
+              if (count >= 3) break;
+              let p = databaseProduk[code];
+              let s = (p.satuan || 'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan || 'Pcs');
+              let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+              daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${s}\n`;
+              count++;
+            }
+          } else {
+            let count = 0;
+            for (let code in databaseProduk) {
+              if (count >= 3) break;
+              let p = databaseProduk[code];
+              let s = (p.satuan || 'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan || 'Pcs');
+              let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+              daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${s}\n`;
+              count++;
             }
           }
+        } else {
+          // OBROLAN SANTAI: Token sangat hemat (0 data produk dikirim ke AI)
+          daftarProdukText = "Tidak ada produk yang dilampirkan (obrolan santai).";
         }
 
         let response = await fetch('/api/tanya', {
@@ -1355,7 +1386,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prompt: prompt,
-            daftarProduk: daftarProdukText || "Tidak ada produk yang dilampirkan untuk obrolan ini.",
+            daftarProduk: daftarProdukText,
             namaToko: pengaturanToko.nama || 'KasirQuh'
           })
         });
