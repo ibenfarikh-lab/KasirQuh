@@ -1328,11 +1328,15 @@
 
       try {
         let daftarProdukText = "";
-        for (let code in databaseProduk) {
-          let p = databaseProduk[code];
-          let s = (p.satuan||'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan||'Pcs');
-          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}\n`;
-        }
+let counter = 0;
+for (let code in databaseProduk) {
+  if (counter >= 3) break;
+  let p = databaseProduk[code];
+  let s = (p.satuan || 'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan || 'Pcs');
+  daftarProdukText += `- ${p.nama}: Rp ${(p.harga || 0).toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${s}\n`;
+  counter++;
+}
+
 
         let response = await fetch('/api/tanya', {
           method: "POST",
