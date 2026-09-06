@@ -1328,10 +1328,26 @@
 
       try {
         let daftarProdukText = "";
-        for (let code in databaseProduk) {
-          let p = databaseProduk[code];
-          let s = (p.satuan||'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan||'Pcs');
-          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}\n`;
+        let keywordLower = prompt.toLowerCase();
+        let matchedCount = 0;
+
+        let isAskingProduct = keywordLower.includes("stok") || 
+                              keywordLower.includes("harga") || 
+                              keywordLower.includes("jual") || 
+                              keywordLower.includes("ada") || 
+                              keywordLower.includes("beli") || 
+                              keywordLower.includes("minta");
+
+        if (isAskingProduct) {
+          for (let code in databaseProduk) {
+            let p = databaseProduk[code];
+            if (keywordLower.includes(p.nama.toLowerCase()) || matchedCount < 3) {
+              if (matchedCount >= 3) break;
+              let s = (p.satuan||'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan||'Pcs');
+              daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}\n`;
+              matchedCount++;
+            }
+          }
         }
 
         let response = await fetch('/api/tanya', {
@@ -1339,7 +1355,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prompt: prompt,
-            daftarProduk: daftarProdukText,
+            daftarProduk: daftarProdukText || "Tidak ada produk yang dilampirkan untuk obrolan ini.",
             namaToko: pengaturanToko.nama || 'KasirQuh'
           })
         });
@@ -1352,7 +1368,6 @@
           aiReply = data.candidates[0].content.parts[0].text.split('\n').map(line => line.trim()).join('\n').trim();
         }
 
-        // PRE-LOAD AUDIO TTS DI BALIK LAYAR SELAMA ANIMASI MENGETIK
         let audioUrl = null;
         if (isAiSoundOn) {
           const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
@@ -1367,10 +1382,8 @@
           }
         }
 
-        // Hapus animasi "Sedang mengetik..."
         document.getElementById(loadingId)?.remove();
 
-        // Tampilkan teks jawaban dan putar suara secara bersamaan
         msgContainer.innerHTML += `
           <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">
             ${escapeHtml(aiReply)}
@@ -1378,7 +1391,6 @@
         `;
         msgContainer.scrollTop = msgContainer.scrollHeight;
 
-        // Suara langsung berbarengan saat teks muncul di layar
         if (audioUrl) {
           const audio = new Audio(audioUrl);
           audio.play();
@@ -1395,7 +1407,7 @@
     }
 
     function escapeHtml(text) {
-      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return text.replace(/&/g, "&amp;").replace(/&lt;/g, "&lt;").replace(/>/g, "&gt;");
     }
 
     function bersihkanCacheTotal() {
