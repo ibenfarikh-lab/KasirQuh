@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       
       if (response.status === 429) {
         return sendJson(200, { 
-          reply: "Wah, obrolan kita lagi ngebut banget sampai otaknya kepanasan! Istirahat bentar 10 detik ya, lalu chat lagi ya Ka, Atau bisa langsung chat Admin toko kaka...  ☕" 
+          reply: "Wah, obrolan kita lagi ngebut banget sampai otaknya kepanasan! Istirahat bentar 10 detik ya, lalu chat lagi ya Ka... Atau bisa langsung chat Admin toko kakak...  ☕" 
         });
       }
 
