@@ -45,13 +45,13 @@ export default async function handler(req, res) {
     4. Tetap jaga kesopanan, ramah, dan jangan pernah kaku atau bersikap seperti bot ensiklopedia.`;
 
     const payload = {
-      model: 'groq/compound',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: promptText }
       ],
       temperature: 0.9,
-      max_tokens: 100
+      max_tokens: 350
     };
 
     const response = await fetch(endpoint, {
