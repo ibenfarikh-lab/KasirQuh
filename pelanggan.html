@@ -484,32 +484,9 @@
       }
     }
 
-    // FITUR TTS TERBARU MENGGUNAKAN API EDGE-TTS
-    async function speakAiText(text) {
-      if (!isAiSoundOn) return; 
-      
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-
-      try {
-        const response = await fetch(`/api/tts?text=${encodeURIComponent(text)}`);
-        if (!response.ok) throw new Error("Gagal mengambil audio TTS");
-        
-        const blob = await response.blob();
-        const audioUrl = URL.createObjectURL(blob);
-        
-        const audio = new Audio(audioUrl);
-        audio.play();
-      } catch (err) {
-        console.error("Gagal menggunakan Edge-TTS, beralih ke suara bawaan:", err);
-        
-        if ('speechSynthesis' in window) {
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'id-ID';
-          utterance.rate = 1.0;
-          utterance.pitch = 1.0;
-          window.speechSynthesis.speak(utterance);
-        }
-      }
+    // Fungsi placeholder kosong agar fungsi pemanggilan aman (audio di-handle langsung saat pre-load di kirimPesanKeAI)
+    function speakAiText(text) {
+      // Ditangani secara pre-load di dalam fungsi kirimPesanKeAI
     }
   </script>
 
@@ -1368,8 +1345,6 @@
         });
 
         let data = await response.json();
-        document.getElementById(loadingId)?.remove();
-
         let aiReply = "Maaf, saya sedang mengalami kendala teknis. Silakan tanyakan langsung ke admin.";
         if (data.reply) {
           aiReply = data.reply.split('\n').map(line => line.trim()).join('\n').trim();
@@ -1377,6 +1352,25 @@
           aiReply = data.candidates[0].content.parts[0].text.split('\n').map(line => line.trim()).join('\n').trim();
         }
 
+        // PRE-LOAD AUDIO TTS DI BALIK LAYAR SELAMA ANIMASI MENGETIK
+        let audioUrl = null;
+        if (isAiSoundOn) {
+          const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim();
+          try {
+            const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`);
+            if (ttsResponse.ok) {
+              const blob = await ttsResponse.blob();
+              audioUrl = URL.createObjectURL(blob);
+            }
+          } catch (e) {
+            console.error("Gagal memuat audio TTS:", e);
+          }
+        }
+
+        // Hapus animasi "Sedang mengetik..."
+        document.getElementById(loadingId)?.remove();
+
+        // Tampilkan teks jawaban dan putar suara secara bersamaan
         msgContainer.innerHTML += `
           <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">
             ${escapeHtml(aiReply)}
@@ -1384,8 +1378,11 @@
         `;
         msgContainer.scrollTop = msgContainer.scrollHeight;
 
-        // Panggil Text-to-Speech otomatis menggunakan Edge-TTS
-        speakAiText(aiReply);
+        // Suara langsung berbarengan saat teks muncul di layar
+        if (audioUrl) {
+          const audio = new Audio(audioUrl);
+          audio.play();
+        }
 
       } catch (err) {
         document.getElementById(loadingId)?.remove();
