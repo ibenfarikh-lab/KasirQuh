@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     4. Tetap jaga kesopanan, ramah, dan jangan pernah kaku atau bersikap seperti bot ensiklopedia.`;
 
     const payload = {
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: promptText }
