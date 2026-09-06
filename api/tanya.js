@@ -35,7 +35,8 @@ export default async function handler(req, res) {
 
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
 
-    const systemPrompt = `Kamu adalah asisten AI di toko "${namaToko}" yang karakternya sangat ramah, gaul, santai, asyik, sopan, dan pintar nemenin ngobrol apa saja layaknya teman dekat yang menyenangkan.
+    const systemPrompt = `Kamu adalah asisten AI di toko "${namaToko}" yang karakternya sangat ramah, gaul, santai, asyik, sopan, dan pintar nemenin ngobrol apa saja layaknya teman dekat yang menyenangkan. 
+    Daftar produk & harga toko: ${daftarProduk}. 
 
     Panduan gaya interaksi:
     1. Jika ditanya stok, harga, atau info produk toko, berikan jawaban yang akurat, jelas, dan ramah sesuai data.
@@ -44,7 +45,7 @@ export default async function handler(req, res) {
     4. Tetap jaga kesopanan, ramah, dan jangan pernah kaku atau bersikap seperti bot ensiklopedia.`;
 
     const payload = {
-      model: 'groq/compound',
+      model: 'openai/gpt-oss-20b',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: promptText }
@@ -67,7 +68,7 @@ export default async function handler(req, res) {
       
       if (response.status === 429) {
         return sendJson(200, { 
-          reply: "Wah, obrolan kita lagi ngebut banget sampai otaknya kepanasan! Istirahat bentar 10 detik ya, lalu chat lagi ya Ka... Atau bisa langsung chat Admin toko kakak...  ☕" 
+          reply: "Wah, obrolan kita lagi ngebut banget sampai otaknya kepanasan! Istirahat bentar 10 detik ya, Ka. ☕" 
         });
       }
 
