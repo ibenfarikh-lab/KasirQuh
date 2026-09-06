@@ -1328,11 +1328,16 @@
 
       try {
         let daftarProdukText = "";
-        for (let code in databaseProduk) {
-          let p = databaseProduk[code];
-          let s = (p.satuan||'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan||'Pcs');
-          daftarProdukText += `- ${p.nama}: Harga Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}\n`;
-        }
+let semuaProduk = Object.values(databaseProduk);
+
+// Batasi maksimal 3 produk agar tidak memicu Error 413 (Payload Too Large)
+let produkDibatasi = semuaProduk.slice(0, 3);
+
+produkDibatasi.forEach(p => {
+  let s = (p.satuan||'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan||'Pcs');
+  daftarProdukText += `- ${p.nama}: Rp ${(p.harga||0).toLocaleString('id-ID')}, Stok: ${p.stok||0} ${s}\n`;
+});
+
 
         let response = await fetch('/api/tanya', {
           method: "POST",
