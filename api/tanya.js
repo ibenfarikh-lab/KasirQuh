@@ -76,7 +76,7 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    const aiReply = data.choices[0]?.message?.content || "Maaf, pikirannya lagi nge-lag dikit, coba ngomong lagi ya Ka...";
+    const aiReply = data.choices[0]?.message?.content || "Maaf, pikirannya lagi nge-lag dikit, coba ngomong lagi ya Ka... atau bisa chat admin toko ya...";
 
     return sendJson(200, { reply: aiReply });
 
