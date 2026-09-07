@@ -1347,27 +1347,36 @@
           }
         }
 
-                // 3. Logika pemilahan data (Hemat Token & Penyesuaian Satuan Harga)
-        if (isAskingProduct || matchedProducts.length > 0) {
-          let targetItems = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3);
-          
-          targetItems.forEach(p => {
-            let sat = (p.satuan || 'Pcs').toLowerCase();
-            let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
-            
-            // Penyesuaian harga jika satuan Kilogram (kg)
-            if (sat === 'kg' || sat === 'kilogram') {
-              valHarga = p.hargaRtg || (valHarga * 10);
-              sat = 'kg';
-            } else if (sat === 'rtg') {
-              sat = 'pcs';
-            } else {
-              sat = p.satuan || 'Pcs';
-            }
-            
-            daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`;
-          });
+                    // 3. Logika pemilahan data (Hemat Token: Maksimal 3 produk & Penyesuaian Harga)
+    if (isAskingProduct || matchedProducts.length > 0) {
+      let targetList = [];
+      if (matchedProducts.length > 0) {
+        targetList = matchedProducts.slice(0, 3);
+      } else {
+        let count = 0;
+        for (let code in databaseProduk) {
+          if (count >= 3) break;
+          targetList.push(databaseProduk[code]);
+          count++;
         }
+      }
+
+      targetList.forEach(p => {
+        let sat = (p.satuan || 'Pcs').toLowerCase();
+        let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+        
+        if (sat === 'kg' || sat === 'kilogram') {
+          valHarga = p.hargaRtg || (valHarga * 10);
+          sat = 'kg';
+        } else if (sat === 'rtg') {
+          sat = 'pcs';
+        } else {
+          sat = p.satuan || 'Pcs';
+        }
+
+        daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`;
+      });
+    } else {
 
 
           // OBROLAN SANTAI: Token sangat hemat (0 data produk dikirim ke AI)
