@@ -319,12 +319,11 @@
       </div>
     </div>
 
-    <!-- 6. HALAMAN CATATAN UTAMA -->
-    <div id="catatan" class="tab-content">
-      <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-        <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
-        <input type="date" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="padding: 6px 10px; font-weight: bold; border-radius: 8px; width: auto; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
-      </div>
+    <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+  <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
+  <input type="date" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="padding: 6px 10px; font-weight: bold; border-radius: 8px; width: auto; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+</div>
+
 
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 6px; gap: 6px; align-items: center;">
         <div id="container-sub-tabs-catatan" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;"></div>
@@ -619,6 +618,12 @@
       <button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button>
       <span id="stok-page-info">1/1</span>
       <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
+    </div>
+
+    <div class="inline-pagination" id="catatan-pagination-wrapper">
+      <button class="inline-page-btn" onclick="geserHariCatatan(-1)">◀</button>
+      <span id="catatan-date-info">Hari Ini</span>
+      <button class="inline-page-btn" onclick="geserHariCatatan(1)">▶</button>
     </div>
 
     <div class="bottom-right-menu-container" style="position: relative;">

@@ -605,6 +605,7 @@ function ubahTanggalCatatan(dateStr) {
   selectedCatatanDate = dateStr;
   updateDateDisplayUI();
   renderSubTabsCatatanUI();
+  updateCatatanBottomDateInfo();
 }
 
 function updateDateDisplayUI() {
@@ -1998,9 +1999,11 @@ function updatePermanentBarTitle() {
   const titleEl = document.getElementById("permanent-title");
   const posPag = document.getElementById("pos-pagination-wrapper");
   const stokPag = document.getElementById("stok-pagination-wrapper");
+  const catatanPag = document.getElementById("catatan-pagination-wrapper");
 
   posPag.classList.remove("show");
   stokPag.classList.remove("show");
+  if (catatanPag) catatanPag.classList.remove("show");
 
   if (activeTab === 'penjualan') {
     titleEl.innerText = (currentLang === 'en') ? "POS Page" : ((currentLang === 'ar') ? "صفحة الكاشير" : "Halaman Kasir");
@@ -2016,6 +2019,8 @@ function updatePermanentBarTitle() {
     titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? ((currentLang === 'en') ? "Customer Data" : ((currentLang === 'ar') ? "بيانات العملاء" : "Data Pelanggan")) : ((activeSubDataTab === 'sub-persetujuan') ? ((currentLang === 'en') ? "Customer Approvals" : ((currentLang === 'ar') ? "موافقات العملاء" : "Persetujuan Pelanggan")) : ((currentLang === 'en') ? "Transaction Data" : ((currentLang === 'ar') ? "بيانات المعاملات" : "Data Transaksi")));
   } else if (activeTab === 'catatan') {
     titleEl.innerText = labelNamaTabCatatan[activeSubCatatanTab] || "Catatan";
+    if (catatanPag) catatanPag.classList.add("show");
+    updateCatatanBottomDateInfo();
   } else if (activeTab === 'pengaturan') {
     titleEl.innerText = (currentLang === 'en') ? "System Settings" : ((currentLang === 'ar') ? "إعدادات النظام" : "Pengaturan Sistem");
   }
@@ -3137,6 +3142,31 @@ document.addEventListener('input', function(e) {
     }, 300);
   }
 });
+
+// Fungsi Navigasi Hari pada Catatan (Tambahan)
+function geserHariCatatan(delta) {
+  if (!selectedCatatanDate) return;
+  let parts = selectedCatatanDate.split('-');
+  let d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  d.setDate(d.getDate() + delta);
+  
+  let year = d.getFullYear();
+  let month = String(d.getMonth() + 1).padStart(2, '0');
+  let day = String(d.getDate()).padStart(2, '0');
+  let newDateStr = `${year}-${month}-${day}`;
+  
+  ubahTanggalCatatan(newDateStr);
+}
+
+function updateCatatanBottomDateInfo() {
+  const infoEl = document.getElementById("catatan-date-info");
+  if (infoEl && selectedCatatanDate) {
+    let parts = selectedCatatanDate.split('-');
+    if (parts.length === 3) {
+      infoEl.innerText = `${parts[2]}/${parts[1]}`;
+    }
+  }
+}
 
 setTheme(currentTheme);
 setLanguage(currentLang);
