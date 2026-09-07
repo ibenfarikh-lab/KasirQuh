@@ -605,15 +605,33 @@ function ubahTanggalCatatan(dateStr) {
   selectedCatatanDate = dateStr;
   updateDateDisplayUI();
   renderSubTabsCatatanUI();
-  updateCatatanBottomDateInfo();
+}
+
+function navigasiHariCatatan(delta) {
+  let currentDate = new Date(selectedCatatanDate + "T00:00:00");
+  currentDate.setDate(currentDate.getDate() + delta);
+  
+  let year = currentDate.getFullYear();
+  let month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  let day = String(currentDate.getDate()).padStart(2, '0');
+  
+  ubahTanggalCatatan(`${year}-${month}-${day}`);
 }
 
 function updateDateDisplayUI() {
   const displayEl = document.getElementById("catatan-date-display");
   const pickerEl = document.getElementById("catatan-date-picker");
+  const bottomDateEl = document.getElementById("catatan-bottom-date-info"); 
+
   if (displayEl) displayEl.innerText = `📅 ${formatTanggalIndo(selectedCatatanDate)}`;
   if (pickerEl && pickerEl.value !== selectedCatatanDate) {
     pickerEl.value = selectedCatatanDate;
+  }
+  
+  if (bottomDateEl) {
+    let fullDate = formatTanggalIndo(selectedCatatanDate);
+    let splitDate = fullDate.split(', ');
+    bottomDateEl.innerText = splitDate.length > 1 ? splitDate[1] : fullDate;
   }
 }
 
@@ -2001,26 +2019,25 @@ function updatePermanentBarTitle() {
   const stokPag = document.getElementById("stok-pagination-wrapper");
   const catatanPag = document.getElementById("catatan-pagination-wrapper");
 
-  if (posPag) posPag.classList.remove("show");
-  if (stokPag) stokPag.classList.remove("show");
+  posPag.classList.remove("show");
+  stokPag.classList.remove("show");
   if (catatanPag) catatanPag.classList.remove("show");
 
   if (activeTab === 'penjualan') {
     titleEl.innerText = (currentLang === 'en') ? "POS Page" : ((currentLang === 'ar') ? "صفحة الكاشير" : "Halaman Kasir");
-    if (posPag) posPag.classList.add("show");
+    posPag.classList.add("show");
   } else if (activeTab === 'kasir-online') {
     titleEl.innerText = (currentLang === 'en') ? "Online POS" : ((currentLang === 'ar') ? "كاشير أونلاين" : "Kasir Online");
   } else if (activeTab === 'data-barang') {
     titleEl.innerText = (currentLang === 'en') ? "Stock Management" : ((currentLang === 'ar') ? "إدارة المخزون" : "Manajemen Stok");
-    if (stokPag) stokPag.classList.add("show");
+    stokPag.classList.add("show");
   } else if (activeTab === 'belanja-stok') {
     titleEl.innerText = (currentLang === 'en') ? "Restock" : ((currentLang === 'ar') ? "إعادة التخزين" : "Belanja Stok");
   } else if (activeTab === 'laporan') {
     titleEl.innerText = (activeSubDataTab === 'sub-pelanggan') ? ((currentLang === 'en') ? "Customer Data" : ((currentLang === 'ar') ? "بيانات العملاء" : "Data Pelanggan")) : ((activeSubDataTab === 'sub-persetujuan') ? ((currentLang === 'en') ? "Customer Approvals" : ((currentLang === 'ar') ? "موافقات العملاء" : "Persetujuan Pelanggan")) : ((currentLang === 'en') ? "Transaction Data" : ((currentLang === 'ar') ? "بيانات المعاملات" : "Data Transaksi")));
   } else if (activeTab === 'catatan') {
     titleEl.innerText = labelNamaTabCatatan[activeSubCatatanTab] || "Catatan";
-    if (catatanPag) catatanPag.classList.add("show");
-    updateCatatanBottomDateInfo();
+    if (catatanPag) catatanPag.classList.add("show"); 
   } else if (activeTab === 'pengaturan') {
     titleEl.innerText = (currentLang === 'en') ? "System Settings" : ((currentLang === 'ar') ? "إعدادات النظام" : "Pengaturan Sistem");
   }
@@ -2044,8 +2061,7 @@ function updatePermanentBarTitle() {
 function switchTab(tabId, pushHistory = true) {
   activeTab = tabId;
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  const targetTab = document.getElementById(tabId);
-  if (targetTab) targetTab.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
 
   if (pushHistory) history.pushState({tab: tabId}, "", "");
 
@@ -2063,7 +2079,7 @@ function switchTab(tabId, pushHistory = true) {
     if(fabAdd) fabAdd.style.display = 'none'; 
     if(fabAddCust) fabAddCust.style.display = 'none'; 
     if(fabAddCatatan) fabAddCatatan.style.display = 'none';
-  } else if (tabId === 'kasir-online' || tabId === 'live-chat-admin') {
+  } else if (tabId === 'kasir-online') {
     if(fabCart) fabCart.style.display = 'none'; 
     if(fabScan) fabScan.style.display = 'none'; 
     if(fabFilter) fabFilter.style.display = 'none'; 
@@ -2306,7 +2322,6 @@ function ubahQty(index, delta) {
 
 function renderCart() {
   const tbody = document.getElementById("cart-body");
-  if (!tbody) return;
   tbody.innerHTML = "";
   totalBelanja = 0;
   let totalItemCount = 0;
@@ -3144,31 +3159,6 @@ document.addEventListener('input', function(e) {
     }, 300);
   }
 });
-
-// Fungsi Navigasi Hari pada Catatan (Bottom Bar)
-function geserHariCatatan(delta) {
-  if (!selectedCatatanDate) return;
-  let parts = selectedCatatanDate.split('-');
-  let d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-  d.setDate(d.getDate() + delta);
-  
-  let year = d.getFullYear();
-  let month = String(d.getMonth() + 1).padStart(2, '0');
-  let day = String(d.getDate()).padStart(2, '0');
-  let newDateStr = `${year}-${month}-${day}`;
-  
-  ubahTanggalCatatan(newDateStr);
-}
-
-function updateCatatanBottomDateInfo() {
-  const infoEl = document.getElementById("catatan-date-info");
-  if (infoEl && selectedCatatanDate) {
-    let parts = selectedCatatanDate.split('-');
-    if (parts.length === 3) {
-      infoEl.innerText = `${parts[2]}/${parts[1]}`;
-    }
-  }
-}
 
 setTheme(currentTheme);
 setLanguage(currentLang);
