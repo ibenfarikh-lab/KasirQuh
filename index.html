@@ -319,11 +319,12 @@
       </div>
     </div>
 
-    <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-  <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
-  <input type="date" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="padding: 6px 10px; font-weight: bold; border-radius: 8px; width: auto; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
-</div>
-
+    <!-- 6. HALAMAN CATATAN UTAMA -->
+    <div id="catatan" class="tab-content">
+      <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
+        <input type="date" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="padding: 6px 10px; font-weight: bold; border-radius: 8px; width: auto; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+      </div>
 
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 6px; gap: 6px; align-items: center;">
         <div id="container-sub-tabs-catatan" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;"></div>
@@ -620,9 +621,9 @@
       <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
     </div>
 
-    <div class="inline-pagination" id="catatan-pagination-wrapper">
+    <div class="inline-pagination" id="catatan-pagination-wrapper" style="display: none;">
       <button class="inline-page-btn" onclick="geserHariCatatan(-1)">◀</button>
-      <span id="catatan-date-info">Hari Ini</span>
+      <span id="catatan-date-info" style="font-size: 0.8rem; font-weight: bold; padding: 0 2px;">Hari</span>
       <button class="inline-page-btn" onclick="geserHariCatatan(1)">▶</button>
     </div>
 
@@ -758,12 +759,10 @@
 
       if (!text) return;
 
-      // Tampilkan pesan admin
       messageContainer.innerHTML += `<div style="background: #2563eb; color: white; padding: 8px 12px; border-radius: 8px; max-width: 85%; align-self: flex-end;">${text}</div>`;
       inputField.value = '';
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      // Ambil data produk toko dari cache/variabel global jika ada di script.js kakak
       let daftarProdukStr = "";
       try {
         if (typeof produk !== 'undefined' && Array.isArray(produk)) {
@@ -784,7 +783,6 @@
         }
       } catch (e) {}
 
-      // Tampilkan indikator loading
       const loadingId = 'loading-' + Date.now();
       messageContainer.innerHTML += `<div id="${loadingId}" style="background: var(--input-bg, #e5e7eb); color: var(--text-color, #374151); padding: 8px 12px; border-radius: 8px; max-width: 85%;">Lagi nge-analisis data... 🧠☕</div>`;
       messageContainer.scrollTop = messageContainer.scrollHeight;
@@ -802,7 +800,6 @@
 
         const data = await response.json();
         
-        // Hapus loading
         const loadingEl = document.getElementById(loadingId);
         if (loadingEl) loadingEl.remove();
 

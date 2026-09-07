@@ -2001,18 +2001,18 @@ function updatePermanentBarTitle() {
   const stokPag = document.getElementById("stok-pagination-wrapper");
   const catatanPag = document.getElementById("catatan-pagination-wrapper");
 
-  posPag.classList.remove("show");
-  stokPag.classList.remove("show");
+  if (posPag) posPag.classList.remove("show");
+  if (stokPag) stokPag.classList.remove("show");
   if (catatanPag) catatanPag.classList.remove("show");
 
   if (activeTab === 'penjualan') {
     titleEl.innerText = (currentLang === 'en') ? "POS Page" : ((currentLang === 'ar') ? "صفحة الكاشير" : "Halaman Kasir");
-    posPag.classList.add("show");
+    if (posPag) posPag.classList.add("show");
   } else if (activeTab === 'kasir-online') {
     titleEl.innerText = (currentLang === 'en') ? "Online POS" : ((currentLang === 'ar') ? "كاشير أونلاين" : "Kasir Online");
   } else if (activeTab === 'data-barang') {
     titleEl.innerText = (currentLang === 'en') ? "Stock Management" : ((currentLang === 'ar') ? "إدارة المخزون" : "Manajemen Stok");
-    stokPag.classList.add("show");
+    if (stokPag) stokPag.classList.add("show");
   } else if (activeTab === 'belanja-stok') {
     titleEl.innerText = (currentLang === 'en') ? "Restock" : ((currentLang === 'ar') ? "إعادة التخزين" : "Belanja Stok");
   } else if (activeTab === 'laporan') {
@@ -2044,7 +2044,8 @@ function updatePermanentBarTitle() {
 function switchTab(tabId, pushHistory = true) {
   activeTab = tabId;
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
+  const targetTab = document.getElementById(tabId);
+  if (targetTab) targetTab.classList.add('active');
 
   if (pushHistory) history.pushState({tab: tabId}, "", "");
 
@@ -2062,7 +2063,7 @@ function switchTab(tabId, pushHistory = true) {
     if(fabAdd) fabAdd.style.display = 'none'; 
     if(fabAddCust) fabAddCust.style.display = 'none'; 
     if(fabAddCatatan) fabAddCatatan.style.display = 'none';
-  } else if (tabId === 'kasir-online') {
+  } else if (tabId === 'kasir-online' || tabId === 'live-chat-admin') {
     if(fabCart) fabCart.style.display = 'none'; 
     if(fabScan) fabScan.style.display = 'none'; 
     if(fabFilter) fabFilter.style.display = 'none'; 
@@ -2305,6 +2306,7 @@ function ubahQty(index, delta) {
 
 function renderCart() {
   const tbody = document.getElementById("cart-body");
+  if (!tbody) return;
   tbody.innerHTML = "";
   totalBelanja = 0;
   let totalItemCount = 0;
@@ -3143,7 +3145,7 @@ document.addEventListener('input', function(e) {
   }
 });
 
-// Fungsi Navigasi Hari pada Catatan (Tambahan)
+// Fungsi Navigasi Hari pada Catatan (Bottom Bar)
 function geserHariCatatan(delta) {
   if (!selectedCatatanDate) return;
   let parts = selectedCatatanDate.split('-');
