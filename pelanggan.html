@@ -1347,36 +1347,29 @@
           }
         }
 
-        // 3. Logika pemilahan data (Hemat Token: Maksimal 3 produk)
+                // 3. Logika pemilahan data (Hemat Token & Penyesuaian Satuan Harga)
         if (isAskingProduct || matchedProducts.length > 0) {
-          if (matchedProducts.length > 0) {
-            matchedProducts.slice(0, 3).forEach(p => {
-              let s = (p.satuan || 'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan || 'Pcs');
-              let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
-              daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${s}\n`;
-            });
-          } else if (keywordLower.includes("semua") || keywordLower.includes("list") || keywordLower.includes("menu") || keywordLower.includes("apa saja")) {
-            let count = 0;
-            for (let code in databaseProduk) {
-              if (count >= 3) break;
-              let p = databaseProduk[code];
-              let s = (p.satuan || 'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan || 'Pcs');
-              let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
-              daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${s}\n`;
-              count++;
+          let targetItems = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3);
+          
+          targetItems.forEach(p => {
+            let sat = (p.satuan || 'Pcs').toLowerCase();
+            let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+            
+            // Penyesuaian harga jika satuan Kilogram (kg)
+            if (sat === 'kg' || sat === 'kilogram') {
+              valHarga = p.hargaRtg || (valHarga * 10);
+              sat = 'kg';
+            } else if (sat === 'rtg') {
+              sat = 'pcs';
+            } else {
+              sat = p.satuan || 'Pcs';
             }
-          } else {
-            let count = 0;
-            for (let code in databaseProduk) {
-              if (count >= 3) break;
-              let p = databaseProduk[code];
-              let s = (p.satuan || 'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan || 'Pcs');
-              let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
-              daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${s}\n`;
-              count++;
-            }
-          }
-        } else {
+            
+            daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`;
+          });
+        }
+
+
           // OBROLAN SANTAI: Token sangat hemat (0 data produk dikirim ke AI)
           daftarProdukText = "Tidak ada produk yang dilampirkan (obrolan santai).";
         }
