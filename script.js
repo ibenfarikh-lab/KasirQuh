@@ -20,6 +20,7 @@ const translations = {
     clear_cart_btn: "🗑️ Kosongkan Keranjang",
     ongoing: "🟡 Sedang Berlangsung",
     completed: "🟢 Selesai",
+    loading_loading: "Memuat pesanan...",
     loading_ongoing: "Memuat pesanan berlangsung...",
     loading_completed: "Memuat riwayat selesai...",
     chat_conversations: "💬 Daftar Percakapan",
@@ -36,7 +37,7 @@ const translations = {
     clear: "🗑️ Kosongkan",
     restock_btn: "🛒 Belanja",
     sub_customers: "👥 Data Pelanggan",
-    sub_persetujuan: "⏳ Persetujuan Pelanggan",
+    sub_approvals: "⏳ Persetujuan Pelanggan",
     sub_transactions: "📋 Data Transaksi",
     cust_total_financial: "TOTAL AKUMULASI KEUANGAN / CATATAN PELANGGAN",
     export_customers: "Ekspor Pelanggan",
@@ -2071,55 +2072,60 @@ function switchTab(tabId, pushHistory = true) {
   const fabAdd = document.getElementById('fab-add-btn');
   const fabAddCust = document.getElementById('fab-add-cust-btn');
   const fabAddCatatan = document.getElementById('fab-add-catatan-btn');
+  const fabVoiceScan = document.getElementById('fab-voice-scan-btn');
 
   if (tabId === 'penjualan') {
     if(fabCart) fabCart.style.display = 'flex'; 
     if(fabScan) fabScan.style.display = 'flex'; 
     if(fabFilter) fabFilter.style.display = 'flex'; 
+    if(fabVoiceScan) fabVoiceScan.style.display = 'flex';
     if(fabAdd) fabAdd.style.display = 'none'; 
     if(fabAddCust) fabAddCust.style.display = 'none'; 
     if(fabAddCatatan) fabAddCatatan.style.display = 'none';
-  } else if (tabId === 'kasir-online') {
-    if(fabCart) fabCart.style.display = 'none'; 
-    if(fabScan) fabScan.style.display = 'none'; 
-    if(fabFilter) fabFilter.style.display = 'none'; 
-    if(fabAdd) fabAdd.style.display = 'none'; 
-    if(fabAddCust) fabAddCust.style.display = 'none'; 
-    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
-  } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
-    if(fabCart) fabCart.style.display = 'none'; 
-    if(fabScan) fabScan.style.display = 'none'; 
-    if(fabFilter) fabFilter.style.display = 'flex'; 
-    if(fabAdd) fabAdd.style.display = 'flex'; 
-    if(fabAddCust) fabAddCust.style.display = 'none'; 
-    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
-    if(fabAdd) fabAdd.setAttribute("onclick", "openProductModal()");
-  } else if (tabId === 'laporan') {
-    if(fabCart) fabCart.style.display = 'none'; 
-    if(fabScan) fabScan.style.display = 'none'; 
-    if(fabFilter) fabFilter.style.display = 'none'; 
-    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
-    if (activeSubDataTab === 'sub-pelanggan') { 
-      if(fabAdd) fabAdd.style.display = 'none'; 
-      if(fabAddCust) fabAddCust.style.display = 'flex'; 
-    } else { 
+  } else {
+    if(fabVoiceScan) fabVoiceScan.style.display = 'none';
+    if (tabId === 'kasir-online') {
+      if(fabCart) fabCart.style.display = 'none'; 
+      if(fabScan) fabScan.style.display = 'none'; 
+      if(fabFilter) fabFilter.style.display = 'none'; 
       if(fabAdd) fabAdd.style.display = 'none'; 
       if(fabAddCust) fabAddCust.style.display = 'none'; 
+      if(fabAddCatatan) fabAddCatatan.style.display = 'none';
+    } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
+      if(fabCart) fabCart.style.display = 'none'; 
+      if(fabScan) fabScan.style.display = 'none'; 
+      if(fabFilter) fabFilter.style.display = 'flex'; 
+      if(fabAdd) fabAdd.style.display = 'flex'; 
+      if(fabAddCust) fabAddCust.style.display = 'none'; 
+      if(fabAddCatatan) fabAddCatatan.style.display = 'none';
+      if(fabAdd) fabAdd.setAttribute("onclick", "openProductModal()");
+    } else if (tabId === 'laporan') {
+      if(fabCart) fabCart.style.display = 'none'; 
+      if(fabScan) fabScan.style.display = 'none'; 
+      if(fabFilter) fabFilter.style.display = 'none'; 
+      if(fabAddCatatan) fabAddCatatan.style.display = 'none';
+      if (activeSubDataTab === 'sub-pelanggan') { 
+        if(fabAdd) fabAdd.style.display = 'none'; 
+        if(fabAddCust) fabAddCust.style.display = 'flex'; 
+      } else { 
+        if(fabAdd) fabAdd.style.display = 'none'; 
+        if(fabAddCust) fabAddCust.style.display = 'none'; 
+      }
+    } else if (tabId === 'catatan') {
+      if(fabCart) fabCart.style.display = 'none'; 
+      if(fabScan) fabScan.style.display = 'none'; 
+      if(fabFilter) fabFilter.style.display = 'none'; 
+      if(fabAdd) fabAdd.style.display = 'none'; 
+      if(fabAddCust) fabAddCust.style.display = 'none';
+      if(fabAddCatatan) fabAddCatatan.style.display = 'flex';
+    } else {
+      if(fabCart) fabCart.style.display = 'none'; 
+      if(fabScan) fabScan.style.display = 'none'; 
+      if(fabFilter) fabFilter.style.display = 'none'; 
+      if(fabAdd) fabAdd.style.display = 'none'; 
+      if(fabAddCust) fabAddCust.style.display = 'none'; 
+      if(fabAddCatatan) fabAddCatatan.style.display = 'none';
     }
-  } else if (tabId === 'catatan') {
-    if(fabCart) fabCart.style.display = 'none'; 
-    if(fabScan) fabScan.style.display = 'none'; 
-    if(fabFilter) fabFilter.style.display = 'none'; 
-    if(fabAdd) fabAdd.style.display = 'none'; 
-    if(fabAddCust) fabAddCust.style.display = 'none';
-    if(fabAddCatatan) fabAddCatatan.style.display = 'flex';
-  } else {
-    if(fabCart) fabCart.style.display = 'none'; 
-    if(fabScan) fabScan.style.display = 'none'; 
-    if(fabFilter) fabFilter.style.display = 'none'; 
-    if(fabAdd) fabAdd.style.display = 'none'; 
-    if(fabAddCust) fabAddCust.style.display = 'none'; 
-    if(fabAddCatatan) fabAddCatatan.style.display = 'none';
   }
   updatePermanentBarTitle();
   refreshData();
@@ -2252,12 +2258,12 @@ function kurangManualDariCode(barcode) {
   }
 }
 
-function tambahItemKeCart(barcode, produk) {
+function tambahItemKeCart(barcode, produk, customQty = null, customSatuanJual = null) {
   const satProd = (produk.satuan || "").toLowerCase();
   const isKg = (satProd === 'kg');
   const isRtg = (satProd === 'rtg');
-  let inputJumlah = 1;
-  let displaySatuan = 'pcs';
+  let inputJumlah = customQty !== null ? customQty : 1;
+  let displaySatuan = customSatuanJual !== null ? customSatuanJual : (isKg ? 'kg' : 'pcs');
   let hargaAktif = produk.harga;
   let modalAktif = produk.modal;
 
@@ -2266,14 +2272,15 @@ function tambahItemKeCart(barcode, produk) {
     let hargaKg = produk.hargaRtg || (produk.harga * isiOns);
     let modalKg = produk.modalRtg || (produk.modal * isiOns);
 
-    let kgStr = prompt(`Masukkan jumlah Kilogram (Kg) untuk ${produk.nama}\n(Contoh: 1 untuk 1 kg, 0.5 untuk setengah kg / 5 ons, 0.1 untuk 1 ons):`, "1");
-    if (kgStr === null) return;
-    inputJumlah = parseFloat(kgStr.replace(',', '.')) || 1;
+    if (customQty === null) {
+      let kgStr = prompt(`Masukkan jumlah Kilogram (Kg) untuk ${produk.nama}\n(Contoh: 1 untuk 1 kg, 0.5 untuk setengah kg / 5 ons, 0.1 untuk 1 ons):`, "1");
+      if (kgStr === null) return;
+      inputJumlah = parseFloat(kgStr.replace(',', '.')) || 1;
+    }
     hargaAktif = hargaKg;
     modalAktif = modalKg;
     displaySatuan = 'kg';
   } else if (isRtg) {
-    inputJumlah = 1;
     hargaAktif = produk.harga;
     modalAktif = produk.modal;
     displaySatuan = 'pcs';
@@ -2282,8 +2289,8 @@ function tambahItemKeCart(barcode, produk) {
   const existingItem = cart.find(item => item.barcode === barcode && item.satuanJual === displaySatuan);
   const currentCartQty = existingItem ? existingItem.qty : 0;
   if (currentCartQty + inputJumlah > (produk.stok || 0)) {
-    alert(`Stok tidak mencukupi! Sisa stok: ${produk.stok} kg/pcs`);
-    return;
+    if (customQty === null) alert(`Stok tidak mencukupi! Sisa stok: ${produk.stok}`);
+    return false;
   }
 
   if (existingItem) {
@@ -2299,6 +2306,7 @@ function tambahItemKeCart(barcode, produk) {
   }
   renderCart();
   refreshData();
+  return true;
 }
 
 function ubahQty(index, delta) {
@@ -3103,6 +3111,166 @@ function stopVoiceRecordingUI() {
     inputField.placeholder = "Tanya stok, saran jualan...";
   }
 }
+
+// --- FITUR BARU: VOICE SCANNER POS (DENGAN TIMER 10 DETIK & MODAL KERANJANG) ---
+let voiceScannerPos = null;
+let isVoiceScannerPosActive = false;
+let voiceTimeoutTimer = null;
+
+function startVoiceScannerFlow() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    return alert("Maaf, browser HP Anda belum mendukung fitur Voice Scanner. Gunakan Google Chrome.");
+  }
+
+  // 1. Langsung buka modal keranjang belanja biar kasir bisa lihat hasilnya live
+  openCartModal();
+
+  // 2. Tampilkan kotak indikator suara di keranjang
+  const indicatorBox = document.getElementById("voice-indicator-container");
+  const indicatorText = document.getElementById("voice-indicator-text");
+  if (indicatorBox) indicatorBox.style.display = "flex";
+  if (indicatorText) indicatorText.innerText = "Mendengarkan pesanan...";
+
+  if (!voiceScannerPos) {
+    voiceScannerPos = new SpeechRecognition();
+    voiceScannerPos.lang = 'id-ID';
+    voiceScannerPos.interimResults = true; // Biar teks langsung ngetik saat kasir ngomong
+    voiceScannerPos.continuous = true;     // Terus aktif sampai timer habis
+
+    voiceScannerPos.onstart = function() {
+      isVoiceScannerPosActive = true;
+      resetVoiceTimeout();
+    };
+
+    voiceScannerPos.onresult = function(event) {
+      resetVoiceTimeout(); // Setiap ada suara masuk, timer 10 detik di-reset dari awal!
+      
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      let currentSpokenText = finalTranscript || interimTranscript;
+      if (indicatorText) indicatorText.innerText = currentSpokenText;
+
+      if (finalTranscript) {
+        processVoicePosCommand(finalTranscript.toLowerCase().trim());
+      }
+    };
+
+    voiceScannerPos.onerror = function(event) {
+      console.log("Voice error:", event.error);
+    };
+
+    voiceScannerPos.onend = function() {
+      if (isVoiceScannerPosActive) {
+        try { voiceScannerPos.start(); } catch(e) {}
+      }
+    };
+  }
+
+  try {
+    voiceScannerPos.start();
+  } catch(e) {
+    // Kalau sudah terlanjur jalan
+  }
+}
+
+function resetVoiceTimeout() {
+  if (voiceTimeoutTimer) clearTimeout(voiceTimeoutTimer);
+  
+  // Timer 10 detik: Jika tidak ada suara baru selama 10 detik, otomatis stop voice scanner
+  voiceTimeoutTimer = setTimeout(() => {
+    stopVoiceScannerUI();
+    showNotif("Voice scanner ditutup otomatis.");
+  }, 10000);
+}
+
+function stopVoiceScannerUI() {
+  isVoiceScannerPosActive = false;
+  if (voiceTimeoutTimer) {
+    clearTimeout(voiceTimeoutTimer);
+    voiceTimeoutTimer = null;
+  }
+  if (voiceScannerPos) {
+    try { voiceScannerPos.stop(); } catch(e) {}
+  }
+  const indicatorBox = document.getElementById("voice-indicator-container");
+  if (indicatorBox) indicatorBox.style.display = "none";
+}
+
+function processVoicePosCommand(spokenText) {
+  // Parsing angka kata ke angka numerik dasar
+  let cleanText = spokenText
+    .replace(/setengah/g, '0.5')
+    .replace(/seperempat/g, '0.25')
+    .replace(/satu/g, '1')
+    .replace(/dua/g, '2')
+    .replace(/tiga/g, '3')
+    .replace(/empat/g, '4')
+    .replace(/lima/g, '5')
+    .replace(/enam/g, '6')
+    .replace(/tujuh/g, '7')
+    .replace(/delapan/g, '8')
+    .replace(/sembilan/g, '9')
+    .replace(/sepuluh/g, '10');
+
+  // Cari angka di akhir kalimat (misal: "bawang merah 1", "kopi susu 2") atau satuan ons/kg
+  let matchedProductCode = null;
+  let parsedQty = 1;
+  let parsedSatuanJual = 'pcs';
+
+  // Cek apakah ada penyebutan satuan berat (kg / ons)
+  let isKgCommand = cleanText.includes('kg') || cleanText.includes('kilo');
+  let isOnsCommand = cleanText.includes('ons');
+
+  for (let code in databaseProduk) {
+    let p = databaseProduk[code];
+    let namaProd = p.nama.toLowerCase();
+
+    if (cleanText.includes(namaProd)) {
+      matchedProductCode = code;
+      
+      // Ambil teks setelah nama barang untuk mendeteksi jumlah/qty
+      let remainingText = cleanText.replace(namaProd, '').trim();
+      let numbersInRemaining = remainingText.match(/[\d\.]+/g);
+
+      if (numbersInRemaining && numbersInRemaining.length > 0) {
+        let val = parseFloat(numbersInRemaining[0]);
+        if (!isNaN(val)) parsedQty = val;
+      }
+
+      if (isOnsCommand) {
+        parsedQty = parsedQty / 10; // Konversi ons ke kg (10 ons = 1 kg)
+        parsedSatuanJual = 'kg';
+      } else if (isKgCommand || (p.satuan && p.satuan.toLowerCase() === 'kg')) {
+        parsedSatuanJual = 'kg';
+      }
+      break;
+    }
+  }
+
+  if (matchedProductCode && databaseProduk[matchedProductCode]) {
+    let prod = databaseProduk[matchedProductCode];
+    let success = tambahItemKeCart(matchedProductCode, prod, parsedQty, parsedSatuanJual);
+    if (success) {
+      playBeep();
+      showNotif(`✔️ ${prod.nama} (${parsedQty} ${parsedSatuanJual})`);
+    } else {
+      showNotif(`❌ Stok habis/kurang: ${prod.nama}`);
+    }
+  } else {
+    showNotif(`❌ Barang tidak dikenali: "${spokenText}"`);
+  }
+}
+// --- END FITUR VOICE SCANNER POS ---
 
 let autoHitungTimer = null;
 

@@ -73,6 +73,26 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Animasi Voice Scanner */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.blinking-cursor {
+  font-weight: bold;
+  color: #ef4444;
+  animation: blink 1s step-end infinite;
+}
+@keyframes pulse-mic {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.mic-active {
+  display: inline-block;
+  animation: pulse-mic 1.5s infinite;
+}
+
 .fab-scanner-modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000000; z-index: 10001; justify-content: center; align-items: center; }
 .fab-scanner-modal.show { display: flex; }
 .scanner-fullscreen-box { width: 100vw; height: 100vh; position: relative; background: #000; display: flex; justify-content: center; align-items: center; overflow: hidden; }
