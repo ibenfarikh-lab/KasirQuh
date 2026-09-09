@@ -3407,6 +3407,118 @@ function calculateResult() {
     }
   }
 }
+
+// --- FITUR VOICE CALCULATOR ---
+let voiceCalc = null;
+let isVoiceCalcActive = false;
+
+function toggleVoiceCalculator() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    return alert("Maaf, browser HP Anda belum mendukung fitur Voice. Gunakan Google Chrome.");
+  }
+
+  const indicator = document.getElementById("voice-calc-indicator");
+  const textDisplay = document.getElementById("voice-calc-text");
+  const btnMic = document.getElementById("btn-voice-calc");
+
+  if (isVoiceCalcActive) {
+    stopVoiceCalculator();
+    return;
+  }
+
+  // Tampilkan UI Indikator
+  indicator.style.display = "flex";
+  textDisplay.innerText = "Mendengarkan hitungan...";
+  btnMic.style.transform = "scale(1.15)";
+  btnMic.style.boxShadow = "0 0 12px rgba(239, 68, 68, 0.7)";
+
+  if (!voiceCalc) {
+    voiceCalc = new SpeechRecognition();
+    voiceCalc.lang = 'id-ID';
+    voiceCalc.interimResults = true; // Langsung tampilkan teks saat bicara
+    voiceCalc.continuous = true;
+
+    voiceCalc.onstart = function() {
+      isVoiceCalcActive = true;
+    };
+
+    voiceCalc.onresult = function(event) {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+
+      let currentText = finalTranscript || interimTranscript;
+      textDisplay.innerText = currentText; // Tampilkan teks yang didengar di kotak indikator
+
+      if (finalTranscript) {
+        prosesVoiceKalkulator(finalTranscript.toLowerCase().trim());
+      }
+    };
+
+    voiceCalc.onerror = function(event) {
+      console.log("Voice Calc Error:", event.error);
+    };
+
+    voiceCalc.onend = function() {
+      // Loop mic agar terus hidup sampai dimatikan manual
+      if (isVoiceCalcActive) {
+        try { voiceCalc.start(); } catch(e) {}
+      }
+    };
+  }
+
+  try { voiceCalc.start(); } catch(e) {}
+}
+
+function stopVoiceCalculator() {
+  isVoiceCalcActive = false;
+  if (voiceCalc) {
+    try { voiceCalc.stop(); } catch(e) {}
+  }
+  document.getElementById("voice-calc-indicator").style.display = "none";
+  const btnMic = document.getElementById("btn-voice-calc");
+  if(btnMic) {
+    btnMic.style.transform = "scale(1)";
+    btnMic.style.boxShadow = "none";
+  }
+}
+
+function prosesVoiceKalkulator(text) {
+  // 1. Ubah kata-kata operasi matematika menjadi simbol
+  let parsed = text
+    .replace(/tambah|ditambah/g, '+')
+    .replace(/kurang|dikurang|dikurangi/g, '-')
+    .replace(/kali|dikali/g, '*')
+    .replace(/bagi|dibagi/g, '/')
+    .replace(/koma/g, '.')
+    .replace(/sama dengan|hasilnya|totalnya/g, '=');
+
+  // Google otomatis mengubah ucapan "seribu" menjadi "1000", dll.
+  // 2. Hapus semua huruf alphabet yang tersisa, agar murni angka & operator saja
+  let mathString = parsed.replace(/[^0-9\+\-\*\/\.\=]/g, '');
+
+  if(!mathString) return;
+
+  // 3. Masukkan ke layar kalkulator satu per satu layaknya diketik
+  for (let i = 0; i < mathString.length; i++) {
+    let char = mathString[i];
+    if (char === '=') {
+      calculateResult();
+    } else {
+      appendCalc(char);
+    }
+  }
+}
+// --- END FITUR VOICE CALCULATOR ---
+
 // --- END FUNGSI KALKULATOR ---
 
 
