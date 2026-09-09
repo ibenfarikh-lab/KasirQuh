@@ -741,38 +741,38 @@
   <div id="floating-menu-backdrop" class="modal-backdrop" onclick="if(event.target === this) toggleFloatingMenu()" style="background: rgba(0,0,0,0.4);">
     <div id="floating-menu-popup" class="modal-content" style="max-width: 240px; border-radius: 16px; padding: 8px; background: var(--card-bg); position: absolute; bottom: 70px; right: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
       <div style="display: flex; flex-direction: column; gap: 2px;">
-        <button class="popup-menu-btn" id="pop-btn-penjualan" onclick="switchTab('penjualan'); toggleFloatingMenu();">
+        <button class="popup-menu-btn" id="pop-btn-penjualan" onclick="switchTabSafe('penjualan');">
           <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> <span data-i18n="menu_pos">Kasir</span>
         </button>
-        <button class="popup-menu-btn" id="pop-btn-kasironline" onclick="switchTab('kasir-online'); toggleFloatingMenu();" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
+        <button class="popup-menu-btn" id="pop-btn-kasironline" onclick="switchTabSafe('kasir-online');" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
           <span style="display: flex; align-items: center; gap: 8px;">
             <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg> <span data-i18n="menu_online">Kasir Online</span>
           </span>
           <span id="badge-online-count" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">0</span>
         </button>
-        <button class="popup-menu-btn" id="pop-btn-kalkulator" onclick="switchTab('kalkulator'); toggleFloatingMenu();">
+        <button class="popup-menu-btn" id="pop-btn-kalkulator" onclick="switchTabSafe('kalkulator');">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 16H7v-2h6v2zm4-4H7v-2h10v2zm0-4H7V9h10v2zm0-4H7V5h10v2z"/></svg> 
           <span data-i18n="menu_calculator">Kalkulator</span>
         </button>
-        <button class="popup-menu-btn" id="pop-btn-livechat" onclick="switchTab('live-chat-admin'); toggleFloatingMenu();" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
+        <button class="popup-menu-btn" id="pop-btn-livechat" onclick="switchTabSafe('live-chat-admin');" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
           <span style="display: flex; align-items: center; gap: 8px;">
             <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> <span data-i18n="menu_chat">Live Chat</span>
           </span>
           <span id="badge-chat-count" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">0</span>
         </button>
-        <button class="popup-menu-btn" id="pop-btn-databarang" onclick="switchTab('data-barang'); toggleFloatingMenu();">
+        <button class="popup-menu-btn" id="pop-btn-databarang" onclick="switchTabSafe('data-barang');">
           <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 15H4V8h16v11z"/></svg> <span data-i18n="menu_stock">Stok</span>
         </button>
-        <button class="popup-menu-btn" id="pop-btn-belanjastok" onclick="switchTab('belanja-stok'); toggleFloatingMenu();">
+        <button class="popup-menu-btn" id="pop-btn-belanjastok" onclick="switchTabSafe('belanja-stok');">
           <svg viewBox="0 0 24 24"><path d="M18 6h-2c0-2.21-1.79-4-4-4S8 3.79 8 6H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6-2c1.1 0 2 .9 2 2h-4c0-1.1.9-2 2-2zm6 16H6V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h4v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/></svg> <span data-i18n="menu_restock">Belanja Stok</span>
         </button>
-        <button class="popup-menu-btn" id="pop-btn-laporan" onclick="switchTab('laporan'); toggleFloatingMenu();">
+        <button class="popup-menu-btn" id="pop-btn-laporan" onclick="switchTabSafe('laporan');">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg> <span data-i18n="menu_data">Data</span>
         </button>
-        <button class="popup-menu-btn" id="pop-btn-catatan" onclick="switchTab('catatan'); toggleFloatingMenu();">
+        <button class="popup-menu-btn" id="pop-btn-catatan" onclick="switchTabSafe('catatan');">
           <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> <span data-i18n="menu_notes">Catatan</span>
         </button>
-        <button class="popup-menu-btn" id="pop-btn-pengaturan" onclick="switchTab('pengaturan'); toggleFloatingMenu();">
+        <button class="popup-menu-btn" id="pop-btn-pengaturan" onclick="switchTabSafe('pengaturan');">
           <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c-.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> <span data-i18n="menu_settings">Pengaturan</span>
         </button>
       </div>
@@ -822,6 +822,29 @@
     let adminChatPrevUnread = {};
     let activeAdminChatSub = 'pribadi';
     let adminChatRumpiUnsubscribe = null;
+
+    // Safety Wrapper untuk switchTab agar tidak blank jika fungsi utama belum siap
+    function switchTabSafe(tabId) {
+      try {
+        if (typeof switchTab === 'function') {
+          switchTab(tabId);
+        } else {
+          // Fallback manual jika fungsi script.js belum termuat
+          document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+          const target = document.getElementById(tabId);
+          if (target) target.classList.add('active');
+        }
+      } catch (e) {
+        console.error("Error switching tab:", e);
+      }
+      
+      // Tutup menu floating secara otomatis setelah diklik
+      const backdrop = document.getElementById('floating-menu-backdrop');
+      if (backdrop) backdrop.classList.remove('show');
+      if (typeof toggleFloatingMenu === 'function') {
+        try { toggleFloatingMenu(); } catch(err) {}
+      }
+    }
 
     document.addEventListener("DOMContentLoaded", function() {
       initOnlineOrdersListener();
