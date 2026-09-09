@@ -3477,7 +3477,7 @@ function toggleVoiceCalculator() {
     voiceCalc = new SpeechRecognition();
     voiceCalc.lang = 'id-ID';
     voiceCalc.interimResults = true;
-    voiceCalc.continuous = true; // Tidak otomatis berhenti saat jeda singkat
+    voiceCalc.continuous = true;
 
     voiceCalc.onstart = function() {
       isVoiceCalcActive = true;
@@ -3498,7 +3498,6 @@ function toggleVoiceCalculator() {
     };
 
     voiceCalc.onend = function() {
-      // Auto restart jika belum dimatikan manual agar tetap aktif
       if (isVoiceCalcActive) {
         try { voiceCalc.start(); } catch(e) {}
       }
@@ -3546,6 +3545,111 @@ function prosesVoiceKalkulator(text) {
   }
 }
 // --- END FITUR VOICE CALCULATOR ---
+
+
+// --- FITUR CHAT RUMPI (ADMIN) ---
+let adminChatRumpiUnsubscribe = null;
+let activeAdminChatSub = 'pribadi';
+
+function switchAdminChatSubTab(sub) {
+  activeAdminChatSub = sub;
+  const btnPribadi = document.getElementById("btn-sub-chat-pribadi");
+  const btnRumpi = document.getElementById("btn-sub-chat-rumpi");
+  const wrapPribadi = document.getElementById("wrapper-admin-chat-pribadi");
+  const wrapRumpi = document.getElementById("wrapper-admin-chat-rumpi");
+
+  if (!btnPribadi || !btnRumpi) return;
+
+  if (sub === 'pribadi') {
+    btnPribadi.style.background = "#2563eb"; 
+    btnPribadi.style.color = "white"; 
+    btnPribadi.style.border = "none";
+    
+    btnRumpi.style.background = "var(--input-bg)"; 
+    btnRumpi.style.color = "var(--text-color)"; 
+    btnRumpi.style.border = "1px solid var(--input-border)";
+    
+    wrapPribadi.style.display = "flex"; 
+    wrapRumpi.style.display = "none";
+  } else {
+    btnRumpi.style.background = "#2563eb"; 
+    btnRumpi.style.color = "white"; 
+    btnRumpi.style.border = "none";
+    
+    btnPribadi.style.background = "var(--input-bg)"; 
+    btnPribadi.style.color = "var(--text-color)"; 
+    btnPribadi.style.border = "1px solid var(--input-border)";
+    
+    wrapRumpi.style.display = "flex"; 
+    wrapPribadi.style.display = "none";
+    
+    initAdminChatRumpiListener();
+  }
+}
+
+function initAdminChatRumpiListener() {
+  if (adminChatRumpiUnsubscribe) adminChatRumpiUnsubscribe();
+
+  adminChatRumpiUnsubscribe = db.collection("db_chat_rumpi")
+    .orderBy("waktuTimestamp", "asc")
+    .onSnapshot((snapshot) => {
+      let msgContainer = document.getElementById("admin-chat-rumpi-messages");
+      if (!msgContainer) return;
+      msgContainer.innerHTML = "";
+
+      if (snapshot.empty) {
+        msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada pesan di Chat Rumpi.</div>`;
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        let m = doc.data();
+        let docId = doc.id;
+        msgContainer.innerHTML += `
+          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <span style="font-weight: bold; color: #2563eb; font-size: 0.8rem;">👤 ${m.senderName || 'Warga'} (${m.senderPhone || '-'})</span>
+                <span style="font-size: 0.68rem; color: var(--text-muted);">${m.waktu || ''}</span>
+              </div>
+              <div style="color: var(--text-color); word-break: break-word;">${escapeHtml(m.pesan || '')}</div>
+            </div>
+            <button onclick="hapusPesanRumpiAdmin('${docId}')" title="Hapus Pesan" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; flex-shrink: 0;">🗑️</button>
+          </div>
+        `;
+      });
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    });
+}
+
+function hapusPesanRumpiAdmin(docId) {
+  if (confirm("Hapus pesan ini dari Chat Rumpi?")) {
+    db.collection("db_chat_rumpi").doc(docId).delete().catch(err => alert("Gagal menghapus pesan: " + err.message));
+  }
+}
+
+function bersihkanSemuaChatRumpiAdmin() {
+  if (confirm("Hapus seluruh riwayat pesan di Chat Rumpi? Tindakan ini tidak dapat dibatalkan!")) {
+    db.collection("db_chat_rumpi").get().then(snapshot => {
+      let batch = db.batch();
+      snapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      return batch.commit();
+    }).then(() => {
+      alert("Semua riwayat Chat Rumpi berhasil dibersihkan!");
+    }).catch(err => {
+      alert("Gagal membersihkan chat: " + err.message);
+    });
+  }
+}
+
+function escapeHtml(text) {
+  if (!text) return "";
+  return text.toString().replace(/&/g, "&amp;").replace(/&lt;/g, "&lt;").replace(/>/g, "&gt;");
+}
+// --- END FITUR CHAT RUMPI ---
+
 
 // Inisialisasi awal saat halaman dimuat
 document.addEventListener("DOMContentLoaded", () => {

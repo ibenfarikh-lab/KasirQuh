@@ -23,7 +23,7 @@
       fill: #2563eb !important;
     }
     /* Animasi Voice Scanner */
-    @keyfKOTAK INDIKATORrames blink {
+    @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
@@ -91,7 +91,7 @@
             <button class="btn-close-modal" onclick="closeCartModal()">&times;</button>
           </div>
 
-          <!-- KODE BARU: Kotak Indikator Voice Scanner -->
+          <!-- Kotak Indikator Voice Scanner -->
           <div id="voice-indicator-container" class="no-print" style="display: none; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-bottom: 12px; text-align: left; color: #1e3a8a; font-size: 0.95rem; align-items: center; gap: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
             <span id="voice-indicator-icon" style="font-size: 1.2rem;">🎙️</span>
             <div style="flex: 1; font-family: monospace; font-size: 1rem;">
@@ -99,7 +99,6 @@
             </div>
             <button onclick="stopVoiceScannerUI()" style="background: transparent; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 1.1rem; padding: 0 4px;" title="Tutup Mic">&times;</button>
           </div>
-          <!-- END KODE BARU -->
 
           <div class="receipt-header">
             <h3 id="receipt-shop-name" style="margin: 0;">Nama Toko</h3>
@@ -169,20 +168,17 @@
       </div>
     </div>
 
-            <!-- HALAMAN KALKULATOR -->
+    <!-- HALAMAN KALKULATOR -->
     <div id="kalkulator" class="tab-content">
       <div class="card" style="max-width: 400px; margin: 0 auto; position: relative;">
         
-        <!-- Judul dan Tombol Voice di Sebelah Kiri -->
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
           <button onclick="toggleVoiceCalculator()" id="btn-voice-calc" style="background: #ef4444; color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.2s; flex-shrink: 0;" title="Kalkulator Suara">🎤</button>
           <h3 style="margin: 0;" data-i18n="page_calculator">Kalkulator</h3>
         </div>
         
-        <!-- Layar Kalkulator -->
         <textarea id="calc-display" disabled style="width: 100%; height: 120px; font-size: 1.5rem; text-align: right; margin-bottom: 15px; font-weight: bold; background: var(--table-header); color: var(--text-color); resize: none; word-break: break-all; padding: 10px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 8px;"></textarea>
         
-                <!-- Tombol Kalkulator -->
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
           <button onclick="clearCalc()" style="background: #ef4444; grid-column: span 2;">C</button>
           <button onclick="hapusSatuCalc()" style="background: #f59e0b;">⌫</button>
@@ -203,34 +199,33 @@
           <button onclick="appendCalc('3')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">3</button>
           <button onclick="appendCalc('+')" style="background: #2563eb;">+</button>
           
-          <!-- Baris Baru: 0, 00, 000, , -->
           <button onclick="appendCalc('0')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">0</button>
           <button onclick="appendCalc('00')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">00</button>
           <button onclick="appendCalc('000')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">000</button>
           <button onclick="appendCalc('.')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">,</button>
           
-          <!-- Tombol Sama Dengan Memanjang di Paling Bawah -->
           <button onclick="calculateResult()" style="grid-column: span 4; background: #16a34a; color: white; padding: 12px; font-size: 1.2rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">=</button>
         </div>
 
-
-      <!--  MENDENGARKAN VOICE -->
-      <div id="voice-calc-indicator" style="display: none; max-width: 400px; margin: 12px auto 0; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; align-items: center; gap: 8px; color: #1e3a8a; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
-        <span style="font-size: 1.2rem;" class="mic-active">🎙️</span>
-        <div style="flex: 1; font-family: monospace; font-size: 0.95rem;">
-          <span id="voice-calc-text" style="color: #3b82f6;">Mendengarkan hitungan...</span><span class="blinking-cursor">|</span>
+        <div id="voice-calc-indicator" style="display: none; max-width: 400px; margin: 12px auto 0; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; align-items: center; gap: 8px; color: #1e3a8a; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+          <span style="font-size: 1.2rem;" class="mic-active">🎙️</span>
+          <div style="flex: 1; font-family: monospace; font-size: 0.95rem;">
+            <span id="voice-calc-text" style="color: #3b82f6;">Mendengarkan hitungan...</span><span class="blinking-cursor">|</span>
+          </div>
+          <button onclick="stopVoiceCalculator()" style="background: transparent; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 1.2rem; padding: 0 4px;" title="Matikan Mic">&times;</button>
         </div>
-        <button onclick="stopVoiceCalculator()" style="background: transparent; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 1.2rem; padding: 0 4px;" title="Matikan Mic">&times;</button>
       </div>
     </div>
-  </div>
 
-
-
-
-    <!-- HALAMAN LIVE CHAT ADMIN -->
+    <!-- HALAMAN LIVE CHAT ADMIN (DENGAN SUB-MENU CHAT RUMPI) -->
     <div id="live-chat-admin" class="tab-content">
-      <div style="display: flex; height: calc(100vh - 140px); gap: 10px;">
+      <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <button id="btn-sub-chat-pribadi" onclick="switchAdminChatSubTab('pribadi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">💬 Chat Pribadi Pelanggan</button>
+        <button id="btn-sub-chat-rumpi" onclick="switchAdminChatSubTab('rumpi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">🌐 Chat Rumpi (Komunitas)</button>
+      </div>
+
+      <!-- Wrapper Chat Pribadi -->
+      <div id="wrapper-admin-chat-pribadi" style="display: flex; height: calc(100vh - 190px); gap: 10px;">
         <!-- Daftar Kontak Chat Pelanggan -->
         <div style="width: 35%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
           <div style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);" data-i18n="chat_conversations">💬 Daftar Percakapan</div>
@@ -248,6 +243,17 @@
             <input type="text" id="admin-chat-input" placeholder="Ketik balasan..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);" disabled data-i18n-placeholder="placeholder_reply">
             <button onclick="kirimPesanAdmin()" id="admin-chat-send-btn" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;" disabled data-i18n="send">Kirim</button>
           </div>
+        </div>
+      </div>
+
+      <!-- Wrapper Chat Rumpi (Komunitas) -->
+      <div id="wrapper-admin-chat-rumpi" style="display: none; height: calc(100vh - 190px); background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; flex-direction: column; overflow: hidden;">
+        <div style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header); display: flex; justify-content: space-between; align-items: center;">
+          <span>🌐 Pemantauan & Moderasi Chat Rumpi (Semua Pelanggan)</span>
+          <button onclick="bersihkanSemuaChatRumpiAdmin()" style="background: #dc2626; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer;">🧹 Bersihkan Obrolan</button>
+        </div>
+        <div id="admin-chat-rumpi-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
+          <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;">Memuat pesan chat rumpi...</div>
         </div>
       </div>
     </div>
@@ -316,13 +322,11 @@
         <span class="cart-badge" id="cart-count">0</span>
       </button>
 
-      <!-- KODE BARU: Tombol Voice Scanner -->
       <button id="fab-voice-scan-btn" class="fab-main" onclick="startVoiceScannerFlow()" title="Voice Scanner" style="background: #ef4444; color: white;">
         <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: currentColor;">
           <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
         </svg>
       </button>
-      <!-- END KODE BARU -->
 
       <button id="fab-add-btn" class="fab-add" onclick="openProductModal()" title="Tambah Barang" style="display: none;">
         <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
@@ -567,7 +571,7 @@
     </div>
   </div>
 
-    <!-- MODAL TAMBAH/EDIT CATATAN -->
+  <!-- MODAL TAMBAH/EDIT CATATAN -->
   <div id="catatanModal" class="modal-backdrop" onclick="if(event.target === this) closeCatatanModal()">
     <div class="modal-content" style="max-width: 400px;">
       <div class="modal-header">
@@ -717,7 +721,6 @@
       <button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button>
     </div>
 
-    <!-- TAMBAHAN: Navigasi untuk Halaman Catatan -->
     <div class="inline-pagination" id="catatan-pagination-wrapper">
       <button class="inline-page-btn" onclick="navigasiHariCatatan(-1)">◀</button>
       <span id="catatan-bottom-date-info">Tgl</span>
@@ -776,7 +779,7 @@
     </div>
   </div>
 
-  <!-- FLOATING AI ADMIN CO-PILOT WIDGET (Ikon Lingkaran Biru Pojok Kanan Atas dengan Tombol Mic Voice Input) -->
+  <!-- FLOATING AI ADMIN CO-PILOT WIDGET -->
   <div id="admin-ai-wrapper" style="position: fixed; top: 10px; right: 10px; z-index: 9998; font-family: sans-serif; display: flex; flex-direction: column; align-items: flex-end;">
     <button id="ai-toggle-btn" onclick="toggleAdminAi()" title="Tanya AI Co-Pilot" style="background: #2563eb; color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
       😁
@@ -817,6 +820,8 @@
     let selectedChatPhone = null;
     let chatUnsubscribe = null;
     let adminChatPrevUnread = {};
+    let activeAdminChatSub = 'pribadi';
+    let adminChatRumpiUnsubscribe = null;
 
     document.addEventListener("DOMContentLoaded", function() {
       initOnlineOrdersListener();
@@ -837,7 +842,6 @@
       }
     });
 
-    // --- SCRIPT AI CO-PILOT ADMIN ---
     function toggleAdminAi() {
       const chatBox = document.getElementById('ai-chat-box');
       if (chatBox.style.display === 'none' || chatBox.style.display === '') {
@@ -860,12 +864,10 @@
 
       if (!text) return;
 
-      // Tampilkan pesan admin
       messageContainer.innerHTML += `<div style="background: #2563eb; color: white; padding: 8px 12px; border-radius: 8px; max-width: 85%; align-self: flex-end;">${text}</div>`;
       inputField.value = '';
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      // Ambil data produk toko dari cache/variabel global jika ada di script.js kakak
       let daftarProdukStr = "";
       try {
         if (typeof produk !== 'undefined' && Array.isArray(produk)) {
@@ -886,7 +888,6 @@
         }
       } catch (e) {}
 
-      // Tampilkan indikator loading
       const loadingId = 'loading-' + Date.now();
       messageContainer.innerHTML += `<div id="${loadingId}" style="background: var(--input-bg, #e5e7eb); color: var(--text-color, #374151); padding: 8px 12px; border-radius: 8px; max-width: 85%;">Lagi nge-analisis data... 🧠☕</div>`;
       messageContainer.scrollTop = messageContainer.scrollHeight;
@@ -903,8 +904,6 @@
         });
 
         const data = await response.json();
-        
-        // Hapus loading
         const loadingEl = document.getElementById(loadingId);
         if (loadingEl) loadingEl.remove();
 
@@ -921,7 +920,82 @@
 
       messageContainer.scrollTop = messageContainer.scrollHeight;
     }
-    // --- END SCRIPT AI CO-PILOT ADMIN ---
+
+    function switchAdminChatSubTab(sub) {
+      activeAdminChatSub = sub;
+      const btnPribadi = document.getElementById("btn-sub-chat-pribadi");
+      const btnRumpi = document.getElementById("btn-sub-chat-rumpi");
+      const wrapPribadi = document.getElementById("wrapper-admin-chat-pribadi");
+      const wrapRumpi = document.getElementById("wrapper-admin-chat-rumpi");
+
+      if (sub === 'pribadi') {
+        btnPribadi.style.background = "#2563eb"; btnPribadi.style.color = "white"; btnPribadi.style.border = "none";
+        btnRumpi.style.background = "var(--input-bg)"; btnRumpi.style.color = "var(--text-color)"; btnRumpi.style.border = "1px solid var(--input-border)";
+        wrapPribadi.style.display = "flex"; wrapRumpi.style.display = "none";
+      } else {
+        btnRumpi.style.background = "#2563eb"; btnRumpi.style.color = "white"; btnRumpi.style.border = "none";
+        btnPribadi.style.background = "var(--input-bg)"; btnPribadi.style.color = "var(--text-color)"; btnPribadi.style.border = "1px solid var(--input-border)";
+        wrapRumpi.style.display = "flex"; wrapPribadi.style.display = "none";
+        initAdminChatRumpiListener();
+      }
+    }
+
+    function initAdminChatRumpiListener() {
+      if (adminChatRumpiUnsubscribe) adminChatRumpiUnsubscribe();
+
+      adminChatRumpiUnsubscribe = db.collection("db_chat_rumpi")
+        .orderBy("waktuTimestamp", "asc")
+        .onSnapshot((snapshot) => {
+          let msgContainer = document.getElementById("admin-chat-rumpi-messages");
+          if (!msgContainer) return;
+          msgContainer.innerHTML = "";
+
+          if (snapshot.empty) {
+            msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada pesan di Chat Rumpi.</div>`;
+            return;
+          }
+
+          snapshot.forEach(doc => {
+            let m = doc.data();
+            let docId = doc.id;
+            msgContainer.innerHTML += `
+              <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                    <span style="font-weight: bold; color: #2563eb; font-size: 0.8rem;">👤 ${m.senderName || 'Warga'} (${m.senderPhone || '-'})</span>
+                    <span style="font-size: 0.68rem; color: var(--text-muted);">${m.waktu || ''}</span>
+                  </div>
+                  <div style="color: var(--text-color); word-break: break-word;">${m.pesan || ''}</div>
+                </div>
+                <button onclick="hapusPesanRumpiAdmin('${docId}')" title="Hapus Pesan" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; flex-shrink: 0;">🗑️</button>
+              </div>
+            `;
+          });
+          msgContainer.scrollTop = msgContainer.scrollHeight;
+        });
+    }
+
+    function hapusPesanRumpiAdmin(docId) {
+      if (confirm("Hapus pesan ini dari Chat Rumpi?")) {
+        db.collection("db_chat_rumpi").doc(docId).delete().catch(err => alert("Gagal menghapus pesan: " + err.message));
+      }
+    }
+
+    function bersihkanSemuaChatRumpiAdmin() {
+      if (confirm("Hapus seluruh riwayat pesan di Chat Rumpi? Tindakan ini tidak dapat dibatalkan!")) {
+        db.collection("db_chat_rumpi").get().then(snapshot => {
+          let batch = db.batch();
+          snapshot.forEach(doc => {
+            batch.delete(doc.ref);
+          });
+          return batch.commit();
+        }).then(() => {
+          alert("Semua riwayat Chat Rumpi berhasil dibersihkan!");
+        }).catch(err => {
+          alert("Gagal membersihkan chat: " + err.message);
+        });
+      }
+    }
 
     function switchOnlineTab(tab) {
       activeOnlineTab = tab;
@@ -1026,7 +1100,6 @@
       });
     }
 
-    // --- FITUR LIVE CHAT ADMIN ---
     function initAdminChatListener() {
       let isInitialChatLoad = true;
       db.collection("chats").onSnapshot((snapshot) => {
