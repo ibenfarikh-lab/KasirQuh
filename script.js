@@ -138,7 +138,9 @@ const translations = {
     menu_restock: "Belanja Stok",
     menu_data: "Data",
     menu_notes: "Catatan",
-    menu_settings: "Pengaturan"
+    menu_settings: "Pengaturan",
+    menu_calculator: "Kalkulator",
+    page_calculator: "Kalkulator"
   },
   en: {
     app_title: "KasirQuh",
@@ -279,7 +281,9 @@ const translations = {
     menu_restock: "Restock",
     menu_data: "Data",
     menu_notes: "Notes",
-    menu_settings: "Settings"
+    menu_settings: "Settings",
+    menu_calculator: "Calculator",
+    page_calculator: "Calculator"
   },
   ar: {
     app_title: "قصيركو",
@@ -420,7 +424,9 @@ const translations = {
     menu_restock: "إعادة التخزين",
     menu_data: "البيانات",
     menu_notes: "الملاحظات",
-    menu_settings: "الإعدادات"
+    menu_settings: "الإعدادات",
+    menu_calculator: "آلة حاسبة",
+    page_calculator: "آلة حاسبة"
   }
 };
 
@@ -2041,12 +2047,15 @@ function updatePermanentBarTitle() {
     if (catatanPag) catatanPag.classList.add("show"); 
   } else if (activeTab === 'pengaturan') {
     titleEl.innerText = (currentLang === 'en') ? "System Settings" : ((currentLang === 'ar') ? "إعدادات النظام" : "Pengaturan Sistem");
+  } else if (activeTab === 'kalkulator') {
+    titleEl.innerText = (currentLang === 'en') ? "Calculator" : ((currentLang === 'ar') ? "آلة حاسبة" : "Kalkulator");
   }
 
   document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
   const activeBtnMap = {
     'penjualan': 'pop-btn-penjualan',
     'kasir-online': 'pop-btn-kasironline',
+    'kalkulator': 'pop-btn-kalkulator',
     'data-barang': 'pop-btn-databarang',
     'belanja-stok': 'pop-btn-belanjastok',
     'laporan': 'pop-btn-laporan',
@@ -2118,6 +2127,13 @@ function switchTab(tabId, pushHistory = true) {
       if(fabAdd) fabAdd.style.display = 'none'; 
       if(fabAddCust) fabAddCust.style.display = 'none';
       if(fabAddCatatan) fabAddCatatan.style.display = 'flex';
+    } else if (tabId === 'kalkulator') {
+      if(fabCart) fabCart.style.display = 'none'; 
+      if(fabScan) fabScan.style.display = 'none'; 
+      if(fabFilter) fabFilter.style.display = 'none'; 
+      if(fabAdd) fabAdd.style.display = 'none'; 
+      if(fabAddCust) fabAddCust.style.display = 'none'; 
+      if(fabAddCatatan) fabAddCatatan.style.display = 'none';
     } else {
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
@@ -3327,6 +3343,43 @@ document.addEventListener('input', function(e) {
     }, 300);
   }
 });
+
+// --- FUNGSI KALKULATOR ---
+function appendCalc(value) {
+  const display = document.getElementById("calc-display");
+  if(display) display.value += value;
+}
+
+function clearCalc() {
+  const display = document.getElementById("calc-display");
+  if(display) display.value = "";
+}
+
+function hapusSatuCalc() {
+  const display = document.getElementById("calc-display");
+  if(display) display.value = display.value.slice(0, -1);
+}
+
+function calculateResult() {
+  const display = document.getElementById("calc-display");
+  if(display && display.value) {
+    try {
+      // Menggunakan eval untuk kalkulasi dasar yang aman dari input tombol internal
+      let result = eval(display.value);
+      
+      // Jika hasilnya desimal panjang, bulatkan
+      if (result % 1 !== 0) {
+        result = parseFloat(result.toFixed(4));
+      }
+      
+      display.value = result;
+    } catch (e) {
+      alert("Format hitungan salah");
+      display.value = "";
+    }
+  }
+}
+// --- END FUNGSI KALKULATOR ---
 
 setTheme(currentTheme);
 setLanguage(currentLang);
