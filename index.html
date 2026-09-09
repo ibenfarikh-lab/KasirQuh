@@ -169,18 +169,18 @@
       </div>
     </div>
 
-        <!-- HALAMAN KALKULATOR -->
+            <!-- HALAMAN KALKULATOR -->
     <div id="kalkulator" class="tab-content">
       <div class="card" style="max-width: 400px; margin: 0 auto; position: relative;">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <!-- Judul dan Tombol Voice di Sebelah Kiri -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+          <button onclick="toggleVoiceCalculator()" id="btn-voice-calc" style="background: #ef4444; color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.2s; flex-shrink: 0;" title="Kalkulator Suara">🎤</button>
           <h3 style="margin: 0;" data-i18n="page_calculator">Kalkulator</h3>
-          <!-- Tombol Voice Calculator -->
-          <button onclick="toggleVoiceCalculator()" id="btn-voice-calc" style="background: #ef4444; color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.2s;" title="Kalkulator Suara">🎤</button>
         </div>
         
         <!-- Layar Kalkulator -->
-        <textarea id="calc-display" disabled style="width: 100%; height: 200px; font-size: 1.5rem; text-align: right; margin-bottom: 15px; font-weight: bold; background: var(--table-header); color: var(--text-color); resize: none; word-break: break-all; padding: 10px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 8px;"></textarea>
+        <textarea id="calc-display" disabled style="width: 100%; height: 120px; font-size: 1.5rem; text-align: right; margin-bottom: 15px; font-weight: bold; background: var(--table-header); color: var(--text-color); resize: none; word-break: break-all; padding: 10px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 8px;"></textarea>
         
         <!-- Tombol Kalkulator -->
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
@@ -208,6 +208,16 @@
           <button onclick="calculateResult()" style="background: #16a34a;">=</button>
         </div>
       </div>
+
+      <!-- KOTAK INDIKATOR MENDENGARKAN VOICE -->
+      <div id="voice-calc-indicator" style="display: none; max-width: 400px; margin: 12px auto 0; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; align-items: center; gap: 8px; color: #1e3a8a; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+        <span style="font-size: 1.2rem;" class="mic-active">🎙️</span>
+        <div style="flex: 1; font-family: monospace; font-size: 0.95rem;">
+          <span id="voice-calc-text" style="color: #3b82f6;">Mendengarkan hitungan...</span><span class="blinking-cursor">|</span>
+        </div>
+        <button onclick="stopVoiceCalculator()" style="background: transparent; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 1.2rem; padding: 0 4px;" title="Matikan Mic">&times;</button>
+      </div>
+    </div>
 
       <!-- KOTAK INDIKATOR MENDENGARKAN VOICE -->
       <div id="voice-calc-indicator" style="display: none; max-width: 400px; margin: 12px auto 0; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; align-items: center; gap: 8px; color: #1e3a8a; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
