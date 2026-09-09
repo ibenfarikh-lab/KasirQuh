@@ -3371,7 +3371,6 @@ function autoCalculate() {
     return;
   }
 
-  // Auto kalkulasi jalan secara live jika ekspresi diakhiri dengan angka atau kurung tutup
   if (/[\d\)]$/.test(rawVal)) {
     try {
       let result = eval(rawVal);
@@ -3448,7 +3447,7 @@ function calculateResult() {
   }
 }
 
-// --- FITUR VOICE CALCULATOR ---
+// --- FITUR VOICE CALCULATOR (FIXED ANTI-DUPLIKASI/MENUMPUK) ---
 let voiceCalc = null;
 let isVoiceCalcActive = false;
 
@@ -3477,31 +3476,17 @@ function toggleVoiceCalculator() {
   if (!voiceCalc) {
     voiceCalc = new SpeechRecognition();
     voiceCalc.lang = 'id-ID';
-    voiceCalc.interimResults = true;
-    voiceCalc.continuous = true;
+    voiceCalc.interimResults = false;
+    voiceCalc.continuous = false;
 
     voiceCalc.onstart = function() {
       isVoiceCalcActive = true;
     };
 
     voiceCalc.onresult = function(event) {
-      let interimTranscript = '';
-      let finalTranscript = '';
-
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        } else {
-          interimTranscript += event.results[i][0].transcript;
-        }
-      }
-
-      let currentText = finalTranscript || interimTranscript;
-      if(textDisplay) textDisplay.innerText = currentText;
-
-      if (finalTranscript) {
-        prosesVoiceKalkulator(finalTranscript.toLowerCase().trim());
-      }
+      const speechResult = event.results[0][0].transcript.toLowerCase();
+      if(textDisplay) textDisplay.innerText = speechResult;
+      prosesVoiceKalkulator(speechResult);
     };
 
     voiceCalc.onerror = function(event) {
@@ -3509,8 +3494,11 @@ function toggleVoiceCalculator() {
     };
 
     voiceCalc.onend = function() {
-      if (isVoiceCalcActive) {
-        try { voiceCalc.start(); } catch(e) {}
+      isVoiceCalcActive = false;
+      if(indicator) indicator.style.display = "none";
+      if(btnMic) {
+        btnMic.style.transform = "scale(1)";
+        btnMic.style.boxShadow = "none";
       }
     };
   }
@@ -3545,12 +3533,13 @@ function prosesVoiceKalkulator(text) {
 
   if(!mathString) return;
 
-  for (let i = 0; i < mathString.length; i++) {
-    let char = mathString[i];
-    if (char === '=') {
+  const display = document.getElementById("calc-display");
+  if (display) {
+    display.value = formatKalkulator(mathString.replace(/=/g, ''));
+    autoCalculate();
+
+    if (mathString.includes('=') || text.includes('sama dengan') || text.includes('hasilnya')) {
       calculateResult();
-    } else {
-      appendCalc(char);
     }
   }
 }
