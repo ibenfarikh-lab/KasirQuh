@@ -3701,6 +3701,25 @@ function escapeHtml(text) {
 }
 // --- END FITUR CHAT RUMPI ---
 
+// Listener sederhana khusus untuk Badge Chat Rumpi
+db.collection("db_chat_rumpi").onSnapshot((snapshot) => {
+  let badgeChat = document.getElementById("badge-chat-count");
+  if (!badgeChat) return;
+
+  // Hitung jumlah pesan di chat rumpi (atau bisa disesuaikan logika unread-nya)
+  let rumpiCount = snapshot.size; 
+  
+  // Ambil angka badge chat pribadi yang sudah ada (jika ada)
+  let currentBadge = parseInt(badgeChat.innerText) || 0;
+  
+  // Jika ada pesan rumpi, gabungkan atau tampilkan
+  if (rumpiCount > 0) {
+    // Cari elemen badge online/chat, lalu tampilkan totalnya
+    badgeChat.innerText = rumpiCount; // atau gabungkan dengan chat pribadi
+    badgeChat.style.display = "inline-block";
+  }
+});
+
 
 // Inisialisasi awal saat halaman dimuat
 document.addEventListener("DOMContentLoaded", () => {
