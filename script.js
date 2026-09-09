@@ -3345,9 +3345,24 @@ document.addEventListener('input', function(e) {
 });
 
 // --- FUNGSI KALKULATOR ---
+function formatKalkulator(rawStr) {
+  // Pisahkan angka untuk diberi format ribuan (titik) dan desimal (koma)
+  return rawStr.replace(/\d+(?:\.\d+)?/g, function(match) {
+    let parts = match.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return parts.join(',');
+  });
+}
+
 function appendCalc(value) {
   const display = document.getElementById("calc-display");
-  if(display) display.value += value;
+  if(display) {
+    // Kembalikan ke format baku Javascript sebelum ditambah angka/operator baru
+    let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
+    rawVal += value;
+    // Format ulang dan tampilkan
+    display.value = formatKalkulator(rawVal);
+  }
 }
 
 function clearCalc() {
@@ -3357,22 +3372,26 @@ function clearCalc() {
 
 function hapusSatuCalc() {
   const display = document.getElementById("calc-display");
-  if(display) display.value = display.value.slice(0, -1);
+  if(display) {
+    let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
+    rawVal = rawVal.slice(0, -1);
+    display.value = formatKalkulator(rawVal);
+  }
 }
 
 function calculateResult() {
   const display = document.getElementById("calc-display");
   if(display && display.value) {
+    // Ubah kembali string format Indonesia (titik ribuan, koma desimal) ke format baku JS
+    let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
+    
     try {
-      // Menggunakan eval untuk kalkulasi dasar yang aman dari input tombol internal
-      let result = eval(display.value);
-      
+      let result = eval(rawVal);
       // Jika hasilnya desimal panjang, bulatkan
       if (result % 1 !== 0) {
         result = parseFloat(result.toFixed(4));
       }
-      
-      display.value = result;
+      display.value = formatKalkulator(result.toString());
     } catch (e) {
       alert("Format hitungan salah");
       display.value = "";
@@ -3380,6 +3399,7 @@ function calculateResult() {
   }
 }
 // --- END FUNGSI KALKULATOR ---
+
 
 setTheme(currentTheme);
 setLanguage(currentLang);
