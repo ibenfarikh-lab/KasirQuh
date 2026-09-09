@@ -3549,8 +3549,6 @@ function prosesVoiceKalkulator(text) {
 
 // --- FITUR CHAT RUMPI (ADMIN) ---
 let adminChatRumpiUnsubscribe = null;
-let unreadRumpiAdmin = 0;
-let isInitialLoadAdminRumpi = true;
 let activeAdminChatSub = 'pribadi';
 
 function switchAdminChatSubTab(sub) {
@@ -3584,11 +3582,6 @@ function switchAdminChatSubTab(sub) {
     
     wrapRumpi.style.display = "flex"; 
     wrapPribadi.style.display = "none";
-
-    // Reset badge unread chat rumpi admin saat tab dibuka
-    unreadRumpiAdmin = 0;
-    let badge = document.getElementById("badge-rumpi-admin");
-    if (badge) badge.style.display = "none";
     
     initAdminChatRumpiListener();
   }
@@ -3600,29 +3593,6 @@ function initAdminChatRumpiListener() {
   adminChatRumpiUnsubscribe = db.collection("db_chat_rumpi")
     .orderBy("waktuTimestamp", "asc")
     .onSnapshot((snapshot) => {
-      
-      if (!isInitialLoadAdminRumpi) {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
-            let m = change.doc.data();
-            // Jika pesan bukan dikirim oleh Admin, bunyikan nada & naikkan badge
-            if (m.senderPhone !== "Admin") {
-              playNotificationSound(); 
-              let isRumpiActive = document.getElementById('wrapper-admin-chat-rumpi').style.display === 'flex';
-              if (!isRumpiActive) {
-                unreadRumpiAdmin++;
-                let badge = document.getElementById("badge-rumpi-admin");
-                if (badge) { 
-                  badge.innerText = unreadRumpiAdmin; 
-                  badge.style.display = "inline-block"; 
-                }
-              }
-            }
-          }
-        });
-      }
-      isInitialLoadAdminRumpi = false;
-
       let msgContainer = document.getElementById("admin-chat-rumpi-messages");
       if (!msgContainer) return;
       msgContainer.innerHTML = "";
@@ -3635,42 +3605,21 @@ function initAdminChatRumpiListener() {
       snapshot.forEach(doc => {
         let m = doc.data();
         let docId = doc.id;
-        let isMyMessage = m.senderPhone === "Admin";
-        let alignBubble = isMyMessage ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
-
         msgContainer.innerHTML += `
-          <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble} display: flex; flex-direction: column;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; gap: 10px;">
-              <span style="font-weight: bold; font-size: 0.75rem; opacity: 0.9;">👤 ${m.senderName || 'Warga'}</span>
-              <button onclick="hapusPesanRumpiAdmin('${docId}')" title="Hapus" style="background: transparent; border: none; color: inherit; cursor: pointer; font-size: 0.75rem; padding: 0;" opacity="0.7">🗑️</button>
+          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <span style="font-weight: bold; color: #2563eb; font-size: 0.8rem;">👤 ${m.senderName || 'Warga'} (${m.senderPhone || '-'})</span>
+                <span style="font-size: 0.68rem; color: var(--text-muted);">${m.waktu || ''}</span>
+              </div>
+              <div style="color: var(--text-color); word-break: break-word;">${escapeHtml(m.pesan || '')}</div>
             </div>
-            <div>${escapeHtml(m.pesan || '')}</div>
-            <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
+            <button onclick="hapusPesanRumpiAdmin('${docId}')" title="Hapus Pesan" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; flex-shrink: 0;">🗑️</button>
           </div>
         `;
       });
       msgContainer.scrollTop = msgContainer.scrollHeight;
     });
-}
-
-function kirimPesanRumpiAdmin() {
-  let inputEl = document.getElementById("admin-chat-rumpi-input");
-  let pesan = inputEl.value.trim();
-  if (!pesan) return;
-
-  let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
-
-  db.collection("db_chat_rumpi").add({
-    senderPhone: "Admin",
-    senderName: "Admin Toko",
-    pesan: pesan,
-    waktu: nowStr,
-    waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
-    inputEl.value = "";
-  }).catch(err => {
-    alert("Gagal mengirim pesan: " + err.message);
-  });
 }
 
 function hapusPesanRumpiAdmin(docId) {
@@ -3701,163 +3650,10 @@ function escapeHtml(text) {
 }
 // --- END FITUR CHAT RUMPI ---
 
-// Listener sederhana khusus untuk Badge Chat Rumpi
-db.collection("db_chat_rumpi").onSnapshot((snapshot) => {
-  let badgeChat = document.getElementById("badge-chat-count");
-  if (!badgeChat) return;
-
-  // Hitung jumlah pesan di chat rumpi (atau bisa disesuaikan logika unread-nya)
-  let rumpiCount = snapshot.size; 
-  
-  // Ambil angka badge chat pribadi yang sudah ada (jika ada)
-  let currentBadge = parseInt(badgeChat.innerText) || 0;
-  
-  // Jika ada pesan rumpi, gabungkan atau tampilkan
-  if (rumpiCount > 0) {
-    // Cari elemen badge online/chat, lalu tampilkan totalnya
-    badgeChat.innerText = rumpiCount; // atau gabungkan dengan chat pribadi
-    badgeChat.style.display = "inline-block";
-  }
-});
-
-// --- PERBAIKAN BADGE & SUARA CHAT RUMPI ---
-let globalPrivateUnread = 0;
-let globalRumpiUnread = 0;
-let lastViewedRumpiTime = parseInt(localStorage.getItem('last_viewed_rumpi_v2') || Date.now());
-let isRumpiFirstLoad = true;
-
-// Fungsi gabungan untuk memperbarui total badge Live Chat
-function updateCombinedBadge() {
-  let total = globalPrivateUnread + globalRumpiUnread;
-  let badgeChat = document.getElementById("badge-chat-count");
-  if (badgeChat) {
-    if (total > 0) {
-      badgeChat.innerText = total;
-      badgeChat.style.display = "inline-block";
-    } else {
-      badgeChat.style.display = "none";
-    }
-  }
-}
-
-// 1. Pantau unread chat pribadi secara terpisah untuk digabungkan ke badge
-db.collection("chats").onSnapshot((snapshot) => {
-  let count = 0;
-  snapshot.forEach(doc => {
-    count += (doc.data().unreadAdmin || 0);
-  });
-  globalPrivateUnread = count;
-  updateCombinedBadge();
-});
-
-// 2. Modifikasi fungsi Switch Tab Chat Rumpi agar mereset badge saat dibuka
-function switchAdminChatSubTab(sub) {
-  activeAdminChatSub = sub;
-  const btnPribadi = document.getElementById("btn-sub-chat-pribadi");
-  const btnRumpi = document.getElementById("btn-sub-chat-rumpi");
-  const wrapPribadi = document.getElementById("wrapper-admin-chat-pribadi");
-  const wrapRumpi = document.getElementById("wrapper-admin-chat-rumpi");
-
-  if (!btnPribadi || !btnRumpi) return;
-
-  if (sub === 'pribadi') {
-    btnPribadi.style.background = "#2563eb"; 
-    btnPribadi.style.color = "white"; 
-    btnPribadi.style.border = "none";
-    btnRumpi.style.background = "var(--input-bg)"; 
-    btnRumpi.style.color = "var(--text-color)"; 
-    btnRumpi.style.border = "1px solid var(--input-border)";
-    wrapPribadi.style.display = "flex"; 
-    wrapRumpi.style.display = "none";
-  } else {
-    btnRumpi.style.background = "#2563eb"; 
-    btnRumpi.style.color = "white"; 
-    btnRumpi.style.border = "none";
-    btnPribadi.style.background = "var(--input-bg)"; 
-    btnPribadi.style.color = "var(--text-color)"; 
-    btnPribadi.style.border = "1px solid var(--input-border)";
-    wrapRumpi.style.display = "flex"; 
-    wrapPribadi.style.display = "none";
-    
-    // KETIKA TAB RUMPI DIBUKA: Reset unread menjadi 0 & perbarui waktu terakhir dibaca
-    globalRumpiUnread = 0;
-    lastViewedRumpiTime = Date.now();
-    localStorage.setItem('last_viewed_rumpi_v2', lastViewedRumpiTime);
-    updateCombinedBadge();
-    
-    initAdminChatRumpiListener();
-  }
-}
-
-// 3. Listener Chat Rumpi yang mendeteksi pesan unread & mencegah bunyi berulang
-let adminChatRumpiUnsubscribe = null;
-
-function initAdminChatRumpiListener() {
-  if (adminChatRumpiUnsubscribe) adminChatRumpiUnsubscribe();
-
-  adminChatRumpiUnsubscribe = db.collection("db_chat_rumpi")
-    .orderBy("waktuTimestamp", "asc")
-    .onSnapshot((snapshot) => {
-      let msgContainer = document.getElementById("admin-chat-rumpi-messages");
-      if (!msgContainer) return;
-      msgContainer.innerHTML = "";
-
-      if (snapshot.empty) {
-        msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada pesan di Chat Rumpi.</div>`;
-        isRumpiFirstLoad = false;
-        return;
-      }
-
-      let unreadCount = 0;
-      snapshot.forEach(doc => {
-        let m = doc.data();
-        let docId = doc.id;
-        
-        // Hitung hanya pesan dari warga yang masuk setelah terakhir kali admin membuka tab rumpi
-        let msgTime = m.waktuTimestamp?.toMillis ? m.waktuTimestamp.toMillis() : 0;
-        if (m.senderPhone !== "Admin" && msgTime > lastViewedRumpiTime) {
-          unreadCount++;
-        }
-
-        msgContainer.innerHTML += `
-          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-            <div style="flex: 1; min-width: 0;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                <span style="font-weight: bold; color: #2563eb; font-size: 0.8rem;">👤 ${m.senderName || 'Warga'} (${m.senderPhone || '-'})</span>
-                <span style="font-size: 0.68rem; color: var(--text-muted);">${m.waktu || ''}</span>
-              </div>
-              <div style="color: var(--text-color); word-break: break-word;">${escapeHtml(m.pesan || '')}</div>
-            </div>
-            <button onclick="hapusPesanRumpiAdmin('${docId}')" title="Hapus Pesan" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; flex-shrink: 0;">🗑️</button>
-          </div>
-        `;
-      });
-
-      // Bunyikan suara HANYA jika ada pesan baru masuk dari warga secara real-time (bukan saat memuat halaman pertama kali)
-      if (!isRumpiFirstLoad) {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
-            let data = change.doc.data();
-            if (data.senderPhone !== "Admin") {
-              if (typeof playNotificationSound === 'function') playNotificationSound();
-            }
-          }
-        });
-      }
-
-      globalRumpiUnread = unreadCount;
-      updateCombinedBadge();
-
-      isRumpiFirstLoad = false;
-      msgContainer.scrollTop = msgContainer.scrollHeight;
-    });
-}
-
 
 // Inisialisasi awal saat halaman dimuat
 document.addEventListener("DOMContentLoaded", () => {
   initCalcPreview();
-  initAdminChatRumpiListener(); // Inisialisasi listener chat rumpi admin di latar belakang
   const display = document.getElementById("calc-display");
   if (display) {
     display.addEventListener("input", () => {
