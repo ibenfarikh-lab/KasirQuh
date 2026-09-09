@@ -169,6 +169,42 @@
       </div>
     </div>
 
+    <!-- HALAMAN KALKULATOR -->
+    <div id="kalkulator" class="tab-content">
+      <div class="card" style="max-width: 400px; margin: 0 auto;">
+        <h3 style="margin-top: 0; text-align: center;" data-i18n="page_calculator">Kalkulator</h3>
+        
+        <!-- Layar Kalkulator -->
+        <input type="text" id="calc-display" disabled style="width: 100%; height: 60px; font-size: 1.5rem; text-align: right; margin-bottom: 15px; font-weight: bold; background: var(--table-header); color: var(--text-color);">
+        
+        <!-- Tombol Kalkulator -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+          <button onclick="clearCalc()" style="background: #ef4444; grid-column: span 2;">C</button>
+          <button onclick="hapusSatuCalc()" style="background: #f59e0b;">⌫</button>
+          <button onclick="appendCalc('/')" style="background: #2563eb;">/</button>
+          
+          <button onclick="appendCalc('7')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">7</button>
+          <button onclick="appendCalc('8')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">8</button>
+          <button onclick="appendCalc('9')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">9</button>
+          <button onclick="appendCalc('*')" style="background: #2563eb;">x</button>
+          
+          <button onclick="appendCalc('4')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">4</button>
+          <button onclick="appendCalc('5')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">5</button>
+          <button onclick="appendCalc('6')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">6</button>
+          <button onclick="appendCalc('-')" style="background: #2563eb;">-</button>
+          
+          <button onclick="appendCalc('1')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">1</button>
+          <button onclick="appendCalc('2')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">2</button>
+          <button onclick="appendCalc('3')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">3</button>
+          <button onclick="appendCalc('+')" style="background: #2563eb;">+</button>
+          
+          <button onclick="appendCalc('0')" style="grid-column: span 2; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">0</button>
+          <button onclick="appendCalc('.')" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">.</button>
+          <button onclick="calculateResult()" style="background: #16a34a;">=</button>
+        </div>
+      </div>
+    </div>
+
     <!-- HALAMAN LIVE CHAT ADMIN -->
     <div id="live-chat-admin" class="tab-content">
       <div style="display: flex; height: calc(100vh - 140px); gap: 10px;">
@@ -687,6 +723,10 @@
             <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/></svg> <span data-i18n="menu_online">Kasir Online</span>
           </span>
           <span id="badge-online-count" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 6px;">0</span>
+          </button>
+          <button class="popup-menu-btn" id="pop-btn-kalkulator" onclick="switchTab('kalkulator'); toggleFloatingMenu();">
+       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-6 16H7v-2h6v2zm4-4H7v-2h10v2zm0-4H7V9h10v2zm0-4H7V5h10v2z"/></svg> 
+        <span data-i18n="menu_calculator">Kalkulator</span>
         </button>
         <button class="popup-menu-btn" id="pop-btn-livechat" onclick="switchTab('live-chat-admin'); toggleFloatingMenu();" style="position: relative; display: flex; align-items: center; justify-content: space-between;">
           <span style="display: flex; align-items: center; gap: 8px;">
