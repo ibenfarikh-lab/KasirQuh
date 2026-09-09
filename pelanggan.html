@@ -102,12 +102,12 @@
           <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
           Data Pelanggan
         </button>
-        <button id="pop-btn-chatrumpi" class="popup-menu-btn" onclick="switchTabPelanggan('chat-rumpi'); toggleMenuModal();" style="justify-content: space-between;">
+        <button id="pop-btn-livechat" class="popup-menu-btn" onclick="switchTabPelanggan('live-chat'); toggleMenuModal();" style="justify-content: space-between;">
           <span style="display: flex; align-items: center; gap: 8px;">
-            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> Chat Rumpi
+            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> Live Chat
           </span>
           <!-- Angka Notifikasi -->
-          <span id="badge-rumpi-cust" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px;">0</span>
+          <span id="badge-livechat-cust" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px;">0</span>
         </button>
         <button id="pop-btn-pengaturan" class="popup-menu-btn" onclick="switchTabPelanggan('pengaturan'); toggleMenuModal();">
           <svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.53,5.05 19.27,4.97 19.05,5.05L16.56,6.05C16.04,5.66 15.45,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.55,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.97 4.47,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.47,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.55,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.45,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.53,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
@@ -222,18 +222,37 @@
       </div>
     </div>
 
-    <!-- 3. HALAMAN CHAT RUMPI -->
-    <div id="chat-rumpi" class="tab-content" style="height: calc(100vh - 130px); padding: 0;">
-      <div class="card" style="display: flex; flex-direction: column; margin: 0; padding: 12px; height: 100%; box-sizing: border-box;">
-        <div style="font-weight: bold; font-size: 1rem; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; color: var(--text-color);">💬 Chat Rumpi Warga Toko</div>
-        
-        <!-- Area Gelembung Pesan -->
-        <div id="chat-rumpi-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
-          <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;">Memuat obrolan warga...</div>
-        </div>
+    <!-- 3. HALAMAN LIVE CHAT (Dua Tab: Chat Admin Toko & Chat Rumpi) -->
+    <div id="live-chat" class="tab-content" style="height: calc(100vh - 130px); padding: 0; display: flex; flex-direction: column;">
+      <!-- Header Sub-Tabs -->
+      <div style="display: flex; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
+        <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>Chat Admin Toko</span>
+          <span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px;">0</span>
+        </button>
+        <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>Chat Rumpi</span>
+          <span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px;">0</span>
+        </button>
+      </div>
 
-        <!-- Kolom Input Pesan -->
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
+      <!-- Sub-Tab 1: Chat Admin Toko -->
+      <div id="subtab-admin-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
+        <div id="customer-chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat pesan...</div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 10px; flex-shrink: 0;">
+          <input type="text" id="customer-chat-input" placeholder="Tulis pesan ke toko..." onkeypress="if(event.key==='Enter') kirimPesanPelanggan()" style="flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.9rem;">
+          <button onclick="kirimPesanPelanggan()" style="background: #16a34a; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
+        </div>
+      </div>
+
+      <!-- Sub-Tab 2: Chat Rumpi -->
+      <div id="subtab-rumpi-content" class="subtab-content-pane" style="display: none; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
+        <div id="chat-rumpi-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat obrolan warga...</div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 10px; flex-shrink: 0;">
           <input type="text" id="chat-rumpi-input" placeholder="Tulis pesan ke warga toko..." onkeypress="if(event.key==='Enter') kirimPesanChatRumpi()" style="flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.9rem;">
           <button onclick="kirimPesanChatRumpi()" style="background: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
         </div>
@@ -311,7 +330,7 @@
 
   </div>
 
-  <!-- FLOATING CHAT & UTILITIES -->
+  <!-- FLOATING CHAT & UTILITIES (FAB khusus AI, Search, Cart) -->
   <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
     <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten AI Toko" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
@@ -323,26 +342,6 @@
       <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
       <span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.75rem; min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span>
     </button>
-  </div>
-
-  <!-- MODAL LIVE CHAT PELANGGAN -->
-  <div id="customerChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleCustomerChatModal()">
-    <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
-      <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #16a34a; color: white; display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0; font-size: 1rem; color: white;">💬 Live Chat dengan Toko</h3>
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <button onclick="beralihKeAIFromLiveChat()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">😁 Tanya AI</button>
-          <button class="btn-close-modal" onclick="toggleCustomerChatModal()" style="color: white; background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
-        </div>
-      </div>
-      <div id="customer-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat pesan...</div>
-      </div>
-      <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px;">
-        <input type="text" id="customer-chat-input" placeholder="Tulis pesan ke toko..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);">
-        <button onclick="kirimPesanPelanggan()" style="background: #16a34a; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
-      </div>
-    </div>
   </div>
 
   <!-- MODAL ASISTEN AI DENGAN FITUR SUARA (TTS & SPEECH RECOGNITION) -->
@@ -507,10 +506,6 @@
       if (!isAiSoundOn && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
-    }
-
-    function speakAiText(text) {
-      // Ditangani secara pre-load di dalam fungsi kirimPesanKeAI
     }
   </script>
 
@@ -691,14 +686,6 @@
       }
     }
 
-    function toggleCustomerChatModal() {
-      let modal = document.getElementById("customerChatModal");
-      modal.classList.toggle("show");
-      if (modal.classList.contains("show") && currentCustomerPhone) {
-        db.collection("chats").doc(currentCustomerPhone).update({ unreadCustomer: 0 }).catch(() => {});
-      }
-    }
-
     function toggleAIChatModal() {
       let modal = document.getElementById("aiChatModal");
       modal.classList.toggle("show");
@@ -706,12 +693,42 @@
 
     function beralihKeLiveChatFromAI() {
       toggleAIChatModal();
-      toggleCustomerChatModal();
+      switchTabPelanggan('live-chat');
+      switchSubTabLiveChat('admin');
     }
 
-    function beralihKeAIFromLiveChat() {
-      toggleCustomerChatModal();
-      toggleAIChatModal();
+    // Navigasi Sub-Tab di Halaman Live Chat
+    function switchSubTabLiveChat(sub) {
+      const btnAdmin = document.getElementById('subtab-btn-admin');
+      const btnRumpi = document.getElementById('subtab-btn-rumpi');
+      const contentAdmin = document.getElementById('subtab-admin-content');
+      const contentRumpi = document.getElementById('subtab-rumpi-content');
+
+      if (sub === 'admin') {
+        btnAdmin.style.color = '#2563eb';
+        btnAdmin.style.borderBottomColor = '#2563eb';
+        btnRumpi.style.color = 'var(--text-muted)';
+        btnRumpi.style.borderBottomColor = 'transparent';
+        contentAdmin.style.display = 'flex';
+        contentRumpi.style.display = 'none';
+        
+        if (currentCustomerPhone) {
+          db.collection("chats").doc(currentCustomerPhone).update({ unreadCustomer: 0 }).catch(() => {});
+        }
+      } else {
+        btnRumpi.style.color = '#2563eb';
+        btnRumpi.style.borderBottomColor = '#2563eb';
+        btnAdmin.style.color = 'var(--text-muted)';
+        btnAdmin.style.borderBottomColor = 'transparent';
+        contentRumpi.style.display = 'flex';
+        contentAdmin.style.display = 'none';
+
+        unreadRumpiCust = 0;
+        let badgeSub = document.getElementById("badge-rumpi-subtab");
+        if (badgeSub) badgeSub.style.display = "none";
+        let badgeMain = document.getElementById("badge-livechat-cust");
+        if (badgeMain) badgeMain.style.display = "none";
+      }
     }
 
     let unreadRumpiCust = 0;
@@ -723,18 +740,21 @@
       chatRumpiUnsubscribe = db.collection("db_chat_rumpi")
         .orderBy("waktuTimestamp", "asc")
         .onSnapshot((snapshot) => {
-          
           if (!isInitialLoadRumpi) {
             snapshot.docChanges().forEach((change) => {
               if (change.type === "added") {
                 let m = change.doc.data();
                 if (m.senderPhone !== currentCustomerPhone) {
                   playCustomerNotificationSound(); 
-                  let isActive = document.getElementById('chat-rumpi').classList.contains('active');
-                  if (!isActive) {
+                  let isLiveChatActive = document.getElementById('live-chat').classList.contains('active');
+                  let isRumpiSubActive = isLiveChatActive && document.getElementById('subtab-rumpi-content').style.display !== 'none';
+                  
+                  if (!isRumpiSubActive) {
                     unreadRumpiCust++;
-                    let badge = document.getElementById("badge-rumpi-cust");
-                    if (badge) { badge.innerText = unreadRumpiCust; badge.style.display = "inline-block"; }
+                    let badgeSub = document.getElementById("badge-rumpi-subtab");
+                    if (badgeSub) { badgeSub.innerText = unreadRumpiCust; badgeSub.style.display = "inline-block"; }
+                    let badgeMain = document.getElementById("badge-livechat-cust");
+                    if (badgeMain) { badgeMain.innerText = unreadRumpiCust; badgeMain.style.display = "inline-block"; }
                   }
                 }
               }
@@ -796,13 +816,13 @@
         if (doc.exists) {
           let data = doc.data();
           let unread = data.unreadCustomer || 0;
-          let badge = document.getElementById("chat-badge-count");
-          if (badge) {
+          let badgeAdminSub = document.getElementById("badge-admin-subtab");
+          if (badgeAdminSub) {
             if (unread > 0) {
-              badge.innerText = unread;
-              badge.style.display = "flex";
+              badgeAdminSub.innerText = unread;
+              badgeAdminSub.style.display = "inline-block";
             } else {
-              badge.style.display = "none";
+              badgeAdminSub.style.display = "none";
             }
           }
         }
@@ -985,17 +1005,19 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       
-      if (tabId === 'chat-rumpi') {
+      if (tabId === 'live-chat') {
         unreadRumpiCust = 0;
-        let badge = document.getElementById("badge-rumpi-cust");
-        if (badge) badge.style.display = "none";
+        let badgeSub = document.getElementById("badge-rumpi-subtab");
+        if (badgeSub) badgeSub.style.display = "none";
+        let badgeMain = document.getElementById("badge-livechat-cust");
+        if (badgeMain) badgeMain.style.display = "none";
       }
 
       document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
       const activeBtnMap = {
         'belanja': 'pop-btn-belanja',
         'data-pelanggan': 'pop-btn-datapelanggan',
-        'chat-rumpi': 'pop-btn-chatrumpi',
+        'live-chat': 'pop-btn-livechat',
         'pengaturan': 'pop-btn-pengaturan'
       };
       if (activeBtnMap[tabId]) {
@@ -1023,8 +1045,8 @@
         if (cartFab) cartFab.style.display = "none";
         if (aiFab) aiFab.style.display = "none";
         
-        if (tabId === 'chat-rumpi') {
-          titleEl.innerText = "Chat Rumpi";
+        if (tabId === 'live-chat') {
+          titleEl.innerText = "Live Chat";
         } else if (tabId === 'data-pelanggan') {
           titleEl.innerText = "Data Pelanggan";
         } else {
