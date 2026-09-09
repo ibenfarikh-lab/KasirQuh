@@ -91,7 +91,7 @@ export default async function handler(req, res) {
         { role: 'user', content: promptText }
       ],
       temperature: 0.9,
-      max_tokens: 300
+      max_tokens: 500
     };
 
     const response = await fetch(endpoint, {
