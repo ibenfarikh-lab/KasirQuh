@@ -102,10 +102,6 @@
           <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
           Data Pelanggan
         </button>
-        <button id="pop-btn-chatrumpi" class="popup-menu-btn" onclick="switchTabPelanggan('chat-rumpi'); toggleMenuModal();">
-          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-          Chat Rumpi
-        </button>
         <button id="pop-btn-pengaturan" class="popup-menu-btn" onclick="switchTabPelanggan('pengaturan'); toggleMenuModal();">
           <svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.53,5.05 19.27,4.97 19.05,5.05L16.56,6.05C16.04,5.66 15.45,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.55,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.97 4.47,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.47,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.55,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.45,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.53,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg>
           Pengaturan
@@ -219,26 +215,7 @@
       </div>
     </div>
 
-    <!-- 3. HALAMAN CHAT RUMPI -->
-    <!-- 3. HALAMAN CHAT RUMPI -->
-<div id="chat-rumpi" class="tab-content" style="height: calc(100vh - 130px); padding: 0;">
-      <div class="card" style="flex: 1; display: flex; flex-direction: column; margin: 0; padding: 12px; height: 100%; box-sizing: border-box;">
-        <div style="font-weight: bold; font-size: 1rem; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; color: var(--text-color);">💬 Chat Rumpi Warga Toko</div>
-        
-        <!-- Area Gelembung Pesan -->
-        <div id="chat-rumpi-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
-          <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;">Memuat obrolan warga...</div>
-        </div>
-
-        <!-- Kolom Input Pesan -->
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-          <input type="text" id="chat-rumpi-input" placeholder="Tulis pesan ke warga toko..." onkeypress="if(event.key==='Enter') kirimPesanChatRumpi()" style="flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.9rem;">
-          <button onclick="kirimPesanChatRumpi()" style="background: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. HALAMAN PENGATURAN -->
+    <!-- 3. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
       <div class="card" id="card-install-pwa" style="display: none; border: 1px solid #2563eb; background-color: var(--card-bg);">
         <h3 style="color: #2563eb; margin-top: 0; font-size: 1rem;">📱 Install Aplikasi ke HP</h3>
@@ -535,7 +512,6 @@
     let currentPosPage = 1;
     let itemsPerPagePos = 24;
     let customerChatUnsubscribe = null;
-    let chatRumpiUnsubscribe = null;
 
     window.onload = function() {
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
@@ -553,8 +529,6 @@
         const welcomeEl = document.getElementById('welcomeScreen');
         if (welcomeEl) welcomeEl.style.display = 'none';
       }
-
-      initChatRumpiListener();
 
       if (currentCustomerPhone) {
         const welcomeEl = document.getElementById('welcomeScreen');
@@ -710,61 +684,6 @@
     function beralihKeAIFromLiveChat() {
       toggleCustomerChatModal();
       toggleAIChatModal();
-    }
-
-    function initChatRumpiListener() {
-      if (chatRumpiUnsubscribe) chatRumpiUnsubscribe();
-
-      chatRumpiUnsubscribe = db.collection("db_chat_rumpi")
-        .orderBy("waktuTimestamp", "asc")
-        .onSnapshot((snapshot) => {
-          let msgContainer = document.getElementById("chat-rumpi-messages");
-          if (!msgContainer) return;
-          msgContainer.innerHTML = "";
-
-          if (snapshot.empty) {
-            msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada percakapan. Yuk mulai ngobrol, Kak!</div>`;
-            return;
-          }
-
-          snapshot.forEach(doc => {
-            let m = doc.data();
-            let isMyMessage = m.senderPhone === currentCustomerPhone;
-            
-            let alignStyle = isMyMessage ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
-            let senderLabel = !isMyMessage ? `<div style="font-size: 0.7rem; font-weight: bold; color: #16a34a; margin-bottom: 2px;">${m.senderName || 'Warga Toko'}</div>` : '';
-
-            msgContainer.innerHTML += `
-              <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignStyle}">
-                ${senderLabel}
-                <div>${escapeHtml(m.pesan || '')}</div>
-                <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
-              </div>
-            `;
-          });
-          msgContainer.scrollTop = msgContainer.scrollHeight;
-        });
-    }
-
-    function kirimPesanChatRumpi() {
-      if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu untuk ikut merumpikan!");
-      let inputEl = document.getElementById("chat-rumpi-input");
-      let pesan = inputEl.value.trim();
-      if (!pesan) return;
-
-      let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
-
-      db.collection("db_chat_rumpi").add({
-        senderPhone: currentCustomerPhone,
-        senderName: currentCustomerName || 'Pelanggan',
-        pesan: pesan,
-        waktu: nowStr,
-        waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        inputEl.value = "";
-      }).catch(err => {
-        alert("Gagal mengirim pesan: " + err.message);
-      });
     }
 
     function initCustomerChatListener() {
@@ -966,7 +885,6 @@
       const activeBtnMap = {
         'belanja': 'pop-btn-belanja',
         'data-pelanggan': 'pop-btn-datapelanggan',
-        'chat-rumpi': 'pop-btn-chatrumpi',
         'pengaturan': 'pop-btn-pengaturan'
       };
       if (activeBtnMap[tabId]) {
@@ -986,21 +904,14 @@
         paginationBox.style.display = "flex";
         if (searchFab) searchFab.style.display = "flex";
         if (cartFab) cartFab.style.display = "flex";
-        if (aiFab) aiFab.style.display = "flex";
+        if (aiFab) aiFab.style.display = "none";
       } else {
         paginationBox.style.display = "none";
         if (searchContainer) searchContainer.style.display = "none";
         if (searchFab) searchFab.style.display = "none";
         if (cartFab) cartFab.style.display = "none";
         if (aiFab) aiFab.style.display = "flex";
-        
-        if (tabId === 'chat-rumpi') {
-          titleEl.innerText = "Chat Rumpi";
-        } else if (tabId === 'data-pelanggan') {
-          titleEl.innerText = "Data Pelanggan";
-        } else {
-          titleEl.innerText = "Pengaturan";
-        }
+        titleEl.innerText = tabId === 'data-pelanggan' ? "Data Pelanggan" : "Pengaturan";
         
         if (tabId === 'pengaturan') {
           document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto';
@@ -1418,9 +1329,11 @@
         let daftarProdukText = "";
         let keywordLower = prompt.toLowerCase();
         
+        // 1. Deteksi kata kunci pertanyaan belanja/produk
         let shoppingKeywords = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"];
         let isAskingProduct = shoppingKeywords.some(kw => keywordLower.includes(kw));
 
+        // 2. Cek apakah ada nama produk di database yang cocok dengan ketikan user
         let matchedProducts = [];
         for (let code in databaseProduk) {
           let p = databaseProduk[code];
@@ -1434,35 +1347,39 @@
           }
         }
 
-        if (isAskingProduct || matchedProducts.length > 0) {
-          let targetList = [];
-          if (matchedProducts.length > 0) {
-            targetList = matchedProducts.slice(0, 3);
-          } else {
-            let count = 0;
-            for (let code in databaseProduk) {
-              if (count >= 3) break;
-              targetList.push(databaseProduk[code]);
-              count++;
-            }
-          }
+                    // 3. Logika pemilahan data (Hemat Token: Maksimal 3 produk & Penyesuaian Harga)
+    if (isAskingProduct || matchedProducts.length > 0) {
+      let targetList = [];
+      if (matchedProducts.length > 0) {
+        targetList = matchedProducts.slice(0, 3);
+      } else {
+        let count = 0;
+        for (let code in databaseProduk) {
+          if (count >= 3) break;
+          targetList.push(databaseProduk[code]);
+          count++;
+        }
+      }
 
-          targetList.forEach(p => {
-            let sat = (p.satuan || 'Pcs').toLowerCase();
-            let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
-            
-            if (sat === 'kg' || sat === 'kilogram') {
-              valHarga = p.hargaRtg || (valHarga * 10);
-              sat = 'kg';
-            } else if (sat === 'rtg') {
-              sat = 'pcs';
-            } else {
-              sat = p.satuan || 'Pcs';
-            }
-
-            daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`;
-          });
+      targetList.forEach(p => {
+        let sat = (p.satuan || 'Pcs').toLowerCase();
+        let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+        
+        if (sat === 'kg' || sat === 'kilogram') {
+          valHarga = p.hargaRtg || (valHarga * 10);
+          sat = 'kg';
+        } else if (sat === 'rtg') {
+          sat = 'pcs';
         } else {
+          sat = p.satuan || 'Pcs';
+        }
+
+        daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`;
+      });
+    } else {
+
+
+          // OBROLAN SANTAI: Token sangat hemat (0 data produk dikirim ke AI)
           daftarProdukText = "Tidak ada produk yang dilampirkan (obrolan santai).";
         }
 
