@@ -3447,7 +3447,7 @@ function calculateResult() {
   }
 }
 
-// --- FITUR VOICE CALCULATOR (FIXED ANTI-DUPLIKASI/MENUMPUK) ---
+// --- FITUR VOICE CALCULATOR (MODE CONTINUOUS / MANUAL TOGGLE) ---
 let voiceCalc = null;
 let isVoiceCalcActive = false;
 
@@ -3476,17 +3476,21 @@ function toggleVoiceCalculator() {
   if (!voiceCalc) {
     voiceCalc = new SpeechRecognition();
     voiceCalc.lang = 'id-ID';
-    voiceCalc.interimResults = false;
-    voiceCalc.continuous = false;
+    voiceCalc.interimResults = true;
+    voiceCalc.continuous = true; // Tidak otomatis berhenti saat jeda singkat
 
     voiceCalc.onstart = function() {
       isVoiceCalcActive = true;
     };
 
     voiceCalc.onresult = function(event) {
-      const speechResult = event.results[0][0].transcript.toLowerCase();
-      if(textDisplay) textDisplay.innerText = speechResult;
-      prosesVoiceKalkulator(speechResult);
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        transcript += event.results[i][0].transcript;
+      }
+      
+      if(textDisplay) textDisplay.innerText = transcript;
+      prosesVoiceKalkulator(transcript.toLowerCase().trim());
     };
 
     voiceCalc.onerror = function(event) {
@@ -3494,11 +3498,9 @@ function toggleVoiceCalculator() {
     };
 
     voiceCalc.onend = function() {
-      isVoiceCalcActive = false;
-      if(indicator) indicator.style.display = "none";
-      if(btnMic) {
-        btnMic.style.transform = "scale(1)";
-        btnMic.style.boxShadow = "none";
+      // Auto restart jika belum dimatikan manual agar tetap aktif
+      if (isVoiceCalcActive) {
+        try { voiceCalc.start(); } catch(e) {}
       }
     };
   }
