@@ -2049,6 +2049,7 @@ function updatePermanentBarTitle() {
     titleEl.innerText = (currentLang === 'en') ? "System Settings" : ((currentLang === 'ar') ? "إعدادات النظام" : "Pengaturan Sistem");
   } else if (activeTab === 'kalkulator') {
     titleEl.innerText = (currentLang === 'en') ? "Calculator" : ((currentLang === 'ar') ? "آلة حاسبة" : "Kalkulator");
+    initCalcPreview();
   }
 
   document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
@@ -2134,6 +2135,7 @@ function switchTab(tabId, pushHistory = true) {
       if(fabAdd) fabAdd.style.display = 'none'; 
       if(fabAddCust) fabAddCust.style.display = 'none'; 
       if(fabAddCatatan) fabAddCatatan.style.display = 'none';
+      initCalcPreview();
     } else {
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
@@ -3139,10 +3141,8 @@ function startVoiceScannerFlow() {
     return alert("Maaf, browser HP Anda belum mendukung fitur Voice Scanner. Gunakan Google Chrome.");
   }
 
-  // 1. Langsung buka modal keranjang belanja biar kasir bisa lihat hasilnya live
   openCartModal();
 
-  // 2. Tampilkan kotak indikator suara di keranjang
   const indicatorBox = document.getElementById("voice-indicator-container");
   const indicatorText = document.getElementById("voice-indicator-text");
   if (indicatorBox) indicatorBox.style.display = "flex";
@@ -3151,8 +3151,8 @@ function startVoiceScannerFlow() {
   if (!voiceScannerPos) {
     voiceScannerPos = new SpeechRecognition();
     voiceScannerPos.lang = 'id-ID';
-    voiceScannerPos.interimResults = true; // Biar teks langsung ngetik saat kasir ngomong
-    voiceScannerPos.continuous = true;     // Terus aktif sampai timer habis
+    voiceScannerPos.interimResults = true;
+    voiceScannerPos.continuous = true;
 
     voiceScannerPos.onstart = function() {
       isVoiceScannerPosActive = true;
@@ -3160,7 +3160,7 @@ function startVoiceScannerFlow() {
     };
 
     voiceScannerPos.onresult = function(event) {
-      resetVoiceTimeout(); // Setiap ada suara masuk, timer 10 detik di-reset dari awal!
+      resetVoiceTimeout();
       
       let interimTranscript = '';
       let finalTranscript = '';
@@ -3194,15 +3194,11 @@ function startVoiceScannerFlow() {
 
   try {
     voiceScannerPos.start();
-  } catch(e) {
-    // Kalau sudah terlanjur jalan
-  }
+  } catch(e) {}
 }
 
 function resetVoiceTimeout() {
   if (voiceTimeoutTimer) clearTimeout(voiceTimeoutTimer);
-  
-  // Timer 10 detik: Jika tidak ada suara baru selama 10 detik, otomatis stop voice scanner
   voiceTimeoutTimer = setTimeout(() => {
     stopVoiceScannerUI();
     showNotif("Voice scanner ditutup otomatis.");
@@ -3223,7 +3219,6 @@ function stopVoiceScannerUI() {
 }
 
 function processVoicePosCommand(spokenText) {
-  // Parsing angka kata ke angka numerik dasar
   let cleanText = spokenText
     .replace(/setengah/g, '0.5')
     .replace(/seperempat/g, '0.25')
@@ -3238,12 +3233,10 @@ function processVoicePosCommand(spokenText) {
     .replace(/sembilan/g, '9')
     .replace(/sepuluh/g, '10');
 
-  // Cari angka di akhir kalimat (misal: "bawang merah 1", "kopi susu 2") atau satuan ons/kg
   let matchedProductCode = null;
   let parsedQty = 1;
   let parsedSatuanJual = 'pcs';
 
-  // Cek apakah ada penyebutan satuan berat (kg / ons)
   let isKgCommand = cleanText.includes('kg') || cleanText.includes('kilo');
   let isOnsCommand = cleanText.includes('ons');
 
@@ -3253,8 +3246,6 @@ function processVoicePosCommand(spokenText) {
 
     if (cleanText.includes(namaProd)) {
       matchedProductCode = code;
-      
-      // Ambil teks setelah nama barang untuk mendeteksi jumlah/qty
       let remainingText = cleanText.replace(namaProd, '').trim();
       let numbersInRemaining = remainingText.match(/[\d\.]+/g);
 
@@ -3264,7 +3255,7 @@ function processVoicePosCommand(spokenText) {
       }
 
       if (isOnsCommand) {
-        parsedQty = parsedQty / 10; // Konversi ons ke kg (10 ons = 1 kg)
+        parsedQty = parsedQty / 10;
         parsedSatuanJual = 'kg';
       } else if (isKgCommand || (p.satuan && p.satuan.toLowerCase() === 'kg')) {
         parsedSatuanJual = 'kg';
@@ -3344,14 +3335,11 @@ document.addEventListener('input', function(e) {
   }
 });
 
-// --- FUNGSI KALKULATOR ---
+// --- FUNGSI KALKULATOR & AUTO-KALKULASI ---
 function formatKalkulator(rawStr) {
-  // Cari angka utuh maupun yang sedang diketik desimalnya
   return rawStr.replace(/\d+(\.\d*)?/g, function(match) {
     let parts = match.split('.');
-    // Tambahkan titik sebagai pemisah ribuan
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    // Jika ada bagian desimal, gabungkan dengan koma
     if (parts.length > 1) {
       return parts[0] + ',' + parts[1];
     } else {
@@ -3360,25 +3348,72 @@ function formatKalkulator(rawStr) {
   });
 }
 
+function initCalcPreview() {
+  const display = document.getElementById("calc-display");
+  if (display && !document.getElementById("calc-preview")) {
+    const previewDiv = document.createElement("div");
+    previewDiv.id = "calc-preview";
+    previewDiv.style.cssText = "text-align: right; font-size: 1.3rem; color: #2563eb; font-weight: bold; padding: 4px 12px; min-height: 30px;";
+    display.parentNode.insertBefore(previewDiv, display.nextSibling);
+  }
+}
+
+function autoCalculate() {
+  const display = document.getElementById("calc-display");
+  const preview = document.getElementById("calc-preview");
+  if (!display) return;
+
+  let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
+  rawVal = rawVal.replace(/\b0+(\d+)/g, '$1');
+
+  if (!rawVal) {
+    if (preview) preview.innerText = "";
+    return;
+  }
+
+  // Auto kalkulasi jalan secara live jika ekspresi diakhiri dengan angka atau kurung tutup
+  if (/[\d\)]$/.test(rawVal)) {
+    try {
+      let result = eval(rawVal);
+      if (result !== undefined && !isNaN(result)) {
+        if (result % 1 !== 0) {
+          result = parseFloat(result.toFixed(4));
+        }
+        let formattedResult = formatKalkulator(result.toString());
+        if (preview) {
+          preview.innerText = "=" + formattedResult;
+        }
+      } else {
+        if (preview) preview.innerText = "";
+      }
+    } catch (e) {
+      if (preview) preview.innerText = "";
+    }
+  } else {
+    if (preview) preview.innerText = "";
+  }
+}
+
 function appendCalc(value) {
   const display = document.getElementById("calc-display");
   if(display) {
-    // Kembalikan ke format baku Javascript (hilangkan titik, ubah koma jadi titik)
     let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
     
-    // Mencegah error jika user langsung mengetik koma tanpa angka 0 di depannya
     if (value === '.' && (rawVal === '' || /[\+\-\*\/]$/.test(rawVal))) {
       value = '0.';
     }
     
     rawVal += value;
     display.value = formatKalkulator(rawVal);
+    autoCalculate();
   }
 }
 
 function clearCalc() {
   const display = document.getElementById("calc-display");
+  const preview = document.getElementById("calc-preview");
   if(display) display.value = "";
+  if(preview) preview.innerText = "";
 }
 
 function hapusSatuCalc() {
@@ -3387,15 +3422,15 @@ function hapusSatuCalc() {
     let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
     rawVal = rawVal.slice(0, -1);
     display.value = formatKalkulator(rawVal);
+    autoCalculate();
   }
 }
 
 function calculateResult() {
   const display = document.getElementById("calc-display");
+  const preview = document.getElementById("calc-preview");
   if(display && display.value) {
     let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
-    
-    // Mencegah error angka berawalan nol ganda pada mesin JavaScript
     rawVal = rawVal.replace(/\b0+(\d+)/g, '$1');
     
     try {
@@ -3404,13 +3439,14 @@ function calculateResult() {
         result = parseFloat(result.toFixed(4));
       }
       display.value = formatKalkulator(result.toString());
+      if (preview) preview.innerText = "";
     } catch (e) {
       alert("Format hitungan salah");
       display.value = "";
+      if (preview) preview.innerText = "";
     }
   }
 }
-
 
 // --- FITUR VOICE CALCULATOR ---
 let voiceCalc = null;
@@ -3431,16 +3467,17 @@ function toggleVoiceCalculator() {
     return;
   }
 
-  // Tampilkan UI Indikator
-  indicator.style.display = "flex";
-  textDisplay.innerText = "Mendengarkan hitungan...";
-  btnMic.style.transform = "scale(1.15)";
-  btnMic.style.boxShadow = "0 0 12px rgba(239, 68, 68, 0.7)";
+  if(indicator) indicator.style.display = "flex";
+  if(textDisplay) textDisplay.innerText = "Mendengarkan hitungan...";
+  if(btnMic) {
+    btnMic.style.transform = "scale(1.15)";
+    btnMic.style.boxShadow = "0 0 12px rgba(239, 68, 68, 0.7)";
+  }
 
   if (!voiceCalc) {
     voiceCalc = new SpeechRecognition();
     voiceCalc.lang = 'id-ID';
-    voiceCalc.interimResults = true; // Langsung tampilkan teks saat bicara
+    voiceCalc.interimResults = true;
     voiceCalc.continuous = true;
 
     voiceCalc.onstart = function() {
@@ -3460,7 +3497,7 @@ function toggleVoiceCalculator() {
       }
 
       let currentText = finalTranscript || interimTranscript;
-      textDisplay.innerText = currentText; // Tampilkan teks yang didengar di kotak indikator
+      if(textDisplay) textDisplay.innerText = currentText;
 
       if (finalTranscript) {
         prosesVoiceKalkulator(finalTranscript.toLowerCase().trim());
@@ -3472,7 +3509,6 @@ function toggleVoiceCalculator() {
     };
 
     voiceCalc.onend = function() {
-      // Loop mic agar terus hidup sampai dimatikan manual
       if (isVoiceCalcActive) {
         try { voiceCalc.start(); } catch(e) {}
       }
@@ -3487,7 +3523,8 @@ function stopVoiceCalculator() {
   if (voiceCalc) {
     try { voiceCalc.stop(); } catch(e) {}
   }
-  document.getElementById("voice-calc-indicator").style.display = "none";
+  const ind = document.getElementById("voice-calc-indicator");
+  if(ind) ind.style.display = "none";
   const btnMic = document.getElementById("btn-voice-calc");
   if(btnMic) {
     btnMic.style.transform = "scale(1)";
@@ -3496,7 +3533,6 @@ function stopVoiceCalculator() {
 }
 
 function prosesVoiceKalkulator(text) {
-  // 1. Ubah kata-kata operasi matematika menjadi simbol
   let parsed = text
     .replace(/tambah|ditambah/g, '+')
     .replace(/kurang|dikurang|dikurangi/g, '-')
@@ -3505,13 +3541,10 @@ function prosesVoiceKalkulator(text) {
     .replace(/koma/g, '.')
     .replace(/sama dengan|hasilnya|totalnya/g, '=');
 
-  // Google otomatis mengubah ucapan "seribu" menjadi "1000", dll.
-  // 2. Hapus semua huruf alphabet yang tersisa, agar murni angka & operator saja
   let mathString = parsed.replace(/[^0-9\+\-\*\/\.\=]/g, '');
 
   if(!mathString) return;
 
-  // 3. Masukkan ke layar kalkulator satu per satu layaknya diketik
   for (let i = 0; i < mathString.length; i++) {
     let char = mathString[i];
     if (char === '=') {
@@ -3523,9 +3556,16 @@ function prosesVoiceKalkulator(text) {
 }
 // --- END FITUR VOICE CALCULATOR ---
 
-// --- END FUNGSI KALKULATOR ---
-
-
+// Inisialisasi awal saat halaman dimuat
+document.addEventListener("DOMContentLoaded", () => {
+  initCalcPreview();
+  const display = document.getElementById("calc-display");
+  if (display) {
+    display.addEventListener("input", () => {
+      autoCalculate();
+    });
+  }
+});
 
 setTheme(currentTheme);
 setLanguage(currentLang);
