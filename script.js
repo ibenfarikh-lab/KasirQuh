@@ -3650,6 +3650,88 @@ function escapeHtml(text) {
 }
 // --- END FITUR CHAT RUMPI ---
 
+let unreadRumpiCount = 0; // Variabel untuk menyimpan jumlah pesan belum dibaca di Chat Rumpi
+let isFirstRumpiLoad = true; // Agar suara tidak berdering saat halaman pertama kali dimuat
+
+function initRumpiChatListener() {
+    // Sesuaikan dengan struktur Firebase Firestore Anda (db)
+    db.collection("db_chat_rumpi").onSnapshot((snapshot) => {
+        let newUnreadCount = 0;
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            // Kondisi menghitung pesan yang belum dibaca dari pengguna/warga
+            // Sesuaikan properti 'status' atau 'readByAdmin' dengan database Anda
+            if (data.status === "unread" || data.readByAdmin === false) {
+                newUnreadCount++;
+            }
+        });
+
+        // Deteksi apakah ada pesan BARU masuk (jumlah bertambah dari sebelumnya)
+        if (!isFirstRumpiLoad && newUnreadCount > unreadRumpiCount) {
+            // Panggil fungsi suara notifikasi yang sudah ada di aplikasi Anda
+            if (typeof playNotificationSound === "function") {
+                playNotificationSound();
+            }
+            
+            // Opsional: Tampilkan browser notification jika diizinkan
+            if (Notification.permission === "granted") {
+                new Notification("Pesan Baru di Chat Rumpi!", {
+                    body: "Ada pesan baru dari warga/anggota rumpi."
+                });
+            }
+        }
+
+        unreadRumpiCount = newUnreadCount;
+        isFirstRumpiLoad = false;
+
+        // Perbarui tampilan badge di antarmuka (UI)
+        updateRumpiBadgeUI(unreadRumpiCount);
+    }, (error) => {
+        console.error("Gagal mendengarkan perubahan Chat Rumpi: ", error);
+    });
+}
+
+// Fungsi untuk memperbarui tampilan badge di HTML
+function updateRumpiBadgeUI(count) {
+    const badgeElement = document.getElementById("badge-rumpi-count");
+    if (badgeElement) {
+        if (count > 0) {
+            badgeElement.textContent = count;
+            badgeElement.style.display = "inline-block"; // Tampilkan badge
+        } else {
+            badgeElement.style.display = "none"; // Sembunyikan jika 0
+        }
+    }
+}
+
+// Di dalam fungsi utama saat aplikasi siap / setelah login:
+function startApp() {
+    // Listener chat pribadi yang sudah ada sebelumnya
+    if (typeof initAdminChatListener === "function") {
+        initAdminChatListener();
+    }
+
+    // TAMBAHKAN PEMANGGILAN INI:
+    initRumpiChatListener();
+}
+
+document.getElementById("menu-chat-rumpi").addEventListener("click", () => {
+    // Reset hitungan lokal
+    unreadRumpiCount = 0;
+    updateRumpiBadgeUI(0);
+
+    // Opsional: Perbarui status dokumen di Firestore menjadi 'read' / 'readByAdmin: true'
+    db.collection("db_chat_rumpi").where("status", "==", "unread").get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            doc.ref.update({
+                status: "read",
+                readByAdmin: true
+            });
+        });
+    });
+});
+
 
 // Inisialisasi awal saat halaman dimuat
 document.addEventListener("DOMContentLoaded", () => {
