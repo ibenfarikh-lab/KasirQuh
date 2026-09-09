@@ -23,7 +23,7 @@
       fill: #2563eb !important;
     }
     /* Animasi Voice Scanner */
-    @keyfKOTAK INDIKATORrames blink {
+@keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
@@ -220,17 +220,23 @@
     </div>
 
 
-    <!-- HALAMAN LIVE CHAT ADMIN -->
+        <!-- HALAMAN LIVE CHAT ADMIN -->
     <div id="live-chat-admin" class="tab-content">
-      <div style="display: flex; height: calc(100vh - 140px); gap: 10px;">
-        <!-- Daftar Kontak Chat Pelanggan -->
+      
+      <!-- Tombol Navigasi Sub-Tab -->
+      <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+        <button id="btn-sub-chat-pribadi" onclick="switchAdminChatSubTab('pribadi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">👤 Chat Pribadi</button>
+        <button id="btn-sub-chat-rumpi" onclick="switchAdminChatSubTab('rumpi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">🗣️ Chat Rumpi</button>
+      </div>
+
+      <!-- WRAPPER CHAT PRIBADI -->
+      <div id="wrapper-admin-chat-pribadi" style="display: flex; height: calc(100vh - 180px); gap: 10px;">
         <div style="width: 35%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
           <div style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);" data-i18n="chat_conversations">💬 Daftar Percakapan</div>
           <div id="admin-chat-list" style="flex: 1; overflow-y: auto;">
             <div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;" data-i18n="loading_chats">Memuat daftar chat...</div>
           </div>
         </div>
-        <!-- Ruang Obrolan Aktif -->
         <div style="flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
           <div id="admin-chat-header" style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);" data-i18n="select_chat_prompt">Pilih pelanggan di samping untuk mulai chat</div>
           <div id="admin-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
@@ -242,17 +248,20 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <div id="scannerModal" class="fab-scanner-modal">
-      <div class="scanner-fullscreen-box">
-        <button class="btn-close-scanner-absolute" onclick="toggleScannerPos()">&times;</button>
-        <div class="scanner-focus-frame"></div>
-        <div class="scanner-laser-line"></div>
-        <div id="scanner-box-pos" class="scanner-wrapper" style="display: block;">
-          <div id="reader-pos"></div>
+      <!-- WRAPPER CHAT RUMPI -->
+      <div id="wrapper-admin-chat-rumpi" style="display: none; height: calc(100vh - 180px); flex-direction: column; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;">
+        <div style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header); display: flex; justify-content: space-between; align-items: center;">
+          <span>🗣️ Chat Rumpi Warga</span>
+          <button onclick="bersihkanSemuaChatRumpiAdmin()" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">🧹 Bersihkan Semua</button>
         </div>
-        <div id="scan-notif" class="scan-status-floating"></div>
+        <div id="admin-chat-rumpi-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
+          <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;">Memuat daftar chat rumpi...</div>
+        </div>
+        <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px;">
+          <input type="text" id="admin-chat-rumpi-input" placeholder="Ketik pesan untuk warga toko..." onkeypress="if(event.key==='Enter') kirimPesanRumpiAdmin()" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);">
+          <button onclick="kirimPesanRumpiAdmin()" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
+        </div>
       </div>
     </div>
 
@@ -1136,6 +1145,26 @@
           unreadCustomer: firebase.firestore.FieldValue.increment(1)
         }, { merge: true });
         inputEl.value = "";
+      });
+    }
+
+    function kirimPesanRumpiAdmin() {
+      let inputEl = document.getElementById("admin-chat-rumpi-input");
+      let pesan = inputEl.value.trim();
+      if (!pesan) return;
+
+      let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
+
+      db.collection("db_chat_rumpi").add({
+        senderPhone: "Admin",
+        senderName: "Admin Toko",
+        pesan: pesan,
+        waktu: nowStr,
+        waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        inputEl.value = "";
+      }).catch(err => {
+        alert("Gagal mengirim pesan: " + err.message);
       });
     }
 
