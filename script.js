@@ -3394,9 +3394,12 @@ function calculateResult() {
   const display = document.getElementById("calc-display");
   if(display && display.value) {
     let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
+    
+    // Mencegah error angka berawalan nol ganda pada mesin JavaScript
+    rawVal = rawVal.replace(/\b0+(\d+)/g, '$1');
+    
     try {
       let result = eval(rawVal);
-      // Jika hasilnya desimal panjang, bulatkan
       if (result % 1 !== 0) {
         result = parseFloat(result.toFixed(4));
       }
@@ -3407,6 +3410,7 @@ function calculateResult() {
     }
   }
 }
+
 
 // --- FITUR VOICE CALCULATOR ---
 let voiceCalc = null;
