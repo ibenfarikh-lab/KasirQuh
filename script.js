@@ -3346,21 +3346,32 @@ document.addEventListener('input', function(e) {
 
 // --- FUNGSI KALKULATOR ---
 function formatKalkulator(rawStr) {
-  // Pisahkan angka untuk diberi format ribuan (titik) dan desimal (koma)
-  return rawStr.replace(/\d+(?:\.\d+)?/g, function(match) {
+  // Cari angka utuh maupun yang sedang diketik desimalnya
+  return rawStr.replace(/\d+(\.\d*)?/g, function(match) {
     let parts = match.split('.');
+    // Tambahkan titik sebagai pemisah ribuan
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    return parts.join(',');
+    // Jika ada bagian desimal, gabungkan dengan koma
+    if (parts.length > 1) {
+      return parts[0] + ',' + parts[1];
+    } else {
+      return parts[0];
+    }
   });
 }
 
 function appendCalc(value) {
   const display = document.getElementById("calc-display");
   if(display) {
-    // Kembalikan ke format baku Javascript sebelum ditambah angka/operator baru
+    // Kembalikan ke format baku Javascript (hilangkan titik, ubah koma jadi titik)
     let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
+    
+    // Mencegah error jika user langsung mengetik koma tanpa angka 0 di depannya
+    if (value === '.' && (rawVal === '' || /[\+\-\*\/]$/.test(rawVal))) {
+      value = '0.';
+    }
+    
     rawVal += value;
-    // Format ulang dan tampilkan
     display.value = formatKalkulator(rawVal);
   }
 }
@@ -3382,9 +3393,7 @@ function hapusSatuCalc() {
 function calculateResult() {
   const display = document.getElementById("calc-display");
   if(display && display.value) {
-    // Ubah kembali string format Indonesia (titik ribuan, koma desimal) ke format baku JS
     let rawVal = display.value.replace(/\./g, '').replace(/,/g, '.');
-    
     try {
       let result = eval(rawVal);
       // Jika hasilnya desimal panjang, bulatkan
@@ -3399,6 +3408,7 @@ function calculateResult() {
   }
 }
 // --- END FUNGSI KALKULATOR ---
+
 
 
 setTheme(currentTheme);
