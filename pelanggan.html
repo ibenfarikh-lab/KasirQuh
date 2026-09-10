@@ -332,7 +332,7 @@
 
   <!-- FLOATING CHAT & UTILITIES (FAB khusus AI, Search, Cart) -->
   <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
-    <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px;">😀</button>
+    <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: grab; font-size: 20px; touch-action: none; user-select: none; -webkit-user-select: none;">😀</button>
     <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="24" height="24" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg>
     </button>
@@ -687,6 +687,109 @@
       let modal = document.getElementById("aiChatModal");
       modal.classList.toggle("show");
     }
+
+    // FAB Asisten AI Pelanggan: bisa digeser bebas dengan jari maupun mouse.
+    function initCustomerAIFabDrag() {
+      const fab = document.getElementById("fab-ai-btn");
+      if (!fab) return;
+
+      const storageKey = "customer_ai_fab_position_v1";
+      let dragging = false;
+      let moved = false;
+      let startX = 0;
+      let startY = 0;
+      let startLeft = 0;
+      let startTop = 0;
+      let suppressClick = false;
+
+      function clampPosition(left, top) {
+        const margin = 8;
+        const maxLeft = Math.max(margin, window.innerWidth - fab.offsetWidth - margin);
+        const maxTop = Math.max(margin, window.innerHeight - fab.offsetHeight - margin);
+        return {
+          left: Math.min(Math.max(left, margin), maxLeft),
+          top: Math.min(Math.max(top, margin), maxTop)
+        };
+      }
+
+      function applyPosition(left, top, save = true) {
+        const pos = clampPosition(left, top);
+        fab.style.position = "fixed";
+        fab.style.left = pos.left + "px";
+        fab.style.top = pos.top + "px";
+        fab.style.right = "auto";
+        fab.style.bottom = "auto";
+        if (save) {
+          try { localStorage.setItem(storageKey, JSON.stringify(pos)); } catch (e) {}
+        }
+      }
+
+      // Ambil posisi terakhir jika sebelumnya sudah dipindahkan.
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+        if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.top)) {
+          applyPosition(saved.left, saved.top, false);
+        }
+      } catch (e) {}
+
+      fab.addEventListener("pointerdown", (event) => {
+        if (event.button !== undefined && event.button !== 0) return;
+
+        const rect = fab.getBoundingClientRect();
+        dragging = true;
+        moved = false;
+        suppressClick = false;
+        startX = event.clientX;
+        startY = event.clientY;
+        startLeft = rect.left;
+        startTop = rect.top;
+        fab.style.cursor = "grabbing";
+        fab.setPointerCapture?.(event.pointerId);
+        event.preventDefault();
+      });
+
+      fab.addEventListener("pointermove", (event) => {
+        if (!dragging) return;
+
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+
+        applyPosition(startLeft + dx, startTop + dy, false);
+        event.preventDefault();
+      });
+
+      function stopDrag(event) {
+        if (!dragging) return;
+        const rect = fab.getBoundingClientRect();
+        dragging = false;
+        fab.style.cursor = "grab";
+        if (moved) {
+          applyPosition(rect.left, rect.top, true);
+          suppressClick = true;
+          setTimeout(() => { suppressClick = false; }, 80);
+        }
+        try { if (event.pointerId !== undefined) fab.releasePointerCapture?.(event.pointerId); } catch (e) {}
+      }
+
+      fab.addEventListener("pointerup", stopDrag);
+      fab.addEventListener("pointercancel", stopDrag);
+
+      // Kalau hanya klik, modal tetap terbuka. Kalau baru selesai drag, jangan buka modal.
+      fab.addEventListener("click", (event) => {
+        if (suppressClick) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+
+      window.addEventListener("resize", () => {
+        const rect = fab.getBoundingClientRect();
+        if (rect.width && rect.height) applyPosition(rect.left, rect.top, true);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", initCustomerAIFabDrag);
 
     // Navigasi Sub-Tab di Halaman Live Chat
     function switchSubTabLiveChat(sub) {
