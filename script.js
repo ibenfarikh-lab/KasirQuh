@@ -3841,9 +3841,9 @@ function initAdminChatRumpiListener() {
 
 
               // Bunyi notifikasi
-              playNotificationSound();
-            }
-          }
+              if (typeof playNotificationSound === "function") {
+  playNotificationSound();
+}
 
 
           // Simpan ID untuk perbandingan berikutnya
