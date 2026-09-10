@@ -1,3 +1,4 @@
+// api/admin-ai.js - Groq API Integration untuk AI Admin KasirQuh
 export default async function handler(req, res) {
   const sendJson = (statusCode, data) => {
     if (typeof res.status === 'function') {
@@ -9,10 +10,9 @@ export default async function handler(req, res) {
   };
 
   if (req.method !== 'POST') {
-    return sendJson(405, { reply: 'Method not allowed' });
+    return sendJson(405, { error: 'Method not allowed' });
   }
 
-  let promptText = '';
   try {
     let body = req.body;
     if (typeof body === 'string') {
@@ -20,49 +20,85 @@ export default async function handler(req, res) {
     }
     body = body || {};
 
-    promptText = body.prompt || body.pesan || body.message || body.text || '';
+    const promptText = body.prompt || body.pesan || body.message || body.text || '';
+    const daftarProduk = body.daftarProduk || 'Tidak ada data produk yang dikirim dari halaman admin.';
+    const namaToko = body.namaToko || 'KasirQuh';
 
     if (!promptText) {
-      return sendJson(200, { reply: "Pesane ora olih kosong, Ka." });
+      return sendJson(200, { reply: 'Halo, Ka! Mau cek stok, harga, produk, atau ngobrol santai dulu? 😁' });
     }
 
-    const text = promptText.toLowerCase();
-    let reply = "";
-
-    // Sistem pencocokan kata kunci lokal basa Cirebon komplit (Stok, Harga, Jam Buka, Lokasi, Pembayaran, Promo, & Candaan Gaul)[span_0](start_span)[span_0](end_span)
-    if (text.includes('halo') || text.includes('hai') || text.includes('pagi') || text.includes('siang') || text.includes('malam')) {
-      reply = "Hai, Ka! Ana sing bisa dibantu? 😊";
-    } else if (text.includes('stok') || text.includes('barang')) {
-      reply = "Nggo ngecek detail stok barang, kakanbisa langsung deleng ning menu daftar produk ya! Supaya datane luwih pas. 📦✨";
-    } else if (text.includes('harga') || text.includes('jual') || text.includes('beli')) {
-      reply = "Soal rega lan produk, kabeh wis kecatet rapi ning sistem kasir ya Ka. Ana maning sing pan dicek? 💰";
-    } else if (text.includes('jam') || text.includes('buka') || text.includes('tutup') || text.includes('operasional')) {
-      reply = "Toko buka saben dina, Ka, wiwit jam 07.00 esuk nganti jam 05.00 sore. Silaturahmi bae ning toko ya! ⏰";
-    } else if (text.includes('lokasi') || text.includes('alamat') || text.includes('toko') || text.includes('dimana')) {
-      reply = "Lokasi tokone gampang dijangkau tur strategis pisan. Yen bingung, bisa langsung takon admin utawa cek maps ya, Ka! 🗺️";
-    } else if (text.includes('bayar') || text.includes('qris') || text.includes('transfer') || text.includes('cash') || text.includes('tunai')) {
-      reply = "Masalah pembayaran gampang gawe, bisa cash utawa scan QRIS langsung. Sing penting lunas lan lancar barokah! 💳💸";
-    } else if (text.includes('promo') || text.includes('diskon') || text.includes('murah') || text.includes('potongan')) {
-      reply = "Sabar, Ka! Promo menarik lan diskon khusus biasane ana saben akhir pekan. Pantengin teros info terbarune ya! 🔥";
-    } else if (text.includes('kabar') || text.includes('gimana') || text.includes('lagi apa')) {
-      reply = "Aman jaya sentosa, Ka! Siap ngancani operasional toko ben tambah sat-set. ⚡";
-    } else if (text.includes('canda') || text.includes('lucu') || text.includes('pantun') || text.includes('joke')) {
-      reply = "Tuku trasi ning Jagasatru, bot lokal kiye pancen paling seru. Pan dibikinin pantun apa malem kiye, Ka? 🤭";
-    } else if (text.includes('mantap') || text.includes('keren') || text.includes('kece') || text.includes('menyala') || text.includes('gokil') || text.includes('sabi')) {
-      reply = "Jelas bae, abangku! Deweke kan sefrekuensi, tambah menyala abangku 🔥😎";
-    } else if (text.includes('capek') || text.includes('lelah') || text.includes('semangat') || text.includes('stress')) {
-      reply = "Tarik napas disit, Ka. Eling, rebahan iku seni, tapi cuan iku pasti! Semangat teross! 💪🔥";
-    } else if (text.includes('terima kasih') || text.includes('makasih') || text.includes('thanks')) {
-      reply = "Sama-sama, Ka! Moga-moga laris manis teros dagangane ya! 💪🚀";
-    } else if (text.includes('siapa kamu') || text.includes('kamu siapa')) {
-      reply = "Kita asisten digital lokal KasirQuh sing setia ngancani tanpa wedi kuota token entek! 😎";
-    } else {
-      reply = `Wah, seru temen iku! Tapi kita bot lokal versi santai nih Ka, dadi jawabane seputar sapa-sapaan, info toko, utawa obrolan seru disit ya! 😉 Boleh langsung chat admin toko bari ngopi yen butuh info jero mah ka 😁`;
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      return sendJson(500, { error: 'GROQ_API_KEY belum diset di Environment Variables Vercel.' });
     }
 
-    return sendJson(200, { reply });
+    const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+
+    const systemPrompt = `Kamu adalah AI Co-Pilot Admin untuk toko "${namaToko}" pada aplikasi KasirQuh.
+Kamu adalah asisten kerja admin toko yang ramah, gaul, santai, cepat, tetapi tetap teliti dan jujur.
+
+DATA PRODUK YANG DITERIMA DARI HALAMAN ADMIN:
+${daftarProduk}
+
+ATURAN PENTING:
+1. Gunakan data produk di atas sebagai sumber utama ketika admin bertanya tentang produk, harga, stok, atau informasi yang berkaitan dengan daftar produk.
+2. Jangan mengarang nama produk, harga, jumlah stok, omzet, transaksi, atau data toko yang tidak ada di data yang diberikan.
+3. Jika data yang dibutuhkan tidak tersedia, katakan dengan jujur bahwa data tersebut belum dikirim/tersedia dan minta admin mengecek menu terkait.
+4. Bedakan dengan jelas antara fakta dari data toko dan saran/analisis dari kamu.
+5. Kalau admin meminta rekomendasi, berikan analisis yang masuk akal berdasarkan data yang tersedia dan tandai sebagai rekomendasi, bukan fakta.
+6. Untuk perhitungan sederhana, hitung dengan teliti. Jika data tidak cukup untuk menghitung, jangan menebak.
+7. Admin boleh bertanya hal umum, coding, strategi jualan, pelayanan pelanggan, atau bercanda. Untuk hal umum, jawab seperti teman kerja yang membantu.
+8. Jika admin menggunakan Bahasa Indonesia, Jawa, Sunda, atau campuran bahasa daerah, balas dengan gaya yang senada dan natural.
+9. Jawaban singkat, jelas, praktis, dan tidak kaku. Gunakan poin-poin bila membuat jawaban lebih mudah dibaca.
+10. Jangan mengaku bisa melihat Firestore atau database secara langsung. Kamu hanya mengetahui data yang dikirim dalam percakapan ini.
+
+Kamu bukan sekadar bot kata kunci. Pahami maksud pertanyaan admin dan berikan jawaban yang relevan berdasarkan konteks yang tersedia.`;
+
+    const payload = {
+      model: 'openai/gpt-oss-20b',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: promptText }
+      ],
+      temperature: 0.7,
+      max_tokens: 500
+    };
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+
+      if (response.status === 429) {
+        return sendJson(200, {
+          reply: 'Wah, AI lagi ramai banget, Ka 😅 Tunggu sekitar 10 detik lalu coba lagi ya.'
+        });
+      }
+
+      console.error('Groq API Error:', response.status, errText);
+      return sendJson(500, { error: 'Server AI sedang mengalami kendala. Coba lagi sebentar ya, Ka.' });
+    }
+
+    const data = await response.json();
+    const aiReply = data.choices?.[0]?.message?.content?.trim();
+
+    if (!aiReply) {
+      return sendJson(200, {
+        reply: 'Maaf Ka, AI belum menghasilkan jawaban. Coba tanyakan lagi ya. 😁'
+      });
+    }
+
+    return sendJson(200, { reply: aiReply });
   } catch (error) {
-    console.error('CRITICAL CATCH ERROR:', error.message, error.stack);
-    return sendJson(200, { reply: `Maaf Ka, kedaden kendala teknis: ${error.message}` });
+    console.error('CRITICAL ADMIN AI ERROR:', error.message);
+    return sendJson(500, { error: 'Gagal terhubung ke server AI. Coba lagi sebentar ya, Ka.' });
   }
 }
