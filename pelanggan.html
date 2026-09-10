@@ -224,20 +224,22 @@
 
     <!-- 3. HALAMAN LIVE CHAT (Dua Tab: Chat Admin Toko & Chat Rumpi) -->
     <div id="live-chat" class="tab-content" style="height: calc(100vh - 130px); padding: 0; display: none; flex-direction: column;">
-      <!-- Header Sub-Tabs -->
-      <div style="display: flex; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
-        <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <span>Chat Admin Toko</span>
-          <span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px;">0</span>
-        </button>
-        <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+      <!-- Header Sub-Tabs: Chat Rumpi dulu, lalu Chat Admin Toko -->
+      <div style="display: flex; gap: 16px; padding: 14px 12px 12px; background: var(--bg-color); flex-shrink: 0; box-sizing: border-box;">
+        <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; min-height: 82px; padding: 12px 10px; background: #2563eb; border: 2px solid #2563eb; border-radius: 24px; font-weight: 800; font-size: 1.05rem; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.12);">
+          <span style="font-size: 1.9rem; line-height: 1;">🗣️</span>
           <span>Chat Rumpi</span>
-          <span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px;">0</span>
+          <span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px;">0</span>
+        </button>
+        <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; min-height: 82px; padding: 12px 10px; background: transparent; border: 2px solid #4b5a70; border-radius: 24px; font-weight: 800; font-size: 1.05rem; color: var(--text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: none;">
+          <span style="font-size: 1.9rem; line-height: 1;">👤</span>
+          <span>Chat Admin Toko</span>
+          <span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px;">0</span>
         </button>
       </div>
 
-      <!-- Sub-Tab 1: Chat Admin Toko -->
-      <div id="subtab-admin-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
+      <!-- Sub-Tab 2: Chat Admin Toko -->
+      <div id="subtab-admin-content" class="subtab-content-pane" style="display: none; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
         <div id="customer-chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
           <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat pesan...</div>
         </div>
@@ -247,8 +249,8 @@
         </div>
       </div>
 
-      <!-- Sub-Tab 2: Chat Rumpi -->
-      <div id="subtab-rumpi-content" class="subtab-content-pane" style="display: none; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
+      <!-- Sub-Tab 1: Chat Rumpi -->
+      <div id="subtab-rumpi-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
         <div id="chat-rumpi-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
           <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat obrolan warga...</div>
         </div>
@@ -816,10 +818,14 @@
       const contentRumpi = document.getElementById('subtab-rumpi-content');
 
       if (sub === 'admin') {
-        btnAdmin.style.color = '#2563eb';
-        btnAdmin.style.borderBottomColor = '#2563eb';
-        btnRumpi.style.color = 'var(--text-muted)';
-        btnRumpi.style.borderBottomColor = 'transparent';
+        btnAdmin.style.color = 'white';
+        btnAdmin.style.background = '#2563eb';
+        btnAdmin.style.borderColor = '#2563eb';
+        btnAdmin.style.boxShadow = '0 2px 6px rgba(0,0,0,0.12)';
+        btnRumpi.style.color = 'var(--text-color)';
+        btnRumpi.style.background = 'transparent';
+        btnRumpi.style.borderColor = '#4b5a70';
+        btnRumpi.style.boxShadow = 'none';
         contentAdmin.style.display = 'flex';
         contentRumpi.style.display = 'none';
         
@@ -827,10 +833,14 @@
           db.collection("chats").doc(currentCustomerPhone).update({ unreadCustomer: 0 }).catch(() => {});
         }
       } else {
-        btnRumpi.style.color = '#2563eb';
-        btnRumpi.style.borderBottomColor = '#2563eb';
-        btnAdmin.style.color = 'var(--text-muted)';
-        btnAdmin.style.borderBottomColor = 'transparent';
+        btnRumpi.style.color = 'white';
+        btnRumpi.style.background = '#2563eb';
+        btnRumpi.style.borderColor = '#2563eb';
+        btnRumpi.style.boxShadow = '0 2px 6px rgba(0,0,0,0.12)';
+        btnAdmin.style.color = 'var(--text-color)';
+        btnAdmin.style.background = 'transparent';
+        btnAdmin.style.borderColor = '#4b5a70';
+        btnAdmin.style.boxShadow = 'none';
         contentRumpi.style.display = 'flex';
         contentAdmin.style.display = 'none';
 
