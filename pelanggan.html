@@ -127,7 +127,7 @@
     </div>
 
     <!-- 1. HALAMAN BELANJA -->
-    <div id="belanja" class="tab-content active">
+    <div id="belanja" class="tab-content active" style="display: block;">
       <div class="pos-container">
         <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none;">
           <div id="pos-catalog-container"></div>
@@ -197,7 +197,7 @@
     </div>
 
     <!-- 2. HALAMAN DATA PELANGGAN -->
-    <div id="data-pelanggan" class="tab-content">
+    <div id="data-pelanggan" class="tab-content" style="display: none;">
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;">Profil Saya</h3>
         <div style="font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px;">
@@ -223,7 +223,7 @@
     </div>
 
     <!-- 3. HALAMAN LIVE CHAT (Dua Tab: Chat Admin Toko & Chat Rumpi) -->
-    <div id="live-chat" class="tab-content" style="height: calc(100vh - 130px); padding: 0;">
+    <div id="live-chat" class="tab-content" style="height: calc(100vh - 130px); padding: 0; display: none; flex-direction: column;">
       <!-- Header Sub-Tabs -->
       <div style="display: flex; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
         <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
@@ -235,7 +235,6 @@
           <span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px;">0</span>
         </button>
       </div>
-    </div>
 
       <!-- Sub-Tab 1: Chat Admin Toko -->
       <div id="subtab-admin-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
@@ -261,7 +260,7 @@
     </div>
 
     <!-- 4. HALAMAN PENGATURAN -->
-    <div id="pengaturan" class="tab-content">
+    <div id="pengaturan" class="tab-content" style="display: none;">
       <div class="card" id="card-install-pwa" style="display: none; border: 1px solid #2563eb; background-color: var(--card-bg);">
         <h3 style="color: #2563eb; margin-top: 0; font-size: 1rem;">📱 Install Aplikasi ke HP</h3>
         <p style="color: var(--text-muted); font-size: 0.80rem; margin-bottom: 10px;">Pasang KasirQuh di layar utama HP Anda agar lebih mudah diakses seperti aplikasi biasa.</p>
@@ -360,7 +359,7 @@
       </div>
       
       <div id="ai-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
-        <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-line;">HALOOOO BESTIE! WELCOME... di **Warunge Mimi**! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari Warunge Mimi siap baturi belanja biar makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget! 😁🛒</div>
+        <div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-line;">HALOOOO BESTIE! WELCOME... di **Warunge Mimi**! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari Warunge Mimi siap baturi belanja makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget! 😁🛒</div>
       </div>
 
       <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px; align-items: center;">
@@ -1003,8 +1002,21 @@
     }
 
     function switchTabPelanggan(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      });
+      
+      const activeEl = document.getElementById(tabId);
+      if (activeEl) {
+        activeEl.classList.add('active');
+        if (tabId === 'live-chat') {
+          activeEl.style.display = 'flex';
+          activeEl.style.flexDirection = 'column';
+        } else {
+          activeEl.style.display = 'block';
+        }
+      }
       
       if (tabId === 'live-chat') {
         unreadRumpiCust = 0;
