@@ -1005,20 +1005,31 @@
       inputField.value = '';
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      // Ambil data produk toko dari cache/variabel global jika ada di script.js kakak
+      // Ambil data produk LANGSUNG dari Firestore agar AI selalu mendapat data terbaru.
+      // Tidak bergantung pada timing/lingkup variabel databaseProduk di script.js.
       let daftarProdukStr = "";
       try {
-        if (typeof produk !== 'undefined' && Array.isArray(produk)) {
-          daftarProdukStr = JSON.stringify(produk);
-        } else if (typeof allProducts !== 'undefined') {
-          daftarProdukStr = JSON.stringify(allProducts);
-        } else {
-          daftarProdukStr = "Data produk aktif di sistem toko.";
-        }
+        const produkSnapshot = await db.collection("produk").get();
+        const produkAktif = [];
+        produkSnapshot.forEach((doc) => {
+          const p = doc.data() || {};
+          produkAktif.push({
+            kode: doc.id,
+            nama: p.nama || '',
+            kategori: p.kategori || '',
+            harga: p.harga ?? 0,
+            hargaBeli: p.hargaBeli ?? 0,
+            stok: p.stok ?? 0,
+            satuan: p.satuan || '',
+            barcode: p.barcode || doc.id
+          });
+        });
+        daftarProdukStr = JSON.stringify(produkAktif);
+        console.log('AI Admin: data produk Firestore terkirim =', produkAktif.length);
       } catch (e) {
-        daftarProdukStr = "Stok toko siap dipantau.";
+        console.error('Gagal mengambil produk Firestore untuk AI Admin:', e);
+        daftarProdukStr = "Data produk belum dapat dibaca dari Firestore.";
       }
-
       let namaTokoVal = "KasirQuh";
       try {
         if (typeof pengaturanToko !== 'undefined' && pengaturanToko.nama) {
