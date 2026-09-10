@@ -222,12 +222,12 @@
       </div>
     </div>
 
-    <!-- 3. HALAMAN LIVE CHAT (Dua Tab: Chat Admin Toko & Chat Rumpi) -->
+    <!-- 3. HALAMAN LIVE CHAT (Dua Tab: Chat Admin & Chat Rumpi) -->
     <div id="live-chat" class="tab-content" style="height: calc(100vh - 130px); padding: 0; display: none; flex-direction: column;">
       <!-- Header Sub-Tabs -->
       <div style="display: flex; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
         <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <span>Chat Admin Toko</span>
+          <span>Chat Admin</span>
           <span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px;">0</span>
         </button>
         <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
@@ -236,7 +236,7 @@
         </button>
       </div>
 
-      <!-- Sub-Tab 1: Chat Admin Toko -->
+      <!-- Sub-Tab 1: Chat Admin -->
       <div id="subtab-admin-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
         <div id="customer-chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
           <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat pesan...</div>
