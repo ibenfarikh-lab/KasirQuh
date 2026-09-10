@@ -8,7 +8,7 @@
   
   <!-- Firebase SDK (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https:/initAdminChatRumpiListener();/www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- External Stylesheet dengan Cache Busting -->
   <link rel="stylesheet" href="style.css?v=1.0.3">
@@ -226,15 +226,8 @@
       <!-- Tombol Navigasi Sub-Tab -->
       <div style="display: flex; gap: 6px; margin-bottom: 12px;">
         <button id="btn-sub-chat-pribadi" onclick="switchAdminChatSubTab('pribadi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">👤 Chat Pribadi</button>
-        <button id="btn-sub-chat-rumpi"
-  onclick="switchAdminChatSubTab('rumpi')"
-  style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">
-  🗣️ Chat Rumpi
-  <span id="badge-chat-rumpi-count"
-    style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 5px;">
-    0
-  </span>
-</button>
+        <button id="btn-sub-chat-rumpi" onclick="switchAdminChatSubTab('rumpi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">🗣️ Chat Rumpi</button>
+      </div>
 
       <!-- WRAPPER CHAT PRIBADI -->
       <div id="wrapper-admin-chat-pribadi" style="display: flex; height: calc(100vh - 180px); gap: 10px;">
@@ -830,7 +823,6 @@
       initOnlineOrdersListener();
       initCustomerCardClickObserver();
       initAdminChatListener();
-      
 
       let savedAdminTone = localStorage.getItem('admin_ringtone_v13') || 'default';
       const adminRingtoneSelect = document.getElementById('setting-admin-ringtone-type');

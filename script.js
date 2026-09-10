@@ -29,7 +29,8 @@ const translations = {
     select_chat_prompt: "Pilih pelanggan di samping untuk mulai chat",
     no_chat_selected: "Belum ada ruang chat yang dipilih.",
     placeholder_reply: "Ketik balasan...",
-    send: "Kirim",
+    send: "Kirim",document.addEventListener("DOMContentLoaded", () => {
+  initCalcPreview();
     export_stock: "Ekspor Stok",
     import_stock: "Impor Stok",
     est_restock_total: "ESTIMASI TOTAL BELANJA STOK",
@@ -3548,587 +3549,208 @@ function prosesVoiceKalkulator(text) {
 
 
 // --- FITUR CHAT RUMPI (ADMIN) ---
-
 let adminChatRumpiUnsubscribe = null;
 let activeAdminChatSub = 'pribadi';
 
-// Status unread Chat Rumpi
-let adminChatRumpiInitialLoad = true;
-let adminChatRumpiPrevMessageIds = new Set();
+// --- BADGE CHAT RUMPI ---
+let adminChatRumpiBadgeUnsubscribe = null;
+let adminChatRumpiLastRead = Number(
+  localStorage.getItem("chatRumpiLastRead") || 0
+);
 
-// Penyimpanan jumlah unread di browser admin
-let adminChatRumpiUnreadStorageKey = 'admin_chat_rumpi_unread_v1';
+function updateBadgeChatRumpi(totalUnread) {
+  const badge = document.getElementById("badge-chat-count");
+  if (!badge) return;
 
-
-// ======================================================
-// AMBIL JUMLAH UNREAD CHAT RUMPI
-// ======================================================
-
-function getAdminChatRumpiUnread() {
-  try {
-    return parseInt(
-      localStorage.getItem(adminChatRumpiUnreadStorageKey) || '0',
-      10
-    ) || 0;
-  } catch (e) {
-    return 0;
+  if (totalUnread > 0) {
+    badge.innerText = totalUnread;
+    badge.style.display = "inline-block";
+    badge.style.background = "#dc2626";
+    badge.style.color = "white";
+  } else {
+    badge.style.display = "none";
   }
 }
 
-
-// ======================================================
-// SET JUMLAH UNREAD + TAMPILKAN BADGE
-// ======================================================
-
-function setAdminChatRumpiUnread(count) {
-
-  count = Math.max(
-    0,
-    parseInt(count, 10) || 0
-  );
-
-  // Simpan supaya tidak hilang ketika halaman direfresh
-  try {
-    localStorage.setItem(
-      adminChatRumpiUnreadStorageKey,
-      String(count)
-    );
-  } catch (e) {}
-
-  // Ambil badge
-  const badge =
-    document.getElementById('badge-chat-rumpi-count');
-
-  if (badge) {
-
-    badge.innerText = count;
-
-    if (count > 0) {
-      badge.style.display = 'inline-block';
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-}
-
-
-// ======================================================
-// RESET UNREAD CHAT RUMPI
-// ======================================================
-
-function resetAdminChatRumpiUnread() {
-  setAdminChatRumpiUnread(0);
-}
-
-
-// ======================================================
-// CEK APAKAH PESAN BERASAL DARI ADMIN
-// ======================================================
-
-function isAdminRumpiMessage(data) {
-
-  const senderPhone =
-    String(data?.senderPhone || '').toLowerCase();
-
-  const senderName =
-    String(data?.senderName || '').toLowerCase();
-
-  return (
-    senderPhone === 'admin' ||
-    senderName === 'admin toko'
-  );
-}
-
-
-// ======================================================
-// PINDAH SUB-TAB CHAT PRIBADI / CHAT RUMPI
-// ======================================================
-
-function switchAdminChatSubTab(sub) {
-
-  activeAdminChatSub = sub;
-
-  const btnPribadi =
-    document.getElementById("btn-sub-chat-pribadi");
-
-  const btnRumpi =
-    document.getElementById("btn-sub-chat-rumpi");
-
-  const wrapPribadi =
-    document.getElementById("wrapper-admin-chat-pribadi");
-
-  const wrapRumpi =
-    document.getElementById("wrapper-admin-chat-rumpi");
-
-
-  if (!btnPribadi || !btnRumpi) {
-    return;
+function initAdminChatRumpiBadge() {
+  if (adminChatRumpiBadgeUnsubscribe) {
+    adminChatRumpiBadgeUnsubscribe();
   }
 
+  adminChatRumpiBadgeUnsubscribe = db.collection("db_chat_rumpi")
+    .orderBy("waktuTimestamp", "asc")
+    .onSnapshot((snapshot) => {
 
-  // ====================================================
-  // CHAT PRIBADI
-  // ====================================================
+      let totalUnread = 0;
+      let latestTimestamp = adminChatRumpiLastRead;
 
-  if (sub === 'pribadi') {
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const ts = data.waktuTimestamp;
 
-    btnPribadi.style.background = "#2563eb";
-    btnPribadi.style.color = "white";
-    btnPribadi.style.border = "none";
+        if (!ts) return;
 
-    btnRumpi.style.background = "var(--input-bg)";
-    btnRumpi.style.color = "var(--text-color)";
-    btnRumpi.style.border =
-      "1px solid var(--input-border)";
+        const time = ts.toMillis
+          ? ts.toMillis()
+          : Number(ts);
 
-    wrapPribadi.style.display = "flex";
-    wrapRumpi.style.display = "none";
-
-  }
-
-
-  // ====================================================
-  // CHAT RUMPI
-  // ====================================================
-
-  else {
-
-    btnRumpi.style.background = "#2563eb";
-    btnRumpi.style.color = "white";
-    btnRumpi.style.border = "none";
-
-    btnPribadi.style.background = "var(--input-bg)";
-    btnPribadi.style.color = "var(--text-color)";
-    btnPribadi.style.border =
-      "1px solid var(--input-border)";
-
-    wrapRumpi.style.display = "flex";
-    wrapPribadi.style.display = "none";
-
-
-    // Admin sudah membuka Chat Rumpi
-    // Jadi semua unread dianggap sudah dibaca.
-    resetAdminChatRumpiUnread();
-
-
-    // Kalau listener belum aktif, jalankan.
-    if (!adminChatRumpiUnsubscribe) {
-      initAdminChatRumpiListener();
-    }
-  }
-}
-
-
-// ======================================================
-// LISTENER CHAT RUMPI
-// ======================================================
-
-function initAdminChatRumpiListener() {
-
-  // Hentikan listener sebelumnya jika ada
-  if (adminChatRumpiUnsubscribe) {
-    adminChatRumpiUnsubscribe();
-  }
-
-
-  // Snapshot pertama hanya menjadi baseline.
-  // Riwayat lama TIDAK dihitung sebagai pesan baru.
-  adminChatRumpiInitialLoad = true;
-
-  adminChatRumpiPrevMessageIds = new Set();
-
-
-  // Tampilkan unread yang tersimpan
-  setAdminChatRumpiUnread(
-    getAdminChatRumpiUnread()
-  );
-
-
-  // ====================================================
-  // FIREBASE LISTENER
-  // ====================================================
-
-  adminChatRumpiUnsubscribe =
-    db.collection("db_chat_rumpi")
-      .orderBy("waktuTimestamp", "asc")
-      .onSnapshot(
-
-        (snapshot) => {
-
-
-          // ==============================================
-          // SIMPAN ID PESAN YANG SEKARANG ADA
-          // ==============================================
-
-          const currentMessageIds = new Set();
-
-          snapshot.forEach((doc) => {
-            currentMessageIds.add(doc.id);
-          });
-
-
-          // ==============================================
-          // SNAPSHOT PERTAMA
-          // ==============================================
-
-          if (adminChatRumpiInitialLoad) {
-
-            // Jangan hitung semua pesan lama sebagai unread
-            adminChatRumpiInitialLoad = false;
-
-          }
-
-
-          // ==============================================
-          // PESAN BARU
-          // ==============================================
-
-          else {
-
-            let jumlahPesanWargaBaru = 0;
-
-
-            snapshot.docChanges().forEach((change) => {
-
-              // Hanya pesan baru
-              if (change.type !== 'added') {
-                return;
-              }
-
-
-              const data = change.doc.data();
-
-
-              // Jangan hitung pesan Admin
-              if (isAdminRumpiMessage(data)) {
-                return;
-              }
-
-
-              // Pastikan ID belum ada sebelumnya
-              if (
-                !adminChatRumpiPrevMessageIds
-                  .has(change.doc.id)
-              ) {
-
-                jumlahPesanWargaBaru++;
-
-              }
-
-            });
-
-
-            // ==========================================
-            // JIKA ADA PESAN BARU DARI WARGA
-            // ==========================================
-
-            if (
-              jumlahPesanWargaBaru > 0 &&
-              activeAdminChatSub !== 'rumpi'
-            ) {
-
-              const unreadLama =
-                getAdminChatRumpiUnread();
-
-              const unreadBaru =
-                unreadLama + jumlahPesanWargaBaru;
-
-
-              // Update badge
-              setAdminChatRumpiUnread(
-                unreadBaru
-              );
-
-
-              // Bunyi notifikasi
-              if (typeof playNotificationSound === "function") {
-  playNotificationSound();
-}
-
-
-          // Simpan ID untuk perbandingan berikutnya
-          adminChatRumpiPrevMessageIds =
-            currentMessageIds;
-
-
-          // ==============================================
-          // RENDER CHAT RUMPI
-          // ==============================================
-
-          const msgContainer =
-            document.getElementById(
-              "admin-chat-rumpi-messages"
-            );
-
-
-          if (!msgContainer) {
-            return;
-          }
-
-
-          msgContainer.innerHTML = "";
-
-
-          // ==============================================
-          // BELUM ADA PESAN
-          // ==============================================
-
-          if (snapshot.empty) {
-
-            msgContainer.innerHTML = `
-              <div
-                style="
-                  text-align: center;
-                  color: var(--text-muted);
-                  font-size: 0.85rem;
-                  margin-top: 20px;
-                "
-              >
-                Belum ada pesan di Chat Rumpi.
-              </div>
-            `;
-
-            return;
-          }
-
-
-          // ==============================================
-          // TAMPILKAN SEMUA PESAN
-          // ==============================================
-
-          snapshot.forEach((doc) => {
-
-            const m = doc.data();
-
-            const docId = doc.id;
-
-
-            msgContainer.innerHTML += `
-
-              <div
-                style="
-                  background: var(--card-bg);
-                  border: 1px solid var(--border-color);
-                  border-radius: 8px;
-                  padding: 8px 12px;
-                  font-size: 0.85rem;
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: flex-start;
-                  gap: 8px;
-                "
-              >
-
-                <div
-                  style="
-                    flex: 1;
-                    min-width: 0;
-                  "
-                >
-
-                  <div
-                    style="
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: center;
-                      margin-bottom: 2px;
-                    "
-                  >
-
-                    <span
-                      style="
-                        font-weight: bold;
-                        color: #2563eb;
-                        font-size: 0.8rem;
-                      "
-                    >
-                      👤 ${escapeHtml(
-                        m.senderName || 'Warga'
-                      )}
-                      (${escapeHtml(
-                        m.senderPhone || '-'
-                      )})
-                    </span>
-
-
-                    <span
-                      style="
-                        font-size: 0.68rem;
-                        color: var(--text-muted);
-                      "
-                    >
-                      ${escapeHtml(
-                        m.waktu || ''
-                      )}
-                    </span>
-
-                  </div>
-
-
-                  <div
-                    style="
-                      color: var(--text-color);
-                      word-break: break-word;
-                    "
-                  >
-                    ${escapeHtml(
-                      m.pesan || ''
-                    )}
-                  </div>
-
-                </div>
-
-
-                <button
-                  onclick="hapusPesanRumpiAdmin('${docId}')"
-                  title="Hapus Pesan"
-                  style="
-                    background: #dc2626;
-                    color: white;
-                    border: none;
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                    font-size: 0.75rem;
-                    cursor: pointer;
-                    flex-shrink: 0;
-                  "
-                >
-                  🗑️
-                </button>
-
-              </div>
-
-            `;
-
-          });
-
-
-          // Scroll ke pesan paling bawah
-          msgContainer.scrollTop =
-            msgContainer.scrollHeight;
-
-        },
-
-
-        // ==============================================
-        // ERROR LISTENER
-        // ==============================================
-
-        (error) => {
-
-          console.error(
-            "Listener Chat Rumpi gagal:",
-            error
-          );
-
+        if (time > latestTimestamp) {
+          latestTimestamp = time;
         }
 
-      );
-}
-
-
-// ======================================================
-// HAPUS PESAN RUMPI
-// ======================================================
-
-function hapusPesanRumpiAdmin(docId) {
-
-  if (
-    confirm(
-      "Hapus pesan ini dari Chat Rumpi?"
-    )
-  ) {
-
-    db.collection("db_chat_rumpi")
-      .doc(docId)
-      .delete()
-      .catch(
-        (err) =>
-          alert(
-            "Gagal menghapus pesan: " +
-            err.message
-          )
-      );
-
-  }
-}
-
-
-// ======================================================
-// BERSIHKAN SEMUA CHAT RUMPI
-// ======================================================
-
-function bersihkanSemuaChatRumpiAdmin() {
-
-  if (
-    confirm(
-      "Hapus seluruh riwayat pesan di Chat Rumpi? " +
-      "Tindakan ini tidak dapat dibatalkan!"
-    )
-  ) {
-
-    db.collection("db_chat_rumpi")
-      .get()
-      .then((snapshot) => {
-
-        let batch = db.batch();
-
-        snapshot.forEach((doc) => {
-          batch.delete(doc.ref);
-        });
-
-        return batch.commit();
-
-      })
-      .then(() => {
-
-        // Karena seluruh pesan sudah dibersihkan,
-        // reset badge juga.
-        resetAdminChatRumpiUnread();
-
-        alert(
-          "Semua riwayat Chat Rumpi berhasil dibersihkan!"
-        );
-
-      })
-      .catch((err) => {
-
-        alert(
-          "Gagal membersihkan chat: " +
-          err.message
-        );
-
+        if (time > adminChatRumpiLastRead) {
+          totalUnread++;
+        }
       });
 
+      updateBadgeChatRumpi(totalUnread);
+    });
+}
+
+function tandaiChatRumpiSudahDibaca() {
+  let latestTimestamp = adminChatRumpiLastRead;
+
+  db.collection("db_chat_rumpi")
+    .orderBy("waktuTimestamp", "desc")
+    .limit(1)
+    .get()
+    .then((snapshot) => {
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const ts = data.waktuTimestamp;
+
+        if (ts) {
+          latestTimestamp = ts.toMillis
+            ? ts.toMillis()
+            : Number(ts);
+        }
+      });
+
+      adminChatRumpiLastRead = latestTimestamp;
+
+      localStorage.setItem(
+        "chatRumpiLastRead",
+        adminChatRumpiLastRead
+      );
+
+      updateBadgeChatRumpi(0);
+    })
+    .catch((err) => {
+      console.error("Gagal menandai Chat Rumpi:", err);
+    });
+}
+// --- END BADGE CHAT RUMPI ---
+
+
+function switchAdminChatSubTab(sub) {
+  activeAdminChatSub = sub;
+  const btnPribadi = document.getElementById("btn-sub-chat-pribadi");
+  const btnRumpi = document.getElementById("btn-sub-chat-rumpi");
+  const wrapPribadi = document.getElementById("wrapper-admin-chat-pribadi");
+  const wrapRumpi = document.getElementById("wrapper-admin-chat-rumpi");
+
+  if (!btnPribadi || !btnRumpi) return;
+
+  if (sub === 'pribadi') {
+    btnPribadi.style.background = "#2563eb"; 
+    btnPribadi.style.color = "white"; 
+    btnPribadi.style.border = "none";
+    
+    btnRumpi.style.background = "var(--input-bg)"; 
+    btnRumpi.style.color = "var(--text-color)"; 
+    btnRumpi.style.border = "1px solid var(--input-border)";
+    
+    wrapPribadi.style.display = "flex"; 
+    wrapRumpi.style.display = "none";
+  } else {
+    btnRumpi.style.background = "#2563eb"; 
+    btnRumpi.style.color = "white"; 
+    btnRumpi.style.border = "none";
+    
+    btnPribadi.style.background = "var(--input-bg)"; 
+    btnPribadi.style.color = "var(--text-color)"; 
+    btnPribadi.style.border = "1px solid var(--input-border)";
+    
+    wrapRumpi.style.display = "flex"; 
+    wrapPribadi.style.display = "none";
+    
+    initAdminChatRumpiListener();
+
+    // Saat Chat Rumpi dibuka = tandai sudah dibaca
+    tandaiChatRumpiSudahDibaca();
   }
 }
 
+function initAdminChatRumpiListener() {
+  if (adminChatRumpiUnsubscribe) adminChatRumpiUnsubscribe();
 
-// ======================================================
-// ESCAPE HTML
-// ======================================================
+  adminChatRumpiUnsubscribe = db.collection("db_chat_rumpi")
+    .orderBy("waktuTimestamp", "asc")
+    .onSnapshot((snapshot) => {
+      let msgContainer = document.getElementById("admin-chat-rumpi-messages");
+      if (!msgContainer) return;
+      msgContainer.innerHTML = "";
+
+      if (snapshot.empty) {
+        msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada pesan di Chat Rumpi.</div>`;
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        let m = doc.data();
+        let docId = doc.id;
+        msgContainer.innerHTML += `
+          <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <span style="font-weight: bold; color: #2563eb; font-size: 0.8rem;">👤 ${m.senderName || 'Warga'} (${m.senderPhone || '-'})</span>
+                <span style="font-size: 0.68rem; color: var(--text-muted);">${m.waktu || ''}</span>
+              </div>
+              <div style="color: var(--text-color); word-break: break-word;">${escapeHtml(m.pesan || '')}</div>
+            </div>
+            <button onclick="hapusPesanRumpiAdmin('${docId}')" title="Hapus Pesan" style="background: #dc2626; color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; flex-shrink: 0;">🗑️</button>
+          </div>
+        `;
+      });
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    });
+}
+
+function hapusPesanRumpiAdmin(docId) {
+  if (confirm("Hapus pesan ini dari Chat Rumpi?")) {
+    db.collection("db_chat_rumpi").doc(docId).delete().catch(err => alert("Gagal menghapus pesan: " + err.message));
+  }
+}
+
+function bersihkanSemuaChatRumpiAdmin() {
+  if (confirm("Hapus seluruh riwayat pesan di Chat Rumpi? Tindakan ini tidak dapat dibatalkan!")) {
+    db.collection("db_chat_rumpi").get().then(snapshot => {
+      let batch = db.batch();
+      snapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      return batch.commit();
+    }).then(() => {
+      alert("Semua riwayat Chat Rumpi berhasil dibersihkan!");
+    }).catch(err => {
+      alert("Gagal membersihkan chat: " + err.message);
+    });
+  }
+}
 
 function escapeHtml(text) {
-
-  if (!text) {
-    return "";
-  }
-
-  return text
-    .toString()
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  if (!text) return "";
+  return text.toString().replace(/&/g, "&amp;").replace(/&lt;/g, "&lt;").replace(/>/g, "&gt;");
 }
-
-
 // --- END FITUR CHAT RUMPI ---
 
 
 // Inisialisasi awal saat halaman dimuat
 document.addEventListener("DOMContentLoaded", () => {
+
+  // Listener badge Chat Rumpi
+  initAdminChatRumpiBadge();
+
   initCalcPreview();
   const display = document.getElementById("calc-display");
   if (display) {
