@@ -3550,7 +3550,56 @@ function prosesVoiceKalkulator(text) {
 // --- FITUR CHAT RUMPI (ADMIN) ---
 let adminChatRumpiUnsubscribe = null;
 let activeAdminChatSub = 'pribadi';
+// --- FITUR CHAT RUMPI (ADMIN) ---
+let adminChatRumpiUnsubscribe = null;
+let activeAdminChatSub = 'pribadi';
 
+
+// ===== TAMBAHAN BADGE CHAT RUMPI =====
+let adminChatRumpiUnreadCount = 0;
+
+let adminChatRumpiLastRead = Number(
+  localStorage.getItem("chatRumpiLastRead") || 0
+);
+
+function updateBadgeChatRumpi() {
+  const badge = document.getElementById("badge-chat-count");
+  if (!badge) return;
+
+  // Untuk sementara hanya mengatur badge Rumpi.
+  // Nanti kita gabungkan dengan badge Chat Pribadi.
+  if (adminChatRumpiUnreadCount > 0) {
+    badge.innerText = adminChatRumpiUnreadCount;
+    badge.style.display = "inline-block";
+  }
+}
+
+function initAdminChatRumpiBadge() {
+  db.collection("db_chat_rumpi")
+    .orderBy("waktuTimestamp", "asc")
+    .onSnapshot((snapshot) => {
+
+      let totalUnread = 0;
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const ts = data.waktuTimestamp;
+
+        if (!ts) return;
+
+        const time = ts.toMillis
+          ? ts.toMillis()
+          : Number(ts);
+
+        if (time > adminChatRumpiLastRead) {
+          totalUnread++;
+        }
+      });
+
+      adminChatRumpiUnreadCount = totalUnread;
+      updateBadgeChatRumpi();
+    });
+}
 function switchAdminChatSubTab(sub) {
   activeAdminChatSub = sub;
   const btnPribadi = document.getElementById("btn-sub-chat-pribadi");
