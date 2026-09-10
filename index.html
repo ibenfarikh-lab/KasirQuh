@@ -226,7 +226,10 @@
       <!-- Tombol Navigasi Sub-Tab -->
       <div style="display: flex; gap: 6px; margin-bottom: 12px;">
         <button id="btn-sub-chat-pribadi" onclick="switchAdminChatSubTab('pribadi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">👤 Chat Pribadi</button>
-        <button id="btn-sub-chat-rumpi" onclick="switchAdminChatSubTab('rumpi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">🗣️ Chat Rumpi</button>
+        <button id="btn-sub-chat-rumpi" onclick="switchAdminChatSubTab('rumpi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">
+    🗣️ Chat Rumpi
+    <span id="badge-rumpi-count" style="display: none; background: red; color: white; border-radius: 10px; padding: 2px 6px; font-size: 12px; margin-left: 5px;" class="badge">0</span>
+</button>
       </div>
 
       <!-- WRAPPER CHAT PRIBADI -->
@@ -823,7 +826,8 @@
       initOnlineOrdersListener();
       initCustomerCardClickObserver();
       initAdminChatListener();
-
+      initRumpiChatListener ();
+   
       let savedAdminTone = localStorage.getItem('admin_ringtone_v13') || 'default';
       const adminRingtoneSelect = document.getElementById('setting-admin-ringtone-type');
       const adminUploadWrapper = document.getElementById('wrapper-upload-ringtone-admin');
@@ -837,6 +841,32 @@
         }
       }
     });
+
+// Fungsi untuk memantau pesan baru di Chat Rumpi
+function initRumpiChatListener() {
+    const rumpiRef = db.collection("db_chat_rumpi");
+    
+    // Pastikan nama field di bawah ini (misal: "statusRead") 
+    // sesuai dengan yang ada di database Firestore Kakak
+    const queryUnread = rumpiRef.where("statusRead", "==", false);
+
+    queryUnread.onSnapshot((snapshot) => {
+        const unreadRumpiCount = snapshot.size;
+        const badgeElement = document.getElementById("badge-rumpi-count");
+
+        if (badgeElement) {
+            if (unreadRumpiCount > 0) {
+                badgeElement.innerText = unreadRumpiCount;
+                badgeElement.style.display = "inline-block";
+            } else {
+                badgeElement.style.display = "none";
+            }
+        }
+    }, (error) => {
+        console.error("Gagal memuat notifikasi Chat Rumpi: ", error);
+    });
+}
+
 
     // --- SCRIPT AI CO-PILOT ADMIN ---
     function toggleAdminAi() {
