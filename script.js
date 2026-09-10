@@ -4095,8 +4095,14 @@ function escapeHtml(text) {
 
 // Inisialisasi awal saat halaman dimuat
 document.addEventListener("DOMContentLoaded", () => {
+
+  // Aktifkan badge + notif suara Chat Rumpi sejak Admin dibuka
+  initAdminChatRumpiBadge();
+
   initCalcPreview();
+
   const display = document.getElementById("calc-display");
+
   if (display) {
     display.addEventListener("input", () => {
       autoCalculate();
