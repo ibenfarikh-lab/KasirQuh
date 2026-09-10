@@ -1000,46 +1000,60 @@
 
       if (!text) return;
 
-      // Tampilkan pesan admin
       messageContainer.innerHTML += `<div style="background: #2563eb; color: white; padding: 8px 12px; border-radius: 8px; max-width: 85%; align-self: flex-end;">${text}</div>`;
       inputField.value = '';
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      // Ambil data produk LANGSUNG dari Firestore agar AI selalu mendapat data terbaru.
-      // Tidak bergantung pada timing/lingkup variabel databaseProduk di script.js.
-      let daftarProdukStr = "";
+      // Sama seperti AI pelanggan: kirim hanya produk yang relevan, maksimal 3.
+      let daftarProdukText = '';
+      const keywordLower = text.toLowerCase();
+      const shoppingKeywords = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"];
+      const isAskingProduct = shoppingKeywords.some(kw => keywordLower.includes(kw));
+
       try {
-        const produkSnapshot = await db.collection("produk").get();
-        const produkAktif = [];
-        produkSnapshot.forEach((doc) => {
-          const p = doc.data() || {};
-          produkAktif.push({
-            kode: doc.id,
-            nama: p.nama || '',
-            kategori: p.kategori || '',
-            harga: p.harga ?? 0,
-            hargaBeli: p.hargaBeli ?? 0,
-            stok: p.stok ?? 0,
-            satuan: p.satuan || '',
-            barcode: p.barcode || doc.id
-          });
+        const produkList = Array.isArray(databaseProduk)
+          ? databaseProduk
+          : Object.values(databaseProduk || {});
+
+        const matchedProducts = produkList.filter(p => {
+          const namaProduk = String(p?.nama || '').toLowerCase();
+          if (!namaProduk) return false;
+          const kataNama = namaProduk.split(/\s+/).filter(k => k.length > 2);
+          return keywordLower.includes(namaProduk) || kataNama.some(k => keywordLower.includes(k));
         });
-        daftarProdukStr = JSON.stringify(produkAktif);
-        console.log('AI Admin: data produk Firestore terkirim =', produkAktif.length);
+
+        if (isAskingProduct || matchedProducts.length > 0) {
+          const produkUntukAI = (matchedProducts.length > 0 ? matchedProducts : produkList).slice(0, 3);
+          produkUntukAI.forEach(p => {
+            let valHarga = Number(p?.hargaJual ?? p?.harga ?? 0);
+            let sat = p?.satuan || 'Pcs';
+
+            if (String(p?.satuan || '').toLowerCase() === 'kg' || String(p?.satuan || '').toLowerCase() === 'kilogram') {
+              valHarga = Number(p?.hargaRtg ?? (valHarga * 10));
+              sat = 'kg';
+            } else if (String(p?.satuan || '').toLowerCase() === 'rtg') {
+              sat = 'pcs';
+            }
+
+            daftarProdukText += `- ${p?.nama || 'Produk'}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p?.stok || 0} ${sat}\n`;
+          });
+        } else {
+          daftarProdukText = 'Tidak ada produk yang dilampirkan (obrolan santai).';
+        }
       } catch (e) {
-        console.error('Gagal mengambil produk Firestore untuk AI Admin:', e);
-        daftarProdukStr = "Data produk belum dapat dibaca dari Firestore.";
+        console.error('AI Admin: gagal menyiapkan data produk ringan:', e);
+        daftarProdukText = 'Tidak ada produk yang dilampirkan (obrolan santai).';
       }
-      let namaTokoVal = "KasirQuh";
+
+      let namaTokoVal = 'KasirQuh';
       try {
         if (typeof pengaturanToko !== 'undefined' && pengaturanToko.nama) {
           namaTokoVal = pengaturanToko.nama;
         }
       } catch (e) {}
 
-      // Tampilkan indikator loading
       const loadingId = 'loading-' + Date.now();
-      messageContainer.innerHTML += `<div id="${loadingId}" style="background: var(--input-bg, #e5e7eb); color: var(--text-color, #374151); padding: 8px 12px; border-radius: 8px; max-width: 85%;">Lagi nge-analisis data... 🧠☕</div>`;
+      messageContainer.innerHTML += `<div id="${loadingId}" style="background: var(--input-bg, #e5e7eb); color: var(--text-color, #374151); padding: 8px 12px; border-radius: 8px; max-width: 85%;">Sedang mengetik...</div>`;
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
       try {
@@ -1048,29 +1062,28 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             prompt: text,
-            daftarProduk: daftarProdukStr,
+            daftarProduk: daftarProdukText,
             namaToko: namaTokoVal
           })
         });
 
         const data = await response.json();
-        
-        // Hapus loading
+
         const loadingEl = document.getElementById(loadingId);
         if (loadingEl) loadingEl.remove();
 
         if (response.ok) {
           messageContainer.innerHTML += `<div style="background: var(--input-bg, #e5e7eb); color: var(--text-color, #111827); padding: 8px 12px; border-radius: 8px; max-width: 85%; white-space: pre-line;">${data.reply}</div>`;
         } else {
-          messageContainer.innerHTML += `<div style="background: #fee2e2; color: #991b1b; padding: 8px 12px; border-radius: 8px; max-width: 85%;">Error: ${data.error}</div>`;
+          messageContainer.innerHTML += `<div style="background: #fee2e2; color: #991b1b; padding: 8px 12px; border-radius: 8px; max-width: 85%;">Error: ${data.error || data.reply || 'Terjadi kendala.'}</div>`;
         }
-      } catch (err) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      } catch (error) {
         const loadingEl = document.getElementById(loadingId);
         if (loadingEl) loadingEl.remove();
-        messageContainer.innerHTML += `<div style="background: #fee2e2; color: #991b1b; padding: 8px 12px; border-radius: 8px; max-width: 85%;">Gagal terhubung ke server AI.</div>`;
+        messageContainer.innerHTML += `<div style="background: #fee2e2; color: #991b1b; padding: 8px 12px; border-radius: 8px; max-width: 85%;">Kendala koneksi AI: ${error.message}</div>`;
+        messageContainer.scrollTop = messageContainer.scrollHeight;
       }
-
-      messageContainer.scrollTop = messageContainer.scrollHeight;
     }
     // --- END SCRIPT AI CO-PILOT ADMIN ---
 
