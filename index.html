@@ -786,7 +786,7 @@
       😁
     </button>
 
-    <div id="ai-chat-box" style="display: none; width: 320px; height: 380px; background: var(--card-bg, #fff); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); flex-direction: column; overflow: hidden; margin-top: 6px; border: 1px solid var(--border-color, #e5e7eb);">
+    <div id="ai-chat-box" style="display: none; width: 320px; height: 380px; background: var(--card-bg, #fff); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.25); flex-direction: column; overflow: hidden; position: fixed; margin-top: 0; border: 1px solid var(--border-color, #e5e7eb);">
       <div style="background: #2563eb; color: white; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 0.9rem;">
         <span>✨ AI Admin</span>
         <button onclick="toggleAdminAi()" style="background: none; border: none; color: white; font-size: 16px; cursor: pointer;">✕</button>
@@ -851,6 +851,35 @@
     let adminAiFabStartLeft = 0;
     let adminAiFabStartTop = 0;
 
+    function positionAdminAiChatBox() {
+      const wrapper = document.getElementById('admin-ai-wrapper');
+      const button = document.getElementById('ai-toggle-btn');
+      const chatBox = document.getElementById('ai-chat-box');
+      if (!wrapper || !button || !chatBox || chatBox.style.display === 'none') return;
+
+      const rect = button.getBoundingClientRect();
+      const gap = 8;
+      const boxWidth = Math.min(320, Math.max(260, window.innerWidth - 16));
+      const boxHeight = Math.min(380, Math.max(220, window.innerHeight - 16));
+
+      chatBox.style.width = boxWidth + 'px';
+      chatBox.style.height = boxHeight + 'px';
+
+      let left = rect.right - boxWidth;
+      let top = rect.bottom + gap;
+
+      if (top + boxHeight > window.innerHeight - 8) {
+        top = rect.top - boxHeight - gap;
+      }
+
+      left = Math.min(Math.max(left, 8), Math.max(8, window.innerWidth - boxWidth - 8));
+      top = Math.min(Math.max(top, 8), Math.max(8, window.innerHeight - boxHeight - 8));
+
+      chatBox.style.left = left + 'px';
+      chatBox.style.top = top + 'px';
+      chatBox.style.right = 'auto';
+    }
+
     function initDraggableAdminAiFab() {
       const wrapper = document.getElementById('admin-ai-wrapper');
       const button = document.getElementById('ai-toggle-btn');
@@ -860,8 +889,8 @@
       if (saved) {
         try {
           const pos = JSON.parse(saved);
-          const maxLeft = Math.max(0, window.innerWidth - wrapper.offsetWidth);
-          const maxTop = Math.max(0, window.innerHeight - wrapper.offsetHeight);
+          const maxLeft = Math.max(0, window.innerWidth - button.offsetWidth);
+          const maxTop = Math.max(0, window.innerHeight - button.offsetHeight);
           const left = Math.min(Math.max(Number(pos.left) || 0, 0), maxLeft);
           const top = Math.min(Math.max(Number(pos.top) || 0, 0), maxTop);
           wrapper.style.left = left + 'px';
@@ -874,7 +903,7 @@
         if (e.button !== undefined && e.button !== 0) return;
         adminAiFabPointerId = e.pointerId;
         adminAiFabDragged = false;
-        const rect = wrapper.getBoundingClientRect();
+        const rect = button.getBoundingClientRect();
         adminAiFabStartX = e.clientX;
         adminAiFabStartY = e.clientY;
         adminAiFabStartLeft = rect.left;
@@ -889,20 +918,23 @@
         if (!adminAiFabDragged && Math.hypot(dx, dy) < 6) return;
         adminAiFabDragged = true;
 
-        const maxLeft = Math.max(0, window.innerWidth - wrapper.offsetWidth);
-        const maxTop = Math.max(0, window.innerHeight - wrapper.offsetHeight);
+        const maxLeft = Math.max(0, window.innerWidth - button.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - button.offsetHeight);
         const left = Math.min(Math.max(adminAiFabStartLeft + dx, 0), maxLeft);
         const top = Math.min(Math.max(adminAiFabStartTop + dy, 0), maxTop);
 
         wrapper.style.left = left + 'px';
         wrapper.style.top = top + 'px';
         wrapper.style.right = 'auto';
+
+        // Jika panel AI sedang terbuka, ikutkan panel agar tetap terlihat.
+        positionAdminAiChatBox();
       });
 
       button.addEventListener('pointerup', function(e) {
         if (adminAiFabPointerId !== e.pointerId) return;
         if (adminAiFabDragged) {
-          const rect = wrapper.getBoundingClientRect();
+          const rect = button.getBoundingClientRect();
           localStorage.setItem('admin_ai_fab_position_v1', JSON.stringify({
             left: Math.round(rect.left),
             top: Math.round(rect.top)
@@ -925,9 +957,9 @@
       }, true);
 
       window.addEventListener('resize', function() {
-        const rect = wrapper.getBoundingClientRect();
-        const maxLeft = Math.max(0, window.innerWidth - wrapper.offsetWidth);
-        const maxTop = Math.max(0, window.innerHeight - wrapper.offsetHeight);
+        const rect = button.getBoundingClientRect();
+        const maxLeft = Math.max(0, window.innerWidth - button.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - button.offsetHeight);
         const left = Math.min(Math.max(rect.left, 0), maxLeft);
         const top = Math.min(Math.max(rect.top, 0), maxTop);
         wrapper.style.left = left + 'px';
@@ -936,6 +968,7 @@
         localStorage.setItem('admin_ai_fab_position_v1', JSON.stringify({
           left: Math.round(left), top: Math.round(top)
         }));
+        positionAdminAiChatBox();
       });
     }
 
@@ -946,6 +979,7 @@
       const chatBox = document.getElementById('ai-chat-box');
       if (chatBox.style.display === 'none' || chatBox.style.display === '') {
         chatBox.style.display = 'flex';
+        positionAdminAiChatBox();
       } else {
         chatBox.style.display = 'none';
       }
