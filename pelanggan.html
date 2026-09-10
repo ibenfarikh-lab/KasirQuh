@@ -353,7 +353,6 @@
           <button id="aiSoundToggle" onclick="toggleAISound()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">🔊 Suara: ON</button>
         </div>
         <div style="display: flex; gap: 8px; align-items: center;">
-          <button onclick="beralihKeLiveChatFromAI()" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold;">💬 Chat Admin</button>
           <button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white; background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
         </div>
       </div>
@@ -689,12 +688,6 @@
     function toggleAIChatModal() {
       let modal = document.getElementById("aiChatModal");
       modal.classList.toggle("show");
-    }
-
-    function beralihKeLiveChatFromAI() {
-      toggleAIChatModal();
-      switchTabPelanggan('live-chat');
-      switchSubTabLiveChat('admin');
     }
 
     // Navigasi Sub-Tab di Halaman Live Chat
