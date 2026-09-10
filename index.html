@@ -818,77 +818,27 @@
     let selectedChatPhone = null;
     let chatUnsubscribe = null;
     let adminChatPrevUnread = {};
+    let adminPrivateUnreadTotal = 0;
 
     document.addEventListener("DOMContentLoaded", function() {
+      initOnlineOrdersListener();
+      initCustomerCardClickObserver();
+      initAdminChatListener();
+      initAdminRumpiNotificationListener();
 
-  // ==================================================
-  // LISTENER PESAN & PESANAN
-  // ==================================================
-
-  initOnlineOrdersListener();
-
-  initCustomerCardClickObserver();
-
-  initAdminChatListener();
-
-
-  // ==================================================
-  // LISTENER CHAT RUMPI
-  // Aktif sejak Admin membuka halaman
-  // Jadi badge bisa muncul walaupun Chat Rumpi
-  // belum dibuka
-  // ==================================================
-
-  if (
-    typeof initAdminChatRumpiBadge === "function"
-  ) {
-    initAdminChatRumpiBadge();
-  }
-
-
-  // ==================================================
-  // PENGATURAN NADA NOTIFIKASI ADMIN
-  // ==================================================
-
-  let savedAdminTone =
-    localStorage.getItem('admin_ringtone_v13') ||
-    'default';
-
-  const adminRingtoneSelect =
-    document.getElementById(
-      'setting-admin-ringtone-type'
-    );
-
-  const adminUploadWrapper =
-    document.getElementById(
-      'wrapper-upload-ringtone-admin'
-    );
-
-
-  if (
-    adminRingtoneSelect &&
-    adminUploadWrapper
-  ) {
-
-    if (savedAdminTone === 'default') {
-
-      adminRingtoneSelect.value = 'default';
-
-      adminUploadWrapper.style.display =
-        'none';
-
-    } else {
-
-      adminRingtoneSelect.value = 'custom';
-
-      adminUploadWrapper.style.display =
-        'block';
-
-    }
-
-  }
-
-});
+      let savedAdminTone = localStorage.getItem('admin_ringtone_v13') || 'default';
+      const adminRingtoneSelect = document.getElementById('setting-admin-ringtone-type');
+      const adminUploadWrapper = document.getElementById('wrapper-upload-ringtone-admin');
+      if (adminRingtoneSelect && adminUploadWrapper) {
+        if (savedAdminTone === 'default') {
+          adminRingtoneSelect.value = 'default';
+          adminUploadWrapper.style.display = 'none';
+        } else {
+          adminRingtoneSelect.value = 'custom';
+          adminUploadWrapper.style.display = 'block';
+        }
+      }
+    });
 
     // --- SCRIPT AI CO-PILOT ADMIN ---
     function toggleAdminAi() {
@@ -1080,176 +1030,60 @@
     }
 
     // --- FITUR LIVE CHAT ADMIN ---
+    function initAdminChatListener() {
+      let isInitialChatLoad = true;
+      db.collection("chats").onSnapshot((snapshot) => {
+        if (!isInitialChatLoad) {
+          snapshot.docChanges().forEach((change) => {
+            let data = change.doc.data();
+            let phone = change.doc.id;
+            let unread = data.unreadAdmin || 0;
+            let prevUnread = adminChatPrevUnread[phone] || 0;
 
-function initAdminChatListener() {
+            if ((change.type === "added" && unread > 0) || (change.type === "modified" && unread > prevUnread)) {
+              playNotificationSound();
+            }
+          });
+        }
+        isInitialChatLoad = false;
 
-  let isInitialChatLoad = true;
+        let chatListContainer = document.getElementById("admin-chat-list");
+        if (!chatListContainer) return;
+        chatListContainer.innerHTML = "";
 
-  db.collection("chats").onSnapshot((snapshot) => {
-
-    // ==================================================
-    // NOTIFIKASI CHAT PRIBADI
-    // ==================================================
-
-    if (!isInitialChatLoad) {
-
-      snapshot.docChanges().forEach((change) => {
-
-        let data = change.doc.data();
-        let phone = change.doc.id;
-
-        let unread = data.unreadAdmin || 0;
-        let prevUnread =
-          adminChatPrevUnread[phone] || 0;
-
-
-        if (
-          (change.type === "added" && unread > 0) ||
-          (change.type === "modified" && unread > prevUnread)
-        ) {
-
-          if (
-            typeof playNotificationSound === "function"
-          ) {
-            playNotificationSound();
-          }
+        if (snapshot.empty) {
+          chatListContainer.innerHTML = `<div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;" data-i18n="no_chat_messages">Belum ada pesan masuk.</div>`;
+          return;
         }
 
+        let totalUnread = 0;
+        snapshot.forEach(doc => {
+          let data = doc.data();
+          let phone = doc.id;
+          let name = data.customerNama || phone;
+          let lastMsg = data.lastMessage || "Kirim pesan...";
+          let unread = data.unreadAdmin || 0;
+          totalUnread += unread;
+
+          adminChatPrevUnread[phone] = unread;
+
+          let activeStyle = selectedChatPhone === phone ? "background: rgba(37,99,235,0.1); border-left: 4px solid #2563eb;" : "";
+
+          chatListContainer.innerHTML += `
+            <div onclick="bukaRuangChatAdmin('${phone}', '${name}')" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; ${activeStyle}">
+              <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem;">
+                <span>👤 ${name}</span>
+                ${unread > 0 ? `<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">${unread}</span>` : ''}
+              </div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${phone}</div>
+            </div>
+          `;
+        });
+
+        adminPrivateUnreadTotal = totalUnread;
+        updateAdminLiveChatBadge();
       });
-
     }
-
-    isInitialChatLoad = false;
-
-
-    // ==================================================
-    // HITUNG TOTAL UNREAD CHAT PRIBADI
-    // ==================================================
-
-    let totalUnread = 0;
-
-    snapshot.forEach(doc => {
-
-      let data = doc.data();
-      let phone = doc.id;
-
-      let unread = data.unreadAdmin || 0;
-
-      totalUnread += unread;
-
-      adminChatPrevUnread[phone] = unread;
-
-    });
-
-
-    // Simpan jumlah Chat Pribadi
-    // supaya bisa digabung dengan Chat Rumpi
-
-    window.adminChatPribadiUnreadCount =
-      totalUnread;
-
-
-    // Update badge gabungan
-    if (
-      typeof updateAdminLiveChatBadge === "function"
-    ) {
-      updateAdminLiveChatBadge();
-    }
-
-
-    // ==================================================
-    // RENDER DAFTAR CHAT PRIBADI
-    // ==================================================
-
-    let chatListContainer =
-      document.getElementById("admin-chat-list");
-
-    if (!chatListContainer) return;
-
-
-    chatListContainer.innerHTML = "";
-
-
-    if (snapshot.empty) {
-
-      chatListContainer.innerHTML =
-        `<div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;" data-i18n="no_chat_messages">
-          Belum ada pesan masuk.
-        </div>`;
-
-      return;
-    }
-
-
-    snapshot.forEach(doc => {
-
-      let data = doc.data();
-
-      let phone = doc.id;
-
-      let name =
-        data.customerNama || phone;
-
-      let lastMsg =
-        data.lastMessage || "Kirim pesan...";
-
-      let unread =
-        data.unreadAdmin || 0;
-
-
-      let activeStyle =
-        selectedChatPhone === phone
-          ? "background: rgba(37,99,235,0.1); border-left: 4px solid #2563eb;"
-          : "";
-
-
-      chatListContainer.innerHTML += `
-
-        <div
-          onclick="bukaRuangChatAdmin('${phone}', '${name}')"
-          style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; ${activeStyle}">
-
-          <div
-            style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem;">
-
-            <span>
-              👤 ${name}
-            </span>
-
-            ${
-              unread > 0
-              ?
-              `<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">
-                ${unread}
-              </span>`
-              :
-              ''
-            }
-
-          </div>
-
-          <div
-            style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
-
-            ${lastMsg}
-
-          </div>
-
-          <div
-            style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">
-
-            ${phone}
-
-          </div>
-
-        </div>
-
-      `;
-
-    });
-
-  });
-}
 
     function bukaRuangChatAdmin(phone, name) {
       selectedChatPhone = phone;
