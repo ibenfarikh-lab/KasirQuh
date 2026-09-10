@@ -778,8 +778,8 @@
   </div>
 
   <!-- FLOATING AI ADMIN CO-PILOT WIDGET (Ikon Lingkaran Biru Pojok Kanan Atas dengan Tombol Mic Voice Input) -->
-  <div id="admin-ai-wrapper" style="position: fixed; top: 10px; right: 10px; z-index: 9998; font-family: sans-serif; display: flex; flex-direction: column; align-items: flex-end;">
-    <button id="ai-toggle-btn" onclick="toggleAdminAi()" title="Tanya AI Co-Pilot" style="background: #2563eb; color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+  <div id="admin-ai-wrapper" style="position: fixed; top: 10px; right: 10px; z-index: 9998; touch-action: none; font-family: sans-serif; display: flex; flex-direction: column; align-items: flex-end;">
+    <button id="ai-toggle-btn" onclick="toggleAdminAi()" title="Tanya AI Co-Pilot" style="touch-action: none; user-select: none; -webkit-user-select: none; background: #2563eb; color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
       😁
     </button>
 
@@ -839,6 +839,104 @@
         }
       }
     });
+
+    // --- DRAG FAB AI ADMIN ---
+    let adminAiFabDragged = false;
+    let adminAiFabPointerId = null;
+    let adminAiFabStartX = 0;
+    let adminAiFabStartY = 0;
+    let adminAiFabStartLeft = 0;
+    let adminAiFabStartTop = 0;
+
+    function initDraggableAdminAiFab() {
+      const wrapper = document.getElementById('admin-ai-wrapper');
+      const button = document.getElementById('ai-toggle-btn');
+      if (!wrapper || !button) return;
+
+      const saved = localStorage.getItem('admin_ai_fab_position_v1');
+      if (saved) {
+        try {
+          const pos = JSON.parse(saved);
+          const maxLeft = Math.max(0, window.innerWidth - wrapper.offsetWidth);
+          const maxTop = Math.max(0, window.innerHeight - wrapper.offsetHeight);
+          const left = Math.min(Math.max(Number(pos.left) || 0, 0), maxLeft);
+          const top = Math.min(Math.max(Number(pos.top) || 0, 0), maxTop);
+          wrapper.style.left = left + 'px';
+          wrapper.style.top = top + 'px';
+          wrapper.style.right = 'auto';
+        } catch (e) {}
+      }
+
+      button.addEventListener('pointerdown', function(e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        adminAiFabPointerId = e.pointerId;
+        adminAiFabDragged = false;
+        const rect = wrapper.getBoundingClientRect();
+        adminAiFabStartX = e.clientX;
+        adminAiFabStartY = e.clientY;
+        adminAiFabStartLeft = rect.left;
+        adminAiFabStartTop = rect.top;
+        try { button.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+
+      button.addEventListener('pointermove', function(e) {
+        if (adminAiFabPointerId !== e.pointerId) return;
+        const dx = e.clientX - adminAiFabStartX;
+        const dy = e.clientY - adminAiFabStartY;
+        if (!adminAiFabDragged && Math.hypot(dx, dy) < 6) return;
+        adminAiFabDragged = true;
+
+        const maxLeft = Math.max(0, window.innerWidth - wrapper.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - wrapper.offsetHeight);
+        const left = Math.min(Math.max(adminAiFabStartLeft + dx, 0), maxLeft);
+        const top = Math.min(Math.max(adminAiFabStartTop + dy, 0), maxTop);
+
+        wrapper.style.left = left + 'px';
+        wrapper.style.top = top + 'px';
+        wrapper.style.right = 'auto';
+      });
+
+      button.addEventListener('pointerup', function(e) {
+        if (adminAiFabPointerId !== e.pointerId) return;
+        if (adminAiFabDragged) {
+          const rect = wrapper.getBoundingClientRect();
+          localStorage.setItem('admin_ai_fab_position_v1', JSON.stringify({
+            left: Math.round(rect.left),
+            top: Math.round(rect.top)
+          }));
+        }
+        adminAiFabPointerId = null;
+      });
+
+      button.addEventListener('pointercancel', function() {
+        adminAiFabPointerId = null;
+      });
+
+      // Jangan membuka AI saat gerakan drag berakhir.
+      button.addEventListener('click', function(e) {
+        if (adminAiFabDragged) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          adminAiFabDragged = false;
+        }
+      }, true);
+
+      window.addEventListener('resize', function() {
+        const rect = wrapper.getBoundingClientRect();
+        const maxLeft = Math.max(0, window.innerWidth - wrapper.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - wrapper.offsetHeight);
+        const left = Math.min(Math.max(rect.left, 0), maxLeft);
+        const top = Math.min(Math.max(rect.top, 0), maxTop);
+        wrapper.style.left = left + 'px';
+        wrapper.style.top = top + 'px';
+        wrapper.style.right = 'auto';
+        localStorage.setItem('admin_ai_fab_position_v1', JSON.stringify({
+          left: Math.round(left), top: Math.round(top)
+        }));
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initDraggableAdminAiFab);
 
     // --- SCRIPT AI CO-PILOT ADMIN ---
     function toggleAdminAi() {
