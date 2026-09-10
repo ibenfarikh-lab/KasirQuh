@@ -1275,7 +1275,6 @@ function openProductModal(codeToEdit = null, restockId = null) {
       document.getElementById("db-cost").value = ((sat === 'rtg' || sat === 'kg') ? (rItem.modalRtg || 0) : (rItem.modal || 0)).toLocaleString('id-ID');
       document.getElementById("db-price").value = ((sat === 'rtg' || sat === 'kg') ? (rItem.hargaRtg || 0) : (rItem.harga || 0)).toLocaleString('id-ID');
       document.getElementById("db-selected-online-img").value = rItem.foto || "";
-      document.getElementById("db-description").value = rItem.deskripsi || "";
     }
   } else if (codeToEdit && databaseProduk[codeToEdit]) {
     let p = databaseProduk[codeToEdit];
@@ -1298,7 +1297,6 @@ function openProductModal(codeToEdit = null, restockId = null) {
     document.getElementById("db-cost").value = ((sat === 'rtg' || sat === 'kg') ? (p.modalRtg || 0) : (p.modal || 0)).toLocaleString('id-ID');
     document.getElementById("db-price").value = ((sat === 'rtg' || sat === 'kg') ? (p.hargaRtg || 0) : (p.harga || 0)).toLocaleString('id-ID');
     document.getElementById("db-selected-online-img").value = p.foto || "";
-    document.getElementById("db-description").value = p.deskripsi || "";
   } else if (activeTab === 'belanja-stok') {
     title.innerText = "Tambah Barang Belanja Stok";
     submitBtn.innerText = "Tambahkan ke Belanja Stok";
@@ -1313,7 +1311,6 @@ function openProductModal(codeToEdit = null, restockId = null) {
     document.getElementById("db-cost").value = "";
     document.getElementById("db-price").value = "";
     document.getElementById("db-selected-online-img").value = "";
-    document.getElementById("db-description").value = "";
   } else {
     title.innerText = "Tambah Barang Stok Baru";
     submitBtn.innerText = "Simpan ke Stok";
@@ -1328,7 +1325,6 @@ function openProductModal(codeToEdit = null, restockId = null) {
     document.getElementById("db-cost").value = "";
     document.getElementById("db-price").value = "";
     document.getElementById("db-selected-online-img").value = "";
-    document.getElementById("db-description").value = "";
   }
 
   updateUnitLabel();
@@ -1398,7 +1394,6 @@ function simpanBarangLangsung() {
   let finalHarga = (unit === 'rtg' || unit === 'kg') ? (price / isiRtg) : price;
 
   const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
-  const description = document.getElementById("db-description").value.trim();
   const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
 
   db.collection("produk").doc(code).set({
@@ -1411,8 +1406,7 @@ function simpanBarangLangsung() {
     harga: finalHarga,
     modalRtg: cost,
     hargaRtg: price,
-    foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg,
-    deskripsi: description
+    foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
   }, { merge: true }).then(() => {
     closeProductModal();
     showNotif("Barang baru ditambahkan ke stok!");
@@ -1435,7 +1429,6 @@ function simpanEditBarang(code) {
   let finalHarga = (unit === 'rtg' || unit === 'kg') ? (price / isiRtg) : price;
 
   const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
-  const description = document.getElementById("db-description").value.trim();
   const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
 
   db.collection("produk").doc(code).update({
@@ -1448,8 +1441,7 @@ function simpanEditBarang(code) {
     harga: finalHarga,
     modalRtg: cost,
     hargaRtg: price,
-    foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg,
-    deskripsi: description
+    foto: selectedOnlineImg || existingFoto || defaultPlaceholderImg
   }).then(() => {
     closeProductModal();
     showNotif("Perubahan disimpan!");
@@ -1467,7 +1459,6 @@ function simpanEditBelanjaStok(restockId) {
   const cost = parseRupiahToNumber(document.getElementById("db-cost").value);
   const price = parseRupiahToNumber(document.getElementById("db-price").value);
   const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
-  const description = document.getElementById("db-description").value.trim();
 
   let rItem = restockListItems.find(i => i.id === restockId);
   if (rItem) {
@@ -1482,7 +1473,6 @@ function simpanEditBelanjaStok(restockId) {
     rItem.modalRtg = cost;
     rItem.hargaRtg = price;
     if (selectedOnlineImg) rItem.foto = selectedOnlineImg;
-    rItem.deskripsi = description;
 
     simpanRestockKeCloud();
     closeProductModal();
@@ -2553,7 +2543,7 @@ async function importStokExcel(event) {
           if (!code) code = "BRG-" + Date.now() + "-" + i;
           let stokTersimpan = (sat === 'rtg') ? (stok * 10) : stok;
           let docRef = db.collection("produk").doc(code);
-          batch.set(docRef, { nama, kategori: kat, satuan: sat, isiRtg: 10, stok: stokTersimpan, modal, harga, modalRtg: modal, hargaRtg: harga, foto: "", deskripsi: "" });
+          batch.set(docRef, { nama, kategori: kat, satuan: sat, isiRtg: 10, stok: stokTersimpan, modal, harga, modalRtg: modal, hargaRtg: harga, foto: "" });
           count++;
         }
       }
