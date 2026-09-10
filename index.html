@@ -226,11 +226,15 @@
       <!-- Tombol Navigasi Sub-Tab -->
       <div style="display: flex; gap: 6px; margin-bottom: 12px;">
         <button id="btn-sub-chat-pribadi" onclick="switchAdminChatSubTab('pribadi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: #2563eb; color: white; border: none; cursor: pointer;">👤 Chat Pribadi</button>
-        <button id="btn-sub-chat-rumpi" onclick="switchAdminChatSubTab('rumpi')" style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">
-    🗣️ Chat Rumpi
-    <span id="badge-rumpi-count" style="display: none; background: red; color: white; border-radius: 10px; padding: 2px 6px; font-size: 12px; margin-left: 5px;" class="badge">0</span>
+        <button id="btn-sub-chat-rumpi"
+  onclick="switchAdminChatSubTab('rumpi')"
+  style="flex: 1; padding: 8px; border-radius: 8px; font-weight: bold; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); cursor: pointer;">
+  🗣️ Chat Rumpi
+  <span id="badge-chat-rumpi-count"
+    style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: 5px;">
+    0
+  </span>
 </button>
-      </div>
 
       <!-- WRAPPER CHAT PRIBADI -->
       <div id="wrapper-admin-chat-pribadi" style="display: flex; height: calc(100vh - 180px); gap: 10px;">
@@ -826,8 +830,8 @@
       initOnlineOrdersListener();
       initCustomerCardClickObserver();
       initAdminChatListener();
-      initRumpiChatListener ();
-   
+      initAdminChatRumpiListener();
+
       let savedAdminTone = localStorage.getItem('admin_ringtone_v13') || 'default';
       const adminRingtoneSelect = document.getElementById('setting-admin-ringtone-type');
       const adminUploadWrapper = document.getElementById('wrapper-upload-ringtone-admin');
@@ -841,38 +845,6 @@
         }
       }
     });
-
-// Fungsi untuk memantau pesan baru di Chat Rumpi
-function initRumpiChatListener() {
-    const rumpiRef = db.collection("db_chat_rumpi");
-
-    // Memantau database db_chat_rumpi secara real-time
-    rumpiRef.onSnapshot((snapshot) => {
-        let unreadCount = 0;
-
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            
-            // Hitung pesan yang dikirim oleh customer / bukan admin
-            if (data.pengirim === "customer" || (data.senderName && data.senderName !== "Admin Toko")) {
-                unreadCount++;
-            }
-        });
-
-        const badgeElement = document.getElementById("badge-rumpi-count");
-        if (badgeElement) {
-            if (unreadCount > 0) {
-                badgeElement.innerText = unreadCount;
-                badgeElement.style.display = "inline-block";
-            } else {
-                badgeElement.style.display = "none";
-            }
-        }
-    }, (error) => {
-        console.error("Gagal memuat notifikasi Chat Rumpi: ", error);
-    });
-}
-
 
     // --- SCRIPT AI CO-PILOT ADMIN ---
     function toggleAdminAi() {
