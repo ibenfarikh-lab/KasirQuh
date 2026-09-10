@@ -627,7 +627,24 @@
     function playCustomerNotificationSound() {
       let savedTone = localStorage.getItem('cust_ringtone_v13') || 'default';
       if (savedTone === 'default') {
-        playTone(1000, "sine");
+        try {
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          function playBeep(delay, freq, duration) {
+            setTimeout(() => {
+              if (audioCtx.state === 'suspended') audioCtx.resume();
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.type = 'square';
+              osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+              osc.connect(gain); gain.connect(audioCtx.destination);
+              gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+              osc.start(); osc.stop(audioCtx.currentTime + duration);
+            }, delay);
+          }
+          for (let i = 0; i < 20; i++) {
+            playBeep(i * 110, (i % 4 === 3) ? 1200 : 900, (i === 19) ? 0.3 : 0.08);
+          }
+        } catch (e) { console.log("Audio diblokir:", e); }
       } else {
         const audio = new Audio(savedTone);
         audio.play().catch(e => console.log("Gagal memutar audio:", e));
