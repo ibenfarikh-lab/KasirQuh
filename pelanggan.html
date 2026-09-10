@@ -34,7 +34,7 @@
     .popup-menu-btn svg {
       width: 18px;
       height: 18px;
-      fill: currentColorChat Rumpir;
+      fill: currentColor;
     }
     .popup-menu-btn.active-menu {
       color: #2563eb !important;
@@ -222,21 +222,21 @@
       </div>
     </div>
 
-    <!-- 3. HALAMAN LIVE CHAT (Dua Tab: Chat Admin & Chat Rumpi) -->
+    <!-- 3. HALAMAN LIVE CHAT (Dua Tab: Chat Admin Toko & Chat Rumpi) -->
     <div id="live-chat" class="tab-content" style="height: calc(100vh - 130px); padding: 0; display: none; flex-direction: column;">
       <!-- Header Sub-Tabs -->
       <div style="display: flex; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
         <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <span>Chat Admin</span>
+          <span>Chat Admin Toko</span>
           <span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px;">0</span>
         </button>
         <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-          <span></span>
+          <span>Chat Rumpi</span>
           <span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.65rem; padding: 1px 5px; border-radius: 8px;">0</span>
         </button>
       </div>
 
-      <!-- Sub-Tab 1: Chat Admin -->
+      <!-- Sub-Tab 1: Chat Admin Toko -->
       <div id="subtab-admin-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
         <div id="customer-chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
           <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat pesan...</div>
@@ -332,7 +332,9 @@
 
   <!-- FLOATING CHAT & UTILITIES (FAB khusus AI, Search, Cart) -->
   <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
-    <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; font-size: 28px;">😁</button>
+    <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten AI Toko" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </button>
     <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="24" height="24" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg>
     </button>
@@ -344,7 +346,7 @@
 
   <!-- MODAL ASISTEN AI DENGAN FITUR SUARA (TTS & SPEECH RECOGNITION) -->
   <div id="aiChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleAIChatModal()">
-    <div class="modal-content" style="max-width: 400px; height: 70vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+    <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
       <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <h3 style="margin: 0; font-size: 1rem;">😁 Asisten Belanja AI</h3>
