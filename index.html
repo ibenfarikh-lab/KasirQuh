@@ -845,18 +845,24 @@
 // Fungsi untuk memantau pesan baru di Chat Rumpi
 function initRumpiChatListener() {
     const rumpiRef = db.collection("db_chat_rumpi");
-    
-    // Pastikan nama field di bawah ini (misal: "statusRead") 
-    // sesuai dengan yang ada di database Firestore Kakak
-    const queryUnread = rumpiRef.where("statusRead", "==", false);
 
-    queryUnread.onSnapshot((snapshot) => {
-        const unreadRumpiCount = snapshot.size;
+    // Memantau database db_chat_rumpi secara real-time
+    rumpiRef.onSnapshot((snapshot) => {
+        let unreadCount = 0;
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            
+            // Hitung pesan yang dikirim oleh customer / bukan admin
+            if (data.pengirim === "customer" || (data.senderName && data.senderName !== "Admin Toko")) {
+                unreadCount++;
+            }
+        });
+
         const badgeElement = document.getElementById("badge-rumpi-count");
-
         if (badgeElement) {
-            if (unreadRumpiCount > 0) {
-                badgeElement.innerText = unreadRumpiCount;
+            if (unreadCount > 0) {
+                badgeElement.innerText = unreadCount;
                 badgeElement.style.display = "inline-block";
             } else {
                 badgeElement.style.display = "none";
