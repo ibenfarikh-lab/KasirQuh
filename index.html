@@ -238,7 +238,10 @@
           </div>
         </div>
         <div style="flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
-          <div id="admin-chat-header" style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);" data-i18n="select_chat_prompt">Pilih pelanggan di samping untuk mulai chat</div>
+          <div id="admin-chat-header" style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <span id="admin-chat-title" data-i18n="select_chat_prompt">Pilih pelanggan di samping untuk mulai chat</span>
+            <button id="admin-chat-delete-btn" onclick="hapusSemuaChatPribadiAdmin()" title="Hapus seluruh chat dengan pelanggan ini" style="display: none; background: #dc2626; color: white; border: none; padding: 5px 9px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; flex-shrink: 0;">🗑️ Hapus Chat</button>
+          </div>
           <div id="admin-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
             <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;" data-i18n="no_chat_selected">Belum ada ruang chat yang dipilih.</div>
           </div>
@@ -1185,7 +1188,10 @@
 
     function bukaRuangChatAdmin(phone, name) {
       selectedChatPhone = phone;
-      document.getElementById("admin-chat-header").innerText = `Chat dengan: ${name} (${phone})`;
+      const chatTitleEl = document.getElementById("admin-chat-title");
+      if (chatTitleEl) chatTitleEl.innerText = `Chat dengan: ${name} (${phone})`;
+      const deleteChatBtn = document.getElementById("admin-chat-delete-btn");
+      if (deleteChatBtn) deleteChatBtn.style.display = "inline-block";
       document.getElementById("admin-chat-input").removeAttribute("disabled");
       document.getElementById("admin-chat-send-btn").removeAttribute("disabled");
 
@@ -1239,6 +1245,33 @@
         }, { merge: true });
         inputEl.value = "";
       });
+    }
+
+    async function hapusSemuaChatPribadiAdmin() {
+      if (!selectedChatPhone) return alert("Pilih pelanggan terlebih dahulu!");
+      if (!confirm("Hapus seluruh riwayat Chat Pribadi dengan pelanggan ini? Tindakan ini tidak dapat dibatalkan!")) return;
+
+      try {
+        const messagesRef = db.collection("chats").doc(selectedChatPhone).collection("messages");
+        const snapshot = await messagesRef.get();
+        let batch = db.batch();
+        snapshot.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+
+        await db.collection("chats").doc(selectedChatPhone).set({
+          lastMessage: "",
+          lastTimestamp: firebase.firestore.FieldValue.delete(),
+          unreadAdmin: 0,
+          unreadCustomer: 0
+        }, { merge: true });
+
+        adminChatPrevUnread[selectedChatPhone] = 0;
+        adminPrivateUnreadTotal = 0;
+        updateAdminLiveChatBadge();
+        alert("Riwayat Chat Pribadi berhasil dihapus!");
+      } catch (err) {
+        alert("Gagal menghapus chat: " + err.message);
+      }
     }
 
     function kirimPesanRumpiAdmin() {
