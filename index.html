@@ -1027,6 +1027,71 @@
       });
     }
 
+// --- FITUR CHAT RUMPI ADMIN (DENGAN NADA & BADGE) ---
+let rumpiPrevCount = 0; // Menyimpan jumlah pesan sebelumnya untuk melacak pesan baru
+
+function initAdminChatRumpiListener() {
+  let isInitialRumpiLoad = true;
+
+  db.collection("db_chat_rumpi").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => {
+    
+    // Deteksi pesan baru untuk memicu suara (mirip chat pribadi)
+    if (!isInitialRumpiLoad) {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          let data = change.doc.data();
+          // Jika pesan masuk bukan dikirim oleh Admin
+          if (data.senderPhone !== "Admin" && data.senderName !== "Admin") {
+            playNotificationSound(); // Bunyikan nada notifikasi
+          }
+        }
+      });
+    }
+    isInitialRumpiLoad = false;
+
+    let rumpiMsgContainer = document.getElementById("admin-chat-rumpi-messages");
+    if (!rumpiMsgContainer) return;
+    rumpiMsgContainer.innerHTML = "";
+
+    if (snapshot.empty) {
+      rumpiMsgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;">Belum ada percakapan di chat rumpi.</div>`;
+      return;
+    }
+
+    let totalRumpiMessages = snapshot.size;
+    
+    // Logika Badge: Jika jumlah pesan bertambah dan tab rumpi sedang tidak dibuka
+    // (Anda bisa sesuaikan kondisi pengecekan tab aktif jika ada)
+    let badgeRumpi = document.getElementById("badge-rumpi-count"); // Pastikan elemen badge ini ada di HTML Anda
+    if (badgeRumpi && totalRumpiMessages > rumpiPrevCount) {
+      let selisih = totalRumpiMessages - rumpiPrevCount;
+      let currentBadge = parseInt(badgeRumpi.innerText) || 0;
+      
+      // Tambahkan angka badge (kecuali jika admin sedang berada di tab rumpi)
+      badgeRumpi.innerText = currentBadge + selisih;
+      badgeRumpi.style.display = "inline-block";
+    }
+    rumpiPrevCount = totalRumpiMessages;
+
+    // Render pesan ke dalam container
+    snapshot.forEach(doc => {
+      let m = doc.data();
+      let isAdmin = m.senderPhone === "Admin" || m.senderName === "Admin";
+      let alignBubble = isAdmin ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
+      
+      rumpiMsgContainer.innerHTML += `
+        <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble}">
+          <div style="font-size: 0.7rem; font-weight: bold; opacity: 0.9; margin-bottom: 2px;">${m.senderName || m.senderPhone}</div>
+          <div>${m.pesan}</div>
+          <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
+        </div>
+      `;
+    });
+    
+    rumpiMsgContainer.scrollTop = rumpiMsgContainer.scrollHeight;
+  });
+}
+
     // --- FITUR LIVE CHAT ADMIN ---
     function initAdminChatListener() {
       let isInitialChatLoad = true;
