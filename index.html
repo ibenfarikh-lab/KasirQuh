@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Live Chat - KasirQuh</title>
+  <title>KasirQuh</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   
   <!-- Firebase SDK (Compat Version) -->
@@ -40,45 +40,6 @@
     .mic-active {
       display: inline-block;
       animation: pulse-mic 1.5s infinite;
-    }
-
-    /* --- DESAIN CARD BARANG GRADASI & OVERLAY GELAP --- */
-    /* Target ke grid katalog dan card barang */
-    #pos-catalog-container .card, 
-    #inventory-grid-wrapper .card {
-        position: relative !important;
-        overflow: hidden !important;
-        border: none !important;
-        /* Memaksa background transparan agar gradasi muncul */
-        background-color: transparent !important; 
-    }
-    
-    /* 5 Pola Gradasi Bergantian */
-    #pos-catalog-container .card:nth-child(5n+1), #inventory-grid-wrapper .card:nth-child(5n+1) { background: linear-gradient(135deg, #FF7E5F, #FEB47B) !important; }
-    #pos-catalog-container .card:nth-child(5n+2), #inventory-grid-wrapper .card:nth-child(5n+2) { background: linear-gradient(135deg, #6a11cb, #2575fc) !important; }
-    #pos-catalog-container .card:nth-child(5n+3), #inventory-grid-wrapper .card:nth-child(5n+3) { background: linear-gradient(135deg, #11998e, #38ef7d) !important; }
-    #pos-catalog-container .card:nth-child(5n+4), #inventory-grid-wrapper .card:nth-child(5n+4) { background: linear-gradient(135deg, #b224ef, #7579ff) !important; }
-    #pos-catalog-container .card:nth-child(5n+5), #inventory-grid-wrapper .card:nth-child(5n+5) { background: linear-gradient(135deg, #f12711, #f5af19) !important; }
-
-    /* Overlay gelap semi-transparan dari bawah ke tengah */
-    #pos-catalog-container .card::before, 
-    #inventory-grid-wrapper .card::before {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 65%;
-        background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
-        z-index: 1;
-        pointer-events: none;
-    }
-
-    /* Mengangkat elemen teks dan gambar agar tidak tertutup overlay gelap */
-    #pos-catalog-container .card > *, 
-    #inventory-grid-wrapper .card > * {
-        position: relative;
-        z-index: 2;
     }
   </style>
 
@@ -250,7 +211,7 @@
         </div>
       </div>
 
-      <!--  MENDENGARKAN VOICE -->
+      <!-- MENDENGARKAN VOICE -->
       <div id="voice-calc-indicator" style="display: none; max-width: 400px; margin: 12px auto 0; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; align-items: center; gap: 8px; color: #1e3a8a; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
         <span style="font-size: 1.2rem;" class="mic-active">🎙️</span>
         <div style="flex: 1; font-family: monospace; font-size: 0.95rem;">
@@ -538,63 +499,6 @@
         </div>
       </div>
 
-<!-- HALAMAN LIVE CHAT (BARU) -->
-<div id="live-chat" class="tab-content">
-  
-  <!-- Header Tab Chat Pribadi & Rumpi -->
-  <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-    <button id="btn-sub-chat-pribadi" onclick="switchAdminChatSubTab('pribadi')" style="flex: 1; padding: 10px; border-radius: 8px; background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer;">💬 Chat Pribadi</button>
-    <button id="btn-sub-chat-rumpi" onclick="switchAdminChatSubTab('rumpi')" style="flex: 1; padding: 10px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); font-weight: bold; cursor: pointer;">📢 Chat Rumpi</button>
-  </div>
-
-  <!-- WRAPPER CHAT PRIBADI (Desain Lega) -->
-  <div id="wrapper-admin-chat-pribadi" style="display: flex; height: calc(100vh - 220px); position: relative; overflow: hidden; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color);">
-    
-    <!-- Tombol Toggle Melayang (Kiri Atas) -->
-    <button onclick="toggleDaftarChatPribadi()" style="position: absolute; top: 10px; left: 10px; z-index: 10; background: #2563eb; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 1.2rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">👥</button>
-
-    <!-- Sidebar Daftar Kontak (Tersembunyi ke kiri) -->
-    <div id="sidebar-daftar-chat" style="position: absolute; left: -280px; top: 0; bottom: 0; width: 260px; background: var(--card-bg); border-right: 1px solid var(--border-color); z-index: 9; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.15);">
-      <div style="padding: 15px 15px 15px 65px; font-weight: bold; border-bottom: 1px solid var(--border-color); background: var(--bg-color);">Daftar Pelanggan</div>
-      <div id="admin-chat-contacts" style="flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 20px;">Memuat pelanggan...</div>
-      </div>
-    </div>
-
-    <!-- Backdrop Gelap (Klik untuk menutup sidebar) -->
-    <div id="backdrop-daftar-chat" onclick="toggleDaftarChatPribadi()" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 8;"></div>
-
-    <!-- Area Chat 100% Layar -->
-    <div style="flex: 1; display: flex; flex-direction: column; width: 100%;">
-      <div id="admin-chat-header" style="padding: 12px 15px 12px 65px; font-weight: bold; border-bottom: 1px solid var(--border-color); background: var(--bg-color); min-height: 23px; display: flex; align-items: center;">
-        Pilih pelanggan dari menu 👥
-      </div>
-      <div id="admin-chat-messages" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.02);">
-        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada ruang chat yang dipilih.</div>
-      </div>
-      <div style="padding: 10px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; background: var(--card-bg);">
-        <input type="text" id="admin-chat-input" placeholder="Ketik balasan..." style="flex: 1; padding: 10px; border: 1px solid var(--input-border); border-radius: 8px; background: var(--input-bg); color: var(--text-color);" disabled>
-        <button id="admin-chat-send-btn" onclick="kirimPesanAdmin()" style="background: #2563eb; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: not-allowed; opacity: 0.5;" disabled>Kirim</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- WRAPPER CHAT RUMPI -->
-  <div id="wrapper-admin-chat-rumpi" style="display: none; height: calc(100vh - 220px); flex-direction: column; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
-    <div style="padding: 12px 15px; font-weight: bold; border-bottom: 1px solid var(--border-color); background: var(--bg-color); display: flex; justify-content: space-between; align-items: center;">
-      <span>📢 Chat Rumpi (Publik)</span>
-      <button onclick="bersihkanSemuaChatRumpiAdmin()" style="background: #dc2626; color: white; border: none; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">Bersihkan</button>
-    </div>
-    <div id="admin-chat-rumpi-messages" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.02);">
-    </div>
-    <div style="padding: 10px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; background: var(--card-bg);">
-      <input type="text" id="admin-chat-rumpi-input" placeholder="Ketik pengumuman..." style="flex: 1; padding: 10px; border: 1px solid var(--input-border); border-radius: 8px; background: var(--input-bg); color: var(--text-color);">
-      <button onclick="kirimPesanRumpiAdmin()" style="background: #2563eb; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
-    </div>
-  </div>
-</div>
-
-
       <!-- NADA DERING NOTIFIKASI -->
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;" data-i18n="ringtone_settings">Pengaturan Nada Dering Notifikasi</h3>
@@ -668,7 +572,7 @@
     </div>
   </div>
 
-    <!-- MODAL TAMBAH/EDIT CATATAN -->
+  <!-- MODAL TAMBAH/EDIT CATATAN -->
   <div id="catatanModal" class="modal-backdrop" onclick="if(event.target === this) closeCatatanModal()">
     <div class="modal-content" style="max-width: 400px;">
       <div class="modal-header">
@@ -871,13 +775,13 @@
           <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> <span data-i18n="menu_notes">Catatan</span>
         </button>
         <button class="popup-menu-btn" id="pop-btn-pengaturan" onclick="switchTab('pengaturan'); toggleFloatingMenu();">
-          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c-.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> <span data-i18n="menu_settings">Pengaturan</span>
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c-.5.38-1.03.7-1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c-.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> <span data-i18n="menu_settings">Pengaturan</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- FLOATING AI ADMIN CO-PILOT WIDGET (Ikon Lingkaran Biru Pojok Kanan Atas dengan Tombol Mic Voice Input) -->
+  <!-- FLOATING AI ADMIN CO-PILOT WIDGET -->
   <div id="admin-ai-wrapper" style="position: fixed; top: 10px; right: 10px; z-index: 9998; touch-action: none; font-family: sans-serif; display: flex; flex-direction: column; align-items: flex-end;">
     <button id="ai-toggle-btn" onclick="toggleAdminAi()" title="Tanya AI Co-Pilot" style="touch-action: none; user-select: none; -webkit-user-select: none; background: #2563eb; color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
       😁
@@ -1024,7 +928,6 @@
         wrapper.style.top = top + 'px';
         wrapper.style.right = 'auto';
 
-        // Jika panel AI sedang terbuka, ikutkan panel agar tetap terlihat.
         positionAdminAiChatBox();
       });
 
@@ -1044,7 +947,6 @@
         adminAiFabPointerId = null;
       });
 
-      // Jangan membuka AI saat gerakan drag berakhir.
       button.addEventListener('click', function(e) {
         if (adminAiFabDragged) {
           e.preventDefault();
@@ -1099,7 +1001,6 @@
       inputField.value = '';
       messageContainer.scrollTop = messageContainer.scrollHeight;
 
-      // Sama seperti AI pelanggan: kirim hanya produk yang relevan, maksimal 3.
       let daftarProdukText = '';
       const keywordLower = text.toLowerCase();
       const shoppingKeywords = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"];
@@ -1285,7 +1186,35 @@
       });
     }
 
-    // --- FITUR LIVE CHAT ADMIN ---
+    // --- FITUR LIVE CHAT ADMIN & SUB-TAB RUMPI ---
+    let activeAdminChatSub = 'pribadi';
+    let unreadRumpiAdmin = 0;
+    let adminRumpiListenerUnsub = null;
+
+    function switchAdminChatSubTab(sub) {
+      activeAdminChatSub = sub;
+      const btnPribadi = document.getElementById("btn-sub-chat-pribadi");
+      const btnRumpi = document.getElementById("btn-sub-chat-rumpi");
+      const wrapPribadi = document.getElementById("wrapper-admin-chat-pribadi");
+      const wrapRumpi = document.getElementById("wrapper-admin-chat-rumpi");
+
+      if (!btnPribadi || !btnRumpi) return;
+
+      if (sub === 'pribadi') {
+        btnPribadi.style.background = "#2563eb"; btnPribadi.style.color = "white"; btnPribadi.style.border = "none";
+        btnRumpi.style.background = "var(--input-bg)"; btnRumpi.style.color = "var(--text-color)"; btnRumpi.style.border = "1px solid var(--input-border)";
+        wrapPribadi.style.display = "flex"; wrapRumpi.style.display = "none";
+      } else {
+        btnRumpi.style.background = "#2563eb"; btnRumpi.style.color = "white"; btnRumpi.style.border = "none";
+        btnPribadi.style.background = "var(--input-bg)"; btnPribadi.style.color = "var(--text-color)"; btnPribadi.style.border = "1px solid var(--input-border)";
+        wrapRumpi.style.display = "flex"; wrapPribadi.style.display = "none";
+
+        unreadRumpiAdmin = 0;
+        updateAdminLiveChatBadge();
+        initAdminRumpiListener();
+      }
+    }
+
     function initAdminChatListener() {
       let isInitialChatLoad = true;
       db.collection("chats").onSnapshot((snapshot) => {
@@ -1341,6 +1270,73 @@
       });
     }
 
+    function initAdminRumpiNotificationListener() {
+      let isFirst = true;
+      db.collection("db_chat_rumpi").orderBy("waktuTimestamp", "desc").limit(1).onSnapshot((snapshot) => {
+        if (!isFirst && !snapshot.empty) {
+          let change = snapshot.docChanges()[0];
+          if (change && change.type === "added") {
+            let data = change.doc.data();
+            if (data.senderPhone !== "Admin") {
+              unreadRumpiAdmin++;
+              updateAdminLiveChatBadge();
+              playNotificationSound();
+            }
+          }
+        }
+        isFirst = false;
+      });
+    }
+
+    function initAdminRumpiListener() {
+      if (adminRumpiListenerUnsub) adminRumpiListenerUnsub();
+
+      adminRumpiListenerUnsub = db.collection("db_chat_rumpi")
+        .orderBy("waktuTimestamp", "asc")
+        .onSnapshot((snapshot) => {
+          let msgContainer = document.getElementById("admin-chat-rumpi-messages");
+          if (!msgContainer) return;
+          msgContainer.innerHTML = "";
+
+          if (snapshot.empty) {
+            msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;">Belum ada pesan di Chat Rumpi.</div>`;
+            return;
+          }
+
+          snapshot.forEach(doc => {
+            let m = doc.data();
+            let docId = doc.id;
+            let isAdmin = m.senderPhone === "Admin";
+            let alignBubble = isAdmin ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
+
+            msgContainer.innerHTML += `
+              <div style="max-width: 80%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble} display: flex; flex-direction: column; gap: 2px; position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 0.75rem; opacity: 0.9; font-weight: bold;">
+                  <span>👤 ${m.senderName || 'Warga'} (${m.senderPhone || '-'})</span>
+                  <button onclick="hapusPesanRumpiAdmin('${docId}')" title="Hapus" style="background: none; border: none; color: inherit; cursor: pointer; font-size: 0.8rem; padding: 0;">🗑️</button>
+                </div>
+                <div>${m.pesan}</div>
+                <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
+              </div>
+            `;
+          });
+          msgContainer.scrollTop = msgContainer.scrollHeight;
+        });
+    }
+
+    function updateAdminLiveChatBadge() {
+      const badgeChat = document.getElementById("badge-chat-count");
+      if (!badgeChat) return;
+
+      const totalUnread = adminPrivateUnreadTotal + (activeAdminChatSub === 'pribadi' ? unreadRumpiAdmin : 0);
+      if (totalUnread > 0) {
+        badgeChat.innerText = totalUnread > 99 ? "99+" : totalUnread;
+        badgeChat.style.display = "inline-block";
+      } else {
+        badgeChat.style.display = "none";
+      }
+    }
+
     function bukaRuangChatAdmin(phone, name) {
       selectedChatPhone = phone;
       const chatTitleEl = document.getElementById("admin-chat-title");
@@ -1368,11 +1364,10 @@
             let m = doc.data();
             let isAdmin = m.pengirim === "admin";
             let alignBubble = isAdmin ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
-            // KODE DIPERBARUI: Padding dan Margin diperbesar agar lega seperti Chat Rumpi
             msgContainer.innerHTML += `
-              <div style="max-width: 75%; padding: 12px 18px; border-radius: 16px; font-size: 0.85rem; margin-bottom: 8px; line-height: 1.5; ${alignBubble}">
+              <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble}">
                 <div>${m.pesan}</div>
-                <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 4px;">${m.waktu || ''}</div>
+                <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
               </div>
             `;
           });
@@ -1449,6 +1444,29 @@
         alert("Gagal mengirim pesan: " + err.message);
       });
     }
+
+    function hapusPesanRumpiAdmin(docId) {
+      if (confirm("Hapus pesan ini dari Chat Rumpi?")) {
+        db.collection("db_chat_rumpi").doc(docId).delete().catch(err => alert("Gagal menghapus pesan: " + err.message));
+      }
+    }
+
+    function bersihkanSemuaChatRumpiAdmin() {
+      if (confirm("Hapus seluruh riwayat pesan di Chat Rumpi? Tindakan ini tidak dapat dibatalkan!")) {
+        db.collection("db_chat_rumpi").get().then(snapshot => {
+          let batch = db.batch();
+          snapshot.forEach(doc => {
+            batch.delete(doc.ref);
+          });
+          return batch.commit();
+        }).then(() => {
+          alert("Semua riwayat Chat Rumpi berhasil dibersihkan!");
+        }).catch(err => {
+          alert("Gagal membersihkan chat: " + err.message);
+        });
+      }
+    }
+    // --- END FITUR LIVE CHAT ADMIN ---
 
     function renderOnlineOrdersUI() {
       const containerBerlangsung = document.getElementById("wrapper-pesanan-berlangsung");
