@@ -73,27 +73,25 @@
     .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 4px 10px 10px 10px; scrollbar-width: none; }
     .horizontal-scroll-container::-webkit-scrollbar { display: none; }
 
-    /* EFEK BERGULIR OTOMATIS (MARQUEE HALUS) DENGAN JEDA SAAT DISENTUH/HOVER */
+    /* KONTINER BERGULIR OTOMATIS YANG BISA DI-SWIPE / SENTUH MANUAL */
     .auto-scroll-wrapper {
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
       width: 100%;
       position: relative;
       padding: 4px 0 10px 0;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .auto-scroll-wrapper::-webkit-scrollbar {
+      display: none;
     }
     .auto-scroll-track {
       display: flex;
       gap: 8px;
       width: max-content;
-      animation: scrollTicker 25s linear infinite;
       padding-left: 10px;
       padding-right: 10px;
-    }
-    .auto-scroll-track:hover, .auto-scroll-track:active {
-      animation-play-state: paused;
-    }
-    @keyframes scrollTicker {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
     }
     
     /* SEMUA KARTU DENGAN 3 WARNA GRADASI BERBEDA */
@@ -932,6 +930,37 @@
       }).catch(()=>{});
     }
 
+    // FUNGSI INISIALISASI AUTO-SCROLL YANG MENDUKUNG SENTUHAN/GESEKAN JARI
+    function setupAutoScrollInteraction(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      let scrollSpeed = 0.8;
+      let isInteracting = false;
+      let timeoutId = null;
+
+      // Interval pergerakan otomatis halus
+      const scrollInterval = setInterval(() => {
+        if (!isInteracting) {
+          container.scrollLeft += scrollSpeed;
+          // Jika mencapai ujung, putar balik ke awal secara mulus
+          if (container.scrollLeft >= (container.scrollWidth - container.clientWidth - 2)) {
+            container.scrollLeft = 0;
+          }
+        }
+      }, 30);
+
+      // Berhenti otomatis saat disentuh atau digeser user, lalu lanjut lagi setelah beberapa detik
+      container.addEventListener('touchstart', () => { isInteracting = true; clearTimeout(timeoutId); });
+      container.addEventListener('touchend', () => {
+        timeoutId = setTimeout(() => { isInteracting = false; }, 2500);
+      });
+      container.addEventListener('mousedown', () => { isInteracting = true; clearTimeout(timeoutId); });
+      container.addEventListener('mouseup', () => {
+        timeoutId = setTimeout(() => { isInteracting = false; }, 2500);
+      });
+    }
+
     function renderTrending(codes) {
       const container = document.getElementById("trending-container"); const wrapper = document.getElementById("trending-section-wrapper"); container.innerHTML = "";
       if(codes.length === 0) { wrapper.style.display = "none"; return; }
@@ -953,8 +982,9 @@
             </div>
           </div>`;
       });
-      // Duplikasi elemen agar efek bergulir mulus tanpa terputus (infinite loop trick)
+      // Duplikasi elemen agar perputaran item mulus tanpa jeda kosong
       container.innerHTML = `<div class="auto-scroll-track">${itemsHtml}${itemsHtml}</div>`;
+      setupAutoScrollInteraction("trending-container");
       perbaruiTampilanKategori(); 
     }
 
@@ -1192,6 +1222,7 @@
       
       if(renderedCount > 0) {
         container.innerHTML = `<div class="auto-scroll-track">${itemsHtml}${itemsHtml}</div>`;
+        setupAutoScrollInteraction("reorder-container");
       }
 
       if(renderedCount > 0 && activeKategoriPelanggan === 'Semua' && document.getElementById('belanja').classList.contains('active')) { wrapper.style.display = "block"; } else { wrapper.style.display = "none"; }
