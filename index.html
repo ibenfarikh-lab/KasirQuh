@@ -47,6 +47,118 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2563eb">
   <link rel="apple-touch-icon" href="icon-192.png">
+<style>
+
+/* ============================================================
+   ADMIN COLORFUL v.2 — SOLID ONLY
+   Colorful v.1 remains untouched.
+   ============================================================ */
+[data-theme="colorful-v2"],
+[data-theme="colorful2"],
+[data-theme="colorful-v.2"] {
+  --admin-solid-blue: #2563eb;
+  --admin-solid-purple: #7c3aed;
+  --admin-solid-pink: #ec4899;
+  --admin-solid-orange: #f97316;
+  --admin-solid-green: #10b981;
+  --admin-solid-cyan: #06b6d4;
+  background-image: none !important;
+}
+
+/* Kill gradients/images only while V2 is active. */
+[data-theme="colorful-v2"] *,
+[data-theme="colorful-v2"] *::before,
+[data-theme="colorful-v2"] *::after,
+[data-theme="colorful2"] *,
+[data-theme="colorful2"] *::before,
+[data-theme="colorful2"] *::after,
+[data-theme="colorful-v.2"] *,
+[data-theme="colorful-v.2"] *::before,
+[data-theme="colorful-v.2"] *::after {
+  background-image: none !important;
+}
+
+/* Main surfaces: solid colors. */
+[data-theme="colorful-v2"] body,
+[data-theme="colorful2"] body,
+[data-theme="colorful-v.2"] body {
+  background: #070b12 !important;
+}
+
+[data-theme="colorful-v2"] .card,
+[data-theme="colorful-v2"] .panel,
+[data-theme="colorful-v2"] .stat-card,
+[data-theme="colorful-v2"] .menu-card,
+[data-theme="colorful-v2"] .product-card,
+[data-theme="colorful-v2"] .table-card,
+[data-theme="colorful2"] .card,
+[data-theme="colorful2"] .panel,
+[data-theme="colorful2"] .stat-card,
+[data-theme="colorful2"] .menu-card,
+[data-theme="colorful2"] .product-card,
+[data-theme="colorful2"] .table-card,
+[data-theme="colorful-v.2"] .card,
+[data-theme="colorful-v.2"] .panel,
+[data-theme="colorful-v.2"] .stat-card,
+[data-theme="colorful-v.2"] .menu-card,
+[data-theme="colorful-v.2"] .product-card,
+[data-theme="colorful-v.2"] .table-card {
+  background: var(--admin-solid-blue) !important;
+  background-image: none !important;
+  color: #fff !important;
+}
+
+/* Solid palette by card position. */
+[data-theme="colorful-v2"] .card:nth-child(5n+1),
+[data-theme="colorful2"] .card:nth-child(5n+1),
+[data-theme="colorful-v.2"] .card:nth-child(5n+1) { background:#2563eb !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(5n+2),
+[data-theme="colorful2"] .card:nth-child(5n+2),
+[data-theme="colorful-v.2"] .card:nth-child(5n+2) { background:#f97316 !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(5n+3),
+[data-theme="colorful2"] .card:nth-child(5n+3),
+[data-theme="colorful-v.2"] .card:nth-child(5n+3) { background:#10b981 !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(5n+4),
+[data-theme="colorful2"] .card:nth-child(5n+4),
+[data-theme="colorful-v.2"] .card:nth-child(5n+4) { background:#7c3aed !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(5n+5),
+[data-theme="colorful2"] .card:nth-child(5n+5),
+[data-theme="colorful-v.2"] .card:nth-child(5n+5) { background:#ec4899 !important; }
+
+/* Buttons and navigation are solid too. */
+[data-theme="colorful-v2"] button,
+[data-theme="colorful-v2"] .btn,
+[data-theme="colorful-v2"] .button,
+[data-theme="colorful2"] button,
+[data-theme="colorful2"] .btn,
+[data-theme="colorful2"] .button,
+[data-theme="colorful-v.2"] button,
+[data-theme="colorful-v.2"] .btn,
+[data-theme="colorful-v.2"] .button {
+  background-image: none !important;
+  color: #fff !important;
+}
+
+/* Keep text readable on V2 colored surfaces. */
+[data-theme="colorful-v2"] .card *,
+[data-theme="colorful-v2"] .panel *,
+[data-theme="colorful-v2"] .stat-card *,
+[data-theme="colorful-v2"] .menu-card *,
+[data-theme="colorful2"] .card *,
+[data-theme="colorful2"] .panel *,
+[data-theme="colorful2"] .stat-card *,
+[data-theme="colorful2"] .menu-card *,
+[data-theme="colorful-v.2"] .card *,
+[data-theme="colorful-v.2"] .panel *,
+[data-theme="colorful-v.2"] .stat-card *,
+[data-theme="colorful-v.2"] .menu-card * {
+  color: #fff !important;
+}
+</style>
 </head>
 <body data-theme="light">
 
@@ -481,11 +593,12 @@
 
           <label style="font-size: 0.85rem; margin-top: 5px;" data-i18n="theme_label">Tema Tampilan:</label>
           <select id="setting-theme" onchange="gantiTema(this.value)">
-            <option value="light" data-i18n="theme_light">Terang (Light)</option>
-            <option value="dark" data-i18n="theme_dark">Gelap (Dark)</option>
-            <option value="colorful" data-i18n="theme_colorful">Colorful (Warna)</option>
-            <option value="auto" data-i18n="theme_auto">Sistem (Auto)</option>
-          </select>
+             <option value="light" data-i18n="theme_light">Light</option>
+             <option value="dark" data-i18n="theme_dark">Dark</option>
+             <option value="auto" data-i18n="theme_auto">Auto</option>
+             <option value="colorful" data-i18n="theme_colorful">Colorful v.1</option>
+             <option value="colorful-v2" data-i18n="theme_colorful_v2">Colorful v.2</option>
+           </select>
 
           <label style="font-size: 0.85rem; margin-top: 5px;" data-i18n="catalog_view_mode">Tampilan Katalog / Stok:</label>
           <select id="setting-view-mode" onchange="gantiViewModeSetting(this.value)">
