@@ -67,6 +67,52 @@
       100% { transform: scale(1); }
     }
     .cart-animating { animation: cartBounce 0.3s ease-in-out; }
+
+    /* Toast Notification (Gaya Marketplace) */
+    .toast {
+      visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+      text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed;
+      z-index: 10000; left: 50%; bottom: 85px; transform: translateX(-50%);
+      font-size: 0.85rem; font-weight: bold; box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+      opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+    }
+    .toast.show { visibility: visible; opacity: 1; bottom: 100px; }
+    .toast.success { background-color: #16a34a; }
+    .toast.error { background-color: #dc2626; }
+
+    /* Timeline Tracking Pesanan */
+    .order-timeline {
+      display: flex; justify-content: space-between; align-items: center;
+      margin: 15px 0 10px 0; position: relative;
+    }
+    .order-timeline::before {
+      content: ''; position: absolute; top: 12px; left: 10%; right: 10%;
+      height: 2px; background: var(--border-color); z-index: 1;
+    }
+    .timeline-step {
+      z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1;
+    }
+    .timeline-icon {
+      width: 24px; height: 24px; border-radius: 50%; background: var(--input-bg);
+      color: var(--text-muted); display: flex; align-items: center; justify-content: center; 
+      font-size: 0.7rem; font-weight: bold; border: 2px solid var(--border-color);
+    }
+    .timeline-step.active .timeline-icon { background: #2563eb; color: white; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37,99,235,0.2); }
+    .timeline-step.completed .timeline-icon { background: #16a34a; color: white; border-color: #16a34a; }
+    .timeline-text { font-size: 0.65rem; color: var(--text-muted); text-align: center; line-height: 1.1; }
+    .timeline-step.active .timeline-text { color: #2563eb; font-weight: bold; }
+    .timeline-step.completed .timeline-text { color: #16a34a; font-weight: bold; }
+
+    /* Modal Bottom Sheet untuk Detail Produk */
+    .bottom-sheet-content {
+      max-width: 450px; width: 100%; margin: 0 auto; background: var(--card-bg);
+      border-radius: 20px 20px 0 0; position: absolute; bottom: -100%; 
+      transition: bottom 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: flex; flex-direction: column; max-height: 85vh;
+    }
+    .modal-backdrop.show-sheet .bottom-sheet-content {
+      bottom: 0;
+    }
   </style>
 </head>
 <body data-theme="light">
@@ -269,7 +315,7 @@
 
     <!-- 3. HALAMAN LIVE CHAT (Dua Tab: Chat Rumpi & Chat Admin Toko) -->
     <div id="live-chat" class="tab-content" style="height: calc(100vh - 130px); padding: 0; display: none; flex-direction: column;">
-      <!-- Header Sub-Tabs (URUTAN DIBALIK) -->
+      <!-- Header Sub-Tabs -->
       <div style="display: flex; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
         <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
           <span>Chat Rumpi</span>
@@ -387,7 +433,7 @@
     </button>
   </div>
 
-  <!-- MODAL ASISTEN AI DENGAN FITUR SUARA (TTS & SPEECH RECOGNITION) -->
+  <!-- MODAL ASISTEN AI -->
   <div id="aiChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleAIChatModal()">
     <div class="modal-content" style="max-width: 400px; height: 70vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
       <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
@@ -414,6 +460,34 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL DETAIL PRODUK (STYLE MARKETPLACE) -->
+  <div id="productDetailModal" class="modal-backdrop" onclick="if(event.target === this) closeProductDetail()">
+    <div class="bottom-sheet-content">
+      <div style="position: relative;">
+        <img id="detail-img" src="" style="width: 100%; height: 220px; object-fit: cover; border-radius: 20px 20px 0 0;">
+        <button onclick="closeProductDetail()" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem;">✕</button>
+      </div>
+      <div style="padding: 16px; overflow-y: auto;">
+        <div id="detail-category" style="font-size: 0.75rem; color: #2563eb; font-weight: bold; margin-bottom: 4px; text-transform: uppercase;">KATEGORI</div>
+        <h2 id="detail-name" style="margin: 0 0 8px 0; font-size: 1.2rem; color: var(--text-color);">Nama Produk</h2>
+        <div id="detail-price" style="font-size: 1.4rem; font-weight: 800; color: #16a34a; margin-bottom: 16px;">Rp 0</div>
+        
+        <div style="background: var(--bg-color); padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Sisa Stok: <strong id="detail-stock" style="color: var(--text-color);">0</strong></div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">Deskripsi: <span id="detail-desc" style="color: var(--text-color);">Tidak ada deskripsi dari toko.</span></div>
+        </div>
+        
+        <button id="btn-detail-add" onclick="" style="width: 100%; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.3); display: flex; justify-content: center; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          Masukkan Keranjang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastNotification" class="toast">Notifikasi</div>
 
   <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
     <span id="bottom-bar-title" style="font-weight: bold; font-size: 1rem; color: var(--text-color);">Belanja</span>
@@ -513,7 +587,7 @@
 
     function toggleAISpeechRecognition() {
       if (!aiRecognition) {
-        alert("Maaf, browser kamu belum mendukung fitur pengenalan suara, Ka.");
+        showToast("Maaf, browser kamu belum mendukung fitur pengenalan suara, Ka.", "error");
         return;
       }
       if (isAiListening) {
@@ -575,7 +649,8 @@
     let itemsPerPagePos = 24;
     let customerChatUnsubscribe = null;
     let chatRumpiUnsubscribe = null;
-    let activeKategoriPelanggan = 'Semua'; // Variable untuk Kategori Cepat
+    let activeKategoriPelanggan = 'Semua';
+    let toastTimeout;
 
     window.onload = function() {
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
@@ -615,6 +690,18 @@
       initFirebaseListeners();
     };
 
+    // --- FUNGSI TOAST NOTIFICATION ---
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toastNotification");
+      toast.innerText = message;
+      toast.className = "toast show " + type;
+      
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.className = toast.className.replace("show", "");
+      }, 3000);
+    }
+
     let sharedAudioCtx = null;
     function getSharedAudioContext() {
       if (!sharedAudioCtx) {
@@ -653,7 +740,7 @@
       } else {
         uploadWrapper.style.display = "none";
         localStorage.setItem('cust_ringtone_v13', 'default');
-        alert("Nada dering diatur ke Default!");
+        showToast("Nada dering diatur ke Default!");
       }
     }
 
@@ -664,7 +751,7 @@
       reader.onload = function(e) {
         const base64Audio = e.target.result;
         localStorage.setItem('cust_ringtone_v13', base64Audio);
-        alert("Nada dering dari HP berhasil disimpan!");
+        showToast("Nada dering dari HP berhasil disimpan!");
         playCustomerNotificationSound();
       };
       reader.readAsDataURL(file);
@@ -744,7 +831,53 @@
       modal.classList.toggle("show");
     }
 
-    // Navigasi Sub-Tab di Halaman Live Chat
+    // Modal Detail Produk (Marketplace Style)
+    function openProductDetail(code) {
+      let p = databaseProduk[code];
+      if(!p) return;
+
+      let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
+      let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
+      let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+      let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
+      if (satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram') hargaParsed = hargaParsed * 10;
+      
+      let pKat = p.kategori ? p.kategori : "UMUM";
+
+      document.getElementById('detail-img').src = fotoSrc;
+      document.getElementById('detail-category').innerText = pKat;
+      document.getElementById('detail-name').innerText = p.nama;
+      document.getElementById('detail-price').innerText = `Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}`;
+      document.getElementById('detail-stock').innerText = `${p.stok || 0} ${satuan}`;
+      document.getElementById('detail-desc').innerText = p.deskripsi || "Barang berkualitas dari toko kami.";
+
+      let isHabis = (p.stok || 0) <= 0;
+      let btnAdd = document.getElementById('btn-detail-add');
+      
+      if(isHabis) {
+        btnAdd.style.background = "#94a3b8";
+        btnAdd.innerText = "Stok Habis";
+        btnAdd.onclick = null;
+      } else {
+        btnAdd.style.background = "#2563eb";
+        btnAdd.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Masukkan Keranjang`;
+        btnAdd.onclick = function() {
+          tambahKeKeranjangPelanggan(code);
+          closeProductDetail();
+        };
+      }
+
+      const modal = document.getElementById("productDetailModal");
+      modal.style.display = "block";
+      setTimeout(() => modal.classList.add("show-sheet"), 10);
+    }
+
+    function closeProductDetail() {
+      const modal = document.getElementById("productDetailModal");
+      modal.classList.remove("show-sheet");
+      setTimeout(() => modal.style.display = "none", 400);
+    }
+
     function switchSubTabLiveChat(sub) {
       const btnAdmin = document.getElementById('subtab-btn-admin');
       const btnRumpi = document.getElementById('subtab-btn-rumpi');
@@ -837,7 +970,7 @@
     }
 
     function kirimPesanChatRumpi() {
-      if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu untuk ikut merumpikan!");
+      if (!currentCustomerPhone) return showToast("Silakan login untuk ikut merumpikan!", "error");
       let inputEl = document.getElementById("chat-rumpi-input");
       let pesan = inputEl.value.trim();
       if (!pesan) return;
@@ -853,7 +986,7 @@
       }).then(() => {
         inputEl.value = "";
       }).catch(err => {
-        alert("Gagal mengirim pesan: " + err.message);
+        showToast("Gagal mengirim pesan: " + err.message, "error");
       });
     }
 
@@ -915,7 +1048,7 @@
     }
 
     function kirimPesanPelanggan() {
-      if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu!");
+      if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu!", "error");
       let inputEl = document.getElementById("customer-chat-input");
       let pesan = inputEl.value.trim();
       if (!pesan) return;
@@ -936,7 +1069,7 @@
         }, { merge: true });
         inputEl.value = "";
       }).catch(err => {
-        alert("Gagal mengirim pesan: " + err.message);
+        showToast("Gagal mengirim pesan: " + err.message, "error");
       });
     }
 
@@ -944,16 +1077,16 @@
       e.preventDefault();
       const phone = document.getElementById('cust-login-phone').value.trim();
       const pass = document.getElementById('cust-login-pass').value.trim();
-      if (!phone || !pass) return alert("Nomor WhatsApp dan Sandi wajib diisi!");
+      if (!phone || !pass) return showToast("Nomor WhatsApp dan Sandi wajib diisi!", "error");
 
       db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
         if (snapshot.empty) {
-          alert("Nomor WhatsApp belum terdaftar. Silakan daftar terlebih dahulu.");
+          showToast("Nomor belum terdaftar. Silakan daftar dulu.", "error");
         } else {
           let docData = snapshot.docs[0].data();
           
           if (docData.status === "pending" || docData.disetujui === false) {
-            return alert("Akun Anda sedang menunggu persetujuan dari Admin toko. Silakan hubungi admin.");
+            return showToast("Akun sedang menunggu persetujuan Admin.", "error");
           }
 
           if (pass === (docData.password || "user")) {
@@ -965,12 +1098,13 @@
             muatRiwayatPesananOnlinePelanggan();
             initCustomerChatListener();
             refreshKatalogPelanggan();
+            showToast("Berhasil Masuk! Selamat Berbelanja 🛒");
           } else {
-            alert("Sandi salah!");
+            showToast("Sandi salah!", "error");
           }
         }
       }).catch(err => {
-        alert("Terjadi kesalahan saat masuk: " + err.message);
+        showToast("Terjadi kesalahan: " + err.message, "error");
       });
     }
 
@@ -981,11 +1115,11 @@
       const address = document.getElementById('cust-reg-address').value.trim();
       const pass = document.getElementById('cust-reg-pass').value.trim();
 
-      if (!name || !phone || !address || !pass) return alert("Semua kolom wajib diisi!");
+      if (!name || !phone || !address || !pass) return showToast("Semua kolom wajib diisi!", "error");
 
       db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
         if (!snapshot.empty) {
-          alert("Nomor WhatsApp sudah terdaftar! Silakan langsung masuk.");
+          showToast("Nomor sudah terdaftar! Silakan langsung masuk.", "error");
           gantiFormAuth('login');
         } else {
           db.collection("pelanggan").add({
@@ -997,18 +1131,18 @@
             catatan: [],
             waktuDaftar: new Date().toLocaleString('id-ID')
           }).then(() => {
-            alert("Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan Admin toko sebelum dapat digunakan untuk masuk.");
+            showToast("Pendaftaran berhasil! Menunggu ACC Admin.");
             document.getElementById('cust-reg-name').value = '';
             document.getElementById('cust-reg-phone').value = '';
             document.getElementById('cust-reg-address').value = '';
             document.getElementById('cust-reg-pass').value = '';
             gantiFormAuth('login');
           }).catch((err) => {
-            alert("Gagal mendaftar: " + err.message);
+            showToast("Gagal mendaftar: " + err.message, "error");
           });
         }
       }).catch(err => {
-        alert("Terjadi kesalahan: " + err.message);
+        showToast("Terjadi kesalahan: " + err.message, "error");
       });
     }
 
@@ -1092,7 +1226,6 @@
       const cartFab = document.getElementById('fab-cart-btn');
       const aiFab = document.getElementById('fab-ai-btn');
 
-      // Tampilkan Promo Banner dan Kategori hanya di Halaman Belanja
       const promoBanner = document.querySelector('.promo-banner');
       const categoryContainer = document.getElementById('category-container');
 
@@ -1214,7 +1347,7 @@
         // Label FOMO (Sisa Stok)
         let sisaStokBadge = "";
         if (!isHabis && p.stok <= 5) {
-          sisaStokBadge = `<div style="position:absolute; top:8px; left:8px; background:#ef4444; color:white; font-size:0.65rem; padding:3px 6px; border-radius:6px; font-weight:bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">🔥 Sisa ${p.stok}</div>`;
+          sisaStokBadge = `<div style="position:absolute; top:8px; left:8px; background:#ef4444; color:white; font-size:0.65rem; padding:3px 6px; border-radius:6px; font-weight:bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none;">🔥 Sisa ${p.stok}</div>`;
         }
 
         if (catalogViewMode === 'grid') {
@@ -1225,12 +1358,15 @@
                   <button style="flex: 1; height: 38px; background: #16a34a; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
                   <button style="flex: 1; height: 38px; background: #dc2626; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${code}')">-</button>
                 </div>
-                <div style="text-align: center; margin-bottom: 8px; position: relative;">
-                  ${sisaStokBadge}
-                  <img src="${fotoSrc}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px;">
+                <!-- BAGIAN BISA DIKLIK UNTUK DETAIL -->
+                <div onclick="openProductDetail('${code}')" style="cursor: pointer;">
+                  <div style="text-align: center; margin-bottom: 8px; position: relative;">
+                    ${sisaStokBadge}
+                    <img src="${fotoSrc}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px;">
+                  </div>
+                  <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
+                  <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Stok: ${p.stok || 0} ${satuan}</div>
                 </div>
-                <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Stok: ${p.stok || 0} ${satuan}</div>
               </div>
               <div style="font-size: 0.95rem; font-weight: bold; color: #2563eb; margin-top: 4px;">Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}</div>
             </div>
@@ -1242,14 +1378,17 @@
                 <button style="width: 32px; height: 32px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer; font-weight: bold;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
                 <button style="width: 32px; height: 32px; border-radius: 6px; background: #dc2626; color: white; border: none; cursor: pointer; font-weight: bold;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${code}')">-</button>
               </div>
-              <div style="position: relative; flex-shrink: 0;">
-                ${sisaStokBadge}
-                <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px;">
-              </div>
-              <div style="min-width: 0; flex: 1;">
-                <div style="font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-color);">${p.nama}</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: ${p.stok || 0} ${satuan}</div>
-                <div style="font-size: 0.85rem; font-weight: bold; color: #2563eb;">Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}</div>
+              <!-- BAGIAN BISA DIKLIK UNTUK DETAIL -->
+              <div onclick="openProductDetail('${code}')" style="display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0;">
+                <div style="position: relative; flex-shrink: 0;">
+                  ${sisaStokBadge}
+                  <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px;">
+                </div>
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-color);">${p.nama}</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: ${p.stok || 0} ${satuan}</div>
+                  <div style="font-size: 0.85rem; font-weight: bold; color: #2563eb;">Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}</div>
+                </div>
               </div>
             </div>
           `;
@@ -1270,7 +1409,7 @@
 
     function tambahKeKeranjangPelanggan(code) {
       let p = databaseProduk[code];
-      if (!p || (p.stok || 0) <= 0) return alert("Stok habis!");
+      if (!p || (p.stok || 0) <= 0) return showToast("Yah, stok " + p.nama + " lagi habis!", "error");
       
       let satuan = (p.satuan || "").toLowerCase().trim();
       let qtyToAdd = 1;
@@ -1280,7 +1419,7 @@
         if (inputQty === null || inputQty.trim() === "") return;
         qtyToAdd = parseFloat(inputQty.replace(',', '.'));
         if (isNaN(qtyToAdd) || qtyToAdd <= 0) {
-          return alert("Jumlah tidak valid!");
+          return showToast("Jumlah tidak valid!", "error");
         }
       }
 
@@ -1298,21 +1437,22 @@
 
       let item = cart.find(i => i.code === code);
       if (item) {
-        if (item.qty + qtyToAdd > p.stok) return alert("Stok tidak mencukupi!");
+        if (item.qty + qtyToAdd > p.stok) return showToast("Stok tidak mencukupi!", "error");
         item.qty += qtyToAdd;
         item.qty = parseFloat(item.qty.toFixed(3));
         item.subtotal = Math.round(item.qty * hargaParsed);
       } else {
-        if (qtyToAdd > p.stok) return alert("Stok tidak mencukupi!");
+        if (qtyToAdd > p.stok) return showToast("Stok tidak mencukupi!", "error");
         cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto });
       }
       playBeep();
+      showToast("🛒 " + p.nama + " ditambahkan ke keranjang.");
       
       // Animasi tombol keranjang
       const cartFab = document.getElementById("fab-cart-btn");
       if (cartFab) {
         cartFab.classList.remove("cart-animating");
-        void cartFab.offsetWidth; // Trigger reflow agar animasi terestart
+        void cartFab.offsetWidth; 
         cartFab.classList.add("cart-animating");
       }
 
@@ -1331,7 +1471,7 @@
             let inputQty = prompt(`Kurangi jumlah untuk ${item.nama} (Saat ini: ${item.qty} Kg)\nMasukkan jumlah yang ingin dikurangi:`, item.qty);
             if (inputQty === null || inputQty.trim() === "") return;
             let val = parseFloat(inputQty.replace(',', '.'));
-            if (isNaN(val) || val <= 0) return alert("Jumlah tidak valid!");
+            if (isNaN(val) || val <= 0) return showToast("Jumlah tidak valid!", "error");
 
             if (val >= item.qty) {
                 cart.splice(idx, 1);
@@ -1349,6 +1489,7 @@
             }
         }
         playBeepDown();
+        showToast("➖ " + item.nama + " dikurangi.");
         renderCartPelanggan();
         refreshKatalogPelanggan();
       }
@@ -1360,7 +1501,7 @@
       let total = 0, totalQty = 0;
       cart.forEach((item, idx) => {
         total += item.subtotal; totalQty += item.qty;
-        tbody.innerHTML += `<tr><td>${item.nama}</td><td style="text-align: center;">${item.qty}</td><td style="text-align: right;">${item.subtotal.toLocaleString('id-ID')}</td><td class="no-print" style="text-align: center;"><button class="btn-danger" onclick="cart.splice(${idx},1);renderCartPelanggan();refreshKatalogPelanggan();" style="padding: 2px 6px;">✕</button></td></tr>`;
+        tbody.innerHTML += `<tr><td>${item.nama}</td><td style="text-align: center;">${item.qty}</td><td style="text-align: right;">${item.subtotal.toLocaleString('id-ID')}</td><td class="no-print" style="text-align: center;"><button class="btn-danger" onclick="cart.splice(${idx},1);showToast('Dihapus dari keranjang','error');renderCartPelanggan();refreshKatalogPelanggan();" style="padding: 2px 6px;">✕</button></td></tr>`;
       });
       if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px;">Keranjang kosong</td></tr>`;
       document.getElementById("cart-count").innerText = totalQty;
@@ -1368,12 +1509,13 @@
     }
 
     function kosongkanKeranjang() {
-      if (cart.length === 0) return alert("Keranjang sudah kosong!");
+      if (cart.length === 0) return showToast("Keranjang sudah kosong!", "error");
       if (confirm("Kosongkan seluruh isi keranjang?")) {
         cart = [];
         renderCartPelanggan();
         refreshKatalogPelanggan();
         closeCartModal();
+        showToast("Keranjang berhasil dikosongkan.");
       }
     }
 
@@ -1404,11 +1546,11 @@
     }
 
     async function prosesCheckoutPelanggan() {
-      if (cart.length === 0) return alert("Keranjang kosong!");
+      if (cart.length === 0) return showToast("Keranjang kosong!", "error");
       const payMethod = document.getElementById("pay-method-cust").value;
       const proofBase64 = document.getElementById("cust-proof-base64").value;
       const catatanPelanggan = document.getElementById("cust-order-note").value.trim();
-      if (payMethod === "TF" && !proofBase64) return alert("Harap unggah bukti transfer!");
+      if (payMethod === "TF" && !proofBase64) return showToast("Harap unggah bukti transfer!", "error");
 
       let phoneToko = pengaturanToko.phone.replace(/[^0-9]/g, '');
       if (phoneToko.startsWith('0')) phoneToko = '62' + phoneToko.slice(1);
@@ -1461,14 +1603,14 @@
           
           window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
 
-          alert("Pesanan berhasil dikirim ke sistem dan diteruskan ke WhatsApp Admin!");
+          showToast("🎉 Pesanan berhasil dibuat!");
           cart = []; 
           document.getElementById("cust-order-note").value = "";
           renderCartPelanggan(); 
           refreshKatalogPelanggan(); 
           closeCartModal();
         } catch (err) {
-          alert("Gagal memproses pesanan: " + err.message);
+          showToast("Gagal memproses pesanan: " + err.message, "error");
         }
       });
     }
@@ -1515,25 +1657,55 @@
         });
 
         orders.forEach(trx => {
-          let statusBadge = trx.statusPesanan || "Menunggu Diproses";
-          let badgeColor = statusBadge === "Selesai" ? "#16a34a" : "#d97706";
+          let statusLabel = trx.statusPesanan || "Menunggu Diproses";
+          let s_lower = statusLabel.toLowerCase();
+          
+          // Logika Timeline Tracking
+          let step = 1;
+          if(s_lower.includes("siap") || s_lower.includes("proses")) step = 2;
+          else if(s_lower.includes("kirim") || s_lower.includes("jalan")) step = 3;
+          else if(s_lower.includes("selesai")) step = 4;
+
+          let timelineHtml = `
+            <div class="order-timeline">
+              <div class="timeline-step ${step >= 1 ? (step > 1 ? 'completed' : 'active') : ''}">
+                <div class="timeline-icon">${step > 1 ? '✓' : '1'}</div>
+                <div class="timeline-text">Menunggu</div>
+              </div>
+              <div class="timeline-step ${step >= 2 ? (step > 2 ? 'completed' : 'active') : ''}">
+                <div class="timeline-icon">${step > 2 ? '✓' : '2'}</div>
+                <div class="timeline-text">Dikemas</div>
+              </div>
+              <div class="timeline-step ${step >= 3 ? (step > 3 ? 'completed' : 'active') : ''}">
+                <div class="timeline-icon">${step > 3 ? '✓' : '3'}</div>
+                <div class="timeline-text">Dikirim</div>
+              </div>
+              <div class="timeline-step ${step >= 4 ? 'completed' : ''}">
+                <div class="timeline-icon">${step >= 4 ? '✓' : '4'}</div>
+                <div class="timeline-text">Selesai</div>
+              </div>
+            </div>
+          `;
 
           let itemsHtml = "";
           if (trx.items && trx.items.length > 0) {
-            itemsHtml = `<div style="margin: 6px 0; font-size: 0.8rem; background: var(--input-bg); padding: 6px; border-radius: 6px;"><strong>Barang:</strong><ul style="margin: 2px 0 0 14px; padding: 0;">`;
-            trx.items.forEach(it => { itemsHtml += `<li>${it.nama} (${it.qty}x) = Rp ${(it.subtotal || 0).toLocaleString('id-ID')}</li>`; });
+            itemsHtml = `<div style="margin: 6px 0; font-size: 0.8rem; background: var(--input-bg); padding: 8px; border-radius: 8px;"><strong>Rincian Barang:</strong><ul style="margin: 4px 0 0 14px; padding: 0;">`;
+            trx.items.forEach(it => { itemsHtml += `<li>${it.nama} (${it.qty}x)</li>`; });
             itemsHtml += `</ul></div>`;
           }
 
           container.innerHTML += `
-            <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 6px; background: var(--card-bg);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <span style="font-size: 0.75rem; color: var(--text-muted);">${trx.waktu || '-'}</span>
-                <span style="background: ${badgeColor}; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: bold;">${statusBadge}</span>
+            <div style="border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 10px; background: var(--card-bg); box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">🗓️ ${trx.waktu || '-'}</span>
+                <span style="background: ${step===4 ? '#16a34a' : (step===1 ? '#ef4444' : '#d97706')}; color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">${statusLabel}</span>
               </div>
-              <div style="font-size: 0.85rem; font-weight: 600; color: #2563eb;">${trx.metode || '-'}</div>
+              
+              ${timelineHtml}
+
+              <div style="font-size: 0.85rem; font-weight: 600; color: #2563eb;">Metode: ${trx.metode || '-'}</div>
               ${itemsHtml}
-              <div style="font-size: 0.9rem; font-weight: bold; color: #16a34a;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div>
+              <div style="font-size: 0.95rem; font-weight: 800; color: #16a34a; text-align: right;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div>
             </div>
           `;
         });
@@ -1543,12 +1715,12 @@
     function simpanProfilPelanggan() {
       const nama = document.getElementById("setting-cust-name").value.trim();
       const alamat = document.getElementById("setting-cust-address").value.trim();
-      if (!nama) return alert("Nama wajib diisi!");
+      if (!nama) return showToast("Nama wajib diisi!", "error");
       db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => {
         if (!snap.empty) {
-          db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!")).catch(err => alert("Gagal memperbarui profil: " + err.message));
+          db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => showToast("Profil diperbarui!")).catch(err => showToast("Gagal memperbarui: " + err.message, "error"));
         }
-      }).catch(err => alert("Terjadi kesalahan: " + err.message));
+      }).catch(err => showToast("Terjadi kesalahan: " + err.message, "error"));
     }
 
     async function kirimPesanKeAI() {
