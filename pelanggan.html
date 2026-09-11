@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.9">
+  <link rel="stylesheet" href="style.css?v=1.0.8">
 
   <style>
     .popup-menu-btn {
@@ -184,306 +184,6 @@
     @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
   </style>
-  <style>
-
-    /* ============================================================
-       KASIRQUH PELANGGAN — TEMA LIGHT / DARK / COLORFUL
-       Colorful = solid bright cards, dark background, minimal gradients.
-       ============================================================ */
-    [data-theme="light"] .recipe-card,
-    [data-theme="light"] .reorder-card,
-    [data-theme="light"] .trending-card,
-    [data-theme="light"] .inv-card,
-    [data-theme="light"] .catalog-list-item,
-    [data-theme="light"] .card,
-    [data-theme="light"] .cust-list-item,
-    [data-theme="light"] .empty-state {
-      background: var(--card-bg) !important;
-      color: var(--text-color) !important;
-    }
-    [data-theme="dark"] .recipe-card,
-    [data-theme="dark"] .reorder-card,
-    [data-theme="dark"] .trending-card,
-    [data-theme="dark"] .inv-card,
-    [data-theme="dark"] .catalog-list-item,
-    [data-theme="dark"] .card,
-    [data-theme="dark"] .cust-list-item,
-    [data-theme="dark"] .empty-state {
-      background: var(--card-bg) !important;
-      color: var(--text-color) !important;
-    }
-
-    [data-theme="colorful"] {
-      --bg-color: #070b14;
-      --card-bg: #111827;
-      --text-color: #f8fafc;
-      --text-muted: #cbd5e1;
-      --border-color: #334155;
-      --card-border-green: #22c55e;
-      --input-bg: #0f172a;
-      --input-border: #64748b;
-      --table-header: #172033;
-    }
-    [data-theme="colorful"] body { background: #070b14 !important; color: #f8fafc !important; }
-    [data-theme="colorful"] .main-content { background: #070b14; }
-    [data-theme="colorful"] .card,
-    [data-theme="colorful"] .recipe-card,
-    [data-theme="colorful"] .reorder-card,
-    [data-theme="colorful"] .trending-card,
-    [data-theme="colorful"] .inv-card,
-    [data-theme="colorful"] .catalog-list-item,
-    [data-theme="colorful"] .cust-list-item {
-      color: #fff !important;
-      border-color: rgba(255,255,255,0.22) !important;
-      box-shadow: 0 5px 14px rgba(0,0,0,0.22) !important;
-    }
-    /* Solid palette — no heavy gradients in customer Colorful mode. */
-    [data-theme="colorful"] .recipe-card:nth-child(5n+1),
-    [data-theme="colorful"] .reorder-card:nth-child(5n+1),
-    [data-theme="colorful"] .trending-card:nth-child(5n+1),
-    [data-theme="colorful"] .inv-card:nth-child(5n+1),
-    [data-theme="colorful"] .catalog-list-item:nth-child(5n+1) { background: #2563eb !important; }
-    [data-theme="colorful"] .recipe-card:nth-child(5n+2),
-    [data-theme="colorful"] .reorder-card:nth-child(5n+2),
-    [data-theme="colorful"] .trending-card:nth-child(5n+2),
-    [data-theme="colorful"] .inv-card:nth-child(5n+2),
-    [data-theme="colorful"] .catalog-list-item:nth-child(5n+2) { background: #f59e0b !important; }
-    [data-theme="colorful"] .recipe-card:nth-child(5n+3),
-    [data-theme="colorful"] .reorder-card:nth-child(5n+3),
-    [data-theme="colorful"] .trending-card:nth-child(5n+3),
-    [data-theme="colorful"] .inv-card:nth-child(5n+3),
-    [data-theme="colorful"] .catalog-list-item:nth-child(5n+3) { background: #10b981 !important; }
-    [data-theme="colorful"] .recipe-card:nth-child(5n+4),
-    [data-theme="colorful"] .reorder-card:nth-child(5n+4),
-    [data-theme="colorful"] .trending-card:nth-child(5n+4),
-    [data-theme="colorful"] .inv-card:nth-child(5n+4),
-    [data-theme="colorful"] .catalog-list-item:nth-child(5n+4) { background: #8b5cf6 !important; }
-    [data-theme="colorful"] .recipe-card:nth-child(5n+5),
-    [data-theme="colorful"] .reorder-card:nth-child(5n+5),
-    [data-theme="colorful"] .trending-card:nth-child(5n+5),
-    [data-theme="colorful"] .inv-card:nth-child(5n+5),
-    [data-theme="colorful"] .catalog-list-item:nth-child(5n+5) { background: #ec4899 !important; }
-
-    [data-theme="colorful"] .promo-banner { background: #2563eb !important; box-shadow: 0 4px 12px rgba(37,99,235,.25) !important; }
-    [data-theme="colorful"] .permanent-bottom-bar { background: #111827 !important; border-top-color: #334155 !important; color: #fff !important; }
-    [data-theme="colorful"] .sub-tab-btn.active,
-    [data-theme="colorful"] .chip-btn.active,
-    [data-theme="colorful"] .btn-scan-toggle { background: #2563eb !important; border-color: #2563eb !important; }
-    [data-theme="colorful"] .popup-menu-btn.active-menu { color: #fff !important; background: #7c3aed !important; }
-    [data-theme="colorful"] .popup-menu-btn svg { fill: #60a5fa !important; }
-    [data-theme="colorful"] .floating-menu-popup { background: #111827 !important; border-color: #475569 !important; }
-    [data-theme="colorful"] .modal-content,
-    [data-theme="colorful"] .product-detail-box { background: #111827 !important; color: #fff !important; border-color: #475569 !important; }
-    [data-theme="colorful"] input,
-    [data-theme="colorful"] textarea,
-    [data-theme="colorful"] select { background: #0f172a !important; color: #fff !important; border-color: #64748b !important; }
-    [data-theme="colorful"] .empty-state { background: #111827 !important; color: #e2e8f0 !important; }
-    [data-theme="colorful"] .cart-table { background: #111827 !important; color: #fff !important; }
-    [data-theme="colorful"] .cart-table th { background: #172033 !important; color: #cbd5e1 !important; }
-    [data-theme="colorful"] .welcome-screen { background: #070b14 !important; }
-    [data-theme="colorful"] #welcomeScreen { background: #2563eb !important; }
-  </style>
-<style>
-
-/* ============================================================
-   PELANGGAN COLORFUL V2
-   Theme contrast + SOLID colorful cards (no gradients)
-   ============================================================ */
-
-/* ---- LIGHT: dark text everywhere unless an element explicitly
-   uses a white-on-dark surface. ---- */
-[data-theme="light"],
-[data-theme="terang"] {
-  --cust-text-strong: #111827;
-  --cust-text: #1f2937;
-  --cust-text-muted: #4b5563;
-}
-
-[data-theme="light"] body,
-[data-theme="terang"] body {
-  color: var(--cust-text) !important;
-}
-
-[data-theme="light"] .card,
-[data-theme="light"] .modal,
-[data-theme="light"] .section,
-[data-theme="light"] .product-card,
-[data-theme="light"] .menu-card,
-[data-theme="terang"] .card,
-[data-theme="terang"] .modal,
-[data-theme="terang"] .section,
-[data-theme="terang"] .product-card,
-[data-theme="terang"] .menu-card {
-  color: var(--cust-text) !important;
-}
-
-[data-theme="light"] h1,
-[data-theme="light"] h2,
-[data-theme="light"] h3,
-[data-theme="light"] h4,
-[data-theme="light"] h5,
-[data-theme="light"] h6,
-[data-theme="light"] p,
-[data-theme="light"] span,
-[data-theme="light"] label,
-[data-theme="light"] small,
-[data-theme="light"] .title,
-[data-theme="light"] .name,
-[data-theme="light"] .price,
-[data-theme="terang"] h1,
-[data-theme="terang"] h2,
-[data-theme="terang"] h3,
-[data-theme="terang"] h4,
-[data-theme="terang"] h5,
-[data-theme="terang"] h6,
-[data-theme="terang"] p,
-[data-theme="terang"] span,
-[data-theme="terang"] label,
-[data-theme="terang"] small,
-[data-theme="terang"] .title,
-[data-theme="terang"] .name,
-[data-theme="terang"] .price {
-  color: var(--cust-text) !important;
-}
-
-/* ---- DARK: white text. ---- */
-[data-theme="dark"],
-[data-theme="gelap"] {
-  --cust-text-strong: #ffffff;
-  --cust-text: #f8fafc;
-  --cust-text-muted: #cbd5e1;
-}
-
-[data-theme="dark"] body,
-[data-theme="gelap"] body {
-  color: var(--cust-text) !important;
-}
-
-[data-theme="dark"] h1,
-[data-theme="dark"] h2,
-[data-theme="dark"] h3,
-[data-theme="dark"] h4,
-[data-theme="dark"] h5,
-[data-theme="dark"] h6,
-[data-theme="dark"] p,
-[data-theme="dark"] span,
-[data-theme="dark"] label,
-[data-theme="dark"] small,
-[data-theme="dark"] .title,
-[data-theme="dark"] .name,
-[data-theme="dark"] .price,
-[data-theme="gelap"] h1,
-[data-theme="gelap"] h2,
-[data-theme="gelap"] h3,
-[data-theme="gelap"] h4,
-[data-theme="gelap"] h5,
-[data-theme="gelap"] h6,
-[data-theme="gelap"] p,
-[data-theme="gelap"] span,
-[data-theme="gelap"] label,
-[data-theme="gelap"] small,
-[data-theme="gelap"] .title,
-[data-theme="gelap"] .name,
-[data-theme="gelap"] .price {
-  color: var(--cust-text) !important;
-}
-
-/* ---- COLORFUL: black/dark canvas, SOLID card colors only. ---- */
-[data-theme="colorful"] body,
-[data-theme="colorful"] .main-content,
-[data-theme="colorful"] .page,
-[data-theme="colorful"] .content,
-[data-theme="colorful"] .tab-content {
-  background: #070b12 !important;
-  color: #ffffff !important;
-}
-
-[data-theme="colorful"] .card,
-[data-theme="colorful"] .product-card,
-[data-theme="colorful"] .menu-card,
-[data-theme="colorful"] .section-card,
-[data-theme="colorful"] .category-card,
-[data-theme="colorful"] .summary-card,
-[data-theme="colorful"] .order-card,
-[data-theme="colorful"] .cart-card,
-[data-theme="colorful"] .profile-card {
-  color: #ffffff !important;
-  background: #2563eb !important;
-  background-image: none !important;
-  border-color: rgba(255,255,255,.22) !important;
-  box-shadow: 0 8px 22px rgba(0,0,0,.28) !important;
-}
-
-/* Solid palette by card position. */
-[data-theme="colorful"] .card:nth-child(5n+1),
-[data-theme="colorful"] .product-card:nth-child(5n+1),
-[data-theme="colorful"] .menu-card:nth-child(5n+1) {
-  background: #2563eb !important;
-}
-[data-theme="colorful"] .card:nth-child(5n+2),
-[data-theme="colorful"] .product-card:nth-child(5n+2),
-[data-theme="colorful"] .menu-card:nth-child(5n+2) {
-  background: #f97316 !important;
-}
-[data-theme="colorful"] .card:nth-child(5n+3),
-[data-theme="colorful"] .product-card:nth-child(5n+3),
-[data-theme="colorful"] .menu-card:nth-child(5n+3) {
-  background: #10b981 !important;
-}
-[data-theme="colorful"] .card:nth-child(5n+4),
-[data-theme="colorful"] .product-card:nth-child(5n+4),
-[data-theme="colorful"] .menu-card:nth-child(5n+4) {
-  background: #8b5cf6 !important;
-}
-[data-theme="colorful"] .card:nth-child(5n+5),
-[data-theme="colorful"] .product-card:nth-child(5n+5),
-[data-theme="colorful"] .menu-card:nth-child(5n+5) {
-  background: #ec4899 !important;
-}
-
-[data-theme="colorful"] .card *,
-[data-theme="colorful"] .product-card *,
-[data-theme="colorful"] .menu-card *,
-[data-theme="colorful"] .section-card * {
-  color: #ffffff !important;
-}
-
-/* Prevent inherited white text from becoming invisible on light controls. */
-[data-theme="light"] input,
-[data-theme="light"] select,
-[data-theme="light"] textarea,
-[data-theme="terang"] input,
-[data-theme="terang"] select,
-[data-theme="terang"] textarea {
-  color: #111827 !important;
-  background: #ffffff !important;
-}
-
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea,
-[data-theme="gelap"] input,
-[data-theme="gelap"] select,
-[data-theme="gelap"] textarea,
-[data-theme="colorful"] input,
-[data-theme="colorful"] select,
-[data-theme="colorful"] textarea {
-  color: #ffffff !important;
-}
-
-/* Colorful inputs remain solid, not gradient. */
-[data-theme="colorful"] input,
-[data-theme="colorful"] select,
-[data-theme="colorful"] textarea {
-  background: #111827 !important;
-  border-color: rgba(255,255,255,.28) !important;
-}
-
-/* Colorful theme label: text only. */
-[data-theme="colorful"] .theme-colorful-icon {
-  display: none !important;
-}
-</style>
 </head>
 <body data-theme="light" style="font-size: 0.85rem;">
 
@@ -719,7 +419,7 @@
       <div class="card" style="padding: 12px; margin-bottom: 8px;">
         <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Tampilan & Tema</h3>
         <div class="form-vertical" style="display: flex; flex-direction: column; gap: 6px;">
-          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="colorful">Colorful</option></select>
+          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="auto">Auto (Sistem)</option></select>
           <label style="font-size: 0.75rem; margin-top: 4px;">Tampilan:</label><select id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="grid">Kotak</option><option value="list">Daftar</option></select>
         </div>
       </div>
@@ -1068,7 +768,7 @@
     ];
 
     window.onload = function() {
-      applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'light');
+      applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'auto');
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; }
       initChatRumpiListener();
       renderRecipeCards();
@@ -1331,8 +1031,8 @@
     function playBeep() { playTone(1000, "sine"); } function playBeepDown() { playTone(600, "triangle"); }
     function playCustomerNotificationSound() { playTone(800, "sine"); setTimeout(() => playTone(1000, "sine"), 150); }
 
-    function applyThemePelanggan(theme) { const safeTheme = ['light','dark','colorful'].includes(theme) ? theme : 'light'; document.body.setAttribute('data-theme', safeTheme); const sel = document.getElementById('setting-cust-theme'); if (sel) sel.value = safeTheme; }
-    function gantiTemaPelanggan(theme) { const safeTheme = ['light','dark','colorful'].includes(theme) ? theme : 'light'; localStorage.setItem('cust_theme_v13', safeTheme); applyThemePelanggan(safeTheme); }
+    function applyThemePelanggan(theme) { document.body.setAttribute('data-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme); }
+    function gantiTemaPelanggan(theme) { localStorage.setItem('cust_theme_v13', theme); applyThemePelanggan(theme); }
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
     function toggleMenuModal() { document.getElementById("menuToggleModal").classList.toggle("show"); }
     function bukaKolomPencarian() { const searchContainer = document.getElementById("sticky-search-container"); if (searchContainer) { searchContainer.style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => document.getElementById("inventory-search-input")?.focus(), 200); } }
@@ -1587,7 +1287,7 @@
         let reorderWrapper = document.getElementById('reorder-section-wrapper'); if (reorderWrapper) reorderWrapper.style.display = 'none';
       }
 
-      if (tabId === 'pengaturan') { document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'light'; document.getElementById('setting-cust-view').value = catalogViewMode; if (currentCustomerPhone) { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => { if (!snap.empty) { let data = snap.docs[0].data(); document.getElementById('setting-cust-name').value = data.nama || ""; document.getElementById('setting-cust-phone').value = data.phone || ""; document.getElementById('setting-cust-address').value = data.alamat || ""; } }); } }
+      if (tabId === 'pengaturan') { document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto'; document.getElementById('setting-cust-view').value = catalogViewMode; if (currentCustomerPhone) { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => { if (!snap.empty) { let data = snap.docs[0].data(); document.getElementById('setting-cust-name').value = data.nama || ""; document.getElementById('setting-cust-phone').value = data.phone || ""; document.getElementById('setting-cust-address').value = data.alamat || ""; } }); } }
     }
 
     function muatBarangLarisHariIni() {
@@ -2007,184 +1707,5 @@
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
   </script>
-<style>
-
-/* ============================================================
-   PELANGGAN COLORFUL V3 — CONTRAST FIX
-   No gradient in Colorful + readable Light/Dark text
-   ============================================================ */
-
-/* ---------- LIGHT: fix white/yellow text on white cards ---------- */
-[data-theme="light"] .card,
-[data-theme="light"] .product-card,
-[data-theme="light"] .menu-card,
-[data-theme="light"] .section-card,
-[data-theme="light"] .category-card,
-[data-theme="light"] .summary-card,
-[data-theme="light"] .order-card,
-[data-theme="light"] .cart-card,
-[data-theme="light"] .profile-card,
-[data-theme="terang"] .card,
-[data-theme="terang"] .product-card,
-[data-theme="terang"] .menu-card,
-[data-theme="terang"] .section-card,
-[data-theme="terang"] .category-card,
-[data-theme="terang"] .summary-card,
-[data-theme="terang"] .order-card,
-[data-theme="terang"] .cart-card,
-[data-theme="terang"] .profile-card {
-  color: #111827 !important;
-}
-
-/* Inline white text must become dark on Light cards. */
-[data-theme="light"] .card [style*="#fff"],
-[data-theme="light"] .card [style*="#ffffff"],
-[data-theme="light"] .card [style*="white"],
-[data-theme="light"] .product-card [style*="#fff"],
-[data-theme="light"] .product-card [style*="#ffffff"],
-[data-theme="light"] .product-card [style*="white"],
-[data-theme="terang"] .card [style*="#fff"],
-[data-theme="terang"] .card [style*="#ffffff"],
-[data-theme="terang"] .card [style*="white"],
-[data-theme="terang"] .product-card [style*="#fff"],
-[data-theme="terang"] .product-card [style*="#ffffff"],
-[data-theme="terang"] .product-card [style*="white"] {
-  color: #111827 !important;
-}
-
-/* Prices on light product cards: readable dark text. */
-[data-theme="light"] .product-card .price,
-[data-theme="light"] .product-card [class*="price"],
-[data-theme="light"] .card .price,
-[data-theme="light"] .card [class*="price"],
-[data-theme="terang"] .product-card .price,
-[data-theme="terang"] .product-card [class*="price"],
-[data-theme="terang"] .card .price,
-[data-theme="terang"] .card [class*="price"] {
-  color: #111827 !important;
-}
-
-/* ---------- DARK: white text ---------- */
-[data-theme="dark"] .card,
-[data-theme="dark"] .product-card,
-[data-theme="dark"] .menu-card,
-[data-theme="dark"] .section-card,
-[data-theme="dark"] .category-card,
-[data-theme="dark"] .summary-card,
-[data-theme="dark"] .order-card,
-[data-theme="dark"] .cart-card,
-[data-theme="dark"] .profile-card,
-[data-theme="gelap"] .card,
-[data-theme="gelap"] .product-card,
-[data-theme="gelap"] .menu-card,
-[data-theme="gelap"] .section-card,
-[data-theme="gelap"] .category-card,
-[data-theme="gelap"] .summary-card,
-[data-theme="gelap"] .order-card,
-[data-theme="gelap"] .cart-card,
-[data-theme="gelap"] .profile-card {
-  color: #ffffff !important;
-}
-
-[data-theme="dark"] .card *,
-[data-theme="dark"] .product-card *,
-[data-theme="dark"] .menu-card *,
-[data-theme="gelap"] .card *,
-[data-theme="gelap"] .product-card *,
-[data-theme="gelap"] .menu-card * {
-  color: #ffffff !important;
-}
-
-/* ---------- COLORFUL: absolutely no gradient ---------- */
-[data-theme="colorful"] *,
-[data-theme="colorful"] *::before,
-[data-theme="colorful"] *::after {
-  background-image: none !important;
-}
-
-/* Base colorful surfaces are solid. */
-[data-theme="colorful"] .card,
-[data-theme="colorful"] .product-card,
-[data-theme="colorful"] .menu-card,
-[data-theme="colorful"] .section-card,
-[data-theme="colorful"] .category-card,
-[data-theme="colorful"] .summary-card,
-[data-theme="colorful"] .order-card,
-[data-theme="colorful"] .cart-card,
-[data-theme="colorful"] .profile-card,
-[data-theme="colorful"] .modal-content {
-  background: #2563eb !important;
-  background-image: none !important;
-  color: #ffffff !important;
-}
-
-/* Solid palette. */
-[data-theme="colorful"] .card:nth-child(5n+1),
-[data-theme="colorful"] .product-card:nth-child(5n+1),
-[data-theme="colorful"] .menu-card:nth-child(5n+1) { background: #2563eb !important; }
-
-[data-theme="colorful"] .card:nth-child(5n+2),
-[data-theme="colorful"] .product-card:nth-child(5n+2),
-[data-theme="colorful"] .menu-card:nth-child(5n+2) { background: #f97316 !important; }
-
-[data-theme="colorful"] .card:nth-child(5n+3),
-[data-theme="colorful"] .product-card:nth-child(5n+3),
-[data-theme="colorful"] .menu-card:nth-child(5n+3) { background: #10b981 !important; }
-
-[data-theme="colorful"] .card:nth-child(5n+4),
-[data-theme="colorful"] .product-card:nth-child(5n+4),
-[data-theme="colorful"] .menu-card:nth-child(5n+4) { background: #8b5cf6 !important; }
-
-[data-theme="colorful"] .card:nth-child(5n+5),
-[data-theme="colorful"] .product-card:nth-child(5n+5),
-[data-theme="colorful"] .menu-card:nth-child(5n+5) { background: #ec4899 !important; }
-
-/* Colorful text remains white on the solid cards. */
-[data-theme="colorful"] .card *,
-[data-theme="colorful"] .product-card *,
-[data-theme="colorful"] .menu-card *,
-[data-theme="colorful"] .section-card *,
-[data-theme="colorful"] .category-card * {
-  color: #ffffff !important;
-}
-
-/* Remove gradient from common buttons and navigation surfaces. */
-[data-theme="colorful"] button,
-[data-theme="colorful"] .btn,
-[data-theme="colorful"] .button,
-[data-theme="colorful"] .nav-btn,
-[data-theme="colorful"] .menu-item,
-[data-theme="colorful"] .tab,
-[data-theme="colorful"] .chip {
-  background-image: none !important;
-}
-
-/* Solid controls. */
-[data-theme="colorful"] button,
-[data-theme="colorful"] .btn,
-[data-theme="colorful"] .button {
-  background-color: #2563eb !important;
-  color: #ffffff !important;
-}
-
-/* Keep the customer menu colorful but solid. */
-[data-theme="colorful"] #menuModal button:nth-child(1),
-[data-theme="colorful"] #menuModal .menu-item:nth-child(1) { background-color: #2563eb !important; }
-[data-theme="colorful"] #menuModal button:nth-child(2),
-[data-theme="colorful"] #menuModal .menu-item:nth-child(2) { background-color: #10b981 !important; }
-[data-theme="colorful"] #menuModal button:nth-child(3),
-[data-theme="colorful"] #menuModal .menu-item:nth-child(3) { background-color: #f97316 !important; }
-[data-theme="colorful"] #menuModal button:nth-child(4),
-[data-theme="colorful"] #menuModal .menu-item:nth-child(4) { background-color: #8b5cf6 !important; }
-
-/* Inputs in Colorful stay solid dark. */
-[data-theme="colorful"] input,
-[data-theme="colorful"] select,
-[data-theme="colorful"] textarea {
-  background: #111827 !important;
-  background-image: none !important;
-  color: #ffffff !important;
-}
-</style>
 </body>
 </html>
