@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.4">
+  <link rel="stylesheet" href="style.css?v=1.0.5">
 
   <style>
     .popup-menu-btn {
@@ -309,7 +309,7 @@
             <h3 id="receipt-shop-name" style="margin: 0; font-size: 0.9rem;">Nama Toko</h3>
             <p id="receipt-shop-address" style="margin: 0; font-size: 0.7rem; color: var(--text-muted);">Alamat Toko</p>
           </div>
-          <div class="cart-table-wrapper" style="max-height: 30vh; overflow-y: auto;">
+          <div class="cart-table-wrapper" style="max-height: 26vh; overflow-y: auto;">
             <table class="cart-table" style="font-size: 0.78rem; width: 100%;">
               <thead>
                 <tr>
@@ -341,15 +341,17 @@
                 <input type="hidden" id="cust-proof-base64" value="">
               </div>
 
-              <!-- Opsi Simpan Menu Kompak Tanpa Ruang Kosong -->
+              <!-- BLOK SIMPAN MENU DIPADATKAN TANPA RUANG KOSONG & DISELARASKAN KE KANAN -->
               <div style="padding: 6px; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--input-border); display: flex; flex-direction: column; gap: 4px;">
-                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.73rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
-                  <input type="checkbox" id="cust-save-recipe-toggle" onchange="toggleSaveRecipeOptions(this.checked)" style="margin: 0;"> 🌟 Simpan jadi Menu Resep & Berbagi
+                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.73rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
+                  <span>🌟 Simpan jadi Menu Resep</span>
+                  <input type="checkbox" id="cust-save-recipe-toggle" onchange="toggleSaveRecipeOptions(this.checked)" style="margin: 0;">
                 </label>
                 <div id="wrapper-save-recipe-fields" style="display: none; flex-direction: column; gap: 4px; margin-top: 2px;">
                   <input type="text" id="cust-save-recipe-name" placeholder="Nama Menu (Cth: Sop Spesial Weekend)" style="width: 100%; font-size: 0.73rem; padding: 5px 6px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;">
-                  <label style="display: flex; align-items: center; gap: 6px; font-size: 0.7rem; cursor: pointer; color: var(--text-color); margin: 0;">
-                    <input type="checkbox" id="cust-share-rumpi-toggle" checked style="margin: 0;"> 📢 Bagikan otomatis ke Chat Rumpi
+                  <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; cursor: pointer; color: var(--text-color); margin: 0;">
+                    <span>📢 Bagikan otomatis ke Chat Rumpi</span>
+                    <input type="checkbox" id="cust-share-rumpi-toggle" checked style="margin: 0;">
                   </label>
                 </div>
               </div>
@@ -358,9 +360,14 @@
             </div>
           </div>
 
-          <button class="btn-success no-print" onclick="prosesCheckoutPelanggan()" style="background: #16a34a; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; color: white; font-weight: bold; cursor: pointer;">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Belanja Sekarang
-          </button>
+          <div style="display: flex; gap: 4px;" class="no-print">
+            <button class="btn-success" onclick="prosesCheckoutPelanggan()" style="flex: 1; background: #16a34a; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;">
+              🛒 Belanja Sekarang
+            </button>
+            <button onclick="prosesSimpanMenuSaja()" style="flex: 1; background: #7c3aed; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;">
+              💾 Simpan Menu Saja
+            </button>
+          </div>
           <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 0; padding: 4px; font-size: 0.72rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">🗑️ Kosongkan Keranjang</button>
         </div>
       </div>
@@ -521,7 +528,7 @@
     firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
 
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "TokoQuh", phone: "089" };
-    let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
+    let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let currentPosPage = 1; let itemsPerPagePos = 24; let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
     let activeKategoriPelanggan = 'Semua'; let toastTimeout;
 
@@ -661,7 +668,7 @@
       else { if (qtyToAdd <= p.stok) { cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); } }
     }
 
-    // --- RENDER 5 MENU DEFAULT + CUSTOM SAVED RECIPES ---
+    // --- RENDER 5 MENU DEFAULT + CUSTOM FIRESTORE SAVED RECIPES ---
     function renderRecipeCards() {
       const container = document.getElementById('recipe-scroll-container');
       if(!container) return;
@@ -685,12 +692,8 @@
           </div>`;
       });
 
-      // 2. Render Saved Custom Recipes from localStorage
-      let savedKey = 'cust_saved_recipes_' + (currentCustomerPhone || 'guest');
-      let savedRecipes = [];
-      try { savedRecipes = JSON.parse(localStorage.getItem(savedKey)) || []; } catch(e) { savedRecipes = []; }
-
-      savedRecipes.forEach((sr, idx) => {
+      // 2. Render Saved Custom Recipes from Firestore database (customerSavedRecipes)
+      customerSavedRecipes.forEach((sr, idx) => {
         let escName = escapeHtml(sr.nama);
         let srJson = JSON.stringify(sr).replace(/'/g, "&#39;");
         
@@ -701,7 +704,7 @@
             if(p) itemNames.push(p.nama);
           });
         }
-        let descItemText = itemNames.length > 0 ? itemNames.join(', ') : 'masukkan nama nama barang yang telah diracik /tersimpan';
+        let descItemText = itemNames.length > 0 ? itemNames.join(', ') : 'Menu Racikan Toko';
 
         container.innerHTML += `
           <div class="recipe-card">
@@ -724,20 +727,28 @@
         <div class="recipe-card" style="border: 1px dashed rgba(255,255,255,0.4);">
           <div>
             <div style="font-weight: 800; font-size: 0.85rem; margin-bottom: 2px;">Simpan Menu Sendiri 👩‍🍳</div>
-            <div style="font-size: 0.65rem; opacity: 0.9; line-height: 1.2;">Pilih barang di keranjang, centang simpan saat checkout!</div>
+            <div style="font-size: 0.65rem; opacity: 0.9; line-height: 1.2;">Pilih barang di keranjang, simpan menu langsung tanpa harus belanja!</div>
           </div>
-          <div style="font-size: 0.63rem; opacity: 0.8; font-style: italic; text-align: center; margin-top: auto;">Otomatis tersimpan & tampil di sini</div>
+          <div style="font-size: 0.63rem; opacity: 0.8; font-style: italic; text-align: center; margin-top: auto;">Tersimpan otomatis di database akunmu</div>
         </div>`;
     }
 
     function hapusSavedRecipe(idx) {
-      let savedKey = 'cust_saved_recipes_' + (currentCustomerPhone || 'guest');
-      let savedRecipes = [];
-      try { savedRecipes = JSON.parse(localStorage.getItem(savedKey)) || []; } catch(e) {}
-      savedRecipes.splice(idx, 1);
-      localStorage.setItem(savedKey, JSON.stringify(savedRecipes));
-      renderRecipeCards();
-      showToast("Menu kustom dihapus dari beranda.");
+      if (!currentCustomerDocId) return showToast("Silakan login terlebih dahulu.", "error");
+      if (!confirm("Hapus menu resep tersimpan ini?")) return;
+      
+      let updatedRecipes = [...customerSavedRecipes];
+      updatedRecipes.splice(idx, 1);
+
+      db.collection("pelanggan").doc(currentCustomerDocId).update({
+        savedRecipes: updatedRecipes
+      }).then(() => {
+        customerSavedRecipes = updatedRecipes;
+        renderRecipeCards();
+        showToast("Menu kustom berhasil dihapus.");
+      }).catch(err => {
+        showToast("Gagal menghapus: " + err.message, "error");
+      });
     }
 
     function toggleSaveRecipeOptions(isChecked) {
@@ -879,7 +890,7 @@
     function kirimPesanPelanggan() { if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu!", "error"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { db.collection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { showToast("Gagal mengirim pesan: " + err.message, "error"); }); }
 
     function prosesLoginPelanggan(e) { e.preventDefault(); const phone = document.getElementById('cust-login-phone').value.trim(); const pass = document.getElementById('cust-login-pass').value.trim(); if (!phone || !pass) return showToast("Nomor WhatsApp dan Sandi wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (snapshot.empty) { showToast("Nomor belum terdaftar. Silakan daftar dulu.", "error"); } else { let docData = snapshot.docs[0].data(); if (docData.status === "pending" || docData.disetujui === false) return showToast("Akun sedang menunggu persetujuan Admin.", "error"); if (pass === (docData.password || "user")) { localStorage.setItem('cust_phone_v13', phone); currentCustomerPhone = phone; currentCustomerName = docData.nama || 'Pelanggan'; document.getElementById('customerLoginModal').style.display = 'none'; muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); refreshKatalogPelanggan(); showToast("Berhasil Masuk! Selamat Berbelanja 🛒"); periksaCheckinHarian(); tampilkanKoinDiProfil(); renderRecipeCards(); } else { showToast("Sandi salah!", "error"); } } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
-    function prosesDaftarPelanggan(e) { e.preventDefault(); const name = document.getElementById('cust-reg-name').value.trim(); const phone = document.getElementById('cust-reg-phone').value.trim(); const address = document.getElementById('cust-reg-address').value.trim(); const pass = document.getElementById('cust-reg-pass').value.trim(); if (!name || !phone || !address || !pass) return showToast("Semua kolom wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (!snapshot.empty) { showToast("Nomor sudah terdaftar! Silakan langsung masuk.", "error"); gantiFormAuth('login'); } else { db.collection("pelanggan").add({ nama: name, phone: phone, alamat: address, password: pass, status: "pending", catatan: [], waktuDaftar: new Date().toLocaleString('id-ID') }).then(() => { showToast("Pendaftaran berhasil! Menunggu ACC Admin."); document.getElementById('cust-reg-name').value = ''; document.getElementById('cust-reg-phone').value = ''; document.getElementById('cust-reg-address').value = ''; document.getElementById('cust-reg-pass').value = ''; gantiFormAuth('login'); }).catch((err) => { showToast("Gagal mendaftar: " + err.message, "error"); }); } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
+    function prosesDaftarPelanggan(e) { e.preventDefault(); const name = document.getElementById('cust-reg-name').value.trim(); const phone = document.getElementById('cust-reg-phone').value.trim(); const address = document.getElementById('cust-reg-address').value.trim(); const pass = document.getElementById('cust-reg-pass').value.trim(); if (!name || !phone || !address || !pass) return showToast("Semua kolom wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (!snapshot.empty) { showToast("Nomor sudah terdaftar! Silakan langsung masuk.", "error"); gantiFormAuth('login'); } else { db.collection("pelanggan").add({ nama: name, phone: phone, alamat: address, password: pass, status: "pending", catatan: [], savedRecipes: [], waktuDaftar: new Date().toLocaleString('id-ID') }).then(() => { showToast("Pendaftaran berhasil! Menunggu ACC Admin."); document.getElementById('cust-reg-name').value = ''; document.getElementById('cust-reg-phone').value = ''; document.getElementById('cust-reg-address').value = ''; document.getElementById('cust-reg-pass').value = ''; gantiFormAuth('login'); }).catch((err) => { showToast("Gagal mendaftar: " + err.message, "error"); }); } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
     function logoutPelanggan() { if (confirm("Keluar dari sesi ini?")) { localStorage.removeItem('cust_phone_v13'); currentCustomerPhone = ''; document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); location.reload(); } }
 
     function initFirebaseListeners() {
@@ -1148,6 +1159,53 @@
     function togglePayMethodCust() { document.getElementById("wrapper-tf-proof").style.display = (document.getElementById("pay-method-cust").value === "TF") ? "block" : "none"; }
     function handleProofUpload(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let w = img.width, h = img.height; if (w > h) { if (w > 600) { h *= 600 / w; w = 600; } } else { if (h > 600) { w *= 600 / h; h = 600; } } canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h); document.getElementById("cust-proof-base64").value = canvas.toDataURL('image/jpeg', 0.8); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
 
+    // --- FUNGSI SIMPAN MENU SAJA TANPA BELANJA ---
+    function prosesSimpanMenuSaja() {
+      if (cart.length === 0) return showToast("Keranjang kosong, tidak ada barang untuk disimpan!", "error");
+      if (!currentCustomerDocId) return showToast("Silakan login terlebih dahulu.", "error");
+
+      const saveRecipeName = document.getElementById("cust-save-recipe-name").value.trim();
+      const isShareRumpiChecked = document.getElementById("cust-share-rumpi-toggle").checked;
+
+      if (!saveRecipeName) return showToast("Harap isi nama menu resep terlebih dahulu!", "error");
+
+      let itemsArr = cart.map(i => ({ code: i.code, qty: i.qty }));
+      let newRecipeObj = { nama: saveRecipeName, items: itemsArr };
+
+      db.collection("pelanggan").doc(currentCustomerDocId).update({
+        savedRecipes: firebase.firestore.FieldValue.arrayUnion(newRecipeObj)
+      }).then(() => {
+        customerSavedRecipes.push(newRecipeObj);
+        renderRecipeCards();
+
+        // Bagikan ke Rumpi jika dicentang
+        if (isShareRumpiChecked && currentCustomerPhone) {
+          let totalBelanja = cart.reduce((acc, i) => acc + i.subtotal, 0);
+          let itemListText = "";
+          cart.forEach(i => {
+            itemListText += `- ${i.nama} (${i.qty})\n`;
+          });
+          let pesanRumpi = `🍳 *Menu Racikan dari ${currentCustomerName || 'Pelanggan'}*\nNama Menu: "${saveRecipeName}"\nBahan-bahan:\n${itemListText}Perkiraan Total: Rp ${Math.round(totalBelanja).toLocaleString('id-ID')}`;
+          let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
+          db.collection("db_chat_rumpi").add({
+            senderPhone: currentCustomerPhone,
+            senderName: currentCustomerName || 'Pelanggan',
+            pesan: pesanRumpi,
+            waktu: nowStr,
+            waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(()=>{});
+        }
+
+        showToast("🌟 Menu resep berhasil disimpan ke database akunmu!");
+        document.getElementById("cust-save-recipe-name").value = "";
+        document.getElementById("cust-save-recipe-toggle").checked = false;
+        document.getElementById("wrapper-save-recipe-fields").style.display = "none";
+        closeCartModal();
+      }).catch(err => {
+        showToast("Gagal menyimpan menu: " + err.message, "error");
+      });
+    }
+
     async function prosesCheckoutPelanggan() {
       if (cart.length === 0) return showToast("Keranjang kosong!", "error"); 
       const payMethod = document.getElementById("pay-method-cust").value; 
@@ -1167,14 +1225,14 @@
         try {
           let batch = db.batch(); cart.forEach(item => { let pData = databaseProduk[item.code]; if (pData) batch.update(db.collection("produk").doc(item.code), { stok: Math.max(0, parseFloat(((pData.stok || 0) - item.qty).toFixed(3))) }); }); let newTrxRef = db.collection("transaksi").doc(); batch.set(newTrxRef, { waktu: new Date().toLocaleString('id-ID'), waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp(), total: totalBelanja, modal: totalModal, untung: keuntungan, metode: namaMetode, qty: totalQty, customerNama: namaCust, customerPhone: currentCustomerPhone, customerAlamat: alamatCust, catatanPelanggan: catatanPelanggan, buktiTransfer: payMethod === "TF" ? proofBase64 : "", statusPesanan: "Menunggu Diproses", items: cart.map(i => ({ nama: i.nama, qty: i.qty, subtotal: i.subtotal, code: i.code })) }); await batch.commit();
 
-          // Simpan resep jika dicentang
-          if (isSaveRecipeChecked) {
+          // Simpan resep ke Firestore jika dicentang saat checkout
+          if (isSaveRecipeChecked && currentCustomerDocId) {
             let itemsArr = cart.map(i => ({ code: i.code, qty: i.qty }));
-            let savedKey = 'cust_saved_recipes_' + (currentCustomerPhone || 'guest');
-            let savedRecipes = [];
-            try { savedRecipes = JSON.parse(localStorage.getItem(savedKey)) || []; } catch(e) {}
-            savedRecipes.push({ nama: saveRecipeName, items: itemsArr });
-            localStorage.setItem(savedKey, JSON.stringify(savedRecipes));
+            let newRecipeObj = { nama: saveRecipeName, items: itemsArr };
+            await db.collection("pelanggan").doc(currentCustomerDocId).update({
+              savedRecipes: firebase.firestore.FieldValue.arrayUnion(newRecipeObj)
+            });
+            customerSavedRecipes.push(newRecipeObj);
             renderRecipeCards();
 
             // Bagikan ke Rumpi jika dicentang
@@ -1196,12 +1254,35 @@
           }
 
           let text = `*PESANAN BARU DARI PELANGGAN* 🛒\nNama : *${namaCust}*\nNo WA : ${currentCustomerPhone}\nAlamat : ${alamatCust}\nMetode : *${namaMetode}*\n`; if (catatanPelanggan) text += `Catatan : _${catatanPelanggan}_\n`; text += `------------------------------------\n`; cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`; }); text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*`; window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
-          showToast("🎉 Pesanan berhasil dibuat dan resep tersimpan!"); cart = []; document.getElementById("cust-order-note").value = ""; document.getElementById("cust-save-recipe-toggle").checked = false; document.getElementById("cust-save-recipe-name").value = ""; document.getElementById("wrapper-save-recipe-fields").style.display = "none"; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
+          showToast("🎉 Pesanan berhasil dibuat!"); cart = []; document.getElementById("cust-order-note").value = ""; document.getElementById("cust-save-recipe-toggle").checked = false; document.getElementById("cust-save-recipe-name").value = ""; document.getElementById("wrapper-save-recipe-fields").style.display = "none"; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
         } catch (err) { showToast("Gagal memproses pesanan: " + err.message, "error"); }
       });
     }
 
-    function muatDataPelangganRealtime() { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).onSnapshot((snapshot) => { const container = document.getElementById("customer-notes-container"); container.innerHTML = ""; snapshot.forEach((doc) => { let data = doc.data(); currentCustomerName = data.nama || 'Pelanggan'; document.getElementById("profile-name").innerText = currentCustomerName; document.getElementById("profile-phone").innerText = data.phone || "-"; document.getElementById("profile-address").innerText = data.alamat || "-"; if (data.catatan && data.catatan.length > 0) { data.catatan.forEach(note => { container.innerHTML += `<div style="border-bottom: 1px dashed var(--border-color); padding: 4px 0; font-size: 0.78rem;"><div style="color:var(--text-color);"><b>[${note.jenis}]</b> ${note.keterangan}</div><div style="font-size: 0.68rem; color: var(--text-muted);">${note.waktu}</div></div>`; }); } else container.innerHTML = `<div class="empty-state" style="font-size: 0.78rem;">Belum ada catatan atau tagihan.</div>`; }); }); }
+    function muatDataPelangganRealtime() {
+      db.collection("pelanggan").where("phone", "==", currentCustomerPhone).onSnapshot((snapshot) => {
+        const container = document.getElementById("customer-notes-container");
+        container.innerHTML = "";
+        snapshot.forEach((doc) => {
+          let data = doc.data();
+          currentCustomerDocId = doc.id;
+          currentCustomerName = data.nama || 'Pelanggan';
+          customerSavedRecipes = data.savedRecipes || [];
+          renderRecipeCards();
+
+          document.getElementById("profile-name").innerText = currentCustomerName;
+          document.getElementById("profile-phone").innerText = data.phone || "-";
+          
+          if (data.catatan && data.catatan.length > 0) {
+            data.catatan.forEach(note => {
+              container.innerHTML += `<div style="border-bottom: 1px dashed var(--border-color); padding: 4px 0; font-size: 0.78rem;"><div style="color:var(--text-color);"><b>[${note.jenis}]</b> ${note.keterangan}</div><div style="font-size: 0.68rem; color: var(--text-muted);">${note.waktu}</div></div>`;
+            });
+          } else {
+            container.innerHTML = `<div class="empty-state" style="font-size: 0.78rem;">Belum ada catatan atau tagihan.</div>`;
+          }
+        });
+      });
+    }
     
     function renderQuickReorder(orders) {
       const container = document.getElementById("reorder-container"); const wrapper = document.getElementById("reorder-section-wrapper"); container.innerHTML = ""; let recentCodes = new Set(); orders.forEach(trx => { if(trx.items) trx.items.forEach(it => { if(it.code) recentCodes.add(it.code); }); });
