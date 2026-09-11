@@ -283,6 +283,207 @@
     [data-theme="colorful"] .welcome-screen { background: #070b14 !important; }
     [data-theme="colorful"] #welcomeScreen { background: #2563eb !important; }
   </style>
+<style>
+
+/* ============================================================
+   PELANGGAN COLORFUL V2
+   Theme contrast + SOLID colorful cards (no gradients)
+   ============================================================ */
+
+/* ---- LIGHT: dark text everywhere unless an element explicitly
+   uses a white-on-dark surface. ---- */
+[data-theme="light"],
+[data-theme="terang"] {
+  --cust-text-strong: #111827;
+  --cust-text: #1f2937;
+  --cust-text-muted: #4b5563;
+}
+
+[data-theme="light"] body,
+[data-theme="terang"] body {
+  color: var(--cust-text) !important;
+}
+
+[data-theme="light"] .card,
+[data-theme="light"] .modal,
+[data-theme="light"] .section,
+[data-theme="light"] .product-card,
+[data-theme="light"] .menu-card,
+[data-theme="terang"] .card,
+[data-theme="terang"] .modal,
+[data-theme="terang"] .section,
+[data-theme="terang"] .product-card,
+[data-theme="terang"] .menu-card {
+  color: var(--cust-text) !important;
+}
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6,
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] label,
+[data-theme="light"] small,
+[data-theme="light"] .title,
+[data-theme="light"] .name,
+[data-theme="light"] .price,
+[data-theme="terang"] h1,
+[data-theme="terang"] h2,
+[data-theme="terang"] h3,
+[data-theme="terang"] h4,
+[data-theme="terang"] h5,
+[data-theme="terang"] h6,
+[data-theme="terang"] p,
+[data-theme="terang"] span,
+[data-theme="terang"] label,
+[data-theme="terang"] small,
+[data-theme="terang"] .title,
+[data-theme="terang"] .name,
+[data-theme="terang"] .price {
+  color: var(--cust-text) !important;
+}
+
+/* ---- DARK: white text. ---- */
+[data-theme="dark"],
+[data-theme="gelap"] {
+  --cust-text-strong: #ffffff;
+  --cust-text: #f8fafc;
+  --cust-text-muted: #cbd5e1;
+}
+
+[data-theme="dark"] body,
+[data-theme="gelap"] body {
+  color: var(--cust-text) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] label,
+[data-theme="dark"] small,
+[data-theme="dark"] .title,
+[data-theme="dark"] .name,
+[data-theme="dark"] .price,
+[data-theme="gelap"] h1,
+[data-theme="gelap"] h2,
+[data-theme="gelap"] h3,
+[data-theme="gelap"] h4,
+[data-theme="gelap"] h5,
+[data-theme="gelap"] h6,
+[data-theme="gelap"] p,
+[data-theme="gelap"] span,
+[data-theme="gelap"] label,
+[data-theme="gelap"] small,
+[data-theme="gelap"] .title,
+[data-theme="gelap"] .name,
+[data-theme="gelap"] .price {
+  color: var(--cust-text) !important;
+}
+
+/* ---- COLORFUL: black/dark canvas, SOLID card colors only. ---- */
+[data-theme="colorful"] body,
+[data-theme="colorful"] .main-content,
+[data-theme="colorful"] .page,
+[data-theme="colorful"] .content,
+[data-theme="colorful"] .tab-content {
+  background: #070b12 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="colorful"] .card,
+[data-theme="colorful"] .product-card,
+[data-theme="colorful"] .menu-card,
+[data-theme="colorful"] .section-card,
+[data-theme="colorful"] .category-card,
+[data-theme="colorful"] .summary-card,
+[data-theme="colorful"] .order-card,
+[data-theme="colorful"] .cart-card,
+[data-theme="colorful"] .profile-card {
+  color: #ffffff !important;
+  background: #2563eb !important;
+  background-image: none !important;
+  border-color: rgba(255,255,255,.22) !important;
+  box-shadow: 0 8px 22px rgba(0,0,0,.28) !important;
+}
+
+/* Solid palette by card position. */
+[data-theme="colorful"] .card:nth-child(5n+1),
+[data-theme="colorful"] .product-card:nth-child(5n+1),
+[data-theme="colorful"] .menu-card:nth-child(5n+1) {
+  background: #2563eb !important;
+}
+[data-theme="colorful"] .card:nth-child(5n+2),
+[data-theme="colorful"] .product-card:nth-child(5n+2),
+[data-theme="colorful"] .menu-card:nth-child(5n+2) {
+  background: #f97316 !important;
+}
+[data-theme="colorful"] .card:nth-child(5n+3),
+[data-theme="colorful"] .product-card:nth-child(5n+3),
+[data-theme="colorful"] .menu-card:nth-child(5n+3) {
+  background: #10b981 !important;
+}
+[data-theme="colorful"] .card:nth-child(5n+4),
+[data-theme="colorful"] .product-card:nth-child(5n+4),
+[data-theme="colorful"] .menu-card:nth-child(5n+4) {
+  background: #8b5cf6 !important;
+}
+[data-theme="colorful"] .card:nth-child(5n+5),
+[data-theme="colorful"] .product-card:nth-child(5n+5),
+[data-theme="colorful"] .menu-card:nth-child(5n+5) {
+  background: #ec4899 !important;
+}
+
+[data-theme="colorful"] .card *,
+[data-theme="colorful"] .product-card *,
+[data-theme="colorful"] .menu-card *,
+[data-theme="colorful"] .section-card * {
+  color: #ffffff !important;
+}
+
+/* Prevent inherited white text from becoming invisible on light controls. */
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea,
+[data-theme="terang"] input,
+[data-theme="terang"] select,
+[data-theme="terang"] textarea {
+  color: #111827 !important;
+  background: #ffffff !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="gelap"] input,
+[data-theme="gelap"] select,
+[data-theme="gelap"] textarea,
+[data-theme="colorful"] input,
+[data-theme="colorful"] select,
+[data-theme="colorful"] textarea {
+  color: #ffffff !important;
+}
+
+/* Colorful inputs remain solid, not gradient. */
+[data-theme="colorful"] input,
+[data-theme="colorful"] select,
+[data-theme="colorful"] textarea {
+  background: #111827 !important;
+  border-color: rgba(255,255,255,.28) !important;
+}
+
+/* Colorful theme label: text only. */
+[data-theme="colorful"] .theme-colorful-icon {
+  display: none !important;
+}
+</style>
 </head>
 <body data-theme="light" style="font-size: 0.85rem;">
 
