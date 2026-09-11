@@ -500,11 +500,12 @@
     }
 
     function bukaLoginDariWelcome() {
-      tutupWelcomeScreen();
-      if (!currentCustomerPhone) {
-        document.getElementById('customerLoginModal').style.display = 'flex';
-        gantiFormAuth('login');
-      }
+      // Tombol Masuk / Daftar selalu membuka form autentikasi.
+      // Nomor yang tersimpan sebelumnya tidak boleh melewati input sandi.
+      currentCustomerPhone = '';
+      currentCustomerName = 'Pelanggan';
+      document.getElementById('customerLoginModal').style.display = 'flex';
+      gantiFormAuth('login');
     }
 
     // --- VARIABEL & FITUR VOICE (SPEECH TO TEXT & TEXT TO SPEECH) ---
@@ -620,20 +621,18 @@
 
       initChatRumpiListener();
 
-      if (currentCustomerPhone) {
-        const welcomeEl = document.getElementById('welcomeScreen');
-        if (welcomeEl) welcomeEl.style.display = 'none';
-        document.getElementById('customerLoginModal').style.display = 'none';
-        muatDataPelangganRealtime();
-        muatRiwayatPesananOnlinePelanggan();
-        initCustomerChatListener();
-      } else {
-        if (isStandalone) {
-          document.getElementById('customerLoginModal').style.display = 'flex';
-          gantiFormAuth('login');
-        } else {
-          document.getElementById('customerLoginModal').style.display = 'none';
-        }
+      // Jangan bypass form login hanya karena ada nomor tersimpan di localStorage.
+      // Sesi pelanggan dimulai setelah verifikasi No. WhatsApp + Sandi berhasil.
+      currentCustomerPhone = '';
+      currentCustomerName = 'Pelanggan';
+      if (welcomeScreen && !isStandalone) {
+        welcomeScreen.style.display = 'flex';
+        welcomeScreen.style.opacity = '1';
+      }
+      document.getElementById('customerLoginModal').style.display = 'none';
+      if (isStandalone) {
+        document.getElementById('customerLoginModal').style.display = 'flex';
+        gantiFormAuth('login');
       }
 
       initFirebaseListeners();
