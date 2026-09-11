@@ -1205,3 +1205,57 @@ body.theme-colorful-v2 #penjualan > .pos-container > .card {
   background-image: none !important;
   color: #ffffff !important;
 }
+
+/* ============================================================
+   FINAL FIX — TOMBOL +/- KATALOG KASIR
+   Berbeda dari warna card, selalu SOLID, tanpa gradient.
+   ============================================================ */
+[data-theme="colorful"] .inv-card-top .btn-edit,
+[data-theme="colorful-v1"] .inv-card-top .btn-edit,
+[data-theme="colorful-v2"] .inv-card-top .btn-edit,
+[data-theme="colorful2"] .inv-card-top .btn-edit,
+[data-theme="colorful-v.2"] .inv-card-top .btn-edit {
+  background: #16a34a !important;
+  background-image: none !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.35) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="colorful"] .inv-card-top .btn-danger,
+[data-theme="colorful-v1"] .inv-card-top .btn-danger,
+[data-theme="colorful-v2"] .inv-card-top .btn-danger,
+[data-theme="colorful2"] .inv-card-top .btn-danger,
+[data-theme="colorful-v.2"] .inv-card-top .btn-danger {
+  background: #dc2626 !important;
+  background-image: none !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.35) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="colorful"] .inv-card-top .btn-edit:hover,
+[data-theme="colorful-v1"] .inv-card-top .btn-edit:hover,
+[data-theme="colorful-v2"] .inv-card-top .btn-edit:hover,
+[data-theme="colorful2"] .inv-card-top .btn-edit:hover,
+[data-theme="colorful-v.2"] .inv-card-top .btn-edit:hover { background: #15803d !important; }
+
+[data-theme="colorful"] .inv-card-top .btn-danger:hover,
+[data-theme="colorful-v1"] .inv-card-top .btn-danger:hover,
+[data-theme="colorful-v2"] .inv-card-top .btn-danger:hover,
+[data-theme="colorful2"] .inv-card-top .btn-danger:hover,
+[data-theme="colorful-v.2"] .inv-card-top .btn-danger:hover { background: #b91c1c !important; }
+
+[data-theme="colorful"] .inv-card-top .btn-edit:disabled,
+[data-theme="colorful-v1"] .inv-card-top .btn-edit:disabled,
+[data-theme="colorful-v2"] .inv-card-top .btn-edit:disabled,
+[data-theme="colorful2"] .inv-card-top .btn-edit:disabled,
+[data-theme="colorful-v.2"] .inv-card-top .btn-edit:disabled,
+[data-theme="colorful"] .inv-card-top .btn-danger:disabled,
+[data-theme="colorful-v1"] .inv-card-top .btn-danger:disabled,
+[data-theme="colorful-v2"] .inv-card-top .btn-danger:disabled,
+[data-theme="colorful2"] .inv-card-top .btn-danger:disabled,
+[data-theme="colorful-v.2"] .inv-card-top .btn-danger:disabled {
+  opacity: .55 !important;
+  background-image: none !important;
+}
