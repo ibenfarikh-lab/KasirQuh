@@ -699,3 +699,87 @@ button:hover { background: #1d4ed8; }
   color: #fff !important;
   border-color: rgba(255,255,255,.28) !important;
 }
+
+
+/* ============================================================
+   CHAT PRIBADI V5 — ONE WIDE CHAT COLUMN + CUSTOMER TOGGLE
+   ============================================================ */
+.admin-private-chat-wide { min-width: 0; }
+.admin-private-chat-main { width: 100%; min-width: 0; }
+
+.admin-chat-people-toggle {
+  width: 40px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1.15rem;
+  color: #fff;
+  background: linear-gradient(135deg,#2563eb,#7c3aed,#ec4899,#f97316);
+  box-shadow: 0 5px 16px rgba(0,0,0,.28);
+  flex: 0 0 auto;
+}
+.admin-chat-people-toggle:active { transform: scale(.96); }
+
+.admin-private-chat-drawer {
+  position: absolute;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(360px, 88%);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 14px;
+  background: linear-gradient(160deg,#312e81,#7c3aed,#db2777,#f97316);
+  box-shadow: 14px 0 35px rgba(0,0,0,.45);
+}
+.admin-private-chat-drawer-head {
+  min-height: 54px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #fff;
+  font-weight: 800;
+  background: linear-gradient(135deg,#2563eb,#7c3aed,#ec4899);
+  border-bottom: 1px solid rgba(255,255,255,.35);
+}
+.admin-private-chat-drawer-head button {
+  border: 0;
+  border-radius: 9px;
+  padding: 7px 10px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 800;
+  background: rgba(0,0,0,.28);
+}
+.admin-private-chat-list {
+  flex: 1;
+  overflow-y: auto;
+  background: linear-gradient(180deg,#111827,#1e1b4b,#111827);
+}
+[data-theme="colorful"] .admin-private-chat-list > div {
+  color: #fff !important;
+  border-bottom: 1px solid rgba(255,255,255,.25) !important;
+  background: linear-gradient(135deg,#2563eb,#7c3aed,#db2777) !important;
+}
+[data-theme="colorful"] .admin-private-chat-list > div:nth-child(3n+2) {
+  background: linear-gradient(135deg,#10b981,#06b6d4,#2563eb) !important;
+}
+[data-theme="colorful"] .admin-private-chat-list > div:nth-child(3n+3) {
+  background: linear-gradient(135deg,#f59e0b,#f97316,#ec4899,#8b5cf6) !important;
+}
+[data-theme="colorful"] .admin-private-chat-list span,
+[data-theme="colorful"] .admin-private-chat-list div {
+  color: #fff !important;
+}
+[data-theme="colorful"] #admin-chat-messages {
+  background: #05070b !important;
+  color: #fff !important;
+}
+@media (max-width: 600px) {
+  .admin-private-chat-drawer { width: min(330px, 88%); }
+}

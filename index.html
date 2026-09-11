@@ -232,20 +232,27 @@
       </div>
 
       <!-- WRAPPER CHAT PRIBADI -->
-      <div id="wrapper-admin-chat-pribadi" style="display: flex; height: calc(100vh - 180px); gap: 10px;">
-        <div style="width: 35%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
-          <div style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);" data-i18n="chat_conversations">💬 Daftar Percakapan</div>
-          <div id="admin-chat-list" style="flex: 1; overflow-y: auto;">
-            <div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;" data-i18n="loading_chats">Memuat daftar chat...</div>
+      <div id="wrapper-admin-chat-pribadi" class="admin-private-chat-wide" style="display: flex; height: calc(100vh - 180px); gap: 10px; position: relative;">
+        <div id="admin-private-chat-drawer" class="admin-private-chat-drawer" style="display: none;">
+          <div class="admin-private-chat-drawer-head">
+            <span>💬 Daftar Pelanggan</span>
+            <button type="button" onclick="toggleAdminPrivateChatList(false)" aria-label="Tutup daftar pelanggan">✕</button>
+          </div>
+          <div id="admin-chat-list" class="admin-private-chat-list">
+            <div style="padding: 15px; text-align: center; color: #fff; font-size: 0.85rem;" data-i18n="loading_chats">Memuat daftar chat...</div>
           </div>
         </div>
-        <div style="flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
-          <div id="admin-chat-header" style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-            <span id="admin-chat-title" data-i18n="select_chat_prompt">Pilih pelanggan di samping untuk mulai chat</span>
+
+        <div class="admin-private-chat-main" style="flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
+          <div id="admin-chat-header" class="admin-private-chat-header" style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+              <button type="button" class="admin-chat-people-toggle" onclick="toggleAdminPrivateChatList()" title="Daftar pelanggan" aria-label="Buka daftar pelanggan">👤</button>
+              <span id="admin-chat-title" data-i18n="select_chat_prompt">Pilih pelanggan untuk mulai chat</span>
+            </div>
             <button id="admin-chat-delete-btn" onclick="hapusSemuaChatPribadiAdmin()" title="Hapus seluruh chat dengan pelanggan ini" style="display: none; background: #dc2626; color: white; border: none; padding: 5px 9px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; flex-shrink: 0;">🗑️ Hapus Chat</button>
           </div>
           <div id="admin-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
-            <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;" data-i18n="no_chat_selected">Belum ada ruang chat yang dipilih.</div>
+            <div style="text-align: center; color: #fff; margin-top: 20px; font-size: 0.85rem;" data-i18n="no_chat_selected">Belum ada ruang chat yang dipilih.</div>
           </div>
           <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px;">
             <input type="text" id="admin-chat-input" placeholder="Ketik balasan..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);" disabled data-i18n-placeholder="placeholder_reply">
@@ -1234,7 +1241,7 @@
           chatListContainer.innerHTML += `
             <div onclick="bukaRuangChatAdmin('${phone}', '${name}')" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; ${activeStyle}">
               <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem;">
-                <span>👤 ${name}</span>
+                <span style="color:#fff !important;">👤 ${name}</span>
                 ${unread > 0 ? `<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">${unread}</span>` : ''}
               </div>
               <div style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${phone}</div>
@@ -1247,8 +1254,18 @@
       });
     }
 
+    function toggleAdminPrivateChatList(forceState) {
+      const drawer = document.getElementById("admin-private-chat-drawer");
+      if (!drawer) return;
+      const open = typeof forceState === "boolean" ? forceState : drawer.style.display === "none";
+      drawer.style.display = open ? "flex" : "none";
+      const btn = document.querySelector(".admin-chat-people-toggle");
+      if (btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
     function bukaRuangChatAdmin(phone, name) {
       selectedChatPhone = phone;
+      toggleAdminPrivateChatList(false);
       const chatTitleEl = document.getElementById("admin-chat-title");
       if (chatTitleEl) chatTitleEl.innerText = `Chat dengan: ${name} (${phone})`;
       const deleteChatBtn = document.getElementById("admin-chat-delete-btn");
