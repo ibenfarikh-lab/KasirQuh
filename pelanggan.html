@@ -14,42 +14,28 @@
   <link rel="stylesheet" href="style.css?v=1.0.8">
 
   <style>
-    /* HALAMAN BELANJA/BERANDA DIPADATKAN DAN DIKECILKAN KEMBALI SEPERTI SEMULA */
-    #belanja { font-size: 0.78rem !important; }
-    #belanja .promo-banner { padding: 10px 12px !important; margin: 6px 8px !important; border-radius: 10px !important; }
-    #belanja .promo-banner div:nth-child(1) div:nth-child(1) { font-size: 0.88rem !important; margin-bottom: 2px !important; }
-    #belanja .promo-banner div:nth-child(1) div:nth-child(2) { font-size: 0.72rem !important; }
-    #belanja .chip-btn { padding: 4px 10px !important; font-size: 0.73rem !important; border-radius: 12px !important; }
-    #belanja .recipe-card { min-width: 145px !important; max-width: 145px !important; padding: 8px !important; gap: 4px !important; border-radius: 10px !important; }
-    #belanja .recipe-card div[style*="font-weight: 800"] { font-size: 0.78rem !important; }
-    #belanja .recipe-card div[style*="font-size: 0.75rem"], #belanja .recipe-card div[style*="font-size: 0.73rem"] { font-size: 0.62rem !important; }
-    #belanja .recipe-btn-action { padding: 4px 6px !important; font-size: 0.65rem !important; border-radius: 4px !important; }
-    #belanja .reorder-card { min-width: 80px !important; max-width: 80px !important; padding: 4px !important; border-radius: 8px !important; }
-    #belanja .trending-card { min-width: 155px !important; max-width: 155px !important; padding: 6px !important; border-radius: 8px !important; }
-    #belanja .trending-card div[style*="font-weight: bold"] { font-size: 0.72rem !important; }
-    #belanja .trending-card div[style*="font-size: 0.75rem"] { font-size: 0.62rem !important; }
-    #belanja .trending-card div[style*="font-size: 0.85rem"] { font-size: 0.72rem !important; }
-    #belanja .inv-card { padding: 6px !important; border-radius: 6px !important; }
-    #belanja .inv-card div[style*="font-weight: bold"] { font-size: 0.72rem !important; }
-    #belanja .inv-card div[style*="font-size: 0.72rem"] { font-size: 0.62rem !important; }
-    #belanja .inv-card div[style*="font-size: 0.82rem"] { font-size: 0.72rem !important; }
-    #belanja .catalog-list-item { padding: 5px 8px !important; border-radius: 6px !important; }
-    #belanja .catalog-list-item div[style*="font-weight: bold"] { font-size: 0.75rem !important; }
-    #belanja .catalog-list-item div[style*="font-size: 0.75rem"] { font-size: 0.62rem !important; }
-    #belanja div[style*="font-size: 0.9rem"] { font-size: 0.78rem !important; }
-
-    /* FONT MENU POPUP DISAMAKAN DENGAN PANEL ADMIN */
     .popup-menu-btn {
-      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+      display: flex; align-items: center; gap: 10px; padding: 8px 10px;
       border-radius: 8px; background: transparent; color: var(--text-color);
-      border: none; text-align: left; font-weight: 500; font-size: 0.95rem;
+      border: none; text-align: left; font-weight: 500; font-size: 0.85rem;
       cursor: pointer; width: 100%; transition: background 0.2s, color 0.2s;
     }
-    .popup-menu-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .popup-menu-btn svg { width: 16px; height: 16px; fill: currentColor; }
     .popup-menu-btn.active-menu { color: #2563eb !important; font-weight: bold; background: rgba(37, 99, 235, 0.08); }
     
-    .category-chips { display: flex; gap: 6px; overflow-x: auto; padding: 4px 8px; margin-bottom: 2px; scrollbar-width: none; }
+    .category-chips { display: flex; gap: 6px; overflow-x: auto; padding: 6px 10px; margin-bottom: 4px; scrollbar-width: none; }
     .category-chips::-webkit-scrollbar { display: none; }
+    .chip-btn {
+      white-space: nowrap; padding: 4px 12px; border-radius: 16px; border: 1px solid var(--border-color);
+      background: var(--card-bg); color: var(--text-color); font-size: 0.75rem; cursor: pointer; transition: 0.2s;
+    }
+    .chip-btn.active { background: #2563eb; color: white; border-color: #2563eb; font-weight: bold; }
+
+    .promo-banner {
+      background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 10px; padding: 12px; color: white;
+      margin: 8px 10px; display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.2);
+    }
     
     @keyframes cartBounce { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
     .cart-animating { animation: cartBounce 0.3s ease-in-out; }
@@ -57,7 +43,7 @@
     .toast {
       visibility: hidden; min-width: 220px; background-color: #333; color: #fff; text-align: center; border-radius: 25px;
       padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 75px; transform: translateX(-50%);
-      font-size: 0.85rem; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+      font-size: 0.75rem; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
     }
     .toast.show { visibility: visible; opacity: 1; bottom: 85px; }
     .toast.success { background-color: #16a34a; }
@@ -66,13 +52,14 @@
     .order-timeline { display: flex; justify-content: space-between; align-items: center; margin: 12px 0 8px 0; position: relative; }
     .order-timeline::before { content: ''; position: absolute; top: 10px; left: 10%; right: 10%; height: 2px; background: var(--border-color); z-index: 1; }
     .timeline-step { z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
-    .timeline-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--input-bg); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; border: 2px solid var(--border-color); }
+    .timeline-icon { width: 20px; height: 20px; border-radius: 50%; background: var(--input-bg); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; border: 2px solid var(--border-color); }
     .timeline-step.active .timeline-icon { background: #2563eb; color: white; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
     .timeline-step.completed .timeline-icon { background: #16a34a; color: white; border-color: #16a34a; }
-    .timeline-text { font-size: 0.65rem; color: var(--text-muted); text-align: center; line-height: 1; }
+    .timeline-text { font-size: 0.55rem; color: var(--text-muted); text-align: center; line-height: 1; }
     .timeline-step.active .timeline-text { color: #2563eb; font-weight: bold; }
     .timeline-step.completed .timeline-text { color: #16a34a; font-weight: bold; }
 
+    /* MODAL DETAIL FLOATING DI TENGAH */
     .modal-backdrop { background: rgba(0,0,0,0.6); display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box; }
     .modal-backdrop.show { display: flex !important; }
     .product-detail-box {
@@ -83,19 +70,37 @@
     }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-    .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 4px 8px 8px 8px; scrollbar-width: none; }
+    .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 4px 10px 10px 10px; scrollbar-width: none; }
     .horizontal-scroll-container::-webkit-scrollbar { display: none; }
 
     .auto-scroll-wrapper {
-      overflow-x: auto; overflow-y: hidden; width: 100%; position: relative; padding: 2px 0 8px 0; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+      overflow-x: auto;
+      overflow-y: hidden;
+      width: 100%;
+      position: relative;
+      padding: 4px 0 10px 0;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
-    .auto-scroll-wrapper::-webkit-scrollbar { display: none; }
-    .auto-scroll-track { display: flex; gap: 8px; width: max-content; padding-left: 8px; padding-right: 8px; }
+    .auto-scroll-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+    .auto-scroll-track {
+      display: flex;
+      gap: 8px;
+      width: max-content;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
     
     .recipe-card, .reorder-card, .trending-card, .inv-card, .catalog-list-item {
-      color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.15s, box-shadow 0.15s;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .recipe-card:active, .reorder-card:active, .trending-card:active, .inv-card:active, .catalog-list-item:active { transform: scale(0.97); }
+    .recipe-card:active, .reorder-card:active, .trending-card:active, .inv-card:active, .catalog-list-item:active {
+      transform: scale(0.97);
+    }
 
     .recipe-card:nth-child(5n+1), .reorder-card:nth-child(5n+1), .trending-card:nth-child(5n+1), .inv-card:nth-child(5n+1), .catalog-list-item:nth-child(5n+1) { background: linear-gradient(135deg, #2563eb, #1d4ed8, #1e40af); }
     .recipe-card:nth-child(5n+2), .reorder-card:nth-child(5n+2), .trending-card:nth-child(5n+2), .inv-card:nth-child(5n+2), .catalog-list-item:nth-child(5n+2) { background: linear-gradient(135deg, #f59e0b, #d97706, #b45309); }
@@ -103,16 +108,76 @@
     .recipe-card:nth-child(5n+4), .reorder-card:nth-child(5n+4), .trending-card:nth-child(5n+4), .inv-card:nth-child(5n+4), .catalog-list-item:nth-child(5n+4) { background: linear-gradient(135deg, #8b5cf6, #7c3aed, #5b21b6); }
     .recipe-card:nth-child(5n+5), .reorder-card:nth-child(5n+5), .trending-card:nth-child(5n+5), .inv-card:nth-child(5n+5), .catalog-list-item:nth-child(5n+5) { background: linear-gradient(135deg, #ec4899, #db2777, #9d174d); }
 
-    .product-catalog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-    .product-catalog-list { display: flex; flex-direction: column; gap: 6px; }
+    .recipe-card {
+      min-width: 175px;
+      max-width: 175px;
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 4px;
+      position: relative;
+      flex-shrink: 0;
+    }
 
-    .qty-btn { width: 32px; height: 32px; background: var(--input-bg); border: 1px solid var(--border-color); font-size: 1rem; font-weight: bold; color: var(--text-color); cursor: pointer; border-radius: 6px; }
+    .recipe-btn-action {
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.7rem;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s;
+    }
+    .recipe-btn-action:active { background: rgba(255, 255, 255, 0.4); }
+
+    .reorder-card {
+      min-width: 95px; max-width: 95px; border-radius: 10px; padding: 6px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; flex-shrink: 0;
+    }
+
+    .trending-card {
+      min-width: 180px; max-width: 180px; display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 8px; cursor: pointer; flex-shrink: 0;
+    }
+
+    .product-catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    .product-catalog-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .inv-card { border-radius: 8px; padding: 6px; display: flex; flex-direction: column; justify-content: space-between; position: relative; cursor: pointer; }
+    .catalog-list-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; margin-bottom: 4px; position: relative; cursor: pointer; }
+
+    .qty-btn { width: 34px; height: 34px; background: var(--input-bg); border: 1px solid var(--border-color); font-size: 1rem; font-weight: bold; color: var(--text-color); cursor: pointer; border-radius: 6px; }
     .qty-btn:active { background: var(--border-color); }
 
     .btn-quick-cart-icon {
-      position: absolute; bottom: 4px; right: 4px; width: 26px; height: 26px; background: #16a34a; color: white; border: none;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.25); z-index: 5; transition: transform 0.1s;
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      width: 28px;
+      height: 28px;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+      z-index: 5;
+      transition: transform 0.1s;
     }
     .btn-quick-cart-icon:active { transform: scale(0.9); }
 
@@ -120,7 +185,7 @@
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
   </style>
 </head>
-<body data-theme="light">
+<body data-theme="light" style="font-size: 0.85rem;">
 
   <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 15px; box-sizing: border-box;">
     <h1 id="welcomeStoreName" style="font-size: 2.2rem; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
@@ -164,13 +229,12 @@
     </div>
   </div>
 
-  <!-- POPUP TOGGLE MENU (FONT BESAR SEPERTI ADMIN) -->
   <div id="menuToggleModal" class="modal-backdrop" onclick="if(event.target === this) toggleMenuModal()" style="background: rgba(0,0,0,0.4); justify-content: flex-end; align-items: flex-end; padding: 0 10px 65px 0;">
-    <div class="modal-content" style="max-width: 220px; border-radius: 12px; padding: 8px; background: var(--card-bg); box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
-      <div style="display: flex; flex-direction: column; gap: 4px;">
+    <div class="modal-content" style="max-width: 200px; border-radius: 12px; padding: 6px; background: var(--card-bg); box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
         <button id="pop-btn-belanja" class="popup-menu-btn active-menu" onclick="switchTabPelanggan('belanja'); toggleMenuModal();"><svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Belanja</button>
         <button id="pop-btn-datapelanggan" class="popup-menu-btn" onclick="switchTabPelanggan('data-pelanggan'); toggleMenuModal();"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Data Pelanggan</button>
-        <button id="pop-btn-livechat" class="popup-menu-btn" onclick="switchTabPelanggan('live-chat'); toggleMenuModal();" style="justify-content: space-between;"><span style="display: flex; align-items: center; gap: 10px;"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> Live Chat</span><span id="badge-livechat-cust" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 8px;">0</span></button>
+        <button id="pop-btn-livechat" class="popup-menu-btn" onclick="switchTabPelanggan('live-chat'); toggleMenuModal();" style="justify-content: space-between;"><span style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> Live Chat</span><span id="badge-livechat-cust" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; font-weight: bold; padding: 1px 5px; border-radius: 8px;">0</span></button>
         <button id="pop-btn-pengaturan" class="popup-menu-btn" onclick="switchTabPelanggan('pengaturan'); toggleMenuModal();"><svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.53,5.05 19.27,4.97 19.05,5.05L16.56,6.05C16.04,5.66 15.45,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.55,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.97 4.47,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.47,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.55,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.45,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.53,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg> Pengaturan</button>
       </div>
     </div>
@@ -188,14 +252,14 @@
     <div id="belanja" class="tab-content active" style="display: block;">
       <div class="promo-banner no-print" id="promo-banner-section">
         <div>
-          <div style="font-weight: 800; font-size: 0.88rem; margin-bottom: 2px;">Promo Toko Hari Ini! 🎉</div>
-          <div style="font-size: 0.72rem; opacity: 0.9;">Cari barang incaranmu sekarang juga.</div>
+          <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 2px;">Promo Toko Hari Ini! 🎉</div>
+          <div style="font-size: 0.75rem; opacity: 0.9;">Cari barang incaranmu sekarang juga.</div>
         </div>
-        <div style="font-size: 1.5rem;">🛍️</div>
+        <div style="font-size: 1.6rem;">🛍️</div>
       </div>
 
-      <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 8px;">
-        <div style="padding: 0 4px; font-weight: bold; font-size: 0.78rem; margin-bottom: 3px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
+      <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 10px;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
         <div id="reorder-container" class="auto-scroll-wrapper"></div>
       </div>
 
@@ -208,19 +272,23 @@
         <button class="chip-btn" style="border-color: #d97706; color: #d97706;" onclick="pilihKategoriPelanggan('Titipan Warga')">📦 Titipan Warga</button>
       </div>
 
-      <div id="recipe-section-wrapper" class="no-print" style="margin: 6px 0 8px 0;">
-        <div style="padding: 0 4px; font-weight: bold; font-size: 0.78rem; margin-bottom: 3px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
-        <div class="horizontal-scroll-container" id="recipe-scroll-container"></div>
+      <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
+      <div id="recipe-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
+        <div class="horizontal-scroll-container" id="recipe-scroll-container">
+          <!-- Rendered via JavaScript -->
+        </div>
       </div>
 
-      <div id="trending-section-wrapper" class="no-print" style="margin: 6px 0 8px 0;">
-        <div style="padding: 0 4px; font-weight: bold; font-size: 0.78rem; margin-bottom: 3px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
+      <!-- Barang Laris Hari Ini -->
+      <div id="trending-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
         <div id="trending-container" class="auto-scroll-wrapper"></div>
       </div>
 
       <div class="pos-container">
-        <div style="padding: 0 4px; font-weight: bold; font-size: 0.78rem; margin: 8px 0 3px 0; color: var(--text-color);">Semua Kebutuhan Harian 🛍️</div>
-        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 6px; background: transparent; border: none; box-shadow: none;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 10px 0 4px 0; color: var(--text-color);">Semua Kebutuhan Harian 🛍️</div>
+        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 8px; background: transparent; border: none; box-shadow: none;">
           <div id="pos-catalog-container"></div>
         </div>
       </div>
@@ -356,6 +424,7 @@
         </div>
       </div>
 
+      <!-- BAGIKAN APLIKASI DI PENGATURAN -->
       <div class="card" style="padding: 12px; margin-bottom: 8px;">
         <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">📤 Bagikan Aplikasi</h3>
         <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Ajak tetangga dan teman pakai KasirQuh biar belanja makin praktis.</p>
@@ -391,6 +460,7 @@
     </div>
   </div>
 
+  <!-- MODAL BARCODE / QR CODE BAGIKAN APLIKASI -->
   <div id="qrCodeModal" class="modal-backdrop" onclick="if(event.target === this) tutupModalQRCode()">
     <div class="modal-content" style="max-width: 320px; width: 90%; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative;">
       <button onclick="tutupModalQRCode()" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">✕</button>
@@ -409,6 +479,7 @@
     </div>
   </div>
 
+  <!-- MODAL DETAIL PRODUK FLOATING DI TENGAH -->
   <div id="productDetailModal" class="modal-backdrop" onclick="if(event.target === this) closeProductDetail()">
     <div class="product-detail-box">
       <div style="position: relative;">
@@ -424,6 +495,7 @@
           <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">Deskripsi: <span id="detail-desc" style="color: var(--text-color);">Tidak ada deskripsi dari toko.</span></div>
         </div>
         
+        <!-- Input Qty dan Tambah Keranjang -->
         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
           <div style="display: flex; align-items: center; gap: 3px;">
             <button class="qty-btn" onclick="ubahQtyDetail(-1)">-</button>
@@ -435,6 +507,7 @@
           </button>
         </div>
 
+        <!-- Tombol Bagikan Produk via WA -->
         <button onclick="bagikanProdukViaWA()" style="width: 100%; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;">
           💬 Bagikan Produk via WA
         </button>
@@ -481,7 +554,7 @@
     function getPelangganVercelUrl() {
       let origin = window.location.origin;
       if (!origin || origin.includes("null") || origin.includes("file:")) {
-        return "https://kasirquh.vercel.app/pelanggan.html";
+        return "https://kasirquh.vercel.app/pelanggan.html"; // Fallback URL Vercel Anda
       }
       if (!window.location.pathname.includes("pelanggan.html")) {
         return origin + "/pelanggan.html";
@@ -831,12 +904,12 @@
         container.innerHTML += `
           <div class="recipe-card">
             <div>
-              <div style="font-weight: 800; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${escName}</div>
-              <div style="font-size: 0.62rem; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2;">${escDesc}</div>
+              <div style="font-weight: 800; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${escName}</div>
+              <div style="font-size: 0.65rem; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2;">${escDesc}</div>
             </div>
             <div style="display: flex; gap: 4px; margin-top: auto;">
               <button class="recipe-btn-action" style="flex: 1;" onclick='beliPaketResepByKeywords("${escName}", ${kwJson})'>+ Masukkan Bahan</button>
-              <button class="recipe-btn-action" style="flex: 0 0 26px; padding: 4px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepKeywordsKeRumpi("${escName}", ${kwJson})'>📢</button>
+              <button class="recipe-btn-action" style="flex: 0 0 30px; padding: 5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepKeywordsKeRumpi("${escName}", ${kwJson})'>📢</button>
             </div>
           </div>`;
       });
@@ -858,17 +931,17 @@
           <div class="recipe-card">
             <div>
               <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 4px; margin-bottom: 2px;">
-                <div style="font-weight: 800; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">⭐ ${escName}</div>
-                <div style="display: flex; gap: 3px; align-items: center;">
-                  <button onclick="editSavedRecipe(${idx})" title="Edit Menu" style="background: rgba(255,255,255,0.25); border: none; color: #fde047; border-radius: 4px; width: 20px; height: 20px; cursor: pointer; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">✏️</button>
-                  <button onclick="hapusSavedRecipe(${idx})" title="Hapus" style="background: rgba(255,255,255,0.25); border: none; color: #fca5a5; border-radius: 4px; width: 20px; height: 20px; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">✕</button>
+                <div style="font-weight: 800; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">⭐ ${escName}</div>
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <button onclick="editSavedRecipe(${idx})" title="Edit Menu" style="background: rgba(255,255,255,0.25); border: none; color: #fde047; border-radius: 4px; width: 22px; height: 22px; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">✏️</button>
+                  <button onclick="hapusSavedRecipe(${idx})" title="Hapus" style="background: rgba(255,255,255,0.25); border: none; color: #fca5a5; border-radius: 4px; width: 22px; height: 22px; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; font-weight: bold;">✕</button>
                 </div>
               </div>
-              <div style="font-size: 0.62rem; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2;">${escapeHtml(descItemText)}</div>
+              <div style="font-size: 0.63rem; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2;">${escapeHtml(descItemText)}</div>
             </div>
             <div style="display: flex; gap: 4px; margin-top: auto;">
               <button class="recipe-btn-action" style="flex: 1;" onclick='beliPaketResepCustom(${srJson})'>+ Masukkan Bahan</button>
-              <button class="recipe-btn-action" style="flex: 0 0 26px; padding: 4px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepCustomKeRumpi(${srJson})'>📢</button>
+              <button class="recipe-btn-action" style="flex: 0 0 30px; padding: 5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepCustomKeRumpi(${srJson})'>📢</button>
             </div>
           </div>`;
       });
@@ -876,10 +949,10 @@
       container.innerHTML += `
         <div class="recipe-card" style="border: 1px dashed rgba(255,255,255,0.4);">
           <div>
-            <div style="font-weight: 800; font-size: 0.78rem; margin-bottom: 2px;">Simpan Menu Sendiri 👩‍🍳</div>
-            <div style="font-size: 0.62rem; opacity: 0.9; line-height: 1.2;">Pilih barang di keranjang, simpan menu langsung tanpa harus belanja!</div>
+            <div style="font-weight: 800; font-size: 0.85rem; margin-bottom: 2px;">Simpan Menu Sendiri 👩‍🍳</div>
+            <div style="font-size: 0.65rem; opacity: 0.9; line-height: 1.2;">Pilih barang di keranjang, simpan menu langsung tanpa harus belanja!</div>
           </div>
-          <div style="font-size: 0.6rem; opacity: 0.8; font-style: italic; text-align: center; margin-top: auto;">Tersimpan otomatis di database akunmu</div>
+          <div style="font-size: 0.63rem; opacity: 0.8; font-style: italic; text-align: center; margin-top: auto;">Tersimpan otomatis di database akunmu</div>
         </div>`;
     }
 
@@ -1271,11 +1344,11 @@
         
         itemsHtml += `
           <div onclick="openProductDetail('${code}')" class="trending-card">
-            <img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3);">
+            <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3);">
             <div style="flex: 1; min-width: 0;">
-              <div style="font-weight: bold; font-size: 0.72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
-              <div style="font-size: 0.62rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Sisa: ${p.stok} ${satuan}</div>
-              <div style="font-size: 0.72rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+              <div style="font-weight: bold; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
+              <div style="font-size: 0.68rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Sisa: ${p.stok} ${satuan}</div>
+              <div style="font-size: 0.78rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
             </div>
           </div>`;
       });
@@ -1358,20 +1431,20 @@
         let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
         let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
         if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10;
-        let sisaStokBadge = (!isHabis && p.stok <= 5) ? `<div style="position:absolute; top:3px; left:3px; background:#ef4444; color:white; font-size:0.5rem; padding:1px 4px; border-radius:3px; font-weight:bold; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none; z-index: 5;">🔥 Sisa ${p.stok}</div>` : "";
+        let sisaStokBadge = (!isHabis && p.stok <= 5) ? `<div style="position:absolute; top:4px; left:4px; background:#ef4444; color:white; font-size:0.55rem; padding:2px 5px; border-radius:4px; font-weight:bold; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none; z-index: 5;">🔥 Sisa ${p.stok}</div>` : "";
 
         if (catalogViewMode === 'grid') {
           container.innerHTML += `
             <div class="inv-card" onclick="openProductDetail('${code}')">
-              ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:6px; display:flex; align-items:center; justify-content:center;"><span style="background:#dc2626; color:#fff; font-weight:bold; padding:2px 6px; border-radius:4px; font-size:0.65rem; transform:rotate(-15deg);">HABIS</span></div>' : ''}
-              <div style="text-align: center; margin-bottom: 3px; position: relative;">
+              ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:8px; display:flex; align-items:center; justify-content:center;"><span style="background:#dc2626; color:#fff; font-weight:bold; padding:3px 8px; border-radius:6px; font-size:0.7rem; transform:rotate(-15deg);">HABIS</span></div>' : ''}
+              <div style="text-align: center; margin-bottom: 4px; position: relative;">
                 ${sisaStokBadge}
-                <img src="${fotoSrc}" style="width: 100%; height: 68px; object-fit: cover; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3);">
+                <img src="${fotoSrc}" style="width: 100%; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
                 <button class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
               </div>
-              <div style="font-weight: bold; font-size: 0.7rem; color: #fff; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-              <div style="font-size: 0.6rem; color: rgba(255,255,255,0.8); margin-bottom: 1px;">Stok: ${p.stok || 0} ${satuan}</div>
-              <div style="font-size: 0.72rem; font-weight: bold; color: #fde047; margin-top: 1px;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+              <div style="font-weight: bold; font-size: 0.75rem; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
+              <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Stok: ${p.stok || 0} ${satuan}</div>
+              <div style="font-size: 0.78rem; font-weight: bold; color: #fde047; margin-top: 2px;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
             </div>`;
         } else {
           container.innerHTML += `
@@ -1379,15 +1452,15 @@
               ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:6px;"></div>' : ''}
               <div style="position: relative; flex-shrink: 0;">
                 ${sisaStokBadge}
-                <img src="${fotoSrc}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3);">
+                <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
               </div>
               <div style="min-width: 0; flex: 1;">
-                <div style="font-weight: bold; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
-                <div style="font-size: 0.62rem; color: rgba(255,255,255,0.8);">Stok: ${p.stok || 0} ${satuan}</div>
+                <div style="font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
+                <div style="font-size: 0.68rem; color: rgba(255,255,255,0.8);">Stok: ${p.stok || 0} ${satuan}</div>
               </div>
-              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 3px;">
-                <div style="font-size: 0.75rem; font-weight: bold; color: #fde047;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
-                <button class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position: static; width: 22px; height: 22px; font-size: 0.65rem;">🛒</button>
+              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <div style="font-size: 0.8rem; font-weight: bold; color: #fde047;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+                <button class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position: static; width: 24px; height: 24px; font-size: 0.7rem;">🛒</button>
               </div>
             </div>`;
         }
@@ -1577,7 +1650,7 @@
           let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0; 
           if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10; 
           
-          itemsHtml += `<div class="reorder-card" onclick="openProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 50px; object-fit: cover; border-radius: 5px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.62rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.62rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; 
+          itemsHtml += `<div class="reorder-card" onclick="openProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; 
           renderedCount++; 
         } 
       });
