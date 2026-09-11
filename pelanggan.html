@@ -652,8 +652,86 @@
       let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
       if (satuan === 'kg' || satuan === 'kilogram') hargaParsed *= 10;
 
-      let pesan = `Halo! Ada produk menarik nih di *${storeName}*:\n\n*${p.nama}*\nHarga: Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}\nStok Tersedia: ${p.stok || 0} ${satuan}\n\nYuk cek dan belanja melalui link berikut:\n${window.location.href}`;
-      window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 460;
+      const ctx = canvas.getContext('2d');
+
+      const gradient = ctx.createLinearGradient(0, 0, 400, 460);
+      gradient.addColorStop(0, '#2563eb');
+      gradient.addColorStop(1, '#7c3aed');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 400, 460);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(storeName, 200, 40);
+
+      ctx.fillStyle = '#ffffff';
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(30, 60, 340, 300, 16);
+        ctx.fill();
+      } else {
+        ctx.fillRect(30, 60, 340, 300);
+      }
+
+      let fotoSrc = p.foto || "";
+      if (fotoSrc) {
+        let img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = fotoSrc;
+        img.onload = function() {
+          ctx.drawImage(img, 120, 75, 160, 140);
+          renderTeksDanBagikanProduk(ctx, canvas, p, hargaParsed, satuan, storeName);
+        };
+        img.onerror = function() {
+          renderTeksDanBagikanProduk(ctx, canvas, p, hargaParsed, satuan, storeName);
+        };
+      } else {
+        renderTeksDanBagikanProduk(ctx, canvas, p, hargaParsed, satuan, storeName);
+      }
+    }
+
+    function renderTeksDanBagikanProduk(ctx, canvas, p, hargaParsed, satuan, storeName) {
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(p.nama, 200, 245);
+
+      ctx.fillStyle = '#16a34a';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillText(`Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}`, 200, 280);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px sans-serif';
+      ctx.fillText(`Stok Tersedia: ${p.stok || 0} ${satuan}`, 200, 310);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText("🛒 Yuk Belanja di " + storeName, 200, 405);
+
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], "produk-" + p.nama.replace(/[^a-zA-Z0-9]/g, '_') + ".png", { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: p.nama,
+              text: `Yuk beli *${p.nama}* seharga Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan} di ${storeName}!`
+            });
+          } catch (err) {
+            console.log(err);
+          }
+        } else {
+          const link = document.createElement('a');
+          link.download = 'produk.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast("📥 Gambar produk diunduh! Silakan kirimkan ke WhatsApp.");
+        }
+      }, 'image/png');
     }
   </script>
 
