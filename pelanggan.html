@@ -72,6 +72,29 @@
 
     .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 4px 10px 10px 10px; scrollbar-width: none; }
     .horizontal-scroll-container::-webkit-scrollbar { display: none; }
+
+    /* EFEK BERGULIR OTOMATIS (MARQUEE HALUS) DENGAN JEDA SAAT DISENTUH/HOVER */
+    .auto-scroll-wrapper {
+      overflow: hidden;
+      width: 100%;
+      position: relative;
+      padding: 4px 0 10px 0;
+    }
+    .auto-scroll-track {
+      display: flex;
+      gap: 8px;
+      width: max-content;
+      animation: scrollTicker 25s linear infinite;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    .auto-scroll-track:hover, .auto-scroll-track:active {
+      animation-play-state: paused;
+    }
+    @keyframes scrollTicker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
     
     /* SEMUA KARTU DENGAN 3 WARNA GRADASI BERBEDA */
     .recipe-card, .reorder-card, .trending-card, .inv-card, .catalog-list-item {
@@ -118,11 +141,11 @@
     .recipe-btn-action:active { background: rgba(255, 255, 255, 0.4); }
 
     .reorder-card {
-      min-width: 95px; border-radius: 10px; padding: 6px; display: flex; flex-direction: column; gap: 4px; cursor: pointer;
+      min-width: 95px; max-width: 95px; border-radius: 10px; padding: 6px; display: flex; flex-direction: column; gap: 4px; cursor: pointer; flex-shrink: 0;
     }
 
     .trending-card {
-      min-width: 180px; display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 8px; cursor: pointer;
+      min-width: 180px; max-width: 180px; display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 8px; cursor: pointer; flex-shrink: 0;
     }
 
     /* GRID KATALOG 3 KOLOM DEFAULT */
@@ -244,7 +267,7 @@
 
       <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 10px;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
-        <div id="reorder-container" class="horizontal-scroll-container"></div>
+        <div id="reorder-container" class="auto-scroll-wrapper"></div>
       </div>
 
       <div class="category-chips no-print" id="category-container">
@@ -267,10 +290,11 @@
       <!-- Barang Laris Hari Ini -->
       <div id="trending-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
-        <div id="trending-container" class="horizontal-scroll-container"></div>
+        <div id="trending-container" class="auto-scroll-wrapper"></div>
       </div>
 
       <div class="pos-container">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 10px 0 4px 0; color: var(--text-color);">Semua Kebutuhan Harian 🛍️</div>
         <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 8px; background: transparent; border: none; box-shadow: none;">
           <div id="pos-catalog-container"></div>
         </div>
@@ -911,13 +935,15 @@
     function renderTrending(codes) {
       const container = document.getElementById("trending-container"); const wrapper = document.getElementById("trending-section-wrapper"); container.innerHTML = "";
       if(codes.length === 0) { wrapper.style.display = "none"; return; }
+      
+      let itemsHtml = "";
       codes.forEach(code => {
         let p = databaseProduk[code]; let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
         let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
         let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
         if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10;
         
-        container.innerHTML += `
+        itemsHtml += `
           <div onclick="openProductDetail('${code}')" class="trending-card">
             <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3);">
             <div style="flex: 1; min-width: 0;">
@@ -927,6 +953,8 @@
             </div>
           </div>`;
       });
+      // Duplikasi elemen agar efek bergulir mulus tanpa terputus (infinite loop trick)
+      container.innerHTML = `<div class="auto-scroll-track">${itemsHtml}${itemsHtml}</div>`;
       perbaruiTampilanKategori(); 
     }
 
@@ -1144,11 +1172,31 @@
     }
 
     function muatDataPelangganRealtime() { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).onSnapshot((snapshot) => { const container = document.getElementById("customer-notes-container"); container.innerHTML = ""; snapshot.forEach((doc) => { let data = doc.data(); currentCustomerName = data.nama || 'Pelanggan'; document.getElementById("profile-name").innerText = currentCustomerName; document.getElementById("profile-phone").innerText = data.phone || "-"; document.getElementById("profile-address").innerText = data.alamat || "-"; if (data.catatan && data.catatan.length > 0) { data.catatan.forEach(note => { container.innerHTML += `<div style="border-bottom: 1px dashed var(--border-color); padding: 4px 0; font-size: 0.78rem;"><div style="color:var(--text-color);"><b>[${note.jenis}]</b> ${note.keterangan}</div><div style="font-size: 0.68rem; color: var(--text-muted);">${note.waktu}</div></div>`; }); } else container.innerHTML = `<div class="empty-state" style="font-size: 0.78rem;">Belum ada catatan atau tagihan.</div>`; }); }); }
+    
     function renderQuickReorder(orders) {
       const container = document.getElementById("reorder-container"); const wrapper = document.getElementById("reorder-section-wrapper"); container.innerHTML = ""; let recentCodes = new Set(); orders.forEach(trx => { if(trx.items) trx.items.forEach(it => { if(it.code) recentCodes.add(it.code); }); });
-      let renderedCount = 0; recentCodes.forEach(code => { let p = databaseProduk[code]; if(p && (p.stok || 0) > 0 && renderedCount < 5) { let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>"; let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs"); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0; if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10; container.innerHTML += `<div class="reorder-card" onclick="openProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; renderedCount++; } });
+      let renderedCount = 0; let itemsHtml = ""; 
+      recentCodes.forEach(code => { 
+        let p = databaseProduk[code]; 
+        if(p && (p.stok || 0) > 0 && renderedCount < 5) { 
+          let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>"; 
+          let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs"); 
+          let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); 
+          let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0; 
+          if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10; 
+          
+          itemsHtml += `<div class="reorder-card" onclick="openProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; 
+          renderedCount++; 
+        } 
+      });
+      
+      if(renderedCount > 0) {
+        container.innerHTML = `<div class="auto-scroll-track">${itemsHtml}${itemsHtml}</div>`;
+      }
+
       if(renderedCount > 0 && activeKategoriPelanggan === 'Semua' && document.getElementById('belanja').classList.contains('active')) { wrapper.style.display = "block"; } else { wrapper.style.display = "none"; }
     }
+
     function muatRiwayatPesananOnlinePelanggan() { db.collection("transaksi").where("customerPhone", "==", currentCustomerPhone).onSnapshot((snapshot) => { const container = document.getElementById("customer-online-orders-container"); if (!container) return; container.innerHTML = ""; if (snapshot.empty) { container.innerHTML = `<div class="empty-state" style="font-size: 0.78rem;">Belum ada riwayat pesanan online.</div>`; renderQuickReorder([]); return; } let orders = []; snapshot.forEach(doc => { orders.push({ id: doc.id, ...doc.data() }); }); orders.sort((a, b) => { let timeA = a.waktuTimestamp?.toMillis ? a.waktuTimestamp.toMillis() : 0; let timeB = b.waktuTimestamp?.toMillis ? b.waktuTimestamp.toMillis() : 0; return timeB - timeA; }); renderQuickReorder(orders); orders.forEach(trx => { let statusLabel = trx.statusPesanan || "Menunggu Diproses"; let s_lower = statusLabel.toLowerCase(); let step = 1; if(s_lower.includes("siap") || s_lower.includes("proses")) step = 2; else if(s_lower.includes("kirim") || s_lower.includes("jalan")) step = 3; else if(s_lower.includes("selesai")) step = 4; let timelineHtml = `<div class="order-timeline"><div class="timeline-step ${step >= 1 ? (step > 1 ? 'completed' : 'active') : ''}"><div class="timeline-icon">${step > 1 ? '✓' : '1'}</div><div class="timeline-text">Menunggu</div></div><div class="timeline-step ${step >= 2 ? (step > 2 ? 'completed' : 'active') : ''}"><div class="timeline-icon">${step > 2 ? '✓' : '2'}</div><div class="timeline-text">Dikemas</div></div><div class="timeline-step ${step >= 3 ? (step > 3 ? 'completed' : 'active') : ''}"><div class="timeline-icon">${step > 3 ? '✓' : '3'}</div><div class="timeline-text">Dikirim</div></div><div class="timeline-step ${step >= 4 ? 'completed' : ''}"><div class="timeline-icon">${step >= 4 ? '✓' : '4'}</div><div class="timeline-text">Selesai</div></div></div>`; let itemsHtml = ""; if (trx.items && trx.items.length > 0) { itemsHtml = `<div style="margin: 4px 0; font-size: 0.72rem; background: var(--input-bg); padding: 6px; border-radius: 6px; color:var(--text-color);"><strong>Rincian Barang:</strong><ul style="margin: 2px 0 0 12px; padding: 0;">`; trx.items.forEach(it => { itemsHtml += `<li>${it.nama} (${it.qty}x)</li>`; }); itemsHtml += `</ul></div>`; } container.innerHTML += `<div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: var(--card-bg); box-shadow: 0 1px 4px rgba(0,0,0,0.05);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><span style="font-size: 0.68rem; color: var(--text-muted);">🗓️ ${trx.waktu || '-'}</span><span style="background: ${step===4 ? '#16a34a' : (step===1 ? '#ef4444' : '#d97706')}; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.62rem; font-weight: bold;">${statusLabel}</span></div>${timelineHtml}<div style="font-size: 0.75rem; font-weight: 600; color: #2563eb;">Metode: ${trx.metode || '-'}</div>${itemsHtml}<div style="font-size: 0.82rem; font-weight: 800; color: #16a34a; text-align: right;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div></div>`; }); }); }
     function simpanProfilPelanggan() { const nama = document.getElementById("setting-cust-name").value.trim(); const alamat = document.getElementById("setting-cust-address").value.trim(); if (!nama) return showToast("Nama wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => { if (!snap.empty) { db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => showToast("Profil diperbarui!")).catch(err => showToast("Gagal memperbarui: " + err.message, "error")); } }).catch(err => showToast("Terjadi kesalahan: " + err.message, "error")); }
     async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
