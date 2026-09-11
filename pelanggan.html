@@ -551,8 +551,19 @@
     function stopAiListeningState() { isAiListening = false; const micBtn = document.getElementById('aiMicButton'); micBtn.style.background = '#374151'; micBtn.innerText = "🎤"; document.getElementById('ai-chat-input').placeholder = "Tanya stok, harga..."; }
     function toggleAISound() { isAiSoundOn = !isAiSoundOn; document.getElementById('aiSoundToggle').innerText = isAiSoundOn ? "🔊 Suara: ON" : "🔇 Suara: OFF"; if (!isAiSoundOn && 'speechSynthesis' in window) window.speechSynthesis.cancel(); }
 
+    function getPelangganVercelUrl() {
+      let origin = window.location.origin;
+      if (!origin || origin.includes("null") || origin.includes("file:")) {
+        return "https://kasirquh.vercel.app/pelanggan.html"; // Fallback URL Vercel Anda
+      }
+      if (!window.location.pathname.includes("pelanggan.html")) {
+        return origin + "/pelanggan.html";
+      }
+      return window.location.href;
+    }
+
     function bukaModalQRCode() {
-      const currentUrl = window.location.href;
+      const currentUrl = getPelangganVercelUrl();
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
       document.getElementById('qr-code-img').src = qrApiUrl;
       const storeName = pengaturanToko.nama || "KasirQuh";
@@ -566,9 +577,9 @@
     }
 
     function bagikanAplikasiViaWA() {
-      const currentUrl = window.location.href;
+      const currentUrl = getPelangganVercelUrl();
       const storeName = pengaturanToko.nama || "KasirQuh";
-      const pesan = `Halo! Yuk belanja kebutuhan harian makin praktis di *${storeName}* pakai aplikasi KasirQuh.\n\nKlik tautan berikut untuk mulai belanja & daftar:\n${currentUrl}\n\nTinggal Pilih Barang • Belanja Beres! 🛒✨`;
+      const pesan = `Halo! Yuk belanja kebutuhan harian makin praktis di *${storeName}* pakai aplikasi KasirQuh.\n\nKlik tautan Vercel berikut untuk mulai belanja & daftar:\n${currentUrl}\n\nTinggal Pilih Barang • Beres! 🛒✨`;
       window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
     }
 
@@ -603,7 +614,7 @@
         ctx.fillRect(80, 120, 240, 240);
       }
 
-      const currentUrl = window.location.href;
+      const currentUrl = getPelangganVercelUrl();
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
       
       let img = new Image();
@@ -627,7 +638,7 @@
               await navigator.share({
                 files: [file],
                 title: 'Barcode ' + storeName,
-                text: 'Yuk scan barcode ini atau klik link untuk mulai belanja di ' + storeName + '!\n' + currentUrl
+                text: 'Yuk scan barcode ini atau klik link Vercel untuk mulai belanja di ' + storeName + '!\n' + currentUrl
               });
             } catch (err) {
               console.log(err);
@@ -712,6 +723,8 @@
       ctx.font = 'bold 13px sans-serif';
       ctx.fillText("🛒 Yuk Belanja di " + storeName, 200, 405);
 
+      const vercelUrl = getPelangganVercelUrl();
+
       canvas.toBlob(async (blob) => {
         const file = new File([blob], "produk-" + p.nama.replace(/[^a-zA-Z0-9]/g, '_') + ".png", { type: "image/png" });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -719,7 +732,7 @@
             await navigator.share({
               files: [file],
               title: p.nama,
-              text: `Yuk beli *${p.nama}* seharga Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan} di ${storeName}!`
+              text: `Yuk beli *${p.nama}* seharga Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan} di ${storeName}!\n\nCek di sini:\n${vercelUrl}`
             });
           } catch (err) {
             console.log(err);
