@@ -223,25 +223,11 @@
         <button class="chip-btn" style="border-color: #d97706; color: #d97706;" onclick="pilihKategoriPelanggan('Titipan Warga')">📦 Titipan Warga</button>
       </div>
 
+      <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER DINAMIS -->
       <div id="recipe-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
-        <div class="horizontal-scroll-container">
-          <div class="recipe-card">
-            <div style="font-weight: 800; color: #d97706; font-size: 0.85rem;">Sayur Sop Bening</div>
-            <div style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px;">Praktis, tinggal cemplung. Isian kol, wortel, bumbu kaldu.</div>
-            <button onclick="beliPaketResep('Sayur Sop', ['kol', 'wortel', 'royco', 'bawang'])" style="background: #16a34a; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; width: 100%;">+ Masukkan Bahan</button>
-          </div>
-          <div class="recipe-card">
-            <div style="font-weight: 800; color: #d97706; font-size: 0.85rem;">Nasi Goreng Dadakan</div>
-            <div style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px;">Bikin malam makin hangat. Butuh kecap, telur, bumbu instan.</div>
-            <button onclick="beliPaketResep('Nasi Goreng', ['kecap', 'telur', 'bumbu nasi goreng'])" style="background: #16a34a; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; width: 100%;">+ Masukkan Bahan</button>
-          </div>
-          <!-- KARTU MENU KUSTOM BARU -->
-          <div class="recipe-card" style="background: #f0fdf4; border-color: #bbf7d0;">
-            <div style="font-weight: 800; color: #16a34a; font-size: 0.85rem;">Kreasikan Menu Sendiri 👩‍🍳</div>
-            <div style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px;">Pilih bahan favoritmu, racik namanya, & pamerkan ke warga!</div>
-            <button onclick="bukaCustomRecipeModal()" style="background: #16a34a; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; width: 100%;">+ Buat Racikan</button>
-          </div>
+        <div class="horizontal-scroll-container" id="recipe-scroll-container">
+          <!-- Rendered via JavaScript -->
         </div>
       </div>
 
@@ -443,9 +429,12 @@
         <span>Estimasi Total:</span>
         <span style="color: #16a34a;">Rp <span id="custom-recipe-total">0</span></span>
       </div>
-      <div style="display: flex; gap: 6px;">
-        <button onclick="tambahCustomRecipeKeKeranjang()" style="flex: 1; background: #2563eb; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 0.78rem; cursor: pointer;">+ Keranjang</button>
-        <button onclick="kirimCustomRecipeKeRumpi()" style="flex: 1; background: #16a34a; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 0.78rem; cursor: pointer;">📢 Kirim Rumpi</button>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; gap: 6px;">
+          <button onclick="tambahCustomRecipeKeKeranjang()" style="flex: 1; background: #2563eb; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 0.78rem; cursor: pointer;">+ Keranjang</button>
+          <button onclick="kirimCustomRecipeKeRumpi()" style="flex: 1; background: #16a34a; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 0.78rem; cursor: pointer;">📢 Kirim Rumpi</button>
+        </div>
+        <button onclick="simpanCustomRecipeKeBeranda()" style="width: 100%; background: #d97706; color: white; border: none; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 0.78rem; cursor: pointer;">💾 Simpan ke Beranda</button>
       </div>
     </div>
   </div>
@@ -495,10 +484,20 @@
     let currentDetailCode = null; let currentDetailQty = 1; let currentDetailStep = 1;
     let customSelectedItems = {}; // code -> qty
 
+    // 5 Default Menu Resep Warga
+    const defaultRecipes = [
+      { nama: "Sayur Sop Bening", desc: "Praktis, tinggal cemplung. Isian kol, wortel, bumbu kaldu.", keywords: ['kol', 'wortel', 'royco', 'bawang'] },
+      { nama: "Nasi Goreng Dadakan", desc: "Bikin malam makin hangat. Butuh kecap, telur, bumbu instan.", keywords: ['kecap', 'telur', 'bumbu nasi goreng'] },
+      { nama: "Tumis Kangkung Segar", desc: "Menu rumahan favorit. Kangkung hijau segar dan bumbu pilihan.", keywords: ['kangkung', 'bawang', 'cabe'] },
+      { nama: "Mie Instan Telur", desc: "Andalan kala lapar melanda malam hari dengan tambahan telur.", keywords: ['mie instan', 'telur', 'sawi'] },
+      { nama: "Es Teh Manis Segar", desc: "Pelepas dahaga di siang hari yang panas dan menyegarkan.", keywords: ['teh', 'gula', 'es'] }
+    ];
+
     window.onload = function() {
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'auto');
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; }
       initChatRumpiListener();
+      renderRecipeCards();
       if (currentCustomerPhone) {
         document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); periksaCheckinHarian(); tampilkanKoinDiProfil();
@@ -510,12 +509,41 @@
     function klaimKoinHarian() { let today = new Date().toLocaleDateString('id-ID'); localStorage.setItem('last_checkin_date_' + currentCustomerPhone, today); let currentCoins = parseInt(localStorage.getItem('koin_warga_' + currentCustomerPhone)) || 0; localStorage.setItem('koin_warga_' + currentCustomerPhone, currentCoins + 10); document.getElementById('dailyCheckinModal').style.display = 'none'; showToast("🪙 Yey! 10 Koin berhasil ditambahkan ke dompetmu."); playBeep(); tampilkanKoinDiProfil(); }
     function tampilkanKoinDiProfil() { let coins = localStorage.getItem('koin_warga_' + currentCustomerPhone) || 0; document.getElementById('profile-coins').innerText = coins; }
 
-    function beliPaketResep(namaResep, keywords) {
+    function beliPaketResepByKeywords(namaResep, keywords) {
       if(!isProductsLoaded) return showToast("Tunggu katalog dimuat dulu ya kak.", "error");
       let addedCount = 0;
       keywords.forEach(kw => { let foundCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase().includes(kw)); if (foundCode) { tambahKeKeranjangDiamDiam(foundCode); addedCount++; } });
       if (addedCount > 0) { showToast(`🥘 Bahan ${namaResep} berhasil dimasukkan!`); renderCartPelanggan(); openCartModal(); } else { showToast(`Maaf, bahan untuk ${namaResep} lagi kosong di toko.`, "error"); }
     }
+    
+    function beliPaketResepCustom(recipeObj) {
+      if(!isProductsLoaded) return showToast("Tunggu katalog dimuat dulu ya kak.", "error");
+      let addedCount = 0;
+      if(recipeObj.items) {
+        recipeObj.items.forEach(it => {
+          let p = databaseProduk[it.code];
+          if(p && (p.stok || 0) >= it.qty) {
+            let satuan = (p.satuan || "").toLowerCase().trim();
+            let isKg = (satuan === "kg" || satuan === "kilogram");
+            let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+            let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
+            let valModal = p.hargaModal !== undefined ? p.hargaModal : (p.modal || 0);
+            let modalParsed = typeof valModal === 'number' ? valModal : parseInt(valModal.toString().replace(/[^0-9]/g, '')) || 0;
+            if (isKg) { hargaParsed *= 10; modalParsed *= 10; }
+
+            let item = cart.find(i => i.code === it.code);
+            if (item) {
+              item.qty += it.qty; item.qty = parseFloat(item.qty.toFixed(3)); item.subtotal = Math.round(item.qty * hargaParsed);
+            } else {
+              cart.push({ code: it.code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: it.qty, subtotal: Math.round(it.qty * hargaParsed), foto: p.foto });
+            }
+            addedCount++;
+          }
+        });
+      }
+      if (addedCount > 0) { showToast(`🥘 Bahan ${recipeObj.nama} berhasil dimasukkan!`); renderCartPelanggan(); openCartModal(); } else { showToast(`Maaf, bahan untuk ${recipeObj.nama} sedang kosong.`, "error"); }
+    }
+
     function tambahKeKeranjangDiamDiam(code) {
       let p = databaseProduk[code]; if (!p || (p.stok || 0) <= 0) return; let satuan = (p.satuan || "").toLowerCase().trim(); let qtyToAdd = (satuan === "kg" || satuan === "kilogram") ? 0.25 : 1;
       let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
@@ -524,6 +552,64 @@
       let item = cart.find(i => i.code === code);
       if (item) { if (item.qty + qtyToAdd <= p.stok) { item.qty += qtyToAdd; item.qty = parseFloat(item.qty.toFixed(3)); item.subtotal = Math.round(item.qty * hargaParsed); } } 
       else { if (qtyToAdd <= p.stok) { cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); } }
+    }
+
+    // --- RENDER 5 MENU DEFAULT + CUSTOM SAVED RECIPES ---
+    function renderRecipeCards() {
+      const container = document.getElementById('recipe-scroll-container');
+      if(!container) return;
+      container.innerHTML = "";
+
+      // 1. Render 5 Default Recipes
+      defaultRecipes.forEach(r => {
+        let escName = escapeHtml(r.nama);
+        let escDesc = escapeHtml(r.desc);
+        let kwJson = JSON.stringify(r.keywords).replace(/"/g, '&quot;');
+        container.innerHTML += `
+          <div class="recipe-card">
+            <div style="font-weight: 800; color: #d97706; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escName}</div>
+            <div style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escDesc}</div>
+            <button onclick='beliPaketResepByKeywords("${escName}", ${kwJson})' style="background: #16a34a; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; width: 100%; margin-top: auto;">+ Masukkan Bahan</button>
+          </div>`;
+      });
+
+      // 2. Render Saved Custom Recipes from localStorage
+      let savedKey = 'cust_saved_recipes_' + (currentCustomerPhone || 'guest');
+      let savedRecipes = [];
+      try {
+        savedRecipes = JSON.parse(localStorage.getItem(savedKey)) || [];
+      } catch(e) { savedRecipes = []; }
+
+      savedRecipes.forEach((sr, idx) => {
+        let escName = escapeHtml(sr.nama);
+        container.innerHTML += `
+          <div class="recipe-card" style="border-color: #3b82f6; background: #eff6ff;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 4px;">
+              <div style="font-weight: 800; color: #2563eb; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">⭐ ${escName}</div>
+              <button onclick="hapusSavedRecipe(${idx})" title="Hapus" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.7rem; padding:0;">✕</button>
+            </div>
+            <div style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Racikan Kustom Saya</div>
+            <button onclick='beliPaketResepCustom(${JSON.stringify(sr).replace(/'/g, "&#39;")})' style="background: #2563eb; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; width: 100%; margin-top: auto;">+ Masukkan Bahan</button>
+          </div>`;
+      });
+
+      // 3. Kartu Kreasikan Menu Sendiri
+      container.innerHTML += `
+        <div class="recipe-card" style="background: #f0fdf4; border-color: #bbf7d0;">
+          <div style="font-weight: 800; color: #16a34a; font-size: 0.85rem;">Kreasikan Menu Sendiri 👩‍🍳</div>
+          <div style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 4px;">Pilih bahan favoritmu, racik namanya, & simpan/pamerkan!</div>
+          <button onclick="bukaCustomRecipeModal()" style="background: #16a34a; color: white; border: none; padding: 4px 6px; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; width: 100%; margin-top: auto;">+ Buat Racikan</button>
+        </div>`;
+    }
+
+    function hapusSavedRecipe(idx) {
+      let savedKey = 'cust_saved_recipes_' + (currentCustomerPhone || 'guest');
+      let savedRecipes = [];
+      try { savedRecipes = JSON.parse(localStorage.getItem(savedKey)) || []; } catch(e) {}
+      savedRecipes.splice(idx, 1);
+      localStorage.setItem(savedKey, JSON.stringify(savedRecipes));
+      renderRecipeCards();
+      showToast("Menu kustom dihapus dari beranda.");
     }
 
     // --- LOGIKA KUSTOM MENU BUILDER ---
@@ -654,6 +740,29 @@
       closeCustomRecipeModal();
       openCartModal();
     }
+    
+    function simpanCustomRecipeKeBeranda() {
+      let keys = Object.keys(customSelectedItems);
+      if (keys.length === 0) return showToast("Pilih minimal 1 bahan untuk disimpan!", "error");
+      let recipeName = document.getElementById('custom-recipe-title').value.trim() || "Menu Racikan Sendiri";
+
+      let itemsArr = [];
+      keys.forEach(code => {
+        itemsArr.push({ code: code, qty: customSelectedItems[code] });
+      });
+
+      let savedKey = 'cust_saved_recipes_' + (currentCustomerPhone || 'guest');
+      let savedRecipes = [];
+      try { savedRecipes = JSON.parse(localStorage.getItem(savedKey)) || []; } catch(e) {}
+      
+      savedRecipes.push({ nama: recipeName, items: itemsArr });
+      localStorage.setItem(savedKey, JSON.stringify(savedRecipes));
+
+      renderRecipeCards();
+      closeCustomRecipeModal();
+      showToast("💾 Menu racikan berhasil disimpan ke beranda!");
+    }
+
     function kirimCustomRecipeKeRumpi() {
       if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu untuk berbagi resep!", "error");
       let keys = Object.keys(customSelectedItems);
@@ -828,7 +937,7 @@
     function initCustomerChatListener() { if (!currentCustomerPhone) return; db.collection("chats").doc(currentCustomerPhone).onSnapshot((doc) => { if (doc.exists) { let unread = doc.data().unreadCustomer || 0; let badgeAdminSub = document.getElementById("badge-admin-subtab"); if (badgeAdminSub) { if (unread > 0) { badgeAdminSub.innerText = unread; badgeAdminSub.style.display = "inline-block"; } else { badgeAdminSub.style.display = "none"; } } } }); if (customerChatUnsubscribe) customerChatUnsubscribe(); let isInitialLoadChat = true; customerChatUnsubscribe = db.collection("chats").doc(currentCustomerPhone).collection("messages").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => { if (!isInitialLoadChat) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().pengirim === "admin") { playCustomerNotificationSound(); } }); } isInitialLoadChat = false; let msgContainer = document.getElementById("customer-chat-messages"); if (!msgContainer) return; msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>` : ""; snapshot.forEach(doc => { let m = doc.data(); let isCustomer = m.pengirim === "customer"; let alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignBubble}"><div>${m.pesan}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; }); msgContainer.scrollTop = msgContainer.scrollHeight; }); }
     function kirimPesanPelanggan() { if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu!", "error"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { db.collection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { showToast("Gagal mengirim pesan: " + err.message, "error"); }); }
 
-    function prosesLoginPelanggan(e) { e.preventDefault(); const phone = document.getElementById('cust-login-phone').value.trim(); const pass = document.getElementById('cust-login-pass').value.trim(); if (!phone || !pass) return showToast("Nomor WhatsApp dan Sandi wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (snapshot.empty) { showToast("Nomor belum terdaftar. Silakan daftar dulu.", "error"); } else { let docData = snapshot.docs[0].data(); if (docData.status === "pending" || docData.disetujui === false) return showToast("Akun sedang menunggu persetujuan Admin.", "error"); if (pass === (docData.password || "user")) { localStorage.setItem('cust_phone_v13', phone); currentCustomerPhone = phone; currentCustomerName = docData.nama || 'Pelanggan'; document.getElementById('customerLoginModal').style.display = 'none'; muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); refreshKatalogPelanggan(); showToast("Berhasil Masuk! Selamat Berbelanja 🛒"); periksaCheckinHarian(); tampilkanKoinDiProfil(); } else { showToast("Sandi salah!", "error"); } } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
+    function prosesLoginPelanggan(e) { e.preventDefault(); const phone = document.getElementById('cust-login-phone').value.trim(); const pass = document.getElementById('cust-login-pass').value.trim(); if (!phone || !pass) return showToast("Nomor WhatsApp dan Sandi wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (snapshot.empty) { showToast("Nomor belum terdaftar. Silakan daftar dulu.", "error"); } else { let docData = snapshot.docs[0].data(); if (docData.status === "pending" || docData.disetujui === false) return showToast("Akun sedang menunggu persetujuan Admin.", "error"); if (pass === (docData.password || "user")) { localStorage.setItem('cust_phone_v13', phone); currentCustomerPhone = phone; currentCustomerName = docData.nama || 'Pelanggan'; document.getElementById('customerLoginModal').style.display = 'none'; muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); refreshKatalogPelanggan(); showToast("Berhasil Masuk! Selamat Berbelanja 🛒"); periksaCheckinHarian(); tampilkanKoinDiProfil(); renderRecipeCards(); } else { showToast("Sandi salah!", "error"); } } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
     function prosesDaftarPelanggan(e) { e.preventDefault(); const name = document.getElementById('cust-reg-name').value.trim(); const phone = document.getElementById('cust-reg-phone').value.trim(); const address = document.getElementById('cust-reg-address').value.trim(); const pass = document.getElementById('cust-reg-pass').value.trim(); if (!name || !phone || !address || !pass) return showToast("Semua kolom wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (!snapshot.empty) { showToast("Nomor sudah terdaftar! Silakan langsung masuk.", "error"); gantiFormAuth('login'); } else { db.collection("pelanggan").add({ nama: name, phone: phone, alamat: address, password: pass, status: "pending", catatan: [], waktuDaftar: new Date().toLocaleString('id-ID') }).then(() => { showToast("Pendaftaran berhasil! Menunggu ACC Admin."); document.getElementById('cust-reg-name').value = ''; document.getElementById('cust-reg-phone').value = ''; document.getElementById('cust-reg-address').value = ''; document.getElementById('cust-reg-pass').value = ''; gantiFormAuth('login'); }).catch((err) => { showToast("Gagal mendaftar: " + err.message, "error"); }); } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
     function logoutPelanggan() { if (confirm("Keluar dari sesi ini?")) { localStorage.removeItem('cust_phone_v13'); currentCustomerPhone = ''; document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); location.reload(); } }
 
