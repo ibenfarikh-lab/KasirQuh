@@ -2007,5 +2007,184 @@
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
   </script>
+<style>
+
+/* ============================================================
+   PELANGGAN COLORFUL V3 — CONTRAST FIX
+   No gradient in Colorful + readable Light/Dark text
+   ============================================================ */
+
+/* ---------- LIGHT: fix white/yellow text on white cards ---------- */
+[data-theme="light"] .card,
+[data-theme="light"] .product-card,
+[data-theme="light"] .menu-card,
+[data-theme="light"] .section-card,
+[data-theme="light"] .category-card,
+[data-theme="light"] .summary-card,
+[data-theme="light"] .order-card,
+[data-theme="light"] .cart-card,
+[data-theme="light"] .profile-card,
+[data-theme="terang"] .card,
+[data-theme="terang"] .product-card,
+[data-theme="terang"] .menu-card,
+[data-theme="terang"] .section-card,
+[data-theme="terang"] .category-card,
+[data-theme="terang"] .summary-card,
+[data-theme="terang"] .order-card,
+[data-theme="terang"] .cart-card,
+[data-theme="terang"] .profile-card {
+  color: #111827 !important;
+}
+
+/* Inline white text must become dark on Light cards. */
+[data-theme="light"] .card [style*="#fff"],
+[data-theme="light"] .card [style*="#ffffff"],
+[data-theme="light"] .card [style*="white"],
+[data-theme="light"] .product-card [style*="#fff"],
+[data-theme="light"] .product-card [style*="#ffffff"],
+[data-theme="light"] .product-card [style*="white"],
+[data-theme="terang"] .card [style*="#fff"],
+[data-theme="terang"] .card [style*="#ffffff"],
+[data-theme="terang"] .card [style*="white"],
+[data-theme="terang"] .product-card [style*="#fff"],
+[data-theme="terang"] .product-card [style*="#ffffff"],
+[data-theme="terang"] .product-card [style*="white"] {
+  color: #111827 !important;
+}
+
+/* Prices on light product cards: readable dark text. */
+[data-theme="light"] .product-card .price,
+[data-theme="light"] .product-card [class*="price"],
+[data-theme="light"] .card .price,
+[data-theme="light"] .card [class*="price"],
+[data-theme="terang"] .product-card .price,
+[data-theme="terang"] .product-card [class*="price"],
+[data-theme="terang"] .card .price,
+[data-theme="terang"] .card [class*="price"] {
+  color: #111827 !important;
+}
+
+/* ---------- DARK: white text ---------- */
+[data-theme="dark"] .card,
+[data-theme="dark"] .product-card,
+[data-theme="dark"] .menu-card,
+[data-theme="dark"] .section-card,
+[data-theme="dark"] .category-card,
+[data-theme="dark"] .summary-card,
+[data-theme="dark"] .order-card,
+[data-theme="dark"] .cart-card,
+[data-theme="dark"] .profile-card,
+[data-theme="gelap"] .card,
+[data-theme="gelap"] .product-card,
+[data-theme="gelap"] .menu-card,
+[data-theme="gelap"] .section-card,
+[data-theme="gelap"] .category-card,
+[data-theme="gelap"] .summary-card,
+[data-theme="gelap"] .order-card,
+[data-theme="gelap"] .cart-card,
+[data-theme="gelap"] .profile-card {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card *,
+[data-theme="dark"] .product-card *,
+[data-theme="dark"] .menu-card *,
+[data-theme="gelap"] .card *,
+[data-theme="gelap"] .product-card *,
+[data-theme="gelap"] .menu-card * {
+  color: #ffffff !important;
+}
+
+/* ---------- COLORFUL: absolutely no gradient ---------- */
+[data-theme="colorful"] *,
+[data-theme="colorful"] *::before,
+[data-theme="colorful"] *::after {
+  background-image: none !important;
+}
+
+/* Base colorful surfaces are solid. */
+[data-theme="colorful"] .card,
+[data-theme="colorful"] .product-card,
+[data-theme="colorful"] .menu-card,
+[data-theme="colorful"] .section-card,
+[data-theme="colorful"] .category-card,
+[data-theme="colorful"] .summary-card,
+[data-theme="colorful"] .order-card,
+[data-theme="colorful"] .cart-card,
+[data-theme="colorful"] .profile-card,
+[data-theme="colorful"] .modal-content {
+  background: #2563eb !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+/* Solid palette. */
+[data-theme="colorful"] .card:nth-child(5n+1),
+[data-theme="colorful"] .product-card:nth-child(5n+1),
+[data-theme="colorful"] .menu-card:nth-child(5n+1) { background: #2563eb !important; }
+
+[data-theme="colorful"] .card:nth-child(5n+2),
+[data-theme="colorful"] .product-card:nth-child(5n+2),
+[data-theme="colorful"] .menu-card:nth-child(5n+2) { background: #f97316 !important; }
+
+[data-theme="colorful"] .card:nth-child(5n+3),
+[data-theme="colorful"] .product-card:nth-child(5n+3),
+[data-theme="colorful"] .menu-card:nth-child(5n+3) { background: #10b981 !important; }
+
+[data-theme="colorful"] .card:nth-child(5n+4),
+[data-theme="colorful"] .product-card:nth-child(5n+4),
+[data-theme="colorful"] .menu-card:nth-child(5n+4) { background: #8b5cf6 !important; }
+
+[data-theme="colorful"] .card:nth-child(5n+5),
+[data-theme="colorful"] .product-card:nth-child(5n+5),
+[data-theme="colorful"] .menu-card:nth-child(5n+5) { background: #ec4899 !important; }
+
+/* Colorful text remains white on the solid cards. */
+[data-theme="colorful"] .card *,
+[data-theme="colorful"] .product-card *,
+[data-theme="colorful"] .menu-card *,
+[data-theme="colorful"] .section-card *,
+[data-theme="colorful"] .category-card * {
+  color: #ffffff !important;
+}
+
+/* Remove gradient from common buttons and navigation surfaces. */
+[data-theme="colorful"] button,
+[data-theme="colorful"] .btn,
+[data-theme="colorful"] .button,
+[data-theme="colorful"] .nav-btn,
+[data-theme="colorful"] .menu-item,
+[data-theme="colorful"] .tab,
+[data-theme="colorful"] .chip {
+  background-image: none !important;
+}
+
+/* Solid controls. */
+[data-theme="colorful"] button,
+[data-theme="colorful"] .btn,
+[data-theme="colorful"] .button {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* Keep the customer menu colorful but solid. */
+[data-theme="colorful"] #menuModal button:nth-child(1),
+[data-theme="colorful"] #menuModal .menu-item:nth-child(1) { background-color: #2563eb !important; }
+[data-theme="colorful"] #menuModal button:nth-child(2),
+[data-theme="colorful"] #menuModal .menu-item:nth-child(2) { background-color: #10b981 !important; }
+[data-theme="colorful"] #menuModal button:nth-child(3),
+[data-theme="colorful"] #menuModal .menu-item:nth-child(3) { background-color: #f97316 !important; }
+[data-theme="colorful"] #menuModal button:nth-child(4),
+[data-theme="colorful"] #menuModal .menu-item:nth-child(4) { background-color: #8b5cf6 !important; }
+
+/* Inputs in Colorful stay solid dark. */
+[data-theme="colorful"] input,
+[data-theme="colorful"] select,
+[data-theme="colorful"] textarea {
+  background: #111827 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+</style>
 </body>
 </html>
