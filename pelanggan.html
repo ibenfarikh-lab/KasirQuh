@@ -560,15 +560,15 @@
     function tampilkanKoinDiProfil() { let coins = localStorage.getItem('koin_warga_' + currentCustomerPhone) || 0; document.getElementById('profile-coins').innerText = coins; }
 
     function beliPaketResepByKeywords(namaResep, keywords) {
-      if(!isProductsLoaded) return showToast("Tunggu katalog dimuat dulu ya kak.", "error");
+      if(!isProductsLoaded) return alert("Tunggu katalog dimuat dulu ya kak.");
       let addedCount = 0;
       keywords.forEach(kw => { let foundCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase().includes(kw)); if (foundCode) { tambahKeKeranjangDiamDiam(foundCode); addedCount++; } });
-      if (addedCount > 0) { showToast(`🥘 Bahan ${namaResep} berhasil dimasukkan!`); renderCartPelanggan(); openCartModal(); } else { showToast(`Maaf, bahan untuk ${namaResep} lagi kosong di toko.`, "error"); }
+      if (addedCount > 0) { showToast(`🥘 Bahan ${namaResep} berhasil dimasukkan!`); renderCartPelanggan(); openCartModal(); } else { alert(`Maaf, bahan untuk ${namaResep} lagi kosong di toko.`); }
     }
     
     function bagikanResepKeywordsKeRumpi(namaResep, keywords) {
-      if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu untuk berbagi resep!", "error");
-      if(!isProductsLoaded) return showToast("Tunggu katalog dimuat dulu ya kak.", "error");
+      if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu untuk berbagi resep!");
+      if(!isProductsLoaded) return alert("Tunggu katalog dimuat dulu ya kak.");
       let foundItemsText = "";
       keywords.forEach(kw => {
         let foundCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase().includes(kw));
@@ -591,12 +591,12 @@
         switchTabPelanggan('live-chat');
         switchSubTabLiveChat('rumpi');
       }).catch(err => {
-        showToast("Gagal membagikan: " + err.message, "error");
+        alert("Gagal membagikan: " + err.message);
       });
     }
 
     function beliPaketResepCustom(recipeObj) {
-      if(!isProductsLoaded) return showToast("Tunggu katalog dimuat dulu ya kak.", "error");
+      if(!isProductsLoaded) return alert("Tunggu katalog dimuat dulu ya kak.");
       let addedCount = 0;
       if(recipeObj.items) {
         recipeObj.items.forEach(it => {
@@ -620,11 +620,11 @@
           }
         });
       }
-      if (addedCount > 0) { showToast(`🥘 Bahan ${recipeObj.nama} berhasil dimasukkan!`); renderCartPelanggan(); openCartModal(); } else { showToast(`Maaf, bahan untuk ${recipeObj.nama} sedang kosong.`, "error"); }
+      if (addedCount > 0) { showToast(`🥘 Bahan ${recipeObj.nama} berhasil dimasukkan!`); renderCartPelanggan(); openCartModal(); } else { alert(`Maaf, bahan untuk ${recipeObj.nama} sedang kosong.`); }
     }
 
     function bagikanResepCustomKeRumpi(recipeObj) {
-      if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu untuk berbagi resep!", "error");
+      if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu untuk berbagi resep!");
       let total = 0;
       let itemListText = "";
       recipeObj.items.forEach(it => {
@@ -654,7 +654,7 @@
         switchTabPelanggan('live-chat');
         switchSubTabLiveChat('rumpi');
       }).catch(err => {
-        showToast("Gagal membagikan: " + err.message, "error");
+        alert("Gagal membagikan: " + err.message);
       });
     }
 
@@ -785,7 +785,7 @@
     }
 
     function hapusSavedRecipe(idx) {
-      if (!currentCustomerDocId) return showToast("Silakan login terlebih dahulu.", "error");
+      if (!currentCustomerDocId) return alert("Silakan login terlebih dahulu.");
       if (!confirm("Hapus menu resep tersimpan ini?")) return;
       
       let updatedRecipes = [...customerSavedRecipes];
@@ -798,7 +798,7 @@
         renderRecipeCards();
         showToast("Menu kustom berhasil dihapus.");
       }).catch(err => {
-        showToast("Gagal menghapus: " + err.message, "error");
+        alert("Gagal menghapus: " + err.message);
       });
     }
 
@@ -891,7 +891,7 @@
 
       let item = cart.find(i => i.code === currentDetailCode);
       if (item) { 
-        if (item.qty + qtyToAdd > p.stok) return showToast("Stok tidak mencukupi!", "error"); 
+        if (item.qty + qtyToAdd > p.stok) return alert("Stok tidak mencukupi!"); 
         item.qty += qtyToAdd; item.qty = parseFloat(item.qty.toFixed(3)); item.subtotal = Math.round(item.qty * hargaParsed); 
       } else { 
         cart.push({ code: currentDetailCode, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); 
@@ -936,13 +936,100 @@
         });
     }
 
-    function kirimPesanChatRumpi() { if (!currentCustomerPhone) return showToast("Silakan login untuk ikut merumpikan!", "error"); let inputEl = document.getElementById("chat-rumpi-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("db_chat_rumpi").add({ senderPhone: currentCustomerPhone, senderName: currentCustomerName || 'Pelanggan', pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { inputEl.value = ""; }).catch(err => { showToast("Gagal mengirim pesan: " + err.message, "error"); }); }
+    function kirimPesanChatRumpi() { if (!currentCustomerPhone) return alert("Silakan login untuk ikut merumpikan!"); let inputEl = document.getElementById("chat-rumpi-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("db_chat_rumpi").add({ senderPhone: currentCustomerPhone, senderName: currentCustomerName || 'Pelanggan', pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
     function initCustomerChatListener() { if (!currentCustomerPhone) return; db.collection("chats").doc(currentCustomerPhone).onSnapshot((doc) => { if (doc.exists) { let unread = doc.data().unreadCustomer || 0; let badgeAdminSub = document.getElementById("badge-admin-subtab"); if (badgeAdminSub) { if (unread > 0) { badgeAdminSub.innerText = unread; badgeAdminSub.style.display = "inline-block"; } else { badgeAdminSub.style.display = "none"; } } } }); if (customerChatUnsubscribe) customerChatUnsubscribe(); let isInitialLoadChat = true; customerChatUnsubscribe = db.collection("chats").doc(currentCustomerPhone).collection("messages").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => { if (!isInitialLoadChat) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().pengirim === "admin") { playCustomerNotificationSound(); } }); } isInitialLoadChat = false; let msgContainer = document.getElementById("customer-chat-messages"); if (!msgContainer) return; msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>` : ""; snapshot.forEach(doc => { let m = doc.data(); let isCustomer = m.pengirim === "customer"; let alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignBubble}"><div>${m.pesan}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; }); msgContainer.scrollTop = msgContainer.scrollHeight; }); }
-    function kirimPesanPelanggan() { if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu!", "error"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { db.collection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { showToast("Gagal mengirim pesan: " + err.message, "error"); }); }
+    function kirimPesanPelanggan() { if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu!"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { db.collection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
 
-    function prosesLoginPelanggan(e) { e.preventDefault(); const phone = document.getElementById('cust-login-phone').value.trim(); const pass = document.getElementById('cust-login-pass').value.trim(); if (!phone || !pass) return showToast("Nomor WhatsApp dan Sandi wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (snapshot.empty) { showToast("Nomor belum terdaftar. Silakan daftar dulu.", "error"); } else { let docData = snapshot.docs[0].data(); if (docData.status === "pending" || docData.disetujui === false) return showToast("Akun sedang menunggu persetujuan Admin.", "error"); if (pass === (docData.password || "user")) { localStorage.setItem('cust_phone_v13', phone); currentCustomerPhone = phone; currentCustomerName = docData.nama || 'Pelanggan'; document.getElementById('customerLoginModal').style.display = 'none'; muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); refreshKatalogPelanggan(); showToast("Berhasil Masuk! Selamat Berbelanja 🛒"); periksaCheckinHarian(); tampilkanKoinDiProfil(); renderRecipeCards(); } else { showToast("Sandi salah!", "error"); } } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
-    function prosesDaftarPelanggan(e) { e.preventDefault(); const name = document.getElementById('cust-reg-name').value.trim(); const phone = document.getElementById('cust-reg-phone').value.trim(); const address = document.getElementById('cust-reg-address').value.trim(); const pass = document.getElementById('cust-reg-pass').value.trim(); if (!name || !phone || !address || !pass) return showToast("Semua kolom wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (!snapshot.empty) { showToast("Nomor sudah terdaftar! Silakan langsung masuk.", "error"); gantiFormAuth('login'); } else { db.collection("pelanggan").add({ nama: name, phone: phone, alamat: address, password: pass, status: "pending", catatan: [], savedRecipes: [], waktuDaftar: new Date().toLocaleString('id-ID') }).then(() => { showToast("Pendaftaran berhasil! Menunggu ACC Admin."); document.getElementById('cust-reg-name').value = ''; document.getElementById('cust-reg-phone').value = ''; document.getElementById('cust-reg-address').value = ''; document.getElementById('cust-reg-pass').value = ''; gantiFormAuth('login'); }).catch((err) => { showToast("Gagal mendaftar: " + err.message, "error"); }); } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
-    function logoutPelanggan() { if (confirm("Keluar dari sesi ini?")) { localStorage.removeItem('cust_phone_v13'); currentCustomerPhone = ''; document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); location.reload(); } }
+    // ====== FUNGSI AUTH DENGAN ALERT() DARI VERSI LAMA ======
+    function prosesLoginPelanggan(e) {
+      e.preventDefault();
+      const phone = document.getElementById('cust-login-phone').value.trim();
+      const pass = document.getElementById('cust-login-pass').value.trim();
+      if (!phone || !pass) return alert("Nomor WhatsApp dan Sandi wajib diisi!");
+
+      db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
+        if (snapshot.empty) {
+          alert("Nomor WhatsApp belum terdaftar. Silakan daftar terlebih dahulu.");
+        } else {
+          let docData = snapshot.docs[0].data();
+          
+          if (docData.status === "pending" || docData.disetujui === false) {
+            return alert("Akun Anda sedang menunggu persetujuan dari Admin toko. Silakan hubungi admin.");
+          }
+
+          if (pass === (docData.password || "user")) {
+            localStorage.setItem('cust_phone_v13', phone);
+            currentCustomerPhone = phone;
+            currentCustomerName = docData.nama || 'Pelanggan';
+            document.getElementById('customerLoginModal').style.display = 'none';
+            muatDataPelangganRealtime();
+            muatRiwayatPesananOnlinePelanggan();
+            initCustomerChatListener();
+            refreshKatalogPelanggan();
+
+            // Init fitur tambahan dari versi baru
+            showToast("Berhasil Masuk! Selamat Berbelanja 🛒");
+            periksaCheckinHarian();
+            tampilkanKoinDiProfil();
+            renderRecipeCards();
+          } else {
+            alert("Sandi salah!");
+          }
+        }
+      }).catch(err => {
+        alert("Terjadi kesalahan saat masuk: " + err.message);
+      });
+    }
+
+    function prosesDaftarPelanggan(e) {
+      e.preventDefault();
+      const name = document.getElementById('cust-reg-name').value.trim();
+      const phone = document.getElementById('cust-reg-phone').value.trim();
+      const address = document.getElementById('cust-reg-address').value.trim();
+      const pass = document.getElementById('cust-reg-pass').value.trim();
+
+      if (!name || !phone || !address || !pass) return alert("Semua kolom wajib diisi!");
+
+      db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => {
+        if (!snapshot.empty) {
+          alert("Nomor WhatsApp sudah terdaftar! Silakan langsung masuk.");
+          gantiFormAuth('login');
+        } else {
+          db.collection("pelanggan").add({
+            nama: name,
+            phone: phone,
+            alamat: address,
+            password: pass,
+            status: "pending",
+            catatan: [],
+            savedRecipes: [], // Dipertahankan untuk fitur "Simpan Menu"
+            waktuDaftar: new Date().toLocaleString('id-ID')
+          }).then(() => {
+            alert("Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan Admin toko sebelum dapat digunakan untuk masuk.");
+            document.getElementById('cust-reg-name').value = '';
+            document.getElementById('cust-reg-phone').value = '';
+            document.getElementById('cust-reg-address').value = '';
+            document.getElementById('cust-reg-pass').value = '';
+            gantiFormAuth('login');
+          }).catch((err) => {
+            alert("Gagal mendaftar: " + err.message);
+          });
+        }
+      }).catch(err => {
+        alert("Terjadi kesalahan: " + err.message);
+      });
+    }
+
+    function logoutPelanggan() { 
+      if (confirm("Keluar dari sesi ini?")) { 
+        localStorage.removeItem('cust_phone_v13'); 
+        currentCustomerPhone = ''; 
+        document.getElementById('customerLoginModal').style.display = 'flex'; 
+        gantiFormAuth('login'); 
+        location.reload(); 
+      } 
+    }
+    // ========================================================
 
     function initFirebaseListeners() {
       db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; } });
@@ -1002,7 +1089,6 @@
       }).catch(()=>{});
     }
 
-    // FUNGSI INISIALISASI AUTO-SCROLL YANG MENDUKUNG SENTUHAN/GESEKAN JARI
     function setupAutoScrollInteraction(containerId) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -1058,7 +1144,7 @@
 
     function tambahKeKeranjangCepat(code) {
       let p = databaseProduk[code];
-      if (!p || (p.stok || 0) <= 0) return showToast("Maaf, stok barang ini sudah habis!", "error");
+      if (!p || (p.stok || 0) <= 0) return alert("Maaf, stok barang ini sudah habis!");
       
       let satuan = (p.satuan || "").toLowerCase().trim();
       let qtyToAdd = (satuan === "kg" || satuan === "kilogram") ? 0.25 : 1; 
@@ -1077,7 +1163,7 @@
           item.qty = parseFloat(item.qty.toFixed(3));
           item.subtotal = Math.round(item.qty * hargaParsed);
         } else {
-          return showToast("Stok tidak mencukupi!", "error");
+          return alert("Stok tidak mencukupi!");
         }
       } else {
         if (qtyToAdd <= p.stok) {
@@ -1195,11 +1281,11 @@
       let step = isKg ? 0.25 : 1;
       
       if (dir > 0) {
-        if(item.qty + step > p.stok) { showToast("Stok tidak mencukupi!", "error"); return; }
+        if(item.qty + step > p.stok) { alert("Stok tidak mencukupi!"); return; }
         item.qty += step; playBeep();
       } else {
         if(item.qty - step < step) { 
-           cart.splice(idx, 1); playBeepDown(); showToast("Dihapus dari keranjang", "error"); 
+           cart.splice(idx, 1); playBeepDown(); 
         } else { item.qty -= step; playBeepDown(); }
       }
       
@@ -1210,7 +1296,7 @@
       renderCartPelanggan();
     }
 
-    function kosongkanKeranjang() { if (cart.length === 0) return showToast("Keranjang sudah kosong!", "error"); if (confirm("Kosongkan keranjang?")) { cart = []; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal(); showToast("Keranjang berhasil dikosongkan."); } }
+    function kosongkanKeranjang() { if (cart.length === 0) return alert("Keranjang sudah kosong!"); if (confirm("Kosongkan keranjang?")) { cart = []; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal(); } }
     function openCartModal() { document.getElementById("cartModal").classList.add("show"); }
     function closeCartModal() { document.getElementById("cartModal").classList.remove("show"); }
     function togglePayMethodCust() { document.getElementById("wrapper-tf-proof").style.display = (document.getElementById("pay-method-cust").value === "TF") ? "block" : "none"; }
@@ -1218,13 +1304,13 @@
 
     // --- FUNGSI SIMPAN MENU SAJA TANPA BELANJA ---
     function prosesSimpanMenuSaja() {
-      if (cart.length === 0) return showToast("Keranjang kosong, tidak ada barang untuk disimpan!", "error");
-      if (!currentCustomerDocId) return showToast("Silakan login terlebih dahulu.", "error");
+      if (cart.length === 0) return alert("Keranjang kosong, tidak ada barang untuk disimpan!");
+      if (!currentCustomerDocId) return alert("Silakan login terlebih dahulu.");
 
       const saveRecipeName = document.getElementById("cust-save-recipe-name").value.trim();
       const isShareRumpiChecked = document.getElementById("cust-share-rumpi-toggle").checked;
 
-      if (!saveRecipeName) return showToast("Harap isi nama menu resep terlebih dahulu!", "error");
+      if (!saveRecipeName) return alert("Harap isi nama menu resep terlebih dahulu!");
 
       let itemsArr = cart.map(i => ({ code: i.code, qty: i.qty }));
       let newRecipeObj = { nama: saveRecipeName, items: itemsArr };
@@ -1258,12 +1344,12 @@
         document.getElementById("wrapper-save-recipe-fields").style.display = "none";
         closeCartModal();
       }).catch(err => {
-        showToast("Gagal menyimpan menu: " + err.message, "error");
+        alert("Gagal menyimpan menu: " + err.message);
       });
     }
 
     async function prosesCheckoutPelanggan() {
-      if (cart.length === 0) return showToast("Keranjang kosong!", "error"); 
+      if (cart.length === 0) return alert("Keranjang kosong!"); 
       const payMethod = document.getElementById("pay-method-cust").value; 
       const proofBase64 = document.getElementById("cust-proof-base64").value; 
       const catatanPelanggan = document.getElementById("cust-order-note").value.trim(); 
@@ -1271,8 +1357,8 @@
       const saveRecipeName = document.getElementById("cust-save-recipe-name").value.trim();
       const isShareRumpiChecked = document.getElementById("cust-share-rumpi-toggle").checked;
 
-      if (payMethod === "TF" && !proofBase64) return showToast("Harap unggah bukti transfer!", "error");
-      if (isSaveRecipeChecked && !saveRecipeName) return showToast("Harap isi nama menu resep yang akan disimpan!", "error");
+      if (payMethod === "TF" && !proofBase64) return alert("Harap unggah bukti transfer!");
+      if (isSaveRecipeChecked && !saveRecipeName) return alert("Harap isi nama menu resep yang akan disimpan!");
 
       let phoneToko = pengaturanToko.phone.replace(/[^0-9]/g, ''); if (phoneToko.startsWith('0')) phoneToko = '62' + phoneToko.slice(1);
       db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(async (snap) => {
@@ -1308,8 +1394,8 @@
           }
 
           let text = `*PESANAN BARU DARI PELANGGAN* 🛒\nNama : *${namaCust}*\nNo WA : ${currentCustomerPhone}\nAlamat : ${alamatCust}\nMetode : *${namaMetode}*\n`; if (catatanPelanggan) text += `Catatan : _${catatanPelanggan}_\n`; text += `------------------------------------\n`; cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`; }); text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*`; window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
-          showToast("🎉 Pesanan berhasil dibuat!"); cart = []; document.getElementById("cust-order-note").value = ""; document.getElementById("cust-save-recipe-toggle").checked = false; document.getElementById("cust-save-recipe-name").value = ""; document.getElementById("wrapper-save-recipe-fields").style.display = "none"; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
-        } catch (err) { showToast("Gagal memproses pesanan: " + err.message, "error"); }
+          alert("Pesanan berhasil dikirim!"); cart = []; document.getElementById("cust-order-note").value = ""; document.getElementById("cust-save-recipe-toggle").checked = false; document.getElementById("cust-save-recipe-name").value = ""; document.getElementById("wrapper-save-recipe-fields").style.display = "none"; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
+        } catch (err) { alert("Gagal memproses pesanan: " + err.message); }
       });
     }
 
@@ -1402,7 +1488,7 @@
       }); 
     }
 
-    function simpanProfilPelanggan() { const nama = document.getElementById("setting-cust-name").value.trim(); const alamat = document.getElementById("setting-cust-address").value.trim(); if (!nama) return showToast("Nama wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => { if (!snap.empty) { db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => showToast("Profil diperbarui!")).catch(err => showToast("Gagal memperbarui: " + err.message, "error")); } }).catch(err => showToast("Terjadi kesalahan: " + err.message, "error")); }
+    function simpanProfilPelanggan() { const nama = document.getElementById("setting-cust-name").value.trim(); const alamat = document.getElementById("setting-cust-address").value.trim(); if (!nama) return alert("Nama wajib diisi!"); db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => { if (!snap.empty) { db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!")).catch(err => alert("Gagal memperbarui: " + err.message)); } }).catch(err => alert("Terjadi kesalahan: " + err.message)); }
     async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
