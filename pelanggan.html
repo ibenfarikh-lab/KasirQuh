@@ -429,6 +429,17 @@
           <label style="font-size: 0.75rem; margin-top: 4px;">Tampilan:</label><select id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="grid">Kotak</option><option value="list">Daftar</option></select>
         </div>
       </div>
+
+      <!-- FITUR BARU: BAGIKAN APLIKASI DI PENGATURAN (SETELAH TAMPILAN & TEMA) -->
+      <div class="card" style="padding: 12px; margin-bottom: 8px;">
+        <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">📤 Bagikan Aplikasi</h3>
+        <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Ajak tetangga dan teman pakai KasirQuh biar belanja makin praktis.</p>
+        <div style="display: flex; gap: 6px;">
+          <button onclick="bukaModalQRCode()" style="flex: 1; background: #7c3aed; color: white; padding: 8px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem;">📷 Lihat Barcode</button>
+          <button onclick="bagikanAplikasiViaWA()" style="flex: 1; background: #16a34a; color: white; padding: 8px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem;">💬 Bagikan ke WA</button>
+        </div>
+      </div>
+
       <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5; padding: 12px; margin-bottom: 8px;">
         <h3 style="color: #dc2626; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembaruan Sistem & Cache</h3>
         <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Gunakan tombol ini jika aplikasi tersangkut versi lama.</p>
@@ -452,6 +463,22 @@
       </div>
       <div id="ai-chat-messages" style="flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color);"><div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; white-space: pre-line;">HALOOOO BESTIE! WELCOME... di **Warunge Mimi**! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari Warunge Mimi siap baturi belanja makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget! 😁🛒</div></div>
       <div style="padding: 8px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 6px; align-items: center;"><input type="text" id="ai-chat-input" placeholder="Tanya stok, harga, atau ngobrol..." onkeypress="if(event.key==='Enter') kirimPesanKeAI()" style="flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.78rem;"><button id="aiMicButton" onclick="toggleAISpeechRecognition()" title="Ngomong pakai suara" style="background: #374151; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;">🎤</button><button onclick="kirimPesanKeAI()" style="background: #7c3aed; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.78rem;">Kirim</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL BARCODE / QR CODE BAGIKAN APLIKASI -->
+  <div id="qrCodeModal" class="modal-backdrop" onclick="if(event.target === this) tutupModalQRCode()">
+    <div class="modal-content" style="max-width: 320px; width: 90%; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative;">
+      <button onclick="tutupModalQRCode()" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">✕</button>
+      <div style="font-size: 1.5rem; margin-bottom: 4px;">🛍️</div>
+      <h2 id="qr-store-name" style="margin: 0 0 2px 0; font-size: 1.4rem; font-weight: 800; letter-spacing: 0.5px;">KasirQuh</h2>
+      <p style="font-size: 0.75rem; opacity: 0.9; margin: 0 0 15px 0;" id="qr-store-subtitle">Belanja Harian Makin Praktis</p>
+      <div style="background: white; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+        <img id="qr-code-img" src="" alt="QR Code" style="width: 180px; height: 180px; display: block;">
+      </div>
+      <div style="font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">📷 Scan Untuk Daftar / Login</div>
+      <div style="font-size: 0.65rem; opacity: 0.8; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 8px; margin-top: 8px;">✨ Tinggal Scan • Pilih Barang • Beres!</div>
+      <button onclick="bagikanAplikasiViaWA()" style="margin-top: 14px; background: #16a34a; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; cursor: pointer; width: 100%; box-shadow: 0 3px 8px rgba(0,0,0,0.2);">💬 Bagikan Link ke WA</button>
     </div>
   </div>
 
@@ -521,6 +548,28 @@
     function startAiListeningState() { isAiListening = true; const micBtn = document.getElementById('aiMicButton'); micBtn.style.background = '#dc2626'; micBtn.innerText = "🛑"; document.getElementById('ai-chat-input').placeholder = "Mendengarkan..."; }
     function stopAiListeningState() { isAiListening = false; const micBtn = document.getElementById('aiMicButton'); micBtn.style.background = '#374151'; micBtn.innerText = "🎤"; document.getElementById('ai-chat-input').placeholder = "Tanya stok, harga..."; }
     function toggleAISound() { isAiSoundOn = !isAiSoundOn; document.getElementById('aiSoundToggle').innerText = isAiSoundOn ? "🔊 Suara: ON" : "🔇 Suara: OFF"; if (!isAiSoundOn && 'speechSynthesis' in window) window.speechSynthesis.cancel(); }
+
+    // --- FUNGSI BAGIKAN APLIKASI & QR CODE ---
+    function bukaModalQRCode() {
+      const currentUrl = window.location.href;
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
+      document.getElementById('qr-code-img').src = qrApiUrl;
+      const storeName = pengaturanToko.nama || "KasirQuh";
+      document.getElementById('qr-store-name').innerText = storeName;
+      document.getElementById('qr-store-subtitle').innerText = "Belanja Harian Makin Praktis - " + storeName + " -";
+      document.getElementById('qrCodeModal').classList.add('show');
+    }
+
+    function tutupModalQRCode() {
+      document.getElementById('qrCodeModal').classList.remove('show');
+    }
+
+    function bagikanAplikasiViaWA() {
+      const currentUrl = window.location.href;
+      const storeName = pengaturanToko.nama || "KasirQuh";
+      const pesan = `Halo! Yuk belanja kebutuhan harian makin praktis di *${storeName}* pakai aplikasi KasirQuh.\n\nKlik tautan berikut untuk mulai belanja & daftar:\n${currentUrl}\n\nTinggal Pilih Barang • Belanja Beres! 🛒✨`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
+    }
   </script>
 
   <script>
