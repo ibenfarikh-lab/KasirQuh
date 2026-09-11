@@ -799,3 +799,166 @@ button:hover { background: #1d4ed8; }
 [data-theme="colorful"] #admin-private-chat-drawer #admin-chat-list div[onclick] span {
   color: #fff !important;
 }
+
+
+/* ============================================================
+   COLORFUL V2 — SOLID COLORS ONLY
+   No gradients. No gradient backgrounds. Full-color admin mode
+   using solid blocks while preserving the existing layout.
+   ============================================================ */
+[data-theme="colorful-v2"] {
+  --bg-color: #080b12 !important;
+  --card-bg: #2563eb !important;
+  --text-color: #ffffff !important;
+  --text-muted: #e5e7eb !important;
+  --border-color: rgba(255,255,255,.28) !important;
+  --card-border-green: #22c55e !important;
+  --input-bg: #172554 !important;
+  --input-border: rgba(255,255,255,.55) !important;
+  --table-header: #312e81 !important;
+}
+
+[data-theme="colorful-v2"] body,
+[data-theme="colorful-v2"] .main-content,
+[data-theme="colorful-v2"] .tab-content {
+  background: #080b12 !important;
+  background-image: none !important;
+  color: #fff !important;
+}
+
+[data-theme="colorful-v2"] h1,
+[data-theme="colorful-v2"] h2,
+[data-theme="colorful-v2"] h3,
+[data-theme="colorful-v2"] h4,
+[data-theme="colorful-v2"] h5,
+[data-theme="colorful-v2"] h6,
+[data-theme="colorful-v2"] p,
+[data-theme="colorful-v2"] label,
+[data-theme="colorful-v2"] .section-title,
+[data-theme="colorful-v2"] .page-title {
+  color: #fff !important;
+}
+
+/* Main cards: one solid color per card. */
+[data-theme="colorful-v2"] .card,
+[data-theme="colorful-v2"] .catalog-list-item,
+[data-theme="colorful-v2"] .inv-list-item,
+[data-theme="colorful-v2"] .inv-card,
+[data-theme="colorful-v2"] .cust-list-item,
+[data-theme="colorful-v2"] .empty-state,
+[data-theme="colorful-v2"] .summary-box,
+[data-theme="colorful-v2"] .cust-bookkeeping,
+[data-theme="colorful-v2"] .inv-card-details,
+[data-theme="colorful-v2"] .product-catalog-list > *,
+[data-theme="colorful-v2"] .inventory-list > *,
+[data-theme="colorful-v2"] .customer-list > * {
+  color: #fff !important;
+  border-color: rgba(255,255,255,.28) !important;
+  background-image: none !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.25) !important;
+}
+
+[data-theme="colorful-v2"] .card:nth-child(5n+1),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+1),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+1),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+1),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+1) { background: #2563eb !important; }
+[data-theme="colorful-v2"] .card:nth-child(5n+2),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+2),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+2),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+2),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+2) { background: #f97316 !important; }
+[data-theme="colorful-v2"] .card:nth-child(5n+3),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+3),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+3),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+3),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+3) { background: #059669 !important; }
+[data-theme="colorful-v2"] .card:nth-child(5n+4),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+4),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+4),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+4),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+4) { background: #8b5cf6 !important; }
+[data-theme="colorful-v2"] .card:nth-child(5n+5),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+5),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+5),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+5),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+5) { background: #0d9488 !important; }
+
+[data-theme="colorful-v2"] .card h4,
+[data-theme="colorful-v2"] .card .val,
+[data-theme="colorful-v2"] .inv-list-price,
+[data-theme="colorful-v2"] .card p,
+[data-theme="colorful-v2"] .card span,
+[data-theme="colorful-v2"] .card label,
+[data-theme="colorful-v2"] .card small,
+[data-theme="colorful-v2"] td,
+[data-theme="colorful-v2"] th { color: #fff !important; }
+
+/* Tables, pagination and controls: solid surfaces. */
+[data-theme="colorful-v2"] table,
+[data-theme="colorful-v2"] .cart-table,
+[data-theme="colorful-v2"] .inline-pagination { background: #312e81 !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] table tr,
+[data-theme="colorful-v2"] .cart-table tr { background: #3730a3 !important; color: #fff !important; }
+[data-theme="colorful-v2"] .cart-table th { background: #2563eb !important; color: #fff !important; }
+[data-theme="colorful-v2"] td,
+[data-theme="colorful-v2"] th { border-color: rgba(255,255,255,.24) !important; }
+
+[data-theme="colorful-v2"] button,
+[data-theme="colorful-v2"] .btn-scan-toggle,
+[data-theme="colorful-v2"] .inline-page-btn,
+[data-theme="colorful-v2"] .sub-tab-btn.active {
+  background: #7c3aed !important;
+  background-image: none !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.25) !important;
+  box-shadow: 0 5px 14px rgba(0,0,0,.25) !important;
+}
+[data-theme="colorful-v2"] .sub-tab-btn { background: #2563eb !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] input,
+[data-theme="colorful-v2"] select,
+[data-theme="colorful-v2"] textarea {
+  background: #172554 !important;
+  background-image: none !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.55) !important;
+}
+[data-theme="colorful-v2"] input::placeholder,
+[data-theme="colorful-v2"] textarea::placeholder { color: rgba(255,255,255,.72) !important; }
+
+/* Chat and navigation: also strictly solid. */
+[data-theme="colorful-v2"] #live-chat-admin,
+[data-theme="colorful-v2"] #admin-chat-messages,
+[data-theme="colorful-v2"] #admin-chat-rumpi-messages,
+[data-theme="colorful-v2"] #admin-chat-messages > div { background: #05070d !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] #admin-chat-rumpi-messages > div:nth-child(5n+1) { background: #2563eb !important; }
+[data-theme="colorful-v2"] #admin-chat-rumpi-messages > div:nth-child(5n+2) { background: #059669 !important; }
+[data-theme="colorful-v2"] #admin-chat-rumpi-messages > div:nth-child(5n+3) { background: #f97316 !important; }
+[data-theme="colorful-v2"] #admin-chat-rumpi-messages > div:nth-child(5n+4) { background: #8b5cf6 !important; }
+[data-theme="colorful-v2"] #admin-chat-rumpi-messages > div:nth-child(5n+5) { background: #0d9488 !important; }
+[data-theme="colorful-v2"] #wrapper-admin-chat-pribadi > div,
+[data-theme="colorful-v2"] #wrapper-admin-chat-rumpi,
+[data-theme="colorful-v2"] #admin-chat-header,
+[data-theme="colorful-v2"] #wrapper-admin-chat-rumpi > div:first-child { background: #2563eb !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] #admin-chat-input,
+[data-theme="colorful-v2"] #admin-chat-rumpi-input { background: #111827 !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] #admin-chat-list > div { background: #7c3aed !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] #admin-chat-list > div:nth-child(5n+2) { background: #2563eb !important; }
+[data-theme="colorful-v2"] #admin-chat-list > div:nth-child(5n+3) { background: #059669 !important; }
+[data-theme="colorful-v2"] #admin-chat-list > div:nth-child(5n+4) { background: #f97316 !important; }
+[data-theme="colorful-v2"] #admin-chat-list > div:nth-child(5n+5) { background: #db2777 !important; }
+
+[data-theme="colorful-v2"] .admin-private-chat-drawer { background: #312e81 !important; background-image: none !important; }
+[data-theme="colorful-v2"] .admin-private-chat-drawer-head { background: #2563eb !important; background-image: none !important; }
+[data-theme="colorful-v2"] .admin-private-chat-list { background: #111827 !important; background-image: none !important; }
+[data-theme="colorful-v2"] .admin-private-chat-list > div { background: #7c3aed !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] .admin-private-chat-list > div:nth-child(3n+2) { background: #059669 !important; }
+[data-theme="colorful-v2"] .admin-private-chat-list > div:nth-child(3n+3) { background: #f97316 !important; }
+
+[data-theme="colorful-v2"] .permanent-bottom-bar { background: #111827 !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] .floating-menu-popup { background: #1e1b4b !important; background-image: none !important; color: #fff !important; }
+[data-theme="colorful-v2"] .modal-content { background: #312e81 !important; background-image: none !important; color: #fff !important; }
+
+/* Last-resort safety net: any gradient image accidentally inherited
+   by an admin element is disabled in V2. */
+[data-theme="colorful-v2"] * { background-image: none !important; }
