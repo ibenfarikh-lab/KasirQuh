@@ -284,149 +284,6 @@ const translations = {
     menu_settings: "Settings",
     menu_calculator: "Calculator",
     page_calculator: "Calculator"
-  },
-  ar: {
-    app_title: "قصيركو",
-    placeholder_username: "اسم المستخدم",
-    placeholder_password: "كلمة المرور",
-    login_btn: "تسجيل الدخول",
-    placeholder_search: "🔍 البحث عن اسم أو رمز المنتج...",
-    all_categories: "جميع الفئات",
-    available_products: "📦 المنتجات المتاحة",
-    cart_title: "سلة التسوق",
-    th_item: "المنتج",
-    th_qty_unit: "الكمية / الوحدة",
-    th_total: "الإجمالي",
-    pay_cash: "نقدي",
-    placeholder_pay_amount: "مبلغ الدفع",
-    placeholder_wa_customer: "رقم واتساب العميل (مثال: 08123...)",
-    change: "الباقي",
-    checkout_btn: "إتمام وطباعة الإيصال",
-    share_wa_btn: "مشاركة الإيصال عبر واتساب",
-    clear_cart_btn: "🗑️ إفراغ السلة",
-    ongoing: "🟡 قيد التنفيذ",
-    completed: "🟢 مكتمل",
-    loading_loading: "جاري تحميل الطلبات...",
-    loading_ongoing: "جاري تحميل الطلبات الجارية...",
-    loading_completed: "جاري تحميل سجل المكتملة...",
-    chat_conversations: "💬 المحادثات",
-    loading_chats: "جاري تحميل المحادثات...",
-    no_chat_messages: "لا توجد رسائل واردة.",
-    select_chat_prompt: "اختر عميلاً من القائمة لبدء المحادثة",
-    no_chat_selected: "لم يتم اختيار محادثة.",
-    placeholder_reply: "اكتب ردًا...",
-    send: "إرسال",
-    export_stock: "تصدير المخزون",
-    import_stock: "استيراد المخزون",
-    est_restock_total: "إجمالي تكلفة إعادة التخزين التقديرية",
-    take_notes: "📥 أخذ الملاحظات",
-    clear: "🗑️ مسح",
-    restock_btn: "🛒 إعادة تخزين",
-    sub_customers: "👥 العملاء",
-    sub_approvals: "⏳ الموافقات",
-    sub_transactions: "📋 المعاملات",
-    cust_total_financial: "إجمالي الرصيد المالي / ملاحظات العملاء",
-    export_customers: "تصدير العملاء",
-    import_customers: "استيراد العملاء",
-    pending_approval_list: "قائمة العملاء بانتظار الموافقة",
-    loading: "جاري تحميل البيانات...",
-    total_omset: "إجمالي الإيرادات",
-    net_profit: "صافي الربح",
-    successful_trans: "المعاملات الناجحة",
-    total_items: "إجمالي وحدات المنتجات",
-    export_trans: "📥 تصدير المعاملات (csv)",
-    import_trans: "📤 استيراد المعاملات",
-    th_time: "الوقت",
-    th_method: "الطريقة",
-    th_omset: "الإيرادات",
-    th_profit: "الربح",
-    shop_identity: "هوية المتجر",
-    shop_name_label: "اسم المتجر:",
-    shop_address_label: "عنوان المتجر:",
-    shop_phone_label: "رقم الهاتف / الواتساب:",
-    save_profile: "حفظ الملف الشخصي",
-    change_login_account: "تغيير حساب تسجيل الدخول",
-    new_username: "اسم المستخدم الجديد:",
-    new_password: "كلمة المرور الجديدة:",
-    save_account: "حفظ الحساب",
-    pref_appearance: "المظهر وتفضيلات اللغة",
-    theme_label: "المظهر:",
-    theme_light: "فاتح",
-    theme_dark: "داكن",
-    theme_auto: "تلقائي (النظام)",
-    catalog_view_mode: "عرض الكتالوج / المخزون:",
-    view_grid: "شبكة",
-    view_list: "قائمة",
-    autoscan_sensitivity: "حساسية المسح التلقائي للباركود",
-    scan_cooldown_label: "مهلة المسح المتكرر:",
-    scan_fast: "1.0 ثانية (سريع)",
-    scan_normal: "1.5 ثانية (عادي)",
-    scan_slow: "2.0 ثانية (بطيء / آمن)",
-    save_cooldown: "حفظ المهلة",
-    ringtone_settings: "إعدادات نغمة الإشعارات",
-    ringtone_source: "اختر مصدر الصوت:",
-    ringtone_default: "افتراضي (صفير رقمي)",
-    ringtone_custom: "اختر ملفاً من الهاتف (.mp3/.wav)",
-    ringtone_help: "اختر ملف صوتي من ذاكرة جهازك.",
-    system_cache_title: "تحديث النظام وذاكرة التخزين المؤقت",
-    system_cache_desc: "استخدم هذا الزر إذا كان التطبيق عالقاً في إصدار قديم أو غير متزامن.",
-    clear_cache_btn: "🧹 مسح ذاكرة التخزين وإعادة التحميل",
-    app_session: "جلسة التطبيق",
-    logout_btn: "🚪 تسجيل الخروج",
-    proof_transfer: "إثبات التحويل",
-    close: "إغلاق",
-    edit_order_details: "تعديل تفاصيل الطلب",
-    new_total: "الإجمالي الجديد",
-    save_order_changes: "حفظ تغييرات الطلب",
-    customer_detail: "تفاصيل العميل",
-    add_note_title: "إضافة ملاحظة جديدة",
-    note_title_label: "عنوان الملاحظة:",
-    note_subtitle_label: "العنوان الفرعي / الدفع (اختياري):",
-    note_desc_label: "التفاصيل / محتوى الملاحظة:",
-    save_note: "حفظ الملاحظة",
-    add_product_title: "إضافة منتج جديد للمخزون",
-    product_code_label: "رمز المنتج / الباركود:",
-    placeholder_code: "اتركه فارغاً للتوليد التلقائي",
-    scan: "📷 مسح",
-    product_name_label: "اسم المنتج:",
-    category_label: "الفئة:",
-    unit_label: "الوحدة:",
-    unit_pcs: "قطعة",
-    unit_kg: "كيلوغرام (Kg)",
-    unit_rtg: "حزمة (rtg)",
-    isi_rtg_label: "القطع في الحزمة:",
-    stock_qty_label: "كمية المخزون:",
-    cost_price_label: "سعر التكلفة (Rp):",
-    sell_price_label: "سعر البيع (Rp):",
-    product_image_label: "صورة المنتج:",
-    search_photo: "🔍 بحث عن صورة",
-    save_to_stock: "حفظ في المخزون",
-    add_customer_title: "إضافة عميل جديد",
-    customer_name_label: "اسم العميل:",
-    whatsapp_label: "رقم الواتساب:",
-    address_label: "العنوان:",
-    password_label: "كلمة المرور الجديدة:",
-    placeholder_password_reset: "اتركه فارغاً إذا لم تتغير / إعادة تعيين كلمة المرور",
-    save_customer: "حفظ العميل",
-    customer_note_title: "ملاحظة العميل",
-    time_label: "الوقت:",
-    note_type_label: "نوع الملاحظة:",
-    type_debt: "شراء (غير مدفوع)",
-    type_payment: "دفع / تقسيط",
-    type_general: "ملاحظة عامة",
-    nominal_label: "المبلغ (Rp):",
-    desc_label: "الوصف / التفاصيل:",
-    page_pos: "صفحة الكاشير",
-    menu_pos: "الكاشير",
-    menu_online: "كاشير أونلاين",
-    menu_chat: "الدردشة المباشرة",
-    menu_stock: "المخزون",
-    menu_restock: "إعادة التخزين",
-    menu_data: "البيانات",
-    menu_notes: "الملاحظات",
-    menu_settings: "الإعدادات",
-    menu_calculator: "آلة حاسبة",
-    page_calculator: "آلة حاسبة"
   }
 };
 
@@ -456,7 +313,6 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('setting_lang_v13', lang);
   document.documentElement.lang = lang;
-  document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
   updatePermanentBarTitle();
   applyTranslations();
 }
@@ -1108,6 +964,8 @@ db.collection("pelanggan").onSnapshot((snapshot) => {
     data.id = doc.id;
     databasePelanggan.push(data);
   });
+  // Agar sidebar chat langsung memuat saat daftar pelanggan berubah
+  if(typeof renderDaftarPelangganChat === 'function') renderDaftarPelangganChat();
   refreshData();
 });
 
@@ -2051,7 +1909,6 @@ function updatePermanentBarTitle() {
     titleEl.innerText = (currentLang === 'en') ? "Calculator" : ((currentLang === 'ar') ? "آلة حاسبة" : "Kalkulator");
     initCalcPreview();
   } else if (activeTab === 'live-chat' || activeTab === 'chat') {
-    // KODE TAMBAHAN UNTUK FIX JUDUL LIVE CHAT
     titleEl.innerText = (currentLang === 'en') ? "Live Chat" : ((currentLang === 'ar') ? "الدردشة المباشرة" : "Live Chat");
   }
 
@@ -2065,7 +1922,7 @@ function updatePermanentBarTitle() {
     'laporan': 'pop-btn-laporan',
     'catatan': 'pop-btn-catatan',
     'pengaturan': 'pop-btn-pengaturan',
-    'live-chat': 'pop-btn-livechat', // KODE TAMBAHAN
+    'live-chat': 'pop-btn-livechat',
     'chat': 'pop-btn-livechat'
   };
   if (activeBtnMap[activeTab]) {
@@ -2078,7 +1935,6 @@ function switchTab(tabId, pushHistory = true) {
   activeTab = tabId;
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
   
-  // Mencegah error jika id menu di html sedikit berbeda ejaannya
   let targetTab = document.getElementById(tabId);
   if (targetTab) {
       targetTab.classList.add('active');
@@ -2153,7 +2009,6 @@ function switchTab(tabId, pushHistory = true) {
       if(fabAddCatatan) fabAddCatatan.style.display = 'none';
       initCalcPreview();
     } else if (activeTab === 'live-chat' || activeTab === 'chat') {
-      // KODE TAMBAHAN UNTUK FIX TOMBOL MENGAMBANG DI LIVE CHAT
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
       if(fabFilter) fabFilter.style.display = 'none'; 
@@ -2380,7 +2235,6 @@ function renderCart() {
     totalBelanja += item.subtotal;
     totalItemCount += item.qty;
     
-    let sat = (item.satuan || "").toLowerCase();
     let qtyDisplay = '';
     let isiOns = 10;
 
@@ -2871,7 +2725,6 @@ function refreshData() {
         const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
         invList.innerHTML = emptyStokMsg; invGrid.innerHTML = emptyStokMsg;
       } else {
-        // --- KODE TAMBAHAN UNTUK GRADASI WARNA STOK ---
         const gradArray = [
           "linear-gradient(135deg, #FF7E5F, #FEB47B)",
           "linear-gradient(135deg, #6a11cb, #2575fc)",
@@ -2919,7 +2772,6 @@ function refreshData() {
           
           invGrid.innerHTML += `
             <div class="inv-card" style="background: ${cardBg}; display: flex; flex-direction: column; justify-content: space-between; padding: 10px; border: none; position: relative; overflow: hidden; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-              <!-- Bayangan Hitam di Bawah -->
               <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); pointer-events: none; z-index: 1;"></div>
               
               <div style="position: relative; z-index: 2;">
@@ -2976,7 +2828,6 @@ function refreshData() {
       custContainer.innerHTML = "";
       let grandTotalAllCustomersFinancial = 0;
       
-      // FILTER AGAR PELANGGAN PENDING TIDAK MUNCUL DI DAFTAR UTAMA
       databasePelanggan.filter(c => String(c.status || "").toLowerCase() !== "pending").forEach(c => {
         let catatanHtml = "";
         let custTotalNominal = 0;
@@ -2996,11 +2847,9 @@ function refreshData() {
       if (custTotalFin) custTotalFin.innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
     }
 
-    // KODE TAMBAHAN UNTUK MENAMPILKAN PELANGGAN PENDING
     const pendingContainer = document.getElementById("pending-customer-list-wrapper");
     if (pendingContainer) {
       pendingContainer.innerHTML = "";
-      
       let pendingCustomers = databasePelanggan.filter(c => String(c.status || "").toLowerCase() === "pending");
       
       if (pendingCustomers.length === 0) {
@@ -3022,7 +2871,6 @@ function refreshData() {
         });
       }
     }
-    
     return;
   }
 }
@@ -3054,7 +2902,6 @@ function renderKatalogKasirPaginated(filteredItems) {
     const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia.</div>`;
     catalogGrid.innerHTML = emptyMsg; catalogList.innerHTML = emptyMsg;
   } else {
-    // --- KODE TAMBAHAN UNTUK GRADASI WARNA POS ---
     const gradArray = [
       "linear-gradient(135deg, #FF7E5F, #FEB47B)",
       "linear-gradient(135deg, #6a11cb, #2575fc)",
@@ -3078,7 +2925,6 @@ function renderKatalogKasirPaginated(filteredItems) {
 
       catalogGrid.innerHTML += `
         <div class="inv-card" style="background: ${cardBg}; border: none; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-          <!-- Overlay Gelap -->
           <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 65%; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); pointer-events: none; z-index: 1;"></div>
           
           <div class="inv-card-top" style="position: relative; z-index: 2;">
@@ -3240,7 +3086,6 @@ function stopVoiceRecordingUI() {
   }
 }
 
-// --- FITUR BARU: VOICE SCANNER POS (DENGAN TIMER 10 DETIK & MODAL KERANJANG) ---
 let voiceScannerPos = null;
 let isVoiceScannerPosActive = false;
 let voiceTimeoutTimer = null;
@@ -3387,7 +3232,6 @@ function processVoicePosCommand(spokenText) {
     showNotif(`❌ Barang tidak dikenali: "${spokenText}"`);
   }
 }
-// --- END FITUR VOICE SCANNER POS ---
 
 let autoHitungTimer = null;
 
@@ -3445,7 +3289,6 @@ document.addEventListener('input', function(e) {
   }
 });
 
-// --- FUNGSI KALKULATOR & AUTO-KALKULASI ---
 function formatKalkulator(rawStr) {
   return rawStr.replace(/\d+(\.\d*)?/g, function(match) {
     let parts = match.split('.');
@@ -3557,7 +3400,6 @@ function calculateResult() {
   }
 }
 
-// --- FITUR VOICE CALCULATOR (MODE CONTINUOUS / MANUAL TOGGLE) ---
 let voiceCalc = null;
 let isVoiceCalcActive = false;
 
@@ -3654,10 +3496,166 @@ function prosesVoiceKalkulator(text) {
     }
   }
 }
-// --- END FITUR VOICE CALCULATOR ---
 
+// ==========================================
+// BAGIAN SUNTIKAN UI & LOGIKA LIVE CHAT
+// ==========================================
 
-// --- FITUR CHAT RUMPI (ADMIN) ---
+function injectLiveChatUI() {
+  let liveChatContainer = document.getElementById("live-chat") || document.getElementById("chat");
+  
+  if (liveChatContainer) {
+    liveChatContainer.innerHTML = `
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="btn-sub-chat-pribadi" onclick="switchAdminChatSubTab('pribadi')" style="flex: 1; padding: 10px; border-radius: 8px; background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer;">💬 Chat Pribadi</button>
+        <button id="btn-sub-chat-rumpi" onclick="switchAdminChatSubTab('rumpi')" style="flex: 1; padding: 10px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); font-weight: bold; cursor: pointer;">📢 Chat Rumpi</button>
+      </div>
+
+      <div id="wrapper-admin-chat-pribadi" style="display: flex; height: calc(100vh - 220px); position: relative; overflow: hidden; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color);">
+        <button onclick="toggleDaftarChatPribadi()" style="position: absolute; top: 10px; left: 10px; z-index: 10; background: #2563eb; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-size: 1.2rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">👥</button>
+
+        <div id="sidebar-daftar-chat" style="position: absolute; left: -280px; top: 0; bottom: 0; width: 260px; background: var(--card-bg); border-right: 1px solid var(--border-color); z-index: 9; transition: left 0.3s ease; display: flex; flex-direction: column; box-shadow: 2px 0 10px rgba(0,0,0,0.15);">
+          <div style="padding: 15px 15px 15px 65px; font-weight: bold; border-bottom: 1px solid var(--border-color); background: var(--bg-color);">Daftar Pelanggan</div>
+          <div id="admin-chat-contacts" style="flex: 1; overflow-y: auto; padding: 0; display: flex; flex-direction: column;">
+            <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 20px;">Memuat pelanggan...</div>
+          </div>
+        </div>
+
+        <div id="backdrop-daftar-chat" onclick="toggleDaftarChatPribadi()" style="display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 8;"></div>
+
+        <div style="flex: 1; display: flex; flex-direction: column; width: 100%;">
+          <div id="admin-chat-header" style="padding: 12px 15px 12px 65px; font-weight: bold; border-bottom: 1px solid var(--border-color); background: var(--bg-color); min-height: 23px; display: flex; align-items: center;">
+            Pilih pelanggan dari menu 👥
+          </div>
+          <div id="admin-chat-messages" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.02);">
+            <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada ruang chat yang dipilih.</div>
+          </div>
+          <div style="padding: 10px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; background: var(--card-bg);">
+            <input type="text" id="admin-chat-input" placeholder="Ketik balasan..." style="flex: 1; padding: 10px; border: 1px solid var(--input-border); border-radius: 8px; background: var(--input-bg); color: var(--text-color);" disabled>
+            <button id="admin-chat-send-btn" onclick="kirimPesanAdmin()" style="background: #2563eb; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: not-allowed; opacity: 0.5;" disabled>Kirim</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="wrapper-admin-chat-rumpi" style="display: none; height: calc(100vh - 220px); flex-direction: column; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden;">
+        <div style="padding: 12px 15px; font-weight: bold; border-bottom: 1px solid var(--border-color); background: var(--bg-color); display: flex; justify-content: space-between; align-items: center;">
+          <span>📢 Chat Rumpi (Publik)</span>
+          <button onclick="bersihkanSemuaChatRumpiAdmin()" style="background: #dc2626; color: white; border: none; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">Bersihkan</button>
+        </div>
+        <div id="admin-chat-rumpi-messages" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.02);"></div>
+        <div style="padding: 10px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; background: var(--card-bg);">
+          <input type="text" id="admin-chat-rumpi-input" placeholder="Ketik pengumuman..." style="flex: 1; padding: 10px; border: 1px solid var(--input-border); border-radius: 8px; background: var(--input-bg); color: var(--text-color);">
+          <button onclick="kirimPesanRumpiAdmin()" style="background: #2563eb; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer;">Kirim</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+// Logika Chat Pribadi & Sidebar Toggle
+window.toggleDaftarChatPribadi = function() {
+  const sidebar = document.getElementById('sidebar-daftar-chat');
+  const backdrop = document.getElementById('backdrop-daftar-chat');
+  if (!sidebar) return;
+  
+  if (sidebar.style.left === '0px') {
+    sidebar.style.left = '-280px';
+    backdrop.style.display = 'none';
+  } else {
+    sidebar.style.left = '0px';
+    backdrop.style.display = 'block';
+  }
+};
+
+let activeChatCustomerId = null;
+let adminChatPrivateUnsubscribe = null;
+
+window.renderDaftarPelangganChat = function() {
+  const container = document.getElementById("admin-chat-contacts");
+  if (!container) return;
+  container.innerHTML = "";
+  
+  // Ambil hanya pelanggan yang sudah aktif
+  let activeCustomers = databasePelanggan.filter(c => String(c.status || "").toLowerCase() !== "pending");
+
+  if (activeCustomers.length === 0) {
+     container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 20px;">Belum ada pelanggan aktif.</div>`;
+     return;
+  }
+
+  activeCustomers.forEach(c => {
+     container.innerHTML += `
+        <div onclick="pilihPelangganChat('${c.id}')" style="padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; flex-direction: column; gap: 4px; transition: background 0.2s;">
+           <div style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">👤 ${c.nama}</div>
+           <div style="font-size: 0.7rem; color: var(--text-muted);">📞 ${c.phone || '-'}</div>
+        </div>
+     `;
+  });
+};
+
+window.pilihPelangganChat = function(id) {
+  activeChatCustomerId = id;
+  let c = databasePelanggan.find(x => x.id === id);
+  if (!c) return;
+
+  const header = document.getElementById("admin-chat-header");
+  if (header) header.innerHTML = `Chat dengan: <span style="color: #2563eb; margin-left: 5px;">${c.nama}</span>`;
+
+  const input = document.getElementById("admin-chat-input");
+  const btn = document.getElementById("admin-chat-send-btn");
+  if (input) { input.disabled = false; input.focus(); }
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; }
+
+  // Tutup sidebar otomatis saat nama dipilih
+  if (document.getElementById('sidebar-daftar-chat') && document.getElementById('sidebar-daftar-chat').style.left === '0px') {
+    toggleDaftarChatPribadi();
+  }
+
+  if (adminChatPrivateUnsubscribe) adminChatPrivateUnsubscribe();
+
+  adminChatPrivateUnsubscribe = db.collection("db_chat_pribadi").doc(id).collection("pesan")
+    .orderBy("waktuTimestamp", "asc")
+    .onSnapshot((snapshot) => {
+       const msgContainer = document.getElementById("admin-chat-messages");
+       if (!msgContainer) return;
+       msgContainer.innerHTML = "";
+       if (snapshot.empty) {
+          msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Mulai percakapan dengan ${c.nama}.</div>`;
+          return;
+       }
+       snapshot.forEach(doc => {
+          let m = doc.data();
+          let isAdmin = m.sender === "admin";
+          msgContainer.innerHTML += `
+             <div style="display: flex; flex-direction: column; align-items: ${isAdmin ? 'flex-end' : 'flex-start'};">
+                <div style="background: ${isAdmin ? '#2563eb' : 'var(--card-bg)'}; color: ${isAdmin ? 'white' : 'var(--text-color)'}; padding: 8px 12px; border-radius: 8px; max-width: 80%; border: 1px solid ${isAdmin ? '#2563eb' : 'var(--border-color)'}; font-size: 0.85rem; word-break: break-word;">
+                   ${escapeHtml(m.pesan || '')}
+                </div>
+                <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 4px;">${m.waktu || ''}</div>
+             </div>
+          `;
+       });
+       msgContainer.scrollTop = msgContainer.scrollHeight;
+    });
+};
+
+window.kirimPesanAdmin = function() {
+  if (!activeChatCustomerId) return;
+  const input = document.getElementById("admin-chat-input");
+  const pesan = input.value.trim();
+  if (!pesan) return;
+
+  db.collection("db_chat_pribadi").doc(activeChatCustomerId).collection("pesan").add({
+     sender: "admin",
+     pesan: pesan,
+     waktu: new Date().toLocaleString('id-ID'),
+     waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+     isRead: true
+  }).then(() => {
+     input.value = "";
+  }).catch(err => alert("Gagal kirim pesan: " + err.message));
+};
+
 let adminChatRumpiUnsubscribe = null;
 let activeAdminChatSub = 'pribadi';
 let unreadRumpiAdmin = 0;
@@ -3667,8 +3665,7 @@ function updateAdminLiveChatBadge() {
   const badgeChat = document.getElementById("badge-chat-count");
   if (!badgeChat) return;
 
-  const totalUnread = (typeof adminPrivateUnreadTotal === "number" ? adminPrivateUnreadTotal : 0) + unreadRumpiAdmin;
-
+  const totalUnread = unreadRumpiAdmin;
   if (totalUnread > 0) {
     badgeChat.innerText = totalUnread;
     badgeChat.style.display = "inline-block";
@@ -3677,46 +3674,7 @@ function updateAdminLiveChatBadge() {
   }
 }
 
-function initAdminRumpiNotificationListener() {
-  let isInitialLoadRumpiAdmin = true;
-
-  if (adminRumpiBadgeListener) {
-    adminRumpiBadgeListener();
-  }
-
-  adminRumpiBadgeListener = db.collection("db_chat_rumpi")
-    .orderBy("waktuTimestamp", "asc")
-    .onSnapshot((snapshot) => {
-      if (!isInitialLoadRumpiAdmin) {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type !== "added") return;
-
-          const m = change.doc.data();
-
-          // Pesan Admin sendiri tidak dianggap pesan masuk.
-          if (m.senderPhone === "Admin") return;
-
-          // Ikuti pola Rumpi pelanggan: pesan baru dari orang lain membunyikan nada.
-          playNotificationSound();
-
-          const wrapRumpi = document.getElementById("wrapper-admin-chat-rumpi");
-          const isRumpiActive = activeAdminChatSub === "rumpi" &&
-            wrapRumpi && wrapRumpi.style.display !== "none";
-
-          if (!isRumpiActive) {
-            unreadRumpiAdmin++;
-            updateAdminLiveChatBadge();
-          }
-        });
-      }
-
-      isInitialLoadRumpiAdmin = false;
-    }, (error) => {
-      console.error("Listener notifikasi Chat Rumpi Admin gagal:", error);
-    });
-}
-
-function switchAdminChatSubTab(sub) {
+window.switchAdminChatSubTab = function(sub) {
   activeAdminChatSub = sub;
   const btnPribadi = document.getElementById("btn-sub-chat-pribadi");
   const btnRumpi = document.getElementById("btn-sub-chat-rumpi");
@@ -3748,13 +3706,11 @@ function switchAdminChatSubTab(sub) {
     wrapRumpi.style.display = "flex"; 
     wrapPribadi.style.display = "none";
 
-    // Rumpi sudah dibuka, tandai notifikasi Rumpi yang menunggu sebagai terbaca.
     unreadRumpiAdmin = 0;
     updateAdminLiveChatBadge();
-    
     initAdminChatRumpiListener();
   }
-}
+};
 
 function initAdminChatRumpiListener() {
   if (adminChatRumpiUnsubscribe) adminChatRumpiUnsubscribe();
@@ -3791,13 +3747,30 @@ function initAdminChatRumpiListener() {
     });
 }
 
-function hapusPesanRumpiAdmin(docId) {
+window.kirimPesanRumpiAdmin = function() {
+  const input = document.getElementById("admin-chat-rumpi-input");
+  if (!input) return;
+  const pesan = input.value.trim();
+  if (!pesan) return;
+
+  db.collection("db_chat_rumpi").add({
+     senderName: "Admin",
+     senderPhone: "Admin",
+     pesan: pesan,
+     waktu: new Date().toLocaleString('id-ID'),
+     waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+     input.value = "";
+  }).catch(err => alert("Gagal kirim pesan rumpi: " + err.message));
+};
+
+window.hapusPesanRumpiAdmin = function(docId) {
   if (confirm("Hapus pesan ini dari Chat Rumpi?")) {
     db.collection("db_chat_rumpi").doc(docId).delete().catch(err => alert("Gagal menghapus pesan: " + err.message));
   }
-}
+};
 
-function bersihkanSemuaChatRumpiAdmin() {
+window.bersihkanSemuaChatRumpiAdmin = function() {
   if (confirm("Hapus seluruh riwayat pesan di Chat Rumpi? Tindakan ini tidak dapat dibatalkan!")) {
     db.collection("db_chat_rumpi").get().then(snapshot => {
       let batch = db.batch();
@@ -3811,41 +3784,27 @@ function bersihkanSemuaChatRumpiAdmin() {
       alert("Gagal membersihkan chat: " + err.message);
     });
   }
-}
+};
 
 function escapeHtml(text) {
   if (!text) return "";
   return text.toString().replace(/&/g, "&amp;").replace(/&lt;/g, "&lt;").replace(/>/g, "&gt;");
 }
-// --- END FITUR CHAT RUMPI ---
 
-// --- FITUR BARU: TOGGLE DAFTAR KONTAK CHAT PRIBADI ---
-function toggleDaftarChatPribadi() {
-  const sidebar = document.getElementById('sidebar-daftar-chat');
-  const backdrop = document.getElementById('backdrop-daftar-chat');
-  
-  if (!sidebar) return;
-
-  // Jika posisi left adalah 0px (sedang terbuka), kita sembunyikan ke -280px
-  if (sidebar.style.left === '0px') {
-    sidebar.style.left = '-280px';
-    backdrop.style.display = 'none';
-  } else {
-    // Jika tertutup, kita geser ke 0px
-    sidebar.style.left = '0px';
-    backdrop.style.display = 'block';
-  }
-}
-
-
-// Inisialisasi awal saat halaman dimuat
+// ==========================================
+// INISIALISASI AWAL (SAAT HALAMAN DIMUAT)
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
+  injectLiveChatUI();
   initCalcPreview();
   const display = document.getElementById("calc-display");
   if (display) {
     display.addEventListener("input", () => {
       autoCalculate();
     });
+  }
+  if (typeof renderDaftarPelangganChat === 'function') {
+    renderDaftarPelangganChat();
   }
 });
 
