@@ -598,3 +598,104 @@ button:hover { background: #1d4ed8; }
   background: linear-gradient(135deg,#111827,#312e81,#831843) !important;
   color: #fff !important;
 }
+
+
+/* ============================================================
+   COLORFUL V4 — CHAT READABILITY + LIVE CHAT POLISH
+   ============================================================ */
+[data-theme="colorful"] {
+  --bg-color: #05070d !important;
+  --card-bg: #161b2a !important;
+  --text-color: #ffffff !important;
+  --text-muted: rgba(255,255,255,.78) !important;
+  --border-color: rgba(255,255,255,.25) !important;
+  --input-bg: rgba(255,255,255,.10) !important;
+  --input-border: rgba(255,255,255,.42) !important;
+  --table-header: rgba(255,255,255,.12) !important;
+}
+
+/* Never use the customer yellow chat canvas inside admin Colorful. */
+[data-theme="colorful"] #admin-chat-messages,
+[data-theme="colorful"] #admin-chat-rumpi-messages,
+[data-theme="colorful"] #admin-chat-messages > div,
+[data-theme="colorful"] #admin-chat-rumpi-messages > div {
+  background-color: #05070d !important;
+  color: #fff !important;
+}
+
+[data-theme="colorful"] #live-chat-admin {
+  background: #05070d !important;
+  color: #fff !important;
+}
+
+[data-theme="colorful"] #wrapper-admin-chat-pribadi,
+[data-theme="colorful"] #wrapper-admin-chat-rumpi {
+  background: transparent !important;
+}
+
+/* Chat panels: colorful shells, black message canvas. */
+[data-theme="colorful"] #wrapper-admin-chat-pribadi > div,
+[data-theme="colorful"] #wrapper-admin-chat-rumpi {
+  border: 1px solid rgba(255,255,255,.35) !important;
+  background: linear-gradient(135deg,#2563eb,#7c3aed,#ec4899,#f97316) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.4) !important;
+}
+
+[data-theme="colorful"] #admin-chat-header,
+[data-theme="colorful"] #wrapper-admin-chat-rumpi > div:first-child {
+  background: linear-gradient(90deg,#2563eb,#7c3aed,#ec4899) !important;
+  color: #fff !important;
+}
+
+[data-theme="colorful"] #admin-chat-input,
+[data-theme="colorful"] #admin-chat-rumpi-input {
+  background: #111827 !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.55) !important;
+}
+
+[data-theme="colorful"] #admin-chat-input::placeholder,
+[data-theme="colorful"] #admin-chat-rumpi-input::placeholder {
+  color: rgba(255,255,255,.68) !important;
+}
+
+/* Conversation list gets individual colorful rows. */
+[data-theme="colorful"] #admin-chat-list > div {
+  color: #fff !important;
+  border-bottom-color: rgba(255,255,255,.25) !important;
+}
+[data-theme="colorful"] #admin-chat-list > div:nth-child(5n+1) { background: linear-gradient(90deg,#7c3aed,#db2777) !important; }
+[data-theme="colorful"] #admin-chat-list > div:nth-child(5n+2) { background: linear-gradient(90deg,#2563eb,#06b6d4) !important; }
+[data-theme="colorful"] #admin-chat-list > div:nth-child(5n+3) { background: linear-gradient(90deg,#059669,#84cc16) !important; }
+[data-theme="colorful"] #admin-chat-list > div:nth-child(5n+4) { background: linear-gradient(90deg,#f59e0b,#f43f5e) !important; }
+[data-theme="colorful"] #admin-chat-list > div:nth-child(5n+5) { background: linear-gradient(90deg,#06b6d4,#8b5cf6,#ec4899) !important; }
+
+/* Private chat bubbles: both sides readable on black. */
+[data-theme="colorful"] #admin-chat-messages > div[style*="align-self: flex-start"] {
+  background: linear-gradient(135deg,#172554,#312e81,#4c1d95) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.24) !important;
+}
+[data-theme="colorful"] #admin-chat-messages > div[style*="align-self: flex-end"] {
+  background: linear-gradient(135deg,#2563eb,#7c3aed,#ec4899) !important;
+  color: #fff !important;
+}
+
+/* Rumpi messages get rotating colors without changing the data. */
+[data-theme="colorful"] #admin-chat-rumpi-messages > div {
+  border: 1px solid rgba(255,255,255,.28) !important;
+  color: #fff !important;
+}
+[data-theme="colorful"] #admin-chat-rumpi-messages > div:nth-child(5n+1) { background: linear-gradient(135deg,#2563eb,#7c3aed,#ec4899) !important; }
+[data-theme="colorful"] #admin-chat-rumpi-messages > div:nth-child(5n+2) { background: linear-gradient(135deg,#10b981,#06b6d4,#3b82f6) !important; }
+[data-theme="colorful"] #admin-chat-rumpi-messages > div:nth-child(5n+3) { background: linear-gradient(135deg,#f59e0b,#f97316,#ec4899) !important; }
+[data-theme="colorful"] #admin-chat-rumpi-messages > div:nth-child(5n+4) { background: linear-gradient(135deg,#8b5cf6,#db2777,#f43f5e) !important; }
+[data-theme="colorful"] #admin-chat-rumpi-messages > div:nth-child(5n+5) { background: linear-gradient(135deg,#14b8a6,#22c55e,#eab308) !important; }
+
+/* Keep the floating AI chat consistent with black Colorful mode. */
+[data-theme="colorful"] #ai-chat-box,
+[data-theme="colorful"] #ai-chat-messages {
+  background: #05070d !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.28) !important;
+}
