@@ -14,6 +14,59 @@
   <link rel="stylesheet" href="style.css?v=1.0.7">
 
   <style>
+    /* PENGATURAN KHUSUS HALAMAN BERANDA (#belanja) AGAR PADAT/KECIL SEPERTI ZOOM 70% */
+    #belanja {
+      font-size: 0.78rem;
+    }
+    #belanja .promo-banner {
+      padding: 8px 10px;
+      margin: 6px 8px;
+    }
+    #belanja .category-chips {
+      padding: 4px 8px;
+      margin-bottom: 2px;
+    }
+    #belanja .chip-btn {
+      padding: 3px 10px;
+      font-size: 0.7rem;
+    }
+    #belanja .recipe-card {
+      min-width: 145px;
+      max-width: 145px;
+      padding: 8px;
+    }
+    #belanja .recipe-btn-action {
+      padding: 4px 6px;
+      font-size: 0.65rem;
+    }
+    #belanja .reorder-card {
+      min-width: 85px;
+      max-width: 85px;
+      padding: 4px;
+    }
+    #belanja .trending-card {
+      min-width: 155px;
+      max-width: 155px;
+      padding: 6px;
+    }
+    #belanja .inv-card {
+      padding: 5px;
+    }
+    #belanja .inv-card img {
+      height: 65px !important;
+    }
+    #belanja .catalog-list-item {
+      padding: 5px 6px;
+    }
+    #belanja .btn-quick-cart-icon {
+      width: 24px;
+      height: 24px;
+      font-size: 0.7rem;
+      bottom: 4px;
+      right: 4px;
+    }
+
+    /* KELAS UMUM / GLOBAL DI LUAR BERANDA */
     .popup-menu-btn {
       display: flex; align-items: center; gap: 10px; padding: 8px 10px;
       border-radius: 8px; background: transparent; color: var(--text-color);
@@ -190,7 +243,7 @@
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
   </style>
 </head>
-<body data-theme="light" style="font-size: 0.85rem;">
+<body data-theme="light">
 
   <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 15px; box-sizing: border-box;">
     <h1 id="welcomeStoreName" style="font-size: 2.2rem; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
