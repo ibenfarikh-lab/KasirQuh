@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>KasirQuh</title>
+  <title>Live Chat - KasirQuh</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
   
   <!-- Firebase SDK (Compat Version) -->
@@ -23,7 +23,7 @@
       fill: #2563eb !important;
     }
     /* Animasi Voice Scanner */
-@keyframes blink {
+    @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
@@ -40,6 +40,45 @@
     .mic-active {
       display: inline-block;
       animation: pulse-mic 1.5s infinite;
+    }
+
+    /* --- DESAIN CARD BARANG GRADASI & OVERLAY GELAP --- */
+    /* Target ke grid katalog dan card barang */
+    #pos-catalog-container .card, 
+    #inventory-grid-wrapper .card {
+        position: relative !important;
+        overflow: hidden !important;
+        border: none !important;
+        /* Memaksa background transparan agar gradasi muncul */
+        background-color: transparent !important; 
+    }
+    
+    /* 5 Pola Gradasi Bergantian */
+    #pos-catalog-container .card:nth-child(5n+1), #inventory-grid-wrapper .card:nth-child(5n+1) { background: linear-gradient(135deg, #FF7E5F, #FEB47B) !important; }
+    #pos-catalog-container .card:nth-child(5n+2), #inventory-grid-wrapper .card:nth-child(5n+2) { background: linear-gradient(135deg, #6a11cb, #2575fc) !important; }
+    #pos-catalog-container .card:nth-child(5n+3), #inventory-grid-wrapper .card:nth-child(5n+3) { background: linear-gradient(135deg, #11998e, #38ef7d) !important; }
+    #pos-catalog-container .card:nth-child(5n+4), #inventory-grid-wrapper .card:nth-child(5n+4) { background: linear-gradient(135deg, #b224ef, #7579ff) !important; }
+    #pos-catalog-container .card:nth-child(5n+5), #inventory-grid-wrapper .card:nth-child(5n+5) { background: linear-gradient(135deg, #f12711, #f5af19) !important; }
+
+    /* Overlay gelap semi-transparan dari bawah ke tengah */
+    #pos-catalog-container .card::before, 
+    #inventory-grid-wrapper .card::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 65%;
+        background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    /* Mengangkat elemen teks dan gambar agar tidak tertutup overlay gelap */
+    #pos-catalog-container .card > *, 
+    #inventory-grid-wrapper .card > * {
+        position: relative;
+        z-index: 2;
     }
   </style>
 
@@ -169,7 +208,7 @@
       </div>
     </div>
 
-            <!-- HALAMAN KALKULATOR -->
+    <!-- HALAMAN KALKULATOR -->
     <div id="kalkulator" class="tab-content">
       <div class="card" style="max-width: 400px; margin: 0 auto; position: relative;">
         
@@ -221,8 +260,7 @@
       </div>
     </div>
 
-
-        <!-- HALAMAN LIVE CHAT ADMIN -->
+    <!-- HALAMAN LIVE CHAT ADMIN -->
     <div id="live-chat-admin" class="tab-content">
       
       <!-- Tombol Navigasi Sub-Tab -->
@@ -1273,10 +1311,11 @@
             let m = doc.data();
             let isAdmin = m.pengirim === "admin";
             let alignBubble = isAdmin ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
+            // KODE DIPERBARUI: Padding dan Margin diperbesar agar lega seperti Chat Rumpi
             msgContainer.innerHTML += `
-              <div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble}">
+              <div style="max-width: 75%; padding: 12px 18px; border-radius: 16px; font-size: 0.85rem; margin-bottom: 8px; line-height: 1.5; ${alignBubble}">
                 <div>${m.pesan}</div>
-                <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div>
+                <div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 4px;">${m.waktu || ''}</div>
               </div>
             `;
           });
