@@ -940,8 +940,54 @@
     function initCustomerChatListener() { if (!currentCustomerPhone) return; db.collection("chats").doc(currentCustomerPhone).onSnapshot((doc) => { if (doc.exists) { let unread = doc.data().unreadCustomer || 0; let badgeAdminSub = document.getElementById("badge-admin-subtab"); if (badgeAdminSub) { if (unread > 0) { badgeAdminSub.innerText = unread; badgeAdminSub.style.display = "inline-block"; } else { badgeAdminSub.style.display = "none"; } } } }); if (customerChatUnsubscribe) customerChatUnsubscribe(); let isInitialLoadChat = true; customerChatUnsubscribe = db.collection("chats").doc(currentCustomerPhone).collection("messages").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => { if (!isInitialLoadChat) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().pengirim === "admin") { playCustomerNotificationSound(); } }); } isInitialLoadChat = false; let msgContainer = document.getElementById("customer-chat-messages"); if (!msgContainer) return; msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>` : ""; snapshot.forEach(doc => { let m = doc.data(); let isCustomer = m.pengirim === "customer"; let alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignBubble}"><div>${m.pesan}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; }); msgContainer.scrollTop = msgContainer.scrollHeight; }); }
     function kirimPesanPelanggan() { if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu!", "error"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { db.collection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { showToast("Gagal mengirim pesan: " + err.message, "error"); }); }
 
-    function prosesLoginPelanggan(e) { e.preventDefault(); const phone = document.getElementById('cust-login-phone').value.trim(); const pass = document.getElementById('cust-login-pass').value.trim(); if (!phone || !pass) return showToast("Nomor WhatsApp dan Sandi wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (snapshot.empty) { showToast("Nomor belum terdaftar. Silakan daftar dulu.", "error"); } else { let docData = snapshot.docs[0].data(); if (docData.status === "pending" || docData.disetujui === false) return showToast("Akun sedang menunggu persetujuan Admin.", "error"); if (pass === (docData.password || "user")) { localStorage.setItem('cust_phone_v13', phone); currentCustomerPhone = phone; currentCustomerName = docData.nama || 'Pelanggan'; document.getElementById('customerLoginModal').style.display = 'none'; muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); refreshKatalogPelanggan(); showToast("Berhasil Masuk! Selamat Berbelanja 🛒"); periksaCheckinHarian(); tampilkanKoinDiProfil(); renderRecipeCards(); } else { showToast("Sandi salah!", "error"); } } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
-    function prosesDaftarPelanggan(e) { e.preventDefault(); const name = document.getElementById('cust-reg-name').value.trim(); const phone = document.getElementById('cust-reg-phone').value.trim(); const address = document.getElementById('cust-reg-address').value.trim(); const pass = document.getElementById('cust-reg-pass').value.trim(); if (!name || !phone || !address || !pass) return showToast("Semua kolom wajib diisi!", "error"); db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { if (!snapshot.empty) { showToast("Nomor sudah terdaftar! Silakan langsung masuk.", "error"); gantiFormAuth('login'); } else { db.collection("pelanggan").add({ nama: name, phone: phone, alamat: address, password: pass, status: "pending", catatan: [], savedRecipes: [], waktuDaftar: new Date().toLocaleString('id-ID') }).then(() => { showToast("Pendaftaran berhasil! Menunggu ACC Admin."); document.getElementById('cust-reg-name').value = ''; document.getElementById('cust-reg-phone').value = ''; document.getElementById('cust-reg-address').value = ''; document.getElementById('cust-reg-pass').value = ''; gantiFormAuth('login'); }).catch((err) => { showToast("Gagal mendaftar: " + err.message, "error"); }); } }).catch(err => { showToast("Terjadi kesalahan: " + err.message, "error"); }); }
+    function prosesLoginPelanggan(e) { 
+      e.preventDefault(); 
+      const phone = document.getElementById('cust-login-phone').value.trim(); 
+      const pass = document.getElementById('cust-login-pass').value.trim(); 
+      if (!phone || !pass) return alert("Nomor WhatsApp dan Sandi wajib diisi!"); 
+      
+      db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { 
+        if (snapshot.empty) { 
+          alert("Nomor belum terdaftar. Silakan daftar dulu."); 
+        } else { 
+          let docData = snapshot.docs[0].data(); 
+          if (docData.status === "pending" || docData.disetujui === false) return alert("Akun sedang menunggu persetujuan Admin."); 
+          if (pass === (docData.password || "user")) { 
+            localStorage.setItem('cust_phone_v13', phone); currentCustomerPhone = phone; currentCustomerName = docData.nama || 'Pelanggan'; document.getElementById('customerLoginModal').style.display = 'none'; muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); refreshKatalogPelanggan(); showToast("Berhasil Masuk! Selamat Berbelanja 🛒"); periksaCheckinHarian(); tampilkanKoinDiProfil(); renderRecipeCards(); 
+          } else { 
+            alert("Sandi salah!"); 
+          } 
+        } 
+      }).catch(err => { 
+        alert("Terjadi kesalahan: " + err.message); 
+      }); 
+    }
+
+    function prosesDaftarPelanggan(e) { 
+      e.preventDefault(); 
+      const name = document.getElementById('cust-reg-name').value.trim(); 
+      const phone = document.getElementById('cust-reg-phone').value.trim(); 
+      const address = document.getElementById('cust-reg-address').value.trim(); 
+      const pass = document.getElementById('cust-reg-pass').value.trim(); 
+      if (!name || !phone || !address || !pass) return alert("Semua kolom wajib diisi!"); 
+      
+      db.collection("pelanggan").where("phone", "==", phone).get().then((snapshot) => { 
+        if (!snapshot.empty) { 
+          alert("Nomor sudah terdaftar! Silakan langsung masuk."); 
+          gantiFormAuth('login'); 
+        } else { 
+          db.collection("pelanggan").add({ nama: name, phone: phone, alamat: address, password: pass, status: "pending", catatan: [], savedRecipes: [], waktuDaftar: new Date().toLocaleString('id-ID') }).then(() => { 
+            alert("Pendaftaran berhasil! Menunggu ACC Admin."); 
+            document.getElementById('cust-reg-name').value = ''; document.getElementById('cust-reg-phone').value = ''; document.getElementById('cust-reg-address').value = ''; document.getElementById('cust-reg-pass').value = ''; gantiFormAuth('login'); 
+          }).catch((err) => { 
+            alert("Gagal mendaftar: " + err.message); 
+          }); 
+        } 
+      }).catch(err => { 
+        alert("Terjadi kesalahan: " + err.message); 
+      }); 
+    }
+
     function logoutPelanggan() { if (confirm("Keluar dari sesi ini?")) { localStorage.removeItem('cust_phone_v13'); currentCustomerPhone = ''; document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); location.reload(); } }
 
     function initFirebaseListeners() {
