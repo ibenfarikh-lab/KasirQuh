@@ -347,7 +347,7 @@
     <div id="laporan" class="tab-content">
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap;">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')" data-i18n="sub_customers">👥 Data Pelanggan</button>
-        <button id="sub-btn-persetujuan" class="sub-tab-btn" onclick="switchSubDataTab('sub-persetujuan')" data-i18n="sub_approvals">⏳ Persetujuan Pelanggan</button>
+        <button id="sub-btn-persetujuan" class="sub-tab-btn" onclick="switchSubDataTab('sub-persetujuan')" data-i18n="sub_approvals">⏳ Persetujuan Pelanggan <span id="pending-customer-badge" style="display:none; margin-left:4px; min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:#dc2626; color:#fff; font-size:0.68rem; font-weight:800; line-height:18px; text-align:center; vertical-align:middle;"></span></button>
         <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')" data-i18n="sub_transactions">📋 Data Transaksi</button>
       </div>
 
@@ -1668,5 +1668,54 @@
     }
   </script>
   <script src="script.js"></script>
+  <script>
+    // Notifikasi pelanggan baru: badge realtime pada tab Persetujuan Pelanggan.
+    (function initPendingCustomerNotification() {
+      let firstSnapshot = true;
+      let previousPendingCount = 0;
+
+      function updatePendingCustomerBadge(count) {
+        const badge = document.getElementById("pending-customer-badge");
+        if (!badge) return;
+        if (count > 0) {
+          badge.textContent = count > 99 ? "99+" : String(count);
+          badge.style.display = "inline-block";
+        } else {
+          badge.textContent = "";
+          badge.style.display = "none";
+        }
+      }
+
+      function startListener() {
+        if (typeof db === "undefined" || !db.collection) return;
+
+        db.collection("pelanggan").onSnapshot((snapshot) => {
+          let pendingCount = 0;
+          snapshot.forEach((doc) => {
+            const data = doc.data() || {};
+            if (String(data.status || "").toLowerCase() === "pending") pendingCount++;
+          });
+
+          updatePendingCustomerBadge(pendingCount);
+
+          if (!firstSnapshot && pendingCount > previousPendingCount) {
+            if (typeof playNotificationSound === "function") playNotificationSound();
+            if (typeof showNotif === "function") showNotif("🔔 Ada pelanggan baru menunggu persetujuan!");
+          }
+
+          previousPendingCount = pendingCount;
+          firstSnapshot = false;
+        }, (err) => {
+          console.warn("Gagal memantau persetujuan pelanggan:", err);
+        });
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", startListener);
+      } else {
+        startListener();
+      }
+    })();
+  </script>
 </body>
 </html>
