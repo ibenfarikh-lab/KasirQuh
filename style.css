@@ -468,3 +468,133 @@ button:hover { background: #1d4ed8; }
   .receipt-header { display: block; }
   .no-print { display: none !important; }
 }
+
+
+/* ============================================================
+   COLORFUL V3 — BLACK ADMIN BACKGROUND + HOT MULTI-COLOR CARDS
+   ============================================================ */
+[data-theme="colorful"] body,
+[data-theme="colorful"] .main-content,
+[data-theme="colorful"] .tab-content {
+  background: #080b12 !important;
+  color: #fff !important;
+}
+
+[data-theme="colorful"] .main-content {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(37,99,235,.12), transparent 24%),
+    radial-gradient(circle at 90% 15%, rgba(236,72,153,.10), transparent 25%),
+    #080b12 !important;
+}
+
+[data-theme="colorful"] h1,
+[data-theme="colorful"] h2,
+[data-theme="colorful"] h3,
+[data-theme="colorful"] h4,
+[data-theme="colorful"] h5,
+[data-theme="colorful"] h6,
+[data-theme="colorful"] p,
+[data-theme="colorful"] label,
+[data-theme="colorful"] .section-title,
+[data-theme="colorful"] .page-title {
+  color: #fff !important;
+}
+
+/* Force major content cards away from white/light surfaces. */
+[data-theme="colorful"] .card,
+[data-theme="colorful"] .catalog-list-item,
+[data-theme="colorful"] .inv-list-item,
+[data-theme="colorful"] .inv-card,
+[data-theme="colorful"] .cust-list-item,
+[data-theme="colorful"] .empty-state,
+[data-theme="colorful"] .summary-box,
+[data-theme="colorful"] .cust-bookkeeping,
+[data-theme="colorful"] .inv-card-details,
+[data-theme="colorful"] .product-catalog-list > *,
+[data-theme="colorful"] .inventory-list > *,
+[data-theme="colorful"] .customer-list > * {
+  color: #fff !important;
+  border: 0 !important;
+  background-image: linear-gradient(135deg, #2563eb 0%, #7c3aed 42%, #ec4899 72%, #f97316 100%) !important;
+  box-shadow: 0 12px 30px rgba(0,0,0,.34) !important;
+}
+
+/* Five rotating hot palettes, each using 4–5 colors. */
+[data-theme="colorful"] .card:nth-child(5n+1),
+[data-theme="colorful"] .catalog-list-item:nth-child(5n+1),
+[data-theme="colorful"] .inv-card:nth-child(5n+1),
+[data-theme="colorful"] .inv-list-item:nth-child(5n+1),
+[data-theme="colorful"] .cust-list-item:nth-child(5n+1) {
+  background: linear-gradient(135deg,#2563eb 0%,#4f46e5 28%,#7c3aed 52%,#db2777 78%,#f97316 100%) !important;
+}
+[data-theme="colorful"] .card:nth-child(5n+2),
+[data-theme="colorful"] .catalog-list-item:nth-child(5n+2),
+[data-theme="colorful"] .inv-card:nth-child(5n+2),
+[data-theme="colorful"] .inv-list-item:nth-child(5n+2),
+[data-theme="colorful"] .cust-list-item:nth-child(5n+2) {
+  background: linear-gradient(135deg,#f59e0b 0%,#f97316 25%,#ef4444 48%,#ec4899 72%,#8b5cf6 100%) !important;
+}
+[data-theme="colorful"] .card:nth-child(5n+3),
+[data-theme="colorful"] .catalog-list-item:nth-child(5n+3),
+[data-theme="colorful"] .inv-card:nth-child(5n+3),
+[data-theme="colorful"] .inv-list-item:nth-child(5n+3),
+[data-theme="colorful"] .cust-list-item:nth-child(5n+3) {
+  background: linear-gradient(135deg,#10b981 0%,#14b8a6 25%,#06b6d4 50%,#3b82f6 75%,#7c3aed 100%) !important;
+}
+[data-theme="colorful"] .card:nth-child(5n+4),
+[data-theme="colorful"] .catalog-list-item:nth-child(5n+4),
+[data-theme="colorful"] .inv-card:nth-child(5n+4),
+[data-theme="colorful"] .inv-list-item:nth-child(5n+4),
+[data-theme="colorful"] .cust-list-item:nth-child(5n+4) {
+  background: linear-gradient(135deg,#8b5cf6 0%,#a855f7 25%,#ec4899 50%,#f43f5e 75%,#f59e0b 100%) !important;
+}
+[data-theme="colorful"] .card:nth-child(5n+5),
+[data-theme="colorful"] .catalog-list-item:nth-child(5n+5),
+[data-theme="colorful"] .inv-card:nth-child(5n+5),
+[data-theme="colorful"] .inv-list-item:nth-child(5n+5),
+[data-theme="colorful"] .cust-list-item:nth-child(5n+5) {
+  background: linear-gradient(135deg,#14b8a6 0%,#22c55e 25%,#84cc16 45%,#eab308 68%,#f97316 100%) !important;
+}
+
+/* Inner cards/components should also stay colorful. */
+[data-theme="colorful"] .card > *,
+[data-theme="colorful"] .inv-card > *,
+[data-theme="colorful"] .catalog-list-item > *,
+[data-theme="colorful"] .cust-list-item > * {
+  --card-inner-bg: rgba(255,255,255,.12);
+}
+
+[data-theme="colorful"] .inv-card-details,
+[data-theme="colorful"] .summary-box {
+  background: linear-gradient(135deg,rgba(37,99,235,.72),rgba(124,58,237,.72),rgba(236,72,153,.72)) !important;
+}
+
+/* Keep tables/controls readable while colorful. */
+[data-theme="colorful"] table,
+[data-theme="colorful"] .cart-table,
+[data-theme="colorful"] .inline-pagination {
+  background: linear-gradient(135deg,#172554,#4c1d95,#831843) !important;
+  color: #fff !important;
+}
+[data-theme="colorful"] table tr,
+[data-theme="colorful"] .cart-table tr {
+  background: rgba(255,255,255,.08) !important;
+  color: #fff !important;
+}
+[data-theme="colorful"] input,
+[data-theme="colorful"] select,
+[data-theme="colorful"] textarea {
+  background: linear-gradient(135deg,rgba(37,99,235,.72),rgba(124,58,237,.72),rgba(236,72,153,.72)) !important;
+  color: #fff !important;
+}
+
+/* Bottom/admin navigation remains dark around colorful content. */
+[data-theme="colorful"] .permanent-bottom-bar {
+  background: linear-gradient(90deg,#111827,#172554,#1e1b4b,#111827) !important;
+  color: #fff !important;
+  border-top-color: rgba(255,255,255,.18) !important;
+}
+[data-theme="colorful"] .floating-menu-popup {
+  background: linear-gradient(135deg,#111827,#312e81,#831843) !important;
+  color: #fff !important;
+}
