@@ -14,66 +14,13 @@
   <link rel="stylesheet" href="style.css?v=1.0.7">
 
   <style>
-    /* PENGATURAN KHUSUS HALAMAN BERANDA (#belanja) TETAP PADAT/KECIL SEPERTI ZOOM 70% */
-    #belanja {
-      font-size: 0.78rem;
-    }
-    #belanja .promo-banner {
-      padding: 8px 10px;
-      margin: 6px 8px;
-    }
-    #belanja .category-chips {
-      padding: 4px 8px;
-      margin-bottom: 2px;
-    }
-    #belanja .chip-btn {
-      padding: 3px 10px;
-      font-size: 0.7rem;
-    }
-    #belanja .recipe-card {
-      min-width: 145px;
-      max-width: 145px;
-      padding: 8px;
-    }
-    #belanja .recipe-btn-action {
-      padding: 4px 6px;
-      font-size: 0.65rem;
-    }
-    #belanja .reorder-card {
-      min-width: 85px;
-      max-width: 85px;
-      padding: 4px;
-    }
-    #belanja .trending-card {
-      min-width: 155px;
-      max-width: 155px;
-      padding: 6px;
-    }
-    #belanja .inv-card {
-      padding: 5px;
-    }
-    #belanja .inv-card img {
-      height: 65px !important;
-    }
-    #belanja .catalog-list-item {
-      padding: 5px 6px;
-    }
-    #belanja .btn-quick-cart-icon {
-      width: 24px;
-      height: 24px;
-      font-size: 0.7rem;
-      bottom: 4px;
-      right: 4px;
-    }
-
-    /* KELAS UMUM / GLOBAL DI LUAR BERANDA (DIKEMBALIKAN NORMAL SEPERTI FILE LAMA) */
     .popup-menu-btn {
-      display: flex; align-items: center; gap: 12px; padding: 10px 12px;
-      border-radius: 10px; background: transparent; color: var(--text-color);
-      border: none; text-align: left; font-weight: 500; font-size: 0.95rem;
+      display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+      border-radius: 8px; background: transparent; color: var(--text-color);
+      border: none; text-align: left; font-weight: 500; font-size: 0.85rem;
       cursor: pointer; width: 100%; transition: background 0.2s, color 0.2s;
     }
-    .popup-menu-btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .popup-menu-btn svg { width: 16px; height: 16px; fill: currentColor; }
     .popup-menu-btn.active-menu { color: #2563eb !important; font-weight: bold; background: rgba(37, 99, 235, 0.08); }
     
     .category-chips { display: flex; gap: 6px; overflow-x: auto; padding: 6px 10px; margin-bottom: 4px; scrollbar-width: none; }
@@ -95,10 +42,10 @@
 
     .toast {
       visibility: hidden; min-width: 220px; background-color: #333; color: #fff; text-align: center; border-radius: 25px;
-      padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 85px; transform: translateX(-50%);
-      font-size: 0.85rem; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
+      padding: 10px 16px; position: fixed; z-index: 10000; left: 50%; bottom: 75px; transform: translateX(-50%);
+      font-size: 0.75rem; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
     }
-    .toast.show { visibility: visible; opacity: 1; bottom: 95px; }
+    .toast.show { visibility: visible; opacity: 1; bottom: 85px; }
     .toast.success { background-color: #16a34a; }
     .toast.error { background-color: #dc2626; }
 
@@ -126,6 +73,7 @@
     .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 4px 10px 10px 10px; scrollbar-width: none; }
     .horizontal-scroll-container::-webkit-scrollbar { display: none; }
 
+    /* KONTINER BERGULIR OTOMATIS YANG BISA DI-SWIPE / SENTUH MANUAL */
     .auto-scroll-wrapper {
       overflow-x: auto;
       overflow-y: hidden;
@@ -146,6 +94,7 @@
       padding-right: 10px;
     }
     
+    /* SEMUA KARTU DENGAN 3 WARNA GRADASI BERBEDA */
     .recipe-card, .reorder-card, .trending-card, .inv-card, .catalog-list-item {
       color: white;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -155,6 +104,7 @@
       transform: scale(0.97);
     }
 
+    /* KELAS GRADASI WARNA BERPUTAR (5 VARIASI 3 WARNA) */
     .recipe-card:nth-child(5n+1), .reorder-card:nth-child(5n+1), .trending-card:nth-child(5n+1), .inv-card:nth-child(5n+1), .catalog-list-item:nth-child(5n+1) { background: linear-gradient(135deg, #2563eb, #1d4ed8, #1e40af); }
     .recipe-card:nth-child(5n+2), .reorder-card:nth-child(5n+2), .trending-card:nth-child(5n+2), .inv-card:nth-child(5n+2), .catalog-list-item:nth-child(5n+2) { background: linear-gradient(135deg, #f59e0b, #d97706, #b45309); }
     .recipe-card:nth-child(5n+3), .reorder-card:nth-child(5n+3), .trending-card:nth-child(5n+3), .inv-card:nth-child(5n+3), .catalog-list-item:nth-child(5n+3) { background: linear-gradient(135deg, #10b981, #059669, #047857); }
@@ -196,6 +146,7 @@
       min-width: 180px; max-width: 180px; display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 8px; cursor: pointer; flex-shrink: 0;
     }
 
+    /* GRID KATALOG 3 KOLOM DEFAULT */
     .product-catalog-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -213,6 +164,7 @@
     .qty-btn { width: 34px; height: 34px; background: var(--input-bg); border: 1px solid var(--border-color); font-size: 1rem; font-weight: bold; color: var(--text-color); cursor: pointer; border-radius: 6px; }
     .qty-btn:active { background: var(--border-color); }
 
+    /* TOMBOL IKON BELANJA DI POJOK BAWAH GAMBAR */
     .btn-quick-cart-icon {
       position: absolute;
       bottom: 6px;
@@ -238,66 +190,66 @@
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
   </style>
 </head>
-<body data-theme="light">
+<body data-theme="light" style="font-size: 0.85rem;">
 
-  <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 20px; box-sizing: border-box;">
-    <h1 id="welcomeStoreName" style="font-size: 2.8rem; margin: 0 0 10px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
-    <p style="font-size: 1.1rem; opacity: 0.9; margin: 0 0 25px 0;">Selamat Datang di Toko Kami</p>
-    <button id="welcomeInstallBtn" onclick="triggerInstallPWA()" style="background: white; color: #2563eb; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">📲 Install Aplikasi KasirQuh</button>
-    <button onclick="bukaLoginDariWelcome()" style="position: absolute; bottom: 20px; left: 20px; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.6); padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;">Masuk / Daftar</button>
+  <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 15px; box-sizing: border-box;">
+    <h1 id="welcomeStoreName" style="font-size: 2.2rem; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
+    <p style="font-size: 0.95rem; opacity: 0.9; margin: 0 0 20px 0;">Selamat Datang di Toko Kami</p>
+    <button id="welcomeInstallBtn" onclick="triggerInstallPWA()" style="background: white; color: #2563eb; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">📲 Install Aplikasi KasirQuh</button>
+    <button onclick="bukaLoginDariWelcome()" style="position: absolute; bottom: 15px; left: 15px; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.6); padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">Masuk / Daftar</button>
   </div>
 
   <div id="customerLoginModal" class="login-overlay" style="display: none;">
-    <div class="login-card" style="max-height: 90vh; overflow-y: auto;">
-      <h2 style="margin-top: 0; margin-bottom: 5px;">KasirQuh</h2>
+    <div class="login-card" style="max-height: 90vh; overflow-y: auto; padding: 16px;">
+      <h2 style="margin-top: 0; margin-bottom: 4px; font-size: 1.3rem;">KasirQuh</h2>
       <div id="formLoginContainer">
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Silakan masuk dengan No. WhatsApp & Sandi</p>
-        <form onsubmit="prosesLoginPelanggan(event)" class="form-vertical">
-          <input type="text" id="cust-login-phone" placeholder="No. WhatsApp (Cth: 08123...)" required>
-          <input type="password" id="cust-login-pass" placeholder="Sandi" required>
-          <button type="submit" style="margin-top: 10px; border-radius: 8px; padding: 12px; background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer;">Masuk</button>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Silakan masuk dengan No. WhatsApp & Sandi</p>
+        <form onsubmit="prosesLoginPelanggan(event)" class="form-vertical" style="gap: 8px;">
+          <input type="text" id="cust-login-phone" placeholder="No. WhatsApp (Cth: 08123...)" required style="padding: 10px; font-size: 0.85rem;">
+          <input type="password" id="cust-login-pass" placeholder="Sandi" required style="padding: 10px; font-size: 0.85rem;">
+          <button type="submit" style="margin-top: 6px; border-radius: 6px; padding: 10px; background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;">Masuk</button>
         </form>
-        <p style="text-align: center; margin-top: 15px; font-size: 0.85rem;">Belum punya akun? <a href="javascript:void(0)" onclick="gantiFormAuth('register')" style="color: #2563eb; font-weight: bold;">Daftar di sini</a></p>
+        <p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Belum punya akun? <a href="javascript:void(0)" onclick="gantiFormAuth('register')" style="color: #2563eb; font-weight: bold;">Daftar di sini</a></p>
       </div>
       <div id="formRegisterContainer" style="display: none;">
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Daftar Akun (Menunggu Persetujuan Admin)</p>
-        <form onsubmit="prosesDaftarPelanggan(event)" class="form-vertical">
-          <input type="text" id="cust-reg-name" placeholder="Nama Lengkap" required>
-          <input type="text" id="cust-reg-phone" placeholder="No. WhatsApp (Cth: 08123...)" required>
-          <textarea id="cust-reg-address" placeholder="Alamat Pengiriman Lengkap" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px;" required></textarea>
-          <input type="password" id="cust-reg-pass" placeholder="Buat Sandi" required>
-          <button type="submit" style="margin-top: 10px; border-radius: 8px; padding: 12px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer;">Kirim Pendaftaran</button>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Daftar Akun (Menunggu Persetujuan Admin)</p>
+        <form onsubmit="prosesDaftarPelanggan(event)" class="form-vertical" style="gap: 8px;">
+          <input type="text" id="cust-reg-name" placeholder="Nama Lengkap" required style="padding: 10px; font-size: 0.85rem;">
+          <input type="text" id="cust-reg-phone" placeholder="No. WhatsApp (Cth: 08123...)" required style="padding: 10px; font-size: 0.85rem;">
+          <textarea id="cust-reg-address" placeholder="Alamat Pengiriman Lengkap" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px; font-size: 0.85rem;" required></textarea>
+          <input type="password" id="cust-reg-pass" placeholder="Buat Sandi" required style="padding: 10px; font-size: 0.85rem;">
+          <button type="submit" style="margin-top: 6px; border-radius: 6px; padding: 10px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;">Kirim Pendaftaran</button>
         </form>
-        <p style="text-align: center; margin-top: 15px; font-size: 0.85rem;">Sudah punya akun? <a href="javascript:void(0)" onclick="gantiFormAuth('login')" style="color: #2563eb; font-weight: bold;">Masuk di sini</a></p>
+        <p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Sudah punya akun? <a href="javascript:void(0)" onclick="gantiFormAuth('login')" style="color: #2563eb; font-weight: bold;">Masuk di sini</a></p>
       </div>
     </div>
   </div>
 
   <div id="dailyCheckinModal" class="modal-backdrop" style="display: none;">
-    <div class="modal-content modal-checkin-content" style="background: var(--card-bg); max-width: 320px;">
-      <div style="font-size: 3.5rem; margin-bottom: 10px;">🪙</div>
-      <h2 style="margin: 0 0 10px 0; color: #d97706; font-size: 1.4rem;">Bonus Warga!</h2>
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Selamat! Kamu rajin buka aplikasi hari ini. Ini 10 Koin untukmu!</p>
-      <button onclick="klaimKoinHarian()" style="background: #16a34a; color: white; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; width: 100%; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);">Klaim Koin Sekarang</button>
+    <div class="modal-content modal-checkin-content" style="background: var(--card-bg); max-width: 300px;">
+      <div style="font-size: 3rem; margin-bottom: 8px;">🪙</div>
+      <h2 style="margin: 0 0 8px 0; color: #d97706; font-size: 1.2rem;">Bonus Warga!</h2>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Selamat! Kamu rajin buka aplikasi hari ini. Ini 10 Koin untukmu!</p>
+      <button onclick="klaimKoinHarian()" style="background: #16a34a; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; font-size: 0.85rem; cursor: pointer; width: 100%; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.3);">Klaim Koin Sekarang</button>
     </div>
   </div>
 
-  <div id="menuToggleModal" class="modal-backdrop" onclick="if(event.target === this) toggleMenuModal()" style="background: rgba(0,0,0,0.4); justify-content: flex-end; align-items: flex-end; padding: 0 14px 75px 0;">
-    <div class="modal-content" style="max-width: 240px; border-radius: 16px; padding: 8px; background: var(--card-bg); box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
+  <div id="menuToggleModal" class="modal-backdrop" onclick="if(event.target === this) toggleMenuModal()" style="background: rgba(0,0,0,0.4); justify-content: flex-end; align-items: flex-end; padding: 0 10px 65px 0;">
+    <div class="modal-content" style="max-width: 200px; border-radius: 12px; padding: 6px; background: var(--card-bg); box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
       <div style="display: flex; flex-direction: column; gap: 2px;">
         <button id="pop-btn-belanja" class="popup-menu-btn active-menu" onclick="switchTabPelanggan('belanja'); toggleMenuModal();"><svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Belanja</button>
         <button id="pop-btn-datapelanggan" class="popup-menu-btn" onclick="switchTabPelanggan('data-pelanggan'); toggleMenuModal();"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Data Pelanggan</button>
-        <button id="pop-btn-livechat" class="popup-menu-btn" onclick="switchTabPelanggan('live-chat'); toggleMenuModal();" style="justify-content: space-between;"><span style="display: flex; align-items: center; gap: 12px;"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> Live Chat</span><span id="badge-livechat-cust" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 10px;">0</span></button>
+        <button id="pop-btn-livechat" class="popup-menu-btn" onclick="switchTabPelanggan('live-chat'); toggleMenuModal();" style="justify-content: space-between;"><span style="display: flex; align-items: center; gap: 8px;"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg> Live Chat</span><span id="badge-livechat-cust" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; font-weight: bold; padding: 1px 5px; border-radius: 8px;">0</span></button>
         <button id="pop-btn-pengaturan" class="popup-menu-btn" onclick="switchTabPelanggan('pengaturan'); toggleMenuModal();"><svg viewBox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.53,5.05 19.27,4.97 19.05,5.05L16.56,6.05C16.04,5.66 15.45,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.55,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.97 4.47,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.47,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.55,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.45,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.53,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/></svg> Pengaturan</button>
       </div>
     </div>
   </div>
 
-  <div class="main-content" style="padding-bottom: 80px; padding-left: 12px; padding-right: 12px;">
-    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
-        <button onclick="tutupKolomPencarian()" style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;">✕</button>
+  <div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
+    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 6px 0; margin-bottom: 8px;">
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
+        <button onclick="tutupKolomPencarian()" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">✕</button>
       </div>
     </div>
 
@@ -325,11 +277,15 @@
         <button class="chip-btn" style="border-color: #d97706; color: #d97706;" onclick="pilihKategoriPelanggan('Titipan Warga')">📦 Titipan Warga</button>
       </div>
 
+      <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
       <div id="recipe-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
-        <div class="horizontal-scroll-container" id="recipe-scroll-container"></div>
+        <div class="horizontal-scroll-container" id="recipe-scroll-container">
+          <!-- Rendered via JavaScript -->
+        </div>
       </div>
 
+      <!-- Barang Laris Hari Ini -->
       <div id="trending-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
         <div id="trending-container" class="auto-scroll-wrapper"></div>
@@ -337,24 +293,24 @@
 
       <div class="pos-container">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 10px 0 4px 0; color: var(--text-color);">Semua Kebutuhan Harian 🛍️</div>
-        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 12px; background: transparent; border: none; box-shadow: none;">
+        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 8px; background: transparent; border: none; box-shadow: none;">
           <div id="pos-catalog-container"></div>
         </div>
       </div>
 
       <!-- MODAL KERANJANG -->
       <div id="cartModal" class="modal-backdrop" onclick="if(event.target === this) closeCartModal()">
-        <div class="modal-content" style="max-width: 400px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 16px; background: var(--card-bg); display: flex; flex-direction: column; gap: 8px;">
+        <div class="modal-content" style="max-width: 380px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 12px; background: var(--card-bg); display: flex; flex-direction: column; gap: 6px;">
           <div class="modal-header no-print" style="margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="font-size: 1.1rem; margin: 0;">Keranjang Belanja</h3>
-            <button class="btn-close-modal" onclick="closeCartModal()" style="font-size: 1.3rem; background:none; border:none; cursor:pointer; color:var(--text-color);">&times;</button>
+            <h3 style="font-size: 1rem; margin: 0;">Keranjang Belanja</h3>
+            <button class="btn-close-modal" onclick="closeCartModal()" style="font-size: 1.1rem; background:none; border:none; cursor:pointer; color:var(--text-color);">&times;</button>
           </div>
-          <div class="receipt-header" style="margin-bottom: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-            <h3 id="receipt-shop-name" style="margin: 0; font-size: 1rem;">Nama Toko</h3>
-            <p id="receipt-shop-address" style="margin: 4px 0 0 0; font-size: 0.8rem; color: var(--text-muted);">Alamat Toko</p>
+          <div class="receipt-header" style="margin-bottom: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+            <h3 id="receipt-shop-name" style="margin: 0; font-size: 0.9rem;">Nama Toko</h3>
+            <p id="receipt-shop-address" style="margin: 0; font-size: 0.7rem; color: var(--text-muted);">Alamat Toko</p>
           </div>
-          <div class="cart-table-wrapper" style="max-height: 28vh; overflow-y: auto;">
-            <table class="cart-table" style="font-size: 0.85rem; width: 100%;">
+          <div class="cart-table-wrapper" style="max-height: 26vh; overflow-y: auto;">
+            <table class="cart-table" style="font-size: 0.78rem; width: 100%;">
               <thead>
                 <tr>
                   <th style="width: 42%;">Barang</th>
@@ -366,165 +322,168 @@
             </table>
           </div>
           
-          <div class="summary-box" style="padding: 4px 0; display: flex; flex-direction: column; gap: 6px;">
-            <div style="font-size: 0.95rem; font-weight: bold; display: flex; justify-content: space-between;"><span>Total:</span> <span style="color: #16a34a;">Rp <span id="grand-total">0</span></span></div>
+          <div class="summary-box" style="padding: 2px 0; display: flex; flex-direction: column; gap: 4px;">
+            <div style="font-size: 0.85rem; font-weight: bold; display: flex; justify-content: space-between;"><span>Total:</span> <span style="color: #16a34a;">Rp <span id="grand-total">0</span></span></div>
             
-            <div class="no-print" style="display: flex; flex-direction: column; gap: 6px;">
-              <div style="display: flex; align-items: center; gap: 6px;">
-                <label style="font-size: 0.8rem; font-weight: 600; width: 35%;">Pembayaran:</label>
-                <select id="pay-method-cust" onchange="togglePayMethodCust()" style="flex: 1; font-size: 0.85rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+            <div class="no-print" style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <label style="font-size: 0.72rem; font-weight: 600; width: 35%;">Pembayaran:</label>
+                <select id="pay-method-cust" onchange="togglePayMethodCust()" style="flex: 1; font-size: 0.75rem; padding: 4px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
                   <option value="COD">COD (Bayar di Tempat)</option>
                   <option value="TF">Transfer Bank</option>
                   <option value="WhatsApp">Pesan via WA</option>
                 </select>
               </div>
 
-              <div id="wrapper-tf-proof" style="display: none; padding: 6px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: 6px;">
-                <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 4px;">Bukti Transfer:</label>
-                <input type="file" id="cust-proof-file" accept="image/*" onchange="handleProofUpload(event)" style="font-size: 0.75rem; width: 100%;">
+              <div id="wrapper-tf-proof" style="display: none; padding: 4px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: 4px;">
+                <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 2px;">Bukti Transfer:</label>
+                <input type="file" id="cust-proof-file" accept="image/*" onchange="handleProofUpload(event)" style="font-size: 0.68rem; width: 100%;">
                 <input type="hidden" id="cust-proof-base64" value="">
               </div>
 
-              <div style="padding: 8px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--input-border); display: flex; flex-direction: column; gap: 6px;">
-                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
+              <!-- BLOK SIMPAN MENU DIPADATKAN TANPA RUANG KOSONG & DISELARASKAN KE KANAN -->
+              <div style="padding: 6px; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--input-border); display: flex; flex-direction: column; gap: 4px;">
+                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.73rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
                   <span>🌟 Simpan jadi Menu Resep</span>
                   <input type="checkbox" id="cust-save-recipe-toggle" onchange="toggleSaveRecipeOptions(this.checked)" style="margin: 0;">
                 </label>
-                <div id="wrapper-save-recipe-fields" style="display: none; flex-direction: column; gap: 6px; margin-top: 4px;">
-                  <input type="text" id="cust-save-recipe-name" placeholder="Nama Menu (Cth: Sop Spesial Weekend)" style="width: 100%; font-size: 0.8rem; padding: 6px 8px; border-radius: 6px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;">
-                  <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; cursor: pointer; color: var(--text-color); margin: 0;">
+                <div id="wrapper-save-recipe-fields" style="display: none; flex-direction: column; gap: 4px; margin-top: 2px;">
+                  <input type="text" id="cust-save-recipe-name" placeholder="Nama Menu (Cth: Sop Spesial Weekend)" style="width: 100%; font-size: 0.73rem; padding: 5px 6px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;">
+                  <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; cursor: pointer; color: var(--text-color); margin: 0;">
                     <span>📢 Bagikan otomatis ke Chat Rumpi</span>
                     <input type="checkbox" id="cust-share-rumpi-toggle" checked style="margin: 0;">
                   </label>
                 </div>
               </div>
 
-              <textarea id="cust-order-note" rows="2" placeholder="Catatan untuk toko (opsional)..." style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;"></textarea>
+              <textarea id="cust-order-note" rows="1" placeholder="Catatan untuk toko (opsional)..." style="width: 100%; font-size: 0.75rem; padding: 5px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;"></textarea>
             </div>
           </div>
 
-          <div style="display: flex; gap: 6px;" class="no-print">
-            <button class="btn-success" onclick="prosesCheckoutPelanggan()" style="flex: 1; background: #16a34a; margin-top: 0; padding: 10px; font-size: 0.85rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; color: white; font-weight: bold; cursor: pointer;">
+          <div style="display: flex; gap: 4px;" class="no-print">
+            <button class="btn-success" onclick="prosesCheckoutPelanggan()" style="flex: 1; background: #16a34a; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;">
               🛒 Belanja Sekarang
             </button>
-            <button onclick="prosesSimpanMenuSaja()" style="flex: 1; background: #7c3aed; margin-top: 0; padding: 10px; font-size: 0.85rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; color: white; font-weight: bold; cursor: pointer;">
+            <button onclick="prosesSimpanMenuSaja()" style="flex: 1; background: #7c3aed; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;">
               💾 Simpan Menu Saja
             </button>
           </div>
-          <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 0; padding: 6px; font-size: 0.8rem; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer;">🗑️ Kosongkan Keranjang</button>
+          <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 0; padding: 4px; font-size: 0.72rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">🗑️ Kosongkan Keranjang</button>
         </div>
       </div>
     </div>
 
     <!-- 2. HALAMAN DATA PELANGGAN -->
     <div id="data-pelanggan" class="tab-content" style="display: none;">
-      <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; margin-bottom: 12px;">
+      <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px;">
         <div>
-          <h3 style="margin-top: 0; font-size: 1rem; margin-bottom: 4px;">Profil Saya</h3>
-          <div style="font-size: 0.9rem;"><div><strong id="profile-name">-</strong></div><div style="color: var(--text-muted); font-size: 0.8rem;" id="profile-phone">-</div></div>
+          <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Profil Saya</h3>
+          <div style="font-size: 0.8rem;"><div><strong id="profile-name">-</strong></div><div style="color: var(--text-muted); font-size: 0.7rem;" id="profile-phone">-</div></div>
         </div>
-        <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 6px 14px; border-radius: 12px; text-align: center;">
-          <div style="font-size: 0.7rem; color: #d97706; font-weight: bold;">Koin Warga</div>
-          <div style="font-size: 1.1rem; font-weight: 800; color: #b45309;" id="profile-coins">0</div>
+        <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 4px 10px; border-radius: 10px; text-align: center;">
+          <div style="font-size: 0.6rem; color: #d97706; font-weight: bold;">Koin Warga</div>
+          <div style="font-size: 0.95rem; font-weight: 800; color: #b45309;" id="profile-coins">0</div>
         </div>
       </div>
-      <div class="card" style="padding: 16px; margin-bottom: 12px;"><h3 style="margin-top: 0; font-size: 1rem; margin-bottom: 8px;">📦 Riwayat Pesanan Online Saya</h3><div id="customer-online-orders-container" style="display: flex; flex-direction: column; gap: 8px;"><div class="empty-state">Memuat riwayat pesanan...</div></div></div>
-      <div class="card" style="padding: 16px;"><h3 style="margin-top: 0; font-size: 1rem; margin-bottom: 8px;">Catatan & Tagihan dari Toko</h3><div id="customer-notes-container" style="display: flex; flex-direction: column; gap: 8px;"><div class="empty-state">Memuat catatan...</div></div></div>
+      <div class="card" style="padding: 12px; margin-bottom: 8px;"><h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">📦 Riwayat Pesanan Online Saya</h3><div id="customer-online-orders-container" style="display: flex; flex-direction: column; gap: 6px;"><div class="empty-state" style="font-size: 0.78rem;">Memuat riwayat pesanan...</div></div></div>
+      <div class="card" style="padding: 12px;"><h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Catatan & Tagihan dari Toko</h3><div id="customer-notes-container" style="display: flex; flex-direction: column; gap: 6px;"><div class="empty-state" style="font-size: 0.78rem;">Memuat catatan...</div></div></div>
     </div>
 
     <!-- 3. HALAMAN LIVE CHAT -->
-    <div id="live-chat" class="tab-content" style="height: calc(100vh - 120px); padding: 0; display: none; flex-direction: column;">
+    <div id="live-chat" class="tab-content" style="height: calc(100vh - 110px); padding: 0; display: none; flex-direction: column;">
       <div style="display: flex; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
-        <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"><span>Chat Rumpi</span><span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 8px;">0</span></button>
-        <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; padding: 12px; background: none; border: none; font-weight: bold; font-size: 0.9rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"><span>Chat Admin Toko</span><span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 8px;">0</span></button>
+        <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; padding: 10px; background: none; border: none; font-weight: bold; font-size: 0.8rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;"><span>Chat Rumpi</span><span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px;">0</span></button>
+        <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; padding: 10px; background: none; border: none; font-weight: bold; font-size: 0.8rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;"><span>Chat Admin Toko</span><span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px;">0</span></button>
       </div>
-      <div id="subtab-rumpi-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
-        <div id="chat-rumpi-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);"><div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat obrolan warga...</div></div>
-        <div style="display: flex; gap: 8px; margin-top: 10px; flex-shrink: 0;"><input type="text" id="chat-rumpi-input" placeholder="Tulis pesan ke warga toko..." onkeypress="if(event.key==='Enter') kirimPesanChatRumpi()" style="flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.9rem;"><button onclick="kirimPesanChatRumpi()" style="background: #2563eb; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">Kirim</button></div>
+      <div id="subtab-rumpi-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 8px; box-sizing: border-box; overflow: hidden; height: 100%;">
+        <div id="chat-rumpi-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color); padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);"><div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Memuat obrolan warga...</div></div>
+        <div style="display: flex; gap: 6px; margin-top: 8px; flex-shrink: 0;"><input type="text" id="chat-rumpi-input" placeholder="Tulis pesan ke warga toko..." onkeypress="if(event.key==='Enter') kirimPesanChatRumpi()" style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.8rem;"><button onclick="kirimPesanChatRumpi()" style="background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Kirim</button></div>
       </div>
-      <div id="subtab-admin-content" class="subtab-content-pane" style="display: none; flex-direction: column; flex: 1; padding: 12px; box-sizing: border-box; overflow: hidden; height: 100%;">
-        <div id="customer-chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);"><div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Memuat pesan...</div></div>
-        <div style="display: flex; gap: 8px; margin-top: 10px; flex-shrink: 0;"><input type="text" id="customer-chat-input" placeholder="Tulis pesan ke toko..." onkeypress="if(event.key==='Enter') kirimPesanPelanggan()" style="flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.9rem;"><button onclick="kirimPesanPelanggan()" style="background: #16a34a; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;">Kirim</button></div>
+      <div id="subtab-admin-content" class="subtab-content-pane" style="display: none; flex-direction: column; flex: 1; padding: 8px; box-sizing: border-box; overflow: hidden; height: 100%;">
+        <div id="customer-chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color); padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);"><div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Memuat pesan...</div></div>
+        <div style="display: flex; gap: 6px; margin-top: 8px; flex-shrink: 0;"><input type="text" id="customer-chat-input" placeholder="Tulis pesan ke toko..." onkeypress="if(event.key==='Enter') kirimPesanPelanggan()" style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.8rem;"><button onclick="kirimPesanPelanggan()" style="background: #16a34a; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">Kirim</button></div>
       </div>
     </div>
 
     <!-- 4. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content" style="display: none;">
-      <div class="card" id="card-install-pwa" style="display: none; border: 1px solid #2563eb; background-color: var(--card-bg); padding: 16px; margin-bottom: 12px;">
-        <h3 style="color: #2563eb; margin-top: 0; font-size: 1rem; margin-bottom: 4px;">📱 Install Aplikasi ke HP</h3>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">Pasang KasirQuh di layar utama HP Anda agar lebih mudah diakses.</p>
-        <button onclick="triggerInstallPWA()" style="background: #2563eb; color: white; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer; font-size: 0.9rem;">📲 Install Sekarang</button>
+      <div class="card" id="card-install-pwa" style="display: none; border: 1px solid #2563eb; background-color: var(--card-bg); padding: 12px; margin-bottom: 8px;">
+        <h3 style="color: #2563eb; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">📱 Install Aplikasi ke HP</h3>
+        <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Pasang KasirQuh di layar utama HP Anda agar lebih mudah diakses.</p>
+        <button onclick="triggerInstallPWA()" style="background: #2563eb; color: white; padding: 8px; font-weight: bold; border-radius: 6px; width: 100%; border: none; cursor: pointer; font-size: 0.8rem;">📲 Install Sekarang</button>
       </div>
-      <div class="card" style="padding: 16px; margin-bottom: 12px;">
-        <h3 style="margin-top: 0; font-size: 1rem; margin-bottom: 8px;">Identitas Pelanggan</h3>
-        <div class="form-vertical" style="gap: 8px;">
-          <label style="font-size: 0.85rem;">Nama:</label><input type="text" id="setting-cust-name" style="padding: 10px; font-size: 0.9rem;">
-          <label style="font-size: 0.85rem;">No. WhatsApp (Username):</label><input type="text" id="setting-cust-phone" readonly style="background: var(--input-bg); opacity: 0.7; padding: 10px; font-size: 0.9rem;">
-          <label style="font-size: 0.85rem;">Alamat Pengiriman:</label><textarea id="setting-cust-address" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px; font-size: 0.9rem;"></textarea>
-          <label style="font-size: 0.85rem;">Sandi Baru (Opsional):</label><input type="password" id="setting-cust-pass" placeholder="Kosongkan jika tidak diubah" style="padding: 10px; font-size: 0.9rem;">
-          <button onclick="simpanProfilPelanggan()" style="border-radius: 8px; padding: 10px; background: #2563eb; color: white; border: none; cursor: pointer; font-size: 0.9rem; margin-top: 6px;">Simpan Perubahan</button>
+      <div class="card" style="padding: 12px; margin-bottom: 8px;">
+        <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Identitas Pelanggan</h3>
+        <div class="form-vertical" style="gap: 6px;">
+          <label style="font-size: 0.75rem;">Nama:</label><input type="text" id="setting-cust-name" style="padding: 8px; font-size: 0.8rem;">
+          <label style="font-size: 0.75rem;">No. WhatsApp (Username):</label><input type="text" id="setting-cust-phone" readonly style="background: var(--input-bg); opacity: 0.7; padding: 8px; font-size: 0.8rem;">
+          <label style="font-size: 0.75rem;">Alamat Pengiriman:</label><textarea id="setting-cust-address" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 6px; font-size: 0.8rem;"></textarea>
+          <label style="font-size: 0.75rem;">Sandi Baru (Opsional):</label><input type="password" id="setting-cust-pass" placeholder="Kosongkan jika tidak diubah" style="padding: 8px; font-size: 0.8rem;">
+          <button onclick="simpanProfilPelanggan()" style="border-radius: 6px; padding: 8px; background: #2563eb; color: white; border: none; cursor: pointer; font-size: 0.8rem; margin-top: 4px;">Simpan Perubahan</button>
         </div>
       </div>
-      <div class="card" style="padding: 16px; margin-bottom: 12px;">
-        <h3 style="margin-top: 0; font-size: 1rem; margin-bottom: 8px;">Tampilan & Tema</h3>
-        <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
-          <label style="font-size: 0.85rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="auto">Auto (Sistem)</option></select>
-          <label style="font-size: 0.85rem; margin-top: 6px;">Tampilan:</label><select id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.85rem; padding: 8px; border-radius: 8px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="grid">Kotak</option><option value="list">Daftar</option></select>
+      <div class="card" style="padding: 12px; margin-bottom: 8px;">
+        <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Tampilan & Tema</h3>
+        <div class="form-vertical" style="display: flex; flex-direction: column; gap: 6px;">
+          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="auto">Auto (Sistem)</option></select>
+          <label style="font-size: 0.75rem; margin-top: 4px;">Tampilan:</label><select id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="grid">Kotak</option><option value="list">Daftar</option></select>
         </div>
       </div>
-      <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5; padding: 16px; margin-bottom: 12px;">
-        <h3 style="color: #dc2626; margin-top: 0; font-size: 1rem; margin-bottom: 4px;">Pembaruan Sistem & Cache</h3>
-        <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">Gunakan tombol ini jika aplikasi tersangkut versi lama.</p>
-        <button onclick="bersihkanCacheTotal()" style="background: #dc2626; color: white; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer; font-size: 0.9rem;">🧹 Bersihkan Cache & Muat Ulang</button>
+      <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5; padding: 12px; margin-bottom: 8px;">
+        <h3 style="color: #dc2626; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembaruan Sistem & Cache</h3>
+        <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Gunakan tombol ini jika aplikasi tersangkut versi lama.</p>
+        <button onclick="bersihkanCacheTotal()" style="background: #dc2626; color: white; padding: 8px; font-weight: bold; border-radius: 6px; width: 100%; border: none; cursor: pointer; font-size: 0.8rem;">🧹 Bersihkan Cache & Muat Ulang</button>
       </div>
-      <div class="card" style="padding: 16px;"><h3 style="margin-top: 0; font-size: 1rem; margin-bottom: 8px;">Sesi Aplikasi</h3><button class="btn-logout" onclick="logoutPelanggan()" style="background: #dc2626; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 0.9rem;">🚪 Keluar / Ganti Akun</button></div>
+      <div class="card" style="padding: 12px;"><h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Sesi Aplikasi</h3><button class="btn-logout" onclick="logoutPelanggan()" style="background: #dc2626; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 0.8rem;">🚪 Keluar / Ganti Akun</button></div>
     </div>
   </div>
 
-  <div class="fab-container no-print" style="position: fixed; bottom: 75px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 99;">
-    <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten AI Toko" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; font-size: 22px;">😀</button>
-    <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer;"><svg viewBox="0 0 24 24" width="24" height="24" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg></button>
-    <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative; width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.75rem; min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
+  <div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
+    <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;">😀</button>
+    <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;"><svg viewBox="0 0 24 24" width="20" height="20" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg></button>
+    <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
   </div>
 
   <div id="aiChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleAIChatModal()">
-    <div class="modal-content" style="max-width: 400px; width: 95%; height: 75vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 16px;">
-      <div class="modal-header" style="padding: 12px 16px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 8px;"><h3 style="margin: 0; font-size: 1rem;">😀 Asisten Belanja AI</h3><button id="aiSoundToggle" onclick="toggleAISound()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem;">🔊 Suara: ON</button></div>
-        <div style="display: flex; gap: 8px; align-items: center;"><button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white; background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button></div>
+    <div class="modal-content" style="max-width: 380px; width: 95%; height: 65vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 16px;">
+      <div class="modal-header" style="padding: 10px 14px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 6px;"><h3 style="margin: 0; font-size: 0.9rem;">😀 Asisten Belanja AI</h3><button id="aiSoundToggle" onclick="toggleAISound()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 0.65rem;">🔊 Suara: ON</button></div>
+        <div style="display: flex; gap: 6px; align-items: center;"><button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white; background: none; border: none; font-size: 1.1rem; cursor: pointer;">&times;</button></div>
       </div>
-      <div id="ai-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);"><div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; white-space: pre-line;">HALOOOO BESTIE! WELCOME... di **Warunge Mimi**! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari Warunge Mimi siap baturi belanja makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget! 😁🛒</div></div>
-      <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px; align-items: center;"><input type="text" id="ai-chat-input" placeholder="Tanya stok, harga, atau ngobrol..." onkeypress="if(event.key==='Enter') kirimPesanKeAI()" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.85rem;"><button id="aiMicButton" onclick="toggleAISpeechRecognition()" title="Ngomong pakai suara" style="background: #374151; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;">🎤</button><button onclick="kirimPesanKeAI()" style="background: #7c3aed; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">Kirim</button></div>
+      <div id="ai-chat-messages" style="flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color);"><div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; white-space: pre-line;">HALOOOO BESTIE! WELCOME... di **Warunge Mimi**! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari Warunge Mimi siap baturi belanja makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget! 😁🛒</div></div>
+      <div style="padding: 8px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 6px; align-items: center;"><input type="text" id="ai-chat-input" placeholder="Tanya stok, harga, atau ngobrol..." onkeypress="if(event.key==='Enter') kirimPesanKeAI()" style="flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.78rem;"><button id="aiMicButton" onclick="toggleAISpeechRecognition()" title="Ngomong pakai suara" style="background: #374151; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;">🎤</button><button onclick="kirimPesanKeAI()" style="background: #7c3aed; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.78rem;">Kirim</button></div>
     </div>
   </div>
 
+  <!-- MODAL DETAIL PRODUK FLOATING DI TENGAH -->
   <div id="productDetailModal" class="modal-backdrop" onclick="if(event.target === this) closeProductDetail()">
     <div class="product-detail-box">
       <div style="position: relative;">
-        <img id="detail-img" src="" style="width: 100%; height: 180px; object-fit: cover; border-radius: 16px 16px 0 0;">
-        <button onclick="closeProductDetail()" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem;">✕</button>
+        <img id="detail-img" src="" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px 16px 0 0;">
+        <button onclick="closeProductDetail()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">✕</button>
       </div>
-      <div style="padding: 16px; overflow-y: auto;">
-        <div id="detail-category" style="font-size: 0.75rem; color: #67e8f9; font-weight: bold; margin-bottom: 4px; text-transform: uppercase;">KATEGORI</div>
-        <h2 id="detail-name" style="margin: 0 0 6px 0; font-size: 1.15rem; color: var(--text-color);">Nama Produk</h2>
-        <div id="detail-price" style="font-size: 1.25rem; font-weight: 800; color: #4ade80; margin-bottom: 12px;">Rp 0</div>
-        <div style="background: var(--bg-color); padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--border-color);">
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Sisa Stok: <strong id="detail-stock" style="color: var(--text-color);">0</strong></div>
-          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">Deskripsi: <span id="detail-desc" style="color: var(--text-color);">Tidak ada deskripsi dari toko.</span></div>
+      <div style="padding: 12px; overflow-y: auto;">
+        <div id="detail-category" style="font-size: 0.65rem; color: #67e8f9; font-weight: bold; margin-bottom: 2px; text-transform: uppercase;">KATEGORI</div>
+        <h2 id="detail-name" style="margin: 0 0 4px 0; font-size: 1rem; color: var(--text-color);">Nama Produk</h2>
+        <div id="detail-price" style="font-size: 1.15rem; font-weight: 800; color: #4ade80; margin-bottom: 10px;">Rp 0</div>
+        <div style="background: var(--bg-color); padding: 8px 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Sisa Stok: <strong id="detail-stock" style="color: var(--text-color);">0</strong></div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">Deskripsi: <span id="detail-desc" style="color: var(--text-color);">Tidak ada deskripsi dari toko.</span></div>
         </div>
         
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-          <div style="display: flex; align-items: center; gap: 4px;">
+        <!-- Input Qty dan Tambah Keranjang -->
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 3px;">
             <button class="qty-btn" onclick="ubahQtyDetail(-1)">-</button>
-            <input type="text" id="detail-qty-input" value="1" readonly style="width: 44px; height: 38px; text-align: center; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); font-weight: bold; color: var(--text-color); font-size: 0.95rem;">
+            <input type="text" id="detail-qty-input" value="1" readonly style="width: 38px; height: 34px; text-align: center; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); font-weight: bold; color: var(--text-color); font-size: 0.85rem;">
             <button class="qty-btn" onclick="ubahQtyDetail(1)">+</button>
           </div>
-          <button id="btn-detail-add" onclick="tambahDariDetail()" style="flex: 1; background: #2563eb; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(37,99,235,0.3); display: flex; justify-content: center; align-items: center; gap: 8px; padding: 0 12px;">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Masukkan
+          <button id="btn-detail-add" onclick="tambahDariDetail()" style="flex: 1; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 3px 8px rgba(37,99,235,0.3); display: flex; justify-content: center; align-items: center; gap: 6px; padding: 0 10px;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Masukkan
           </button>
         </div>
 
-        <button onclick="tanyaAdminBarang()" style="width: 100%; background: var(--card-bg); color: #16a34a; border: 1.5px solid #16a34a; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 0.85rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <button onclick="tanyaAdminBarang()" style="width: 100%; background: var(--card-bg); color: #16a34a; border: 1.2px solid #16a34a; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;">
           💬 Tanya Admin soal barang ini
         </button>
       </div>
@@ -533,14 +492,14 @@
 
   <div id="toastNotification" class="toast">Notifikasi</div>
 
-  <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
-    <span id="bottom-bar-title" style="font-weight: bold; font-size: 1rem; color: var(--text-color);">Belanja</span>
-    <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 4px 10px; gap: 8px;">
-      <button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.9rem; font-weight: bold;">◄</button>
-      <span id="pos-page-indicator" style="font-size: 0.8rem; font-weight: bold; color: var(--text-color);">1/1</span>
-      <button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.9rem; font-weight: bold;">▶</button>
+  <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
+    <span id="bottom-bar-title" style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">Belanja</span>
+    <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; padding: 2px 8px; gap: 6px;">
+      <button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">◄</button>
+      <span id="pos-page-indicator" style="font-size: 0.72rem; font-weight: bold; color: var(--text-color);">1/1</span>
+      <button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
     </div>
-    <button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+    <button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
   </div>
 
   <script>
@@ -575,6 +534,7 @@
 
     let currentDetailCode = null; let currentDetailQty = 1; let currentDetailStep = 1;
 
+    // 5 Default Menu Resep Warga
     const defaultRecipes = [
       { nama: "Sayur Sop Bening", desc: "Praktis, tinggal cemplung. Isian kol, wortel, bumbu kaldu.", keywords: ['kol', 'wortel', 'royco', 'bawang'] },
       { nama: "Nasi Goreng Dadakan", desc: "Bikin malam makin hangat. Butuh kecap, telur, bumbu instan.", keywords: ['kecap', 'telur', 'bumbu nasi goreng'] },
@@ -708,11 +668,13 @@
       else { if (qtyToAdd <= p.stok) { cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); } }
     }
 
+    // --- RENDER 5 MENU DEFAULT + CUSTOM FIRESTORE SAVED RECIPES (DENGAN TOMBOL EDIT ✏️ & HAPUS ✕) ---
     function renderRecipeCards() {
       const container = document.getElementById('recipe-scroll-container');
       if(!container) return;
       container.innerHTML = "";
 
+      // 1. Render 5 Default Recipes
       defaultRecipes.forEach(r => {
         let escName = escapeHtml(r.nama);
         let escDesc = escapeHtml(r.desc);
@@ -730,6 +692,7 @@
           </div>`;
       });
 
+      // 2. Render Saved Custom Recipes from Firestore database (customerSavedRecipes)
       customerSavedRecipes.forEach((sr, idx) => {
         let escName = escapeHtml(sr.nama);
         let srJson = JSON.stringify(sr).replace(/'/g, "&#39;");
@@ -762,6 +725,7 @@
           </div>`;
       });
 
+      // 3. Kartu Panduan Buat Menu Kustom
       container.innerHTML += `
         <div class="recipe-card" style="border: 1px dashed rgba(255,255,255,0.4);">
           <div>
@@ -772,6 +736,7 @@
         </div>`;
     }
 
+    // --- FUNGSI EDIT MENU KUSTOM ---
     function editSavedRecipe(index) {
       let sr = customerSavedRecipes[index];
       if (!sr) return;
@@ -872,6 +837,7 @@
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
     function toggleAIChatModal() { document.getElementById("aiChatModal").classList.toggle("show"); }
 
+    // --- FUNGSI MODAL DETAIL FLOATING TENGAH ---
     function openProductDetail(code) {
       let p = databaseProduk[code]; if(!p) return;
       currentDetailCode = code;
@@ -896,7 +862,7 @@
       if((p.stok || 0) <= 0) {
         btnAdd.style.background = "#94a3b8"; btnAdd.innerText = "Stok Habis"; btnAdd.disabled = true;
       } else {
-        btnAdd.style.background = "#2563eb"; btnAdd.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Masukkan`; btnAdd.disabled = false;
+        btnAdd.style.background = "#2563eb"; btnAdd.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Masukkan`; btnAdd.disabled = false;
       }
       document.getElementById("productDetailModal").classList.add("show");
     }
@@ -964,16 +930,17 @@
       chatRumpiUnsubscribe = db.collection("db_chat_rumpi").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => {
           if (!isInitialLoadRumpi) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().senderPhone !== currentCustomerPhone) { playCustomerNotificationSound(); let isRumpiSubActive = document.getElementById('live-chat').classList.contains('active') && document.getElementById('subtab-rumpi-content').style.display !== 'none'; if (!isRumpiSubActive) { unreadRumpiCust++; let badgeSub = document.getElementById("badge-rumpi-subtab"); if (badgeSub) { badgeSub.innerText = unreadRumpiCust; badgeSub.style.display = "inline-block"; } let badgeMain = document.getElementById("badge-livechat-cust"); if (badgeMain) { badgeMain.innerText = unreadRumpiCust; badgeMain.style.display = "inline-block"; } } } }); }
           isInitialLoadRumpi = false; let msgContainer = document.getElementById("chat-rumpi-messages"); if (!msgContainer) return;
-          msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada percakapan. Yuk mulai ngobrol, Kak!</div>` : "";
-          snapshot.forEach(doc => { let m = doc.data(); let isMyMessage = m.senderPhone === currentCustomerPhone; let alignStyle = isMyMessage ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignStyle}">${!isMyMessage ? `<div style="font-size: 0.75rem; font-weight: bold; color: #16a34a; margin-bottom: 2px;">${m.senderName || 'Warga Toko'}</div>` : ''}<div>${escapeHtml(m.pesan || '')}</div><div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; });
+          msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada percakapan. Yuk mulai ngobrol, Kak!</div>` : "";
+          snapshot.forEach(doc => { let m = doc.data(); let isMyMessage = m.senderPhone === currentCustomerPhone; let alignStyle = isMyMessage ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignStyle}">${!isMyMessage ? `<div style="font-size: 0.65rem; font-weight: bold; color: #16a34a; margin-bottom: 2px;">${m.senderName || 'Warga Toko'}</div>` : ''}<div>${escapeHtml(m.pesan || '')}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; });
           msgContainer.scrollTop = msgContainer.scrollHeight;
         });
     }
 
     function kirimPesanChatRumpi() { if (!currentCustomerPhone) return alert("Silakan login untuk ikut merumpikan!"); let inputEl = document.getElementById("chat-rumpi-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("db_chat_rumpi").add({ senderPhone: currentCustomerPhone, senderName: currentCustomerName || 'Pelanggan', pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
-    function initCustomerChatListener() { if (!currentCustomerPhone) return; db.collection("chats").doc(currentCustomerPhone).onSnapshot((doc) => { if (doc.exists) { let unread = doc.data().unreadCustomer || 0; let badgeAdminSub = document.getElementById("badge-admin-subtab"); if (badgeAdminSub) { if (unread > 0) { badgeAdminSub.innerText = unread; badgeAdminSub.style.display = "inline-block"; } else { badgeAdminSub.style.display = "none"; } } } }); if (customerChatUnsubscribe) customerChatUnsubscribe(); let isInitialLoadChat = true; customerChatUnsubscribe = db.collection("chats").doc(currentCustomerPhone).collection("messages").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => { if (!isInitialLoadChat) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().pengirim === "admin") { playCustomerNotificationSound(); } }); } isInitialLoadChat = false; let msgContainer = document.getElementById("customer-chat-messages"); if (!msgContainer) return; msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 20px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>` : ""; snapshot.forEach(doc => { let m = doc.data(); let isCustomer = m.pengirim === "customer"; let alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; ${alignBubble}"><div>${m.pesan}</div><div style="font-size: 0.65rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; }); msgContainer.scrollTop = msgContainer.scrollHeight; }); }
+    function initCustomerChatListener() { if (!currentCustomerPhone) return; db.collection("chats").doc(currentCustomerPhone).onSnapshot((doc) => { if (doc.exists) { let unread = doc.data().unreadCustomer || 0; let badgeAdminSub = document.getElementById("badge-admin-subtab"); if (badgeAdminSub) { if (unread > 0) { badgeAdminSub.innerText = unread; badgeAdminSub.style.display = "inline-block"; } else { badgeAdminSub.style.display = "none"; } } } }); if (customerChatUnsubscribe) customerChatUnsubscribe(); let isInitialLoadChat = true; customerChatUnsubscribe = db.collection("chats").doc(currentCustomerPhone).collection("messages").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => { if (!isInitialLoadChat) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().pengirim === "admin") { playCustomerNotificationSound(); } }); } isInitialLoadChat = false; let msgContainer = document.getElementById("customer-chat-messages"); if (!msgContainer) return; msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>` : ""; snapshot.forEach(doc => { let m = doc.data(); let isCustomer = m.pengirim === "customer"; let alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignBubble}"><div>${m.pesan}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; }); msgContainer.scrollTop = msgContainer.scrollHeight; }); }
     function kirimPesanPelanggan() { if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu!"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { db.collection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
 
+    // ====== FUNGSI AUTH DENGAN ALERT() DARI VERSI LAMA ======
     function prosesLoginPelanggan(e) {
       e.preventDefault();
       const phone = document.getElementById('cust-login-phone').value.trim();
@@ -985,9 +952,11 @@
           alert("Nomor WhatsApp belum terdaftar. Silakan daftar terlebih dahulu.");
         } else {
           let docData = snapshot.docs[0].data();
+          
           if (docData.status === "pending" || docData.disetujui === false) {
             return alert("Akun Anda sedang menunggu persetujuan dari Admin toko. Silakan hubungi admin.");
           }
+
           if (pass === (docData.password || "user")) {
             localStorage.setItem('cust_phone_v13', phone);
             currentCustomerPhone = phone;
@@ -997,6 +966,8 @@
             muatRiwayatPesananOnlinePelanggan();
             initCustomerChatListener();
             refreshKatalogPelanggan();
+
+            // Init fitur tambahan dari versi baru
             showToast("Berhasil Masuk! Selamat Berbelanja 🛒");
             periksaCheckinHarian();
             tampilkanKoinDiProfil();
@@ -1025,14 +996,28 @@
           gantiFormAuth('login');
         } else {
           db.collection("pelanggan").add({
-            nama: name, phone: phone, alamat: address, password: pass, status: "pending", catatan: [], savedRecipes: [], waktuDaftar: new Date().toLocaleString('id-ID')
+            nama: name,
+            phone: phone,
+            alamat: address,
+            password: pass,
+            status: "pending",
+            catatan: [],
+            savedRecipes: [], // Dipertahankan untuk fitur "Simpan Menu"
+            waktuDaftar: new Date().toLocaleString('id-ID')
           }).then(() => {
             alert("Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan Admin toko sebelum dapat digunakan untuk masuk.");
-            document.getElementById('cust-reg-name').value = ''; document.getElementById('cust-reg-phone').value = ''; document.getElementById('cust-reg-address').value = ''; document.getElementById('cust-reg-pass').value = '';
+            document.getElementById('cust-reg-name').value = '';
+            document.getElementById('cust-reg-phone').value = '';
+            document.getElementById('cust-reg-address').value = '';
+            document.getElementById('cust-reg-pass').value = '';
             gantiFormAuth('login');
-          }).catch((err) => { alert("Gagal mendaftar: " + err.message); });
+          }).catch((err) => {
+            alert("Gagal mendaftar: " + err.message);
+          });
         }
-      }).catch(err => { alert("Terjadi kesalahan: " + err.message); });
+      }).catch(err => {
+        alert("Terjadi kesalahan: " + err.message);
+      });
     }
 
     function logoutPelanggan() { 
@@ -1044,6 +1029,7 @@
         location.reload(); 
       } 
     }
+    // ========================================================
 
     function initFirebaseListeners() {
       db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; } });
@@ -1054,7 +1040,9 @@
         muatBarangLarisHariIni(); 
         perbaruiTampilanKategori(); 
         refreshKatalogPelanggan(); 
-        if (lastFetchedOrders && lastFetchedOrders.length > 0) { renderQuickReorder(lastFetchedOrders); }
+        if (lastFetchedOrders && lastFetchedOrders.length > 0) {
+          renderQuickReorder(lastFetchedOrders);
+        }
       });
     }
 
@@ -1104,24 +1092,50 @@
     function setupAutoScrollInteraction(containerId) {
       const container = document.getElementById(containerId);
       if (!container) return;
-      let scrollSpeed = 0.8; let isInteracting = false; let timeoutId = null;
-      const scrollInterval = setInterval(() => { if (!isInteracting) { container.scrollLeft += scrollSpeed; if (container.scrollLeft >= (container.scrollWidth - container.clientWidth - 2)) { container.scrollLeft = 0; } } }, 30);
+      
+      let scrollSpeed = 0.8;
+      let isInteracting = false;
+      let timeoutId = null;
+
+      const scrollInterval = setInterval(() => {
+        if (!isInteracting) {
+          container.scrollLeft += scrollSpeed;
+          if (container.scrollLeft >= (container.scrollWidth - container.clientWidth - 2)) {
+            container.scrollLeft = 0;
+          }
+        }
+      }, 30);
+
       container.addEventListener('touchstart', () => { isInteracting = true; clearTimeout(timeoutId); });
-      container.addEventListener('touchend', () => { timeoutId = setTimeout(() => { isInteracting = false; }, 2500); });
+      container.addEventListener('touchend', () => {
+        timeoutId = setTimeout(() => { isInteracting = false; }, 2500);
+      });
       container.addEventListener('mousedown', () => { isInteracting = true; clearTimeout(timeoutId); });
-      container.addEventListener('mouseup', () => { timeoutId = setTimeout(() => { isInteracting = false; }, 2500); });
+      container.addEventListener('mouseup', () => {
+        timeoutId = setTimeout(() => { isInteracting = false; }, 2500);
+      });
     }
 
     function renderTrending(codes) {
       const container = document.getElementById("trending-container"); const wrapper = document.getElementById("trending-section-wrapper"); container.innerHTML = "";
       if(codes.length === 0) { wrapper.style.display = "none"; return; }
+      
       let itemsHtml = "";
       codes.forEach(code => {
         let p = databaseProduk[code]; let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
         let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
         let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
         if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10;
-        itemsHtml += `<div onclick="openProductDetail('${code}')" class="trending-card"><img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3);"><div style="flex: 1; min-width: 0;"><div style="font-weight: bold; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Sisa: ${p.stok} ${satuan}</div><div style="font-size: 0.78rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div></div>`;
+        
+        itemsHtml += `
+          <div onclick="openProductDetail('${code}')" class="trending-card">
+            <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3);">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: bold; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
+              <div style="font-size: 0.68rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Sisa: ${p.stok} ${satuan}</div>
+              <div style="font-size: 0.78rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+            </div>
+          </div>`;
       });
       container.innerHTML = `<div class="auto-scroll-track">${itemsHtml}${itemsHtml}</div>`;
       setupAutoScrollInteraction("trending-container");
@@ -1131,23 +1145,40 @@
     function tambahKeKeranjangCepat(code) {
       let p = databaseProduk[code];
       if (!p || (p.stok || 0) <= 0) return alert("Maaf, stok barang ini sudah habis!");
+      
       let satuan = (p.satuan || "").toLowerCase().trim();
       let qtyToAdd = (satuan === "kg" || satuan === "kilogram") ? 0.25 : 1; 
+
       let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
       let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
       let valModal = p.hargaModal !== undefined ? p.hargaModal : (p.modal || 0);
       let modalParsed = typeof valModal === 'number' ? valModal : parseInt(valModal.toString().replace(/[^0-9]/g, '')) || 0;
+
       if (satuan === "kg" || satuan === "kilogram") { hargaParsed *= 10; modalParsed *= 10; }
+
       let item = cart.find(i => i.code === code);
       if (item) {
-        if (item.qty + qtyToAdd <= p.stok) { item.qty += qtyToAdd; item.qty = parseFloat(item.qty.toFixed(3)); item.subtotal = Math.round(item.qty * hargaParsed); }
-        else { return alert("Stok tidak mencukupi!"); }
+        if (item.qty + qtyToAdd <= p.stok) {
+          item.qty += qtyToAdd;
+          item.qty = parseFloat(item.qty.toFixed(3));
+          item.subtotal = Math.round(item.qty * hargaParsed);
+        } else {
+          return alert("Stok tidak mencukupi!");
+        }
       } else {
-        if (qtyToAdd <= p.stok) { cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); }
+        if (qtyToAdd <= p.stok) {
+          cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto });
+        }
       }
-      playBeep(); showToast("🛒 " + p.nama + " ditambahkan.");
+      
+      playBeep(); 
+      showToast("🛒 " + p.nama + " ditambahkan.");
       const cartFab = document.getElementById("fab-cart-btn"); 
-      if (cartFab) { cartFab.classList.remove("cart-animating"); void cartFab.offsetWidth; cartFab.classList.add("cart-animating"); }
+      if (cartFab) { 
+        cartFab.classList.remove("cart-animating"); 
+        void cartFab.offsetWidth;
+        cartFab.classList.add("cart-animating"); 
+      }
       renderCartPelanggan();
     }
 
@@ -1230,16 +1261,16 @@
         total += item.subtotal; totalQty += item.qty;
         tbody.innerHTML += `
           <tr>
-            <td style="font-size:0.85rem; font-weight:bold; color:var(--text-color);">${item.nama}</td>
+            <td style="font-size:0.75rem; font-weight:bold; color:var(--text-color);">${item.nama}</td>
             <td style="text-align: center; white-space: nowrap;">
-              <button onclick="ubahQtyKeranjang('${item.code}', -1)" style="width:26px; height:26px; background:#dc2626; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.8rem;">-</button>
-              <span style="display:inline-block; width:32px; font-size:0.9rem; font-weight:bold; color:var(--text-color);">${item.qty}</span>
-              <button onclick="ubahQtyKeranjang('${item.code}', 1)" style="width:26px; height:26px; background:#16a34a; color:#fff; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:0.8rem;">+</button>
+              <button onclick="ubahQtyKeranjang('${item.code}', -1)" style="width:22px; height:22px; background:#dc2626; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.7rem;">-</button>
+              <span style="display:inline-block; width:28px; font-size:0.78rem; font-weight:bold; color:var(--text-color);">${item.qty}</span>
+              <button onclick="ubahQtyKeranjang('${item.code}', 1)" style="width:22px; height:22px; background:#16a34a; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.7rem;">+</button>
             </td>
-            <td style="text-align: right; font-size:0.85rem; font-weight:bold; color:var(--text-color);">${item.subtotal.toLocaleString('id-ID')}</td>
+            <td style="text-align: right; font-size:0.75rem; font-weight:bold; color:var(--text-color);">${item.subtotal.toLocaleString('id-ID')}</td>
           </tr>`;
       });
-      if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 15px; font-size: 0.85rem;">Keranjang kosong</td></tr>`;
+      if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 10px; font-size: 0.75rem;">Keranjang kosong</td></tr>`;
       document.getElementById("cart-count").innerText = totalQty; document.getElementById("grand-total").innerText = total.toLocaleString('id-ID');
     }
 
@@ -1253,9 +1284,11 @@
         if(item.qty + step > p.stok) { alert("Stok tidak mencukupi!"); return; }
         item.qty += step; playBeep();
       } else {
-        if(item.qty - step < step) { cart.splice(idx, 1); playBeepDown(); } 
-        else { item.qty -= step; playBeepDown(); }
+        if(item.qty - step < step) { 
+           cart.splice(idx, 1); playBeepDown(); 
+        } else { item.qty -= step; playBeepDown(); }
       }
+      
       if(cart[idx]) {
         item.qty = parseFloat(item.qty.toFixed(3));
         item.subtotal = Math.round(item.qty * item.harga);
@@ -1269,11 +1302,14 @@
     function togglePayMethodCust() { document.getElementById("wrapper-tf-proof").style.display = (document.getElementById("pay-method-cust").value === "TF") ? "block" : "none"; }
     function handleProofUpload(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let w = img.width, h = img.height; if (w > h) { if (w > 600) { h *= 600 / w; w = 600; } } else { if (h > 600) { w *= 600 / h; h = 600; } } canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h); document.getElementById("cust-proof-base64").value = canvas.toDataURL('image/jpeg', 0.8); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
 
+    // --- FUNGSI SIMPAN MENU SAJA TANPA BELANJA ---
     function prosesSimpanMenuSaja() {
       if (cart.length === 0) return alert("Keranjang kosong, tidak ada barang untuk disimpan!");
       if (!currentCustomerDocId) return alert("Silakan login terlebih dahulu.");
+
       const saveRecipeName = document.getElementById("cust-save-recipe-name").value.trim();
       const isShareRumpiChecked = document.getElementById("cust-share-rumpi-toggle").checked;
+
       if (!saveRecipeName) return alert("Harap isi nama menu resep terlebih dahulu!");
 
       let itemsArr = cart.map(i => ({ code: i.code, qty: i.qty }));
@@ -1288,11 +1324,17 @@
         if (isShareRumpiChecked && currentCustomerPhone) {
           let totalBelanja = cart.reduce((acc, i) => acc + i.subtotal, 0);
           let itemListText = "";
-          cart.forEach(i => { itemListText += `- ${i.nama} (${i.qty})\n`; });
+          cart.forEach(i => {
+            itemListText += `- ${i.nama} (${i.qty})\n`;
+          });
           let pesanRumpi = `🍳 *Menu Racikan dari ${currentCustomerName || 'Pelanggan'}*\nNama Menu: "${saveRecipeName}"\nBahan-bahan:\n${itemListText}Perkiraan Total: Rp ${Math.round(totalBelanja).toLocaleString('id-ID')}`;
           let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
           db.collection("db_chat_rumpi").add({
-            senderPhone: currentCustomerPhone, senderName: currentCustomerName || 'Pelanggan', pesan: pesanRumpi, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+            senderPhone: currentCustomerPhone,
+            senderName: currentCustomerName || 'Pelanggan',
+            pesan: pesanRumpi,
+            waktu: nowStr,
+            waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
           }).catch(()=>{});
         }
 
@@ -1301,7 +1343,9 @@
         document.getElementById("cust-save-recipe-toggle").checked = false;
         document.getElementById("wrapper-save-recipe-fields").style.display = "none";
         closeCartModal();
-      }).catch(err => { alert("Gagal menyimpan menu: " + err.message); });
+      }).catch(err => {
+        alert("Gagal menyimpan menu: " + err.message);
+      });
     }
 
     async function prosesCheckoutPelanggan() {
@@ -1334,11 +1378,17 @@
 
             if (isShareRumpiChecked && currentCustomerPhone) {
               let itemListText = "";
-              cart.forEach(i => { itemListText += `- ${i.nama} (${i.qty})\n`; });
+              cart.forEach(i => {
+                itemListText += `- ${i.nama} (${i.qty})\n`;
+              });
               let pesanRumpi = `🍳 *Menu Racikan dari ${namaCust}*\nNama Menu: "${saveRecipeName}"\nBahan-bahan:\n${itemListText}Perkiraan Total: Rp ${Math.round(totalBelanja).toLocaleString('id-ID')}`;
               let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
               db.collection("db_chat_rumpi").add({
-                senderPhone: currentCustomerPhone, senderName: namaCust, pesan: pesanRumpi, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+                senderPhone: currentCustomerPhone,
+                senderName: namaCust,
+                pesan: pesanRumpi,
+                waktu: nowStr,
+                waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
               }).catch(()=>{});
             }
           }
@@ -1365,10 +1415,10 @@
           
           if (data.catatan && data.catatan.length > 0) {
             data.catatan.forEach(note => {
-              container.innerHTML += `<div style="border-bottom: 1px dashed var(--border-color); padding: 6px 0; font-size: 0.85rem;"><div style="color:var(--text-color);"><b>[${note.jenis}]</b> ${note.keterangan}</div><div style="font-size: 0.75rem; color: var(--text-muted);">${note.waktu}</div></div>`;
+              container.innerHTML += `<div style="border-bottom: 1px dashed var(--border-color); padding: 4px 0; font-size: 0.78rem;"><div style="color:var(--text-color);"><b>[${note.jenis}]</b> ${note.keterangan}</div><div style="font-size: 0.68rem; color: var(--text-muted);">${note.waktu}</div></div>`;
             });
           } else {
-            container.innerHTML = `<div class="empty-state">Belum ada catatan atau tagihan.</div>`;
+            container.innerHTML = `<div class="empty-state" style="font-size: 0.78rem;">Belum ada catatan atau tagihan.</div>`;
           }
         });
       });
@@ -1405,7 +1455,7 @@
         if (!container) return; 
         container.innerHTML = ""; 
         if (snapshot.empty) { 
-          container.innerHTML = `<div class="empty-state">Belum ada riwayat pesanan online.</div>`; 
+          container.innerHTML = `<div class="empty-state" style="font-size: 0.78rem;">Belum ada riwayat pesanan online.</div>`; 
           lastFetchedOrders = [];
           renderQuickReorder([]); 
           return; 
@@ -1429,17 +1479,17 @@
           let timelineHtml = `<div class="order-timeline"><div class="timeline-step ${step >= 1 ? (step > 1 ? 'completed' : 'active') : ''}"><div class="timeline-icon">${step > 1 ? '✓' : '1'}</div><div class="timeline-text">Menunggu</div></div><div class="timeline-step ${step >= 2 ? (step > 2 ? 'completed' : 'active') : ''}"><div class="timeline-icon">${step > 2 ? '✓' : '2'}</div><div class="timeline-text">Dikemas</div></div><div class="timeline-step ${step >= 3 ? (step > 3 ? 'completed' : 'active') : ''}"><div class="timeline-icon">${step > 3 ? '✓' : '3'}</div><div class="timeline-text">Dikirim</div></div><div class="timeline-step ${step >= 4 ? 'completed' : ''}"><div class="timeline-icon">${step >= 4 ? '✓' : '4'}</div><div class="timeline-text">Selesai</div></div></div>`; 
           let itemsHtml = ""; 
           if (trx.items && trx.items.length > 0) { 
-            itemsHtml = `<div style="margin: 6px 0; font-size: 0.8rem; background: var(--input-bg); padding: 6px; border-radius: 6px; color:var(--text-color);"><strong>Rincian Barang:</strong><ul style="margin: 2px 0 0 14px; padding: 0;">`; 
+            itemsHtml = `<div style="margin: 4px 0; font-size: 0.72rem; background: var(--input-bg); padding: 6px; border-radius: 6px; color:var(--text-color);"><strong>Rincian Barang:</strong><ul style="margin: 2px 0 0 12px; padding: 0;">`; 
             trx.items.forEach(it => { itemsHtml += `<li>${it.nama} (${it.qty}x)</li>`; }); 
             itemsHtml += `</ul></div>`; 
           } 
-          container.innerHTML += `<div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: var(--card-bg); box-shadow: 0 1px 4px rgba(0,0,0,0.05);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><span style="font-size: 0.75rem; color: var(--text-muted);">🗓️ ${trx.waktu || '-'}</span><span style="background: ${step===4 ? '#16a34a' : (step===1 ? '#ef4444' : '#d97706')}; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.7rem; font-weight: bold;">${statusLabel}</span></div>${timelineHtml}<div style="font-size: 0.85rem; font-weight: 600; color: #2563eb;">Metode: ${trx.metode || '-'}</div>${itemsHtml}<div style="font-size: 0.9rem; font-weight: 800; color: #16a34a; text-align: right;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div></div>`; 
+          container.innerHTML += `<div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: var(--card-bg); box-shadow: 0 1px 4px rgba(0,0,0,0.05);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><span style="font-size: 0.68rem; color: var(--text-muted);">🗓️ ${trx.waktu || '-'}</span><span style="background: ${step===4 ? '#16a34a' : (step===1 ? '#ef4444' : '#d97706')}; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.62rem; font-weight: bold;">${statusLabel}</span></div>${timelineHtml}<div style="font-size: 0.75rem; font-weight: 600; color: #2563eb;">Metode: ${trx.metode || '-'}</div>${itemsHtml}<div style="font-size: 0.82rem; font-weight: 800; color: #16a34a; text-align: right;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div></div>`; 
         }); 
       }); 
     }
 
     function simpanProfilPelanggan() { const nama = document.getElementById("setting-cust-name").value.trim(); const alamat = document.getElementById("setting-cust-address").value.trim(); if (!nama) return alert("Nama wajib diisi!"); db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => { if (!snap.empty) { db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!")).catch(err => alert("Gagal memperbarui: " + err.message)); } }).catch(err => alert("Terjadi kesalahan: " + err.message)); }
-    async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 8px 12px; border-radius: 10px; font-size: 0.85rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
+    async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
   </script>
