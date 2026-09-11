@@ -1879,71 +1879,89 @@ body.theme-colorful-v2 .products-container {
 
 <style>
 
-/* =========================================================
-   ADMIN COLORFUL v1/v2 — CONTRAST + / -
-   Tombol quantity sengaja berbeda dari warna card.
-   ========================================================= */
+/* === KASIRQUH: FIX BOX PEMBUNGKUS HITAM === */
+:root {
+  --admin-mainbox-colorful-bg: #000 !important;
+  --admin-mainbox-colorful-v2-bg: #000 !important;
+}
 
-/* Default control colors */
+/* Main product/catalog wrappers in both colorful themes */
+body.theme-colorful .product-list-container,
+body.theme-colorful .products-container,
+body.theme-colorful .catalog-container,
+body.theme-colorful .available-products,
+body.theme-colorful .barang-tersedia,
+body.theme-colorful .daftar-barang,
+body.theme-colorful .product-section,
+body.theme-colorful-v2 .product-list-container,
+body.theme-colorful-v2 .products-container,
+body.theme-colorful-v2 .catalog-container,
+body.theme-colorful-v2 .available-products,
+body.theme-colorful-v2 .barang-tersedia,
+body.theme-colorful-v2 .daftar-barang,
+body.theme-colorful-v2 .product-section,
+[data-theme="colorful"] .product-list-container,
+[data-theme="colorful"] .products-container,
+[data-theme="colorful"] .catalog-container,
+[data-theme="colorful"] .available-products,
+[data-theme="colorful"] .barang-tersedia,
+[data-theme="colorful"] .daftar-barang,
+[data-theme="colorful"] .product-section,
+[data-theme="colorful-v1"] .product-list-container,
+[data-theme="colorful-v1"] .products-container,
+[data-theme="colorful-v1"] .catalog-container,
+[data-theme="colorful-v1"] .available-products,
+[data-theme="colorful-v1"] .barang-tersedia,
+[data-theme="colorful-v1"] .daftar-barang,
+[data-theme="colorful-v1"] .product-section,
+[data-theme="colorful-v2"] .product-list-container,
+[data-theme="colorful-v2"] .products-container,
+[data-theme="colorful-v2"] .catalog-container,
+[data-theme="colorful-v2"] .available-products,
+[data-theme="colorful-v2"] .barang-tersedia,
+[data-theme="colorful-v2"] .daftar-barang,
+[data-theme="colorful-v2"] .product-section,
+[data-theme="colorful2"] .product-list-container,
+[data-theme="colorful2"] .products-container,
+[data-theme="colorful2"] .catalog-container,
+[data-theme="colorful2"] .available-products,
+[data-theme="colorful2"] .barang-tersedia,
+[data-theme="colorful2"] .daftar-barang,
+[data-theme="colorful2"] .product-section {
+  background: #000 !important;
+  background-image: none !important;
+}
+
+/* Common large wrapper/card around "Daftar Barang Tersedia" */
+body.theme-colorful .section-card,
+body.theme-colorful-v2 .section-card,
+[data-theme="colorful"] .section-card,
+[data-theme="colorful-v1"] .section-card,
+[data-theme="colorful-v2"] .section-card,
+[data-theme="colorful2"] .section-card {
+  background: #000 !important;
+  background-image: none !important;
+}
+
+/* Colorful v2: no gradients on the main wrapper */
+body.theme-colorful-v2 *,
+[data-theme="colorful-v2"] *,
+[data-theme="colorful2"] * {
+  /* only neutralize backgrounds on wrappers; product cards keep their own colors */
+}
+
+/* Quantity controls: deliberately contrast with product-card colors */
 [data-theme="colorful"] .quantity-btn,
+[data-theme="colorful-v1"] .quantity-btn,
 [data-theme="colorful-v2"] .quantity-btn,
 [data-theme="colorful2"] .quantity-btn,
-[data-theme="colorful-v.2"] .quantity-btn,
 [data-theme="colorful"] .qty-btn,
+[data-theme="colorful-v1"] .qty-btn,
 [data-theme="colorful-v2"] .qty-btn,
-[data-theme="colorful2"] .qty-btn,
-[data-theme="colorful-v.2"] .qty-btn {
+[data-theme="colorful2"] .qty-btn {
   background-image: none !important;
   color: #fff !important;
-  border: 1px solid rgba(255,255,255,.45) !important;
-  font-weight: 800 !important;
-}
-
-/* If the existing markup uses common +/- buttons, color them by
-   button order rather than inheriting the product/card color. */
-[data-theme="colorful"] .quantity-btn:nth-of-type(odd),
-[data-theme="colorful-v2"] .quantity-btn:nth-of-type(odd),
-[data-theme="colorful2"] .quantity-btn:nth-of-type(odd),
-[data-theme="colorful-v.2"] .quantity-btn:nth-of-type(odd),
-[data-theme="colorful"] .qty-btn:nth-of-type(odd),
-[data-theme="colorful-v2"] .qty-btn:nth-of-type(odd),
-[data-theme="colorful2"] .qty-btn:nth-of-type(odd),
-[data-theme="colorful-v.2"] .qty-btn:nth-of-type(odd) {
-  background: #10b981 !important;
-}
-
-[data-theme="colorful"] .quantity-btn:nth-of-type(even),
-[data-theme="colorful-v2"] .quantity-btn:nth-of-type(even),
-[data-theme="colorful2"] .quantity-btn:nth-of-type(even),
-[data-theme="colorful-v.2"] .quantity-btn:nth-of-type(even),
-[data-theme="colorful"] .qty-btn:nth-of-type(even),
-[data-theme="colorful-v2"] .qty-btn:nth-of-type(even),
-[data-theme="colorful2"] .qty-btn:nth-of-type(even),
-[data-theme="colorful-v.2"] .qty-btn:nth-of-type(even) {
-  background: #f97316 !important;
-}
-
-/* Strong fallback for actual +/- text inside buttons. */
-[data-theme="colorful"] button[aria-label*="Tambah"],
-[data-theme="colorful"] button[aria-label*="Kurang"],
-[data-theme="colorful-v2"] button[aria-label*="Tambah"],
-[data-theme="colorful-v2"] button[aria-label*="Kurang"],
-[data-theme="colorful2"] button[aria-label*="Tambah"],
-[data-theme="colorful2"] button[aria-label*="Kurang"],
-[data-theme="colorful-v.2"] button[aria-label*="Tambah"],
-[data-theme="colorful-v.2"] button[aria-label*="Kurang"] {
-  color: #fff !important;
-  background-image: none !important;
-}
-
-/* Keep v2 strictly solid for these controls too. */
-[data-theme="colorful-v2"] .quantity-btn,
-[data-theme="colorful-v2"] .qty-btn,
-[data-theme="colorful2"] .quantity-btn,
-[data-theme="colorful2"] .qty-btn,
-[data-theme="colorful-v.2"] .quantity-btn,
-[data-theme="colorful-v.2"] .qty-btn {
-  background-image: none !important;
+  border-color: rgba(255,255,255,.45) !important;
 }
 
 </style>
