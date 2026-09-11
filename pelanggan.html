@@ -23,7 +23,7 @@
     .popup-menu-btn svg { width: 16px; height: 16px; fill: currentColor; }
     .popup-menu-btn.active-menu { color: #2563eb !important; font-weight: bold; background: rgba(37, 99, 235, 0.08); }
     
-    .category-chips { display: flex; gap: 6px; overflow-x: auto; padding: 4px 6px; margin-bottom: 2px; scrollbar-width: none; }
+    .category-chips { display: flex; gap: 6px; overflow-x: auto; padding: 6px 10px; margin-bottom: 4px; scrollbar-width: none; }
     .category-chips::-webkit-scrollbar { display: none; }
     .chip-btn {
       white-space: nowrap; padding: 4px 12px; border-radius: 16px; border: 1px solid var(--border-color);
@@ -32,8 +32,8 @@
     .chip-btn.active { background: #2563eb; color: white; border-color: #2563eb; font-weight: bold; }
 
     .promo-banner {
-      background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 10px; padding: 10px 12px; color: white;
-      margin: 4px 10px 6px 10px; display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 10px; padding: 12px; color: white;
+      margin: 8px 10px; display: flex; align-items: center; justify-content: space-between;
       box-shadow: 0 3px 8px rgba(37, 99, 235, 0.2);
     }
     
@@ -49,7 +49,7 @@
     .toast.success { background-color: #16a34a; }
     .toast.error { background-color: #dc2626; }
 
-    .order-timeline { display: flex; justify-content: space-between; align-items: center; margin: 10px 0 6px 0; position: relative; }
+    .order-timeline { display: flex; justify-content: space-between; align-items: center; margin: 12px 0 8px 0; position: relative; }
     .order-timeline::before { content: ''; position: absolute; top: 10px; left: 10%; right: 10%; height: 2px; background: var(--border-color); z-index: 1; }
     .timeline-step { z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
     .timeline-icon { width: 20px; height: 20px; border-radius: 50%; background: var(--input-bg); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: bold; border: 2px solid var(--border-color); }
@@ -70,7 +70,7 @@
     }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-    .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 2px 10px 4px 10px; scrollbar-width: none; }
+    .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 4px 10px 10px 10px; scrollbar-width: none; }
     .horizontal-scroll-container::-webkit-scrollbar { display: none; }
 
     .auto-scroll-wrapper {
@@ -78,7 +78,7 @@
       overflow-y: hidden;
       width: 100%;
       position: relative;
-      padding: 2px 0 4px 0;
+      padding: 4px 0 10px 0;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
@@ -241,7 +241,7 @@
   </div>
 
   <div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
-    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 4px 0; margin-bottom: 4px;">
+    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 6px 0; margin-bottom: 8px;">
       <div style="display: flex; gap: 6px; align-items: center;">
         <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
         <button onclick="tutupKolomPencarian()" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">✕</button>
@@ -250,7 +250,7 @@
 
     <!-- 1. HALAMAN BELANJA -->
     <div id="belanja" class="tab-content active" style="display: block;">
-      <div class="promo-banner no-print" id="promo-banner-section" style="margin: 4px 10px 4px 10px;">
+      <div class="promo-banner no-print" id="promo-banner-section">
         <div>
           <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 2px;">Promo Toko Hari Ini! 🎉</div>
           <div style="font-size: 0.75rem; opacity: 0.9;">Cari barang incaranmu sekarang juga.</div>
@@ -258,12 +258,12 @@
         <div style="font-size: 1.6rem;">🛍️</div>
       </div>
 
-      <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 4px;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 2px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
+      <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 10px;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
         <div id="reorder-container" class="auto-scroll-wrapper"></div>
       </div>
 
-      <div class="category-chips no-print" id="category-container" style="margin-bottom: 2px; padding: 2px 6px;">
+      <div class="category-chips no-print" id="category-container">
         <button class="chip-btn active" onclick="pilihKategoriPelanggan('Semua')">Semua</button>
         <button class="chip-btn" onclick="pilihKategoriPelanggan('Umum')">Umum</button>
         <button class="chip-btn" onclick="pilihKategoriPelanggan('Minuman')">Minuman</button>
@@ -273,22 +273,22 @@
       </div>
 
       <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
-      <div id="recipe-section-wrapper" class="no-print" style="margin: 2px 0 4px 0;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 2px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
+      <div id="recipe-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
         <div class="horizontal-scroll-container" id="recipe-scroll-container">
           <!-- Rendered via JavaScript -->
         </div>
       </div>
 
       <!-- Barang Laris Hari Ini -->
-      <div id="trending-section-wrapper" class="no-print" style="margin: 2px 0 4px 0;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 2px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
+      <div id="trending-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
         <div id="trending-container" class="auto-scroll-wrapper"></div>
       </div>
 
       <div class="pos-container">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 4px 0 2px 0; color: var(--text-color);">Semua Kebutuhan Harian 🛍️</div>
-        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 4px; background: transparent; border: none; box-shadow: none;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 10px 0 4px 0; color: var(--text-color);">Semua Kebutuhan Harian 🛍️</div>
+        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 8px; background: transparent; border: none; box-shadow: none;">
           <div id="pos-catalog-container"></div>
         </div>
       </div>
