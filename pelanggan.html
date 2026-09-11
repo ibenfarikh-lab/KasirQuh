@@ -41,6 +41,32 @@
       font-weight: bold;
       background: rgba(37, 99, 235, 0.08);
     }
+    
+    /* --- TAMBAHAN UI BARU --- */
+    .category-chips {
+      display: flex; gap: 8px; overflow-x: auto; padding: 10px 14px; margin-bottom: 5px;
+      scrollbar-width: none; /* Firefox */
+    }
+    .category-chips::-webkit-scrollbar { display: none; } /* Chrome */
+    .chip-btn {
+      white-space: nowrap; padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border-color);
+      background: var(--card-bg); color: var(--text-color); font-size: 0.85rem; cursor: pointer; transition: 0.2s;
+    }
+    .chip-btn.active { background: #2563eb; color: white; border-color: #2563eb; font-weight: bold; }
+
+    .promo-banner {
+      background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 12px; padding: 16px; color: white;
+      margin: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+    }
+    
+    /* Animasi Keranjang Melompat */
+    @keyframes cartBounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+    .cart-animating { animation: cartBounce 0.3s ease-in-out; }
   </style>
 </head>
 <body data-theme="light">
@@ -128,6 +154,25 @@
 
     <!-- 1. HALAMAN BELANJA -->
     <div id="belanja" class="tab-content active" style="display: block;">
+      
+      <!-- Promo Banner -->
+      <div class="promo-banner no-print">
+        <div>
+          <div style="font-weight: 800; font-size: 1.1rem; margin-bottom: 4px;">Promo Toko Hari Ini! 🎉</div>
+          <div style="font-size: 0.85rem; opacity: 0.9;">Cari barang incaranmu sekarang juga.</div>
+        </div>
+        <div style="font-size: 2rem;">🛍️</div>
+      </div>
+
+      <!-- Kategori Cepat (Horizontal Filter Chips) -->
+      <div class="category-chips no-print" id="category-container">
+        <button class="chip-btn active" onclick="pilihKategoriPelanggan('Semua')">Semua</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Sembako')">Sembako</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Minuman')">Minuman</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Snack')">Snack</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Bumbu')">Bumbu</button>
+      </div>
+
       <div class="pos-container">
         <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none;">
           <div id="pos-catalog-container"></div>
@@ -530,6 +575,7 @@
     let itemsPerPagePos = 24;
     let customerChatUnsubscribe = null;
     let chatRumpiUnsubscribe = null;
+    let activeKategoriPelanggan = 'Semua'; // Variable untuk Kategori Cepat
 
     window.onload = function() {
       let savedTheme = localStorage.getItem('cust_theme_v13') || 'auto';
@@ -671,6 +717,16 @@
       document.getElementById("inventory-search-input").value = "";
       document.getElementById("sticky-search-container").style.display = "none";
       filterKatalogPelanggan("");
+    }
+    
+    function pilihKategoriPelanggan(kategori) {
+      activeKategoriPelanggan = kategori;
+      document.querySelectorAll('.chip-btn').forEach(btn => {
+        if(btn.innerText === kategori) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      currentPosPage = 1;
+      refreshKatalogPelanggan();
     }
 
     function gantiFormAuth(type) {
@@ -1036,18 +1092,26 @@
       const cartFab = document.getElementById('fab-cart-btn');
       const aiFab = document.getElementById('fab-ai-btn');
 
+      // Tampilkan Promo Banner dan Kategori hanya di Halaman Belanja
+      const promoBanner = document.querySelector('.promo-banner');
+      const categoryContainer = document.getElementById('category-container');
+
       if (tabId === 'belanja') {
         titleEl.innerText = "Belanja";
         paginationBox.style.display = "flex";
         if (searchFab) searchFab.style.display = "flex";
         if (cartFab) cartFab.style.display = "flex";
         if (aiFab) aiFab.style.display = "flex";
+        if (promoBanner) promoBanner.style.display = "flex";
+        if (categoryContainer) categoryContainer.style.display = "flex";
       } else {
         paginationBox.style.display = "none";
         if (searchContainer) searchContainer.style.display = "none";
         if (searchFab) searchFab.style.display = "none";
         if (cartFab) cartFab.style.display = "none";
         if (aiFab) aiFab.style.display = "none";
+        if (promoBanner) promoBanner.style.display = "none";
+        if (categoryContainer) categoryContainer.style.display = "none";
         
         if (tabId === 'live-chat') {
           titleEl.innerText = "Live Chat";
@@ -1095,10 +1159,29 @@
 
       let searchKeyword = (document.getElementById("sticky-search-container").style.display === "block") ? (document.getElementById("inventory-search-input").value.toLowerCase()) : "";
       let matchedProducts = [];
+      
       for (let code in databaseProduk) {
         let p = databaseProduk[code];
-        if (p.nama.toLowerCase().includes(searchKeyword)) matchedProducts.push({ code, ...p });
+        let pNamaLower = p.nama.toLowerCase();
+        let matchSearch = pNamaLower.includes(searchKeyword);
+        
+        // Smart Fallback Category
+        let pKat = p.kategori ? p.kategori : "";
+        if (!pKat) {
+           if(pNamaLower.includes('beras') || pNamaLower.includes('gula') || pNamaLower.includes('minyak') || pNamaLower.includes('telur')) pKat = 'Sembako';
+           else if (pNamaLower.includes('kopi') || pNamaLower.includes('es') || pNamaLower.includes('teh') || pNamaLower.includes('air') || pNamaLower.includes('susu')) pKat = 'Minuman';
+           else if (pNamaLower.includes('snack') || pNamaLower.includes('roti') || pNamaLower.includes('biskuit') || pNamaLower.includes('chiki')) pKat = 'Snack';
+           else if (pNamaLower.includes('bumbu') || pNamaLower.includes('garam') || pNamaLower.includes('kecap') || pNamaLower.includes('bawang') || pNamaLower.includes('masako')) pKat = 'Bumbu';
+           else pKat = 'Lainnya';
+        }
+
+        let matchCategory = (activeKategoriPelanggan === 'Semua') || (pKat.toLowerCase() === activeKategoriPelanggan.toLowerCase());
+
+        if (matchSearch && matchCategory) {
+          matchedProducts.push({ code, ...p });
+        }
       }
+      
       matchedProducts.sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
 
       let totalPages = Math.ceil(matchedProducts.length / itemsPerPagePos) || 1;
@@ -1109,7 +1192,7 @@
       container.innerHTML = "";
 
       if (matchedProducts.length === 0) {
-        container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 20px;">Produk tidak ditemukan.</div>`;
+        container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 20px;">Produk tidak ditemukan untuk kategori ini.</div>`;
         document.getElementById("pos-page-indicator").innerText = `1/1`;
         return;
       }
@@ -1128,6 +1211,12 @@
         let isKg = (satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram');
         if (isKg) hargaParsed = hargaParsed * 10;
 
+        // Label FOMO (Sisa Stok)
+        let sisaStokBadge = "";
+        if (!isHabis && p.stok <= 5) {
+          sisaStokBadge = `<div style="position:absolute; top:8px; left:8px; background:#ef4444; color:white; font-size:0.65rem; padding:3px 6px; border-radius:6px; font-weight:bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">🔥 Sisa ${p.stok}</div>`;
+        }
+
         if (catalogViewMode === 'grid') {
           container.innerHTML += `
             <div class="inv-card" style="border: 2px solid #16a34a; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card-bg);">
@@ -1136,7 +1225,10 @@
                   <button style="flex: 1; height: 38px; background: #16a34a; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
                   <button style="flex: 1; height: 38px; background: #dc2626; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${code}')">-</button>
                 </div>
-                <div style="text-align: center; margin-bottom: 8px;"><img src="${fotoSrc}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px;"></div>
+                <div style="text-align: center; margin-bottom: 8px; position: relative;">
+                  ${sisaStokBadge}
+                  <img src="${fotoSrc}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px;">
+                </div>
                 <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
                 <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px;">Stok: ${p.stok || 0} ${satuan}</div>
               </div>
@@ -1150,7 +1242,10 @@
                 <button style="width: 32px; height: 32px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer; font-weight: bold;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
                 <button style="width: 32px; height: 32px; border-radius: 6px; background: #dc2626; color: white; border: none; cursor: pointer; font-weight: bold;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${code}')">-</button>
               </div>
-              <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+              <div style="position: relative; flex-shrink: 0;">
+                ${sisaStokBadge}
+                <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px;">
+              </div>
               <div style="min-width: 0; flex: 1;">
                 <div style="font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-color);">${p.nama}</div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">Stok: ${p.stok || 0} ${satuan}</div>
@@ -1212,6 +1307,15 @@
         cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto });
       }
       playBeep();
+      
+      // Animasi tombol keranjang
+      const cartFab = document.getElementById("fab-cart-btn");
+      if (cartFab) {
+        cartFab.classList.remove("cart-animating");
+        void cartFab.offsetWidth; // Trigger reflow agar animasi terestart
+        cartFab.classList.add("cart-animating");
+      }
+
       renderCartPelanggan();
       refreshKatalogPelanggan();
     }
