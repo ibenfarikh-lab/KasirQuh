@@ -973,7 +973,17 @@
             localStorage.setItem('cust_phone_v13', phone);
             currentCustomerPhone = phone;
             currentCustomerName = docData.nama || 'Pelanggan';
+
+            // Setelah login berhasil, pastikan splash/welcome benar-benar ditutup.
+            // Sebelumnya splash hanya ditutup saat tombol Masuk/Daftar ditekan,
+            // sehingga setelah autentikasi bisa muncul kembali di atas beranda.
+            const welcomeEl = document.getElementById('welcomeScreen');
+            if (welcomeEl) {
+              welcomeEl.style.opacity = '0';
+              welcomeEl.style.display = 'none';
+            }
             document.getElementById('customerLoginModal').style.display = 'none';
+
             muatDataPelangganRealtime();
             muatRiwayatPesananOnlinePelanggan();
             initCustomerChatListener();
