@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.7">
+  <link rel="stylesheet" href="style.css?v=1.0.8">
 
   <style>
     .popup-menu-btn {
@@ -73,7 +73,6 @@
     .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 4px 10px 10px 10px; scrollbar-width: none; }
     .horizontal-scroll-container::-webkit-scrollbar { display: none; }
 
-    /* KONTINER BERGULIR OTOMATIS YANG BISA DI-SWIPE / SENTUH MANUAL */
     .auto-scroll-wrapper {
       overflow-x: auto;
       overflow-y: hidden;
@@ -94,7 +93,6 @@
       padding-right: 10px;
     }
     
-    /* SEMUA KARTU DENGAN 3 WARNA GRADASI BERBEDA */
     .recipe-card, .reorder-card, .trending-card, .inv-card, .catalog-list-item {
       color: white;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -104,7 +102,6 @@
       transform: scale(0.97);
     }
 
-    /* KELAS GRADASI WARNA BERPUTAR (5 VARIASI 3 WARNA) */
     .recipe-card:nth-child(5n+1), .reorder-card:nth-child(5n+1), .trending-card:nth-child(5n+1), .inv-card:nth-child(5n+1), .catalog-list-item:nth-child(5n+1) { background: linear-gradient(135deg, #2563eb, #1d4ed8, #1e40af); }
     .recipe-card:nth-child(5n+2), .reorder-card:nth-child(5n+2), .trending-card:nth-child(5n+2), .inv-card:nth-child(5n+2), .catalog-list-item:nth-child(5n+2) { background: linear-gradient(135deg, #f59e0b, #d97706, #b45309); }
     .recipe-card:nth-child(5n+3), .reorder-card:nth-child(5n+3), .trending-card:nth-child(5n+3), .inv-card:nth-child(5n+3), .catalog-list-item:nth-child(5n+3) { background: linear-gradient(135deg, #10b981, #059669, #047857); }
@@ -146,7 +143,6 @@
       min-width: 180px; max-width: 180px; display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 8px; cursor: pointer; flex-shrink: 0;
     }
 
-    /* GRID KATALOG 3 KOLOM DEFAULT */
     .product-catalog-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -164,7 +160,6 @@
     .qty-btn { width: 34px; height: 34px; background: var(--input-bg); border: 1px solid var(--border-color); font-size: 1rem; font-weight: bold; color: var(--text-color); cursor: pointer; border-radius: 6px; }
     .qty-btn:active { background: var(--border-color); }
 
-    /* TOMBOL IKON BELANJA DI POJOK BAWAH GAMBAR */
     .btn-quick-cart-icon {
       position: absolute;
       bottom: 6px;
@@ -341,7 +336,6 @@
                 <input type="hidden" id="cust-proof-base64" value="">
               </div>
 
-              <!-- BLOK SIMPAN MENU DIPADATKAN TANPA RUANG KOSONG & DISELARASKAN KE KANAN -->
               <div style="padding: 6px; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--input-border); display: flex; flex-direction: column; gap: 4px;">
                 <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.73rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
                   <span>🌟 Simpan jadi Menu Resep</span>
@@ -466,7 +460,7 @@
     </div>
   </div>
 
-  <!-- MODAL BARCODE / QR CODE BAGIKAN APLIKASI (DENGAN TOMBOL KIRIM GAMBAR KE WA) -->
+  <!-- MODAL BARCODE / QR CODE BAGIKAN APLIKASI -->
   <div id="qrCodeModal" class="modal-backdrop" onclick="if(event.target === this) tutupModalQRCode()">
     <div class="modal-content" style="max-width: 320px; width: 90%; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative;">
       <button onclick="tutupModalQRCode()" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">✕</button>
@@ -505,13 +499,18 @@
         <div style="display: flex; gap: 8px; margin-bottom: 8px;">
           <div style="display: flex; align-items: center; gap: 3px;">
             <button class="qty-btn" onclick="ubahQtyDetail(-1)">-</button>
-            <input type="text" id="detail-qty-input" value="1" readonly style="width: 38px; height: 34px; text-align: center; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); font-weight: bold; color: var(--text-color); font-size: 0.85rem;">
+            <input type="text" id="detail-qty-input" value="1" readonly style="width: 55px; height: 34px; text-align: center; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); font-weight: bold; color: var(--text-color); font-size: 0.85rem;">
             <button class="qty-btn" onclick="ubahQtyDetail(1)">+</button>
           </div>
           <button id="btn-detail-add" onclick="tambahDariDetail()" style="flex: 1; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 3px 8px rgba(37,99,235,0.3); display: flex; justify-content: center; align-items: center; gap: 6px; padding: 0 10px;">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Masukkan
           </button>
         </div>
+
+        <!-- Tombol Bagikan Produk via WA -->
+        <button onclick="bagikanProdukViaWA()" style="width: 100%; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;">
+          💬 Bagikan Produk via WA
+        </button>
 
         <button onclick="tanyaAdminBarang()" style="width: 100%; background: var(--card-bg); color: #16a34a; border: 1.2px solid #16a34a; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;">
           💬 Tanya Admin soal barang ini
@@ -552,7 +551,6 @@
     function stopAiListeningState() { isAiListening = false; const micBtn = document.getElementById('aiMicButton'); micBtn.style.background = '#374151'; micBtn.innerText = "🎤"; document.getElementById('ai-chat-input').placeholder = "Tanya stok, harga..."; }
     function toggleAISound() { isAiSoundOn = !isAiSoundOn; document.getElementById('aiSoundToggle').innerText = isAiSoundOn ? "🔊 Suara: ON" : "🔇 Suara: OFF"; if (!isAiSoundOn && 'speechSynthesis' in window) window.speechSynthesis.cancel(); }
 
-    // --- FUNGSI BARCODE & BAGIKAN GAMBAR KE WA ---
     function bukaModalQRCode() {
       const currentUrl = window.location.href;
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
@@ -574,21 +572,18 @@
       window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
     }
 
-    // Fungsi untuk merender kartu barcode menjadi Gambar (PNG) dan membagikannya ke WhatsApp
     function bagikanBarcodeSebagaiGambar() {
       const canvas = document.createElement('canvas');
       canvas.width = 400;
       canvas.height = 500;
       const ctx = canvas.getContext('2d');
 
-      // Latar Belakang Gradasi
       const gradient = ctx.createLinearGradient(0, 0, 400, 500);
       gradient.addColorStop(0, '#2563eb');
       gradient.addColorStop(1, '#7c3aed');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, 400, 500);
 
-      // Judul Toko
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 26px sans-serif';
       ctx.textAlign = 'center';
@@ -599,7 +594,6 @@
       ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.fillText("Belanja Harian Makin Praktis", 200, 90);
 
-      // Kotak Putih QR Code
       ctx.fillStyle = '#ffffff';
       if (ctx.roundRect) {
         ctx.beginPath();
@@ -609,7 +603,6 @@
         ctx.fillRect(80, 120, 240, 240);
       }
 
-      // Ambil Gambar QR Code dari API
       const currentUrl = window.location.href;
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
       
@@ -619,7 +612,6 @@
       img.onload = async function() {
         ctx.drawImage(img, 100, 140, 200, 200);
 
-        // Teks Footer Bawah
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 14px sans-serif';
         ctx.fillText("📷 Scan Untuk Daftar / Login", 200, 400);
@@ -641,7 +633,6 @@
               console.log(err);
             }
           } else {
-            // Fallback: Unduh otomatis jika browser tidak mendukung Web Share API file
             const link = document.createElement('a');
             link.download = 'barcode-kasirquh.png';
             link.href = canvas.toDataURL('image/png');
@@ -650,6 +641,19 @@
           }
         }, 'image/png');
       };
+    }
+
+    function bagikanProdukViaWA() {
+      if(!currentDetailCode) return;
+      let p = databaseProduk[currentDetailCode]; if(!p) return;
+      let storeName = pengaturanToko.nama || "KasirQuh";
+      let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
+      let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+      let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
+      if (satuan === 'kg' || satuan === 'kilogram') hargaParsed *= 10;
+
+      let pesan = `Halo! Ada produk menarik nih di *${storeName}*:\n\n*${p.nama}*\nHarga: Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}\nStok Tersedia: ${p.stok || 0} ${satuan}\n\nYuk cek dan belanja melalui link berikut:\n${window.location.href}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
     }
   </script>
 
@@ -664,7 +668,6 @@
 
     let currentDetailCode = null; let currentDetailQty = 1; let currentDetailStep = 1;
 
-    // 5 Default Menu Resep Warga
     const defaultRecipes = [
       { nama: "Sayur Sop Bening", desc: "Praktis, tinggal cemplung. Isian kol, wortel, bumbu kaldu.", keywords: ['kol', 'wortel', 'royco', 'bawang'] },
       { nama: "Nasi Goreng Dadakan", desc: "Bikin malam makin hangat. Butuh kecap, telur, bumbu instan.", keywords: ['kecap', 'telur', 'bumbu nasi goreng'] },
@@ -798,13 +801,11 @@
       else { if (qtyToAdd <= p.stok) { cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); } }
     }
 
-    // --- RENDER 5 MENU DEFAULT + CUSTOM FIRESTORE SAVED RECIPES (DENGAN TOMBOL EDIT ✏️ & HAPUS ✕) ---
     function renderRecipeCards() {
       const container = document.getElementById('recipe-scroll-container');
       if(!container) return;
       container.innerHTML = "";
 
-      // 1. Render 5 Default Recipes
       defaultRecipes.forEach(r => {
         let escName = escapeHtml(r.nama);
         let escDesc = escapeHtml(r.desc);
@@ -822,7 +823,6 @@
           </div>`;
       });
 
-      // 2. Render Saved Custom Recipes from Firestore database (customerSavedRecipes)
       customerSavedRecipes.forEach((sr, idx) => {
         let escName = escapeHtml(sr.nama);
         let srJson = JSON.stringify(sr).replace(/'/g, "&#39;");
@@ -855,7 +855,6 @@
           </div>`;
       });
 
-      // 3. Kartu Panduan Buat Menu Kustom
       container.innerHTML += `
         <div class="recipe-card" style="border: 1px dashed rgba(255,255,255,0.4);">
           <div>
@@ -866,7 +865,6 @@
         </div>`;
     }
 
-    // --- FUNGSI EDIT MENU KUSTOM ---
     function editSavedRecipe(index) {
       let sr = customerSavedRecipes[index];
       if (!sr) return;
@@ -967,7 +965,6 @@
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
     function toggleAIChatModal() { document.getElementById("aiChatModal").classList.toggle("show"); }
 
-    // --- FUNGSI MODAL DETAIL FLOATING TENGAH ---
     function openProductDetail(code) {
       let p = databaseProduk[code]; if(!p) return;
       currentDetailCode = code;
@@ -1070,7 +1067,6 @@
     function initCustomerChatListener() { if (!currentCustomerPhone) return; db.collection("chats").doc(currentCustomerPhone).onSnapshot((doc) => { if (doc.exists) { let unread = doc.data().unreadCustomer || 0; let badgeAdminSub = document.getElementById("badge-admin-subtab"); if (badgeAdminSub) { if (unread > 0) { badgeAdminSub.innerText = unread; badgeAdminSub.style.display = "inline-block"; } else { badgeAdminSub.style.display = "none"; } } } }); if (customerChatUnsubscribe) customerChatUnsubscribe(); let isInitialLoadChat = true; customerChatUnsubscribe = db.collection("chats").doc(currentCustomerPhone).collection("messages").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => { if (!isInitialLoadChat) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().pengirim === "admin") { playCustomerNotificationSound(); } }); } isInitialLoadChat = false; let msgContainer = document.getElementById("customer-chat-messages"); if (!msgContainer) return; msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>` : ""; snapshot.forEach(doc => { let m = doc.data(); let isCustomer = m.pengirim === "customer"; let alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignBubble}"><div>${m.pesan}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; }); msgContainer.scrollTop = msgContainer.scrollHeight; }); }
     function kirimPesanPelanggan() { if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu!"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); db.collection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { db.collection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
 
-    // ====== FUNGSI AUTH DENGAN ALERT() DARI VERSI LAMA ======
     function prosesLoginPelanggan(e) {
       e.preventDefault();
       const phone = document.getElementById('cust-login-phone').value.trim();
@@ -1097,7 +1093,6 @@
             initCustomerChatListener();
             refreshKatalogPelanggan();
 
-            // Init fitur tambahan dari versi baru
             showToast("Berhasil Masuk! Selamat Berbelanja 🛒");
             periksaCheckinHarian();
             tampilkanKoinDiProfil();
@@ -1132,7 +1127,7 @@
             password: pass,
             status: "pending",
             catatan: [],
-            savedRecipes: [], // Dipertahankan untuk fitur "Simpan Menu"
+            savedRecipes: [],
             waktuDaftar: new Date().toLocaleString('id-ID')
           }).then(() => {
             alert("Pendaftaran berhasil! Akun Anda sedang menunggu persetujuan Admin toko sebelum dapat digunakan untuk masuk.");
@@ -1159,7 +1154,6 @@
         location.reload(); 
       } 
     }
-    // ========================================================
 
     function initFirebaseListeners() {
       db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; } });
@@ -1432,7 +1426,6 @@
     function togglePayMethodCust() { document.getElementById("wrapper-tf-proof").style.display = (document.getElementById("pay-method-cust").value === "TF") ? "block" : "none"; }
     function handleProofUpload(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let w = img.width, h = img.height; if (w > h) { if (w > 600) { h *= 600 / w; w = 600; } } else { if (h > 600) { w *= 600 / h; h = 600; } } canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h); document.getElementById("cust-proof-base64").value = canvas.toDataURL('image/jpeg', 0.8); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
 
-    // --- FUNGSI SIMPAN MENU SAJA TANPA BELANJA ---
     function prosesSimpanMenuSaja() {
       if (cart.length === 0) return alert("Keranjang kosong, tidak ada barang untuk disimpan!");
       if (!currentCustomerDocId) return alert("Silakan login terlebih dahulu.");
