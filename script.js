@@ -2048,6 +2048,8 @@ function updatePermanentBarTitle() {
   } else if (activeTab === 'catatan') {
     titleEl.innerText = labelNamaTabCatatan[activeSubCatatanTab] || "Catatan";
     if (catatanPag) catatanPag.classList.add("show"); 
+  } else if (activeTab === 'live-chat-admin') {
+    titleEl.innerText = (currentLang === 'en') ? "Live Chat" : ((currentLang === 'ar') ? "الدردشة المباشرة" : "Live Chat");
   } else if (activeTab === 'pengaturan') {
     titleEl.innerText = (currentLang === 'en') ? "System Settings" : ((currentLang === 'ar') ? "إعدادات النظام" : "Pengaturan Sistem");
   } else if (activeTab === 'kalkulator') {
@@ -2064,6 +2066,7 @@ function updatePermanentBarTitle() {
     'belanja-stok': 'pop-btn-belanjastok',
     'laporan': 'pop-btn-laporan',
     'catatan': 'pop-btn-catatan',
+    'live-chat-admin': 'pop-btn-livechat',
     'pengaturan': 'pop-btn-pengaturan'
   };
   if (activeBtnMap[activeTab]) {

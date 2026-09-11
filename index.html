@@ -1240,11 +1240,11 @@
 
           chatListContainer.innerHTML += `
             <div onclick="bukaRuangChatAdmin('${phone}', '${name}')" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; ${activeStyle}">
-              <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem;">
+              <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; color:#fff !important;">
                 <span style="color:#fff !important;">👤 ${name}</span>
                 ${unread > 0 ? `<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">${unread}</span>` : ''}
               </div>
-              <div style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${phone}</div>
+              <div style="font-size: 0.78rem; color:#fff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${phone}</div>
             </div>
           `;
         });

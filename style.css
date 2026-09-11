@@ -783,3 +783,19 @@ button:hover { background: #1d4ed8; }
 @media (max-width: 600px) {
   .admin-private-chat-drawer { width: min(330px, 88%); }
 }
+
+
+/* ============================================================
+   CHAT PRIBADI V6 — LIVE CHAT BOTTOM TITLE + WHITE CUSTOMERS
+   ============================================================ */
+[data-theme="colorful"] #admin-private-chat-drawer #admin-chat-list,
+[data-theme="colorful"] #admin-private-chat-drawer #admin-chat-list div,
+[data-theme="colorful"] #admin-private-chat-drawer #admin-chat-list span {
+  color: #fff !important;
+}
+[data-theme="colorful"] #admin-private-chat-drawer #admin-chat-list div[onclick] {
+  color: #fff !important;
+}
+[data-theme="colorful"] #admin-private-chat-drawer #admin-chat-list div[onclick] span {
+  color: #fff !important;
+}
