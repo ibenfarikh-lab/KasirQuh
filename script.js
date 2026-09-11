@@ -3819,6 +3819,24 @@ function escapeHtml(text) {
 }
 // --- END FITUR CHAT RUMPI ---
 
+// --- FITUR BARU: TOGGLE DAFTAR KONTAK CHAT PRIBADI ---
+function toggleDaftarChatPribadi() {
+  const sidebar = document.getElementById('sidebar-daftar-chat');
+  const backdrop = document.getElementById('backdrop-daftar-chat');
+  
+  if (!sidebar) return;
+
+  // Jika posisi left adalah 0px (sedang terbuka), kita sembunyikan ke -280px
+  if (sidebar.style.left === '0px') {
+    sidebar.style.left = '-280px';
+    backdrop.style.display = 'none';
+  } else {
+    // Jika tertutup, kita geser ke 0px
+    sidebar.style.left = '0px';
+    backdrop.style.display = 'block';
+  }
+}
+
 
 // Inisialisasi awal saat halaman dimuat
 document.addEventListener("DOMContentLoaded", () => {
