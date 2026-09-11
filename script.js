@@ -2050,6 +2050,9 @@ function updatePermanentBarTitle() {
   } else if (activeTab === 'kalkulator') {
     titleEl.innerText = (currentLang === 'en') ? "Calculator" : ((currentLang === 'ar') ? "آلة حاسبة" : "Kalkulator");
     initCalcPreview();
+  } else if (activeTab === 'live-chat' || activeTab === 'chat') {
+    // KODE TAMBAHAN UNTUK FIX JUDUL LIVE CHAT
+    titleEl.innerText = (currentLang === 'en') ? "Live Chat" : ((currentLang === 'ar') ? "الدردشة المباشرة" : "Live Chat");
   }
 
   document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
@@ -2061,7 +2064,9 @@ function updatePermanentBarTitle() {
     'belanja-stok': 'pop-btn-belanjastok',
     'laporan': 'pop-btn-laporan',
     'catatan': 'pop-btn-catatan',
-    'pengaturan': 'pop-btn-pengaturan'
+    'pengaturan': 'pop-btn-pengaturan',
+    'live-chat': 'pop-btn-livechat', // KODE TAMBAHAN
+    'chat': 'pop-btn-livechat'
   };
   if (activeBtnMap[activeTab]) {
     let btnEl = document.getElementById(activeBtnMap[activeTab]);
@@ -2072,9 +2077,20 @@ function updatePermanentBarTitle() {
 function switchTab(tabId, pushHistory = true) {
   activeTab = tabId;
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
+  
+  // Mencegah error jika id menu di html sedikit berbeda ejaannya
+  let targetTab = document.getElementById(tabId);
+  if (targetTab) {
+      targetTab.classList.add('active');
+  } else if (tabId === 'live-chat' && document.getElementById('chat')) {
+      activeTab = 'chat';
+      document.getElementById('chat').classList.add('active');
+  } else if (tabId === 'chat' && document.getElementById('live-chat')) {
+      activeTab = 'live-chat';
+      document.getElementById('live-chat').classList.add('active');
+  }
 
-  if (pushHistory) history.pushState({tab: tabId}, "", "");
+  if (pushHistory) history.pushState({tab: activeTab}, "", "");
 
   const fabCart = document.getElementById('fab-cart-btn');
   const fabScan = document.getElementById('fab-scan-btn');
@@ -2084,7 +2100,7 @@ function switchTab(tabId, pushHistory = true) {
   const fabAddCatatan = document.getElementById('fab-add-catatan-btn');
   const fabVoiceScan = document.getElementById('fab-voice-scan-btn');
 
-  if (tabId === 'penjualan') {
+  if (activeTab === 'penjualan') {
     if(fabCart) fabCart.style.display = 'flex'; 
     if(fabScan) fabScan.style.display = 'flex'; 
     if(fabFilter) fabFilter.style.display = 'flex'; 
@@ -2094,14 +2110,14 @@ function switchTab(tabId, pushHistory = true) {
     if(fabAddCatatan) fabAddCatatan.style.display = 'none';
   } else {
     if(fabVoiceScan) fabVoiceScan.style.display = 'none';
-    if (tabId === 'kasir-online') {
+    if (activeTab === 'kasir-online') {
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
       if(fabFilter) fabFilter.style.display = 'none'; 
       if(fabAdd) fabAdd.style.display = 'none'; 
       if(fabAddCust) fabAddCust.style.display = 'none'; 
       if(fabAddCatatan) fabAddCatatan.style.display = 'none';
-    } else if (tabId === 'data-barang' || tabId === 'belanja-stok') {
+    } else if (activeTab === 'data-barang' || activeTab === 'belanja-stok') {
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
       if(fabFilter) fabFilter.style.display = 'flex'; 
@@ -2109,7 +2125,7 @@ function switchTab(tabId, pushHistory = true) {
       if(fabAddCust) fabAddCust.style.display = 'none'; 
       if(fabAddCatatan) fabAddCatatan.style.display = 'none';
       if(fabAdd) fabAdd.setAttribute("onclick", "openProductModal()");
-    } else if (tabId === 'laporan') {
+    } else if (activeTab === 'laporan') {
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
       if(fabFilter) fabFilter.style.display = 'none'; 
@@ -2121,14 +2137,14 @@ function switchTab(tabId, pushHistory = true) {
         if(fabAdd) fabAdd.style.display = 'none'; 
         if(fabAddCust) fabAddCust.style.display = 'none'; 
       }
-    } else if (tabId === 'catatan') {
+    } else if (activeTab === 'catatan') {
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
       if(fabFilter) fabFilter.style.display = 'none'; 
       if(fabAdd) fabAdd.style.display = 'none'; 
       if(fabAddCust) fabAddCust.style.display = 'none';
       if(fabAddCatatan) fabAddCatatan.style.display = 'flex';
-    } else if (tabId === 'kalkulator') {
+    } else if (activeTab === 'kalkulator') {
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
       if(fabFilter) fabFilter.style.display = 'none'; 
@@ -2136,6 +2152,14 @@ function switchTab(tabId, pushHistory = true) {
       if(fabAddCust) fabAddCust.style.display = 'none'; 
       if(fabAddCatatan) fabAddCatatan.style.display = 'none';
       initCalcPreview();
+    } else if (activeTab === 'live-chat' || activeTab === 'chat') {
+      // KODE TAMBAHAN UNTUK FIX TOMBOL MENGAMBANG DI LIVE CHAT
+      if(fabCart) fabCart.style.display = 'none'; 
+      if(fabScan) fabScan.style.display = 'none'; 
+      if(fabFilter) fabFilter.style.display = 'none'; 
+      if(fabAdd) fabAdd.style.display = 'none'; 
+      if(fabAddCust) fabAddCust.style.display = 'none'; 
+      if(fabAddCatatan) fabAddCatatan.style.display = 'none';
     } else {
       if(fabCart) fabCart.style.display = 'none'; 
       if(fabScan) fabScan.style.display = 'none'; 
@@ -2847,7 +2871,16 @@ function refreshData() {
         const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
         invList.innerHTML = emptyStokMsg; invGrid.innerHTML = emptyStokMsg;
       } else {
-        paginatedStokItems.forEach(item => {
+        // --- KODE TAMBAHAN UNTUK GRADASI WARNA STOK ---
+        const gradArray = [
+          "linear-gradient(135deg, #FF7E5F, #FEB47B)",
+          "linear-gradient(135deg, #6a11cb, #2575fc)",
+          "linear-gradient(135deg, #11998e, #38ef7d)",
+          "linear-gradient(135deg, #b224ef, #7579ff)",
+          "linear-gradient(135deg, #f12711, #f5af19)"
+        ];
+
+        paginatedStokItems.forEach((item, index) => {
           let code = item.code;
           let kat = item.kategori || "Umum";
           let sat = (item.satuan || "pcs").toLowerCase();
@@ -2855,6 +2888,7 @@ function refreshData() {
           let fotoSrc = item.foto || defaultPlaceholderImg;
           let isiRtg = item.isiRtg || 10;
           let satuanLabel = sat === 'rtg' ? 'rtg (isi ' + isiRtg + ')' : (sat === 'kg' ? 'kg' : sat);
+          let cardBg = gradArray[index % 5];
 
           let detailsListHtml = '';
           let detailsGridHtml = '';
@@ -2882,7 +2916,34 @@ function refreshData() {
           }
 
           invList.innerHTML += `<div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; margin-bottom: 8px;"><div style="display: flex; align-items: flex-start; gap: 10px;"><img src="${fotoSrc}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 6px; background: #fff; flex-shrink: 0; border: 1px solid var(--border-color);"><div style="flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start;"><div><div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color);">${item.nama}</div><div style="font-size: 0.78rem; color: var(--text-muted);">${code} • Stok: <b style="color: var(--text-color);">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</b> • ${satuanLabel}</div></div><div><span class="badge-kat">${kat}</span></div></div></div><div style="font-size: 0.75rem; color: var(--text-color); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 3px;">${detailsListHtml}</div><div style="display: flex; justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border-color); margin-top: 8px; padding-top: 6px;"><button onclick="openProductModal('${code}')" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">✏️ Edit</button><button onclick="hapusBarang('${code}')" style="background: rgba(220, 38, 38, 0.1); color: #dc2626; border: none; cursor: pointer; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">🗑️ Hapus</button></div></div>`;
-          invGrid.innerHTML += `<div class="inv-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px;"><div><div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;"><button class="btn-edit" style="flex: 1; height: 26px; border-radius: 6px; font-size: 0.72rem;" onclick="openProductModal('${code}')">Edit</button><button class="btn-danger" style="flex: 1; height: 26px; border-radius: 6px; font-size: 0.72rem;" onclick="hapusBarang('${code}')">Hapus</button></div><div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;"><img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid var(--border-color); flex-shrink: 0;"><div style="min-width: 0; flex: 1;"><div style="font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.nama}</div><div style="font-size: 0.75rem; color: var(--text-muted);">Stok: <b>${stok}</b></div></div></div><div style="background: rgba(0,0,0,0.02); border: 1px dashed var(--border-color); border-radius: 8px; padding: 6px; margin-bottom: 6px;">${detailsGridHtml}</div></div><div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 0.8rem;"><span style="font-weight: bold; color: var(--text-muted);">Kategori:</span><span class="badge-kat">${kat}</span></div></div>`;
+          
+          invGrid.innerHTML += `
+            <div class="inv-card" style="background: ${cardBg}; display: flex; flex-direction: column; justify-content: space-between; padding: 10px; border: none; position: relative; overflow: hidden; color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+              <!-- Bayangan Hitam di Bawah -->
+              <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); pointer-events: none; z-index: 1;"></div>
+              
+              <div style="position: relative; z-index: 2;">
+                <div style="display: flex; gap: 4px; width: 100%; margin-bottom: 4px;">
+                  <button class="btn-edit" style="flex: 1; height: 26px; border-radius: 6px; font-size: 0.72rem; background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3);" onclick="openProductModal('${code}')">Edit</button>
+                  <button class="btn-danger" style="flex: 1; height: 26px; border-radius: 6px; font-size: 0.72rem; background: rgba(220, 38, 38, 0.8); color: #fff; border: 1px solid rgba(255,255,255,0.3);" onclick="hapusBarang('${code}')">Hapus</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                  <img src="${fotoSrc}" style="width: 42px; height: 42px; object-fit: contain; border-radius: 6px; background: #fff; border: 1px solid rgba(255,255,255,0.5); flex-shrink: 0;">
+                  <div style="min-width: 0; flex: 1;">
+                    <div style="font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">${item.nama}</div>
+                    <div style="font-size: 0.75rem; color: rgba(255,255,255,0.9); text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">Stok: <b style="color:#fff;">${stok}</b></div>
+                  </div>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 6px; margin-bottom: 6px; color: #fff; text-shadow: 1px 1px 1px rgba(0,0,0,0.5);">
+                  ${detailsGridHtml}
+                </div>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 6px; font-size: 0.8rem; position: relative; z-index: 2;">
+                <span style="font-weight: bold; color: rgba(255,255,255,0.9);">Kategori:</span>
+                <span class="badge-kat" style="background: rgba(255,255,255,0.25); color: #fff; border: none;">${kat}</span>
+              </div>
+            </div>
+          `;
         });
       }
     }
@@ -2993,7 +3054,16 @@ function renderKatalogKasirPaginated(filteredItems) {
     const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia.</div>`;
     catalogGrid.innerHTML = emptyMsg; catalogList.innerHTML = emptyMsg;
   } else {
-    paginatedPosItems.forEach(p => {
+    // --- KODE TAMBAHAN UNTUK GRADASI WARNA POS ---
+    const gradArray = [
+      "linear-gradient(135deg, #FF7E5F, #FEB47B)",
+      "linear-gradient(135deg, #6a11cb, #2575fc)",
+      "linear-gradient(135deg, #11998e, #38ef7d)",
+      "linear-gradient(135deg, #b224ef, #7579ff)",
+      "linear-gradient(135deg, #f12711, #f5af19)"
+    ];
+
+    paginatedPosItems.forEach((p, index) => {
       let code = p.code;
       let kat = p.kategori || "Umum";
       let sat = (p.satuan || "").toLowerCase();
@@ -3004,23 +3074,33 @@ function renderKatalogKasirPaginated(filteredItems) {
       let displayHarga = sat === 'kg' ? (p.hargaRtg || (p.harga * 10)) : p.harga;
       let cartItem = cart.find(item => item.barcode === code);
       let currentQtyInCart = cartItem ? cartItem.qty : 0;
+      let cardBg = gradArray[index % 5];
 
       catalogGrid.innerHTML += `
-        <div class="inv-card">
-          <div class="inv-card-top">
+        <div class="inv-card" style="background: ${cardBg}; border: none; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+          <!-- Overlay Gelap -->
+          <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 65%; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); pointer-events: none; z-index: 1;"></div>
+          
+          <div class="inv-card-top" style="position: relative; z-index: 2;">
             <div style="display: flex; gap: 6px; width: 100%; margin-bottom: 2px;">
-              <button class="btn-edit" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #16a34a; color: white;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDesimalDariCode('${code}')">+</button>
-              <button class="btn-danger" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')">-</button>
+              <button class="btn-edit" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #16a34a; color: white; border: none;" ${isHabis ? 'disabled' : ''} onclick="tambahManualDesimalDariCode('${code}')">+</button>
+              <button class="btn-danger" style="flex: 1; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: none; background: rgba(220, 38, 38, 0.9); color: white;" ${currentQtyInCart <= 0 ? 'disabled' : ''} onclick="kurangManualDariCode('${code}')">-</button>
             </div>
-            <img src="${fotoSrc}" class="inv-card-img">
-            <div class="inv-card-info">
-              <div class="inv-card-title">${p.nama}</div>
-              <div class="inv-card-code">${code}</div>
-              <div style="margin-top: 2px;"><span class="badge-kat">${kat}</span> <span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</span></div>
+            <img src="${fotoSrc}" class="inv-card-img" style="border: 1px solid rgba(255,255,255,0.4); background: #fff;">
+            <div class="inv-card-info" style="color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">
+              <div class="inv-card-title" style="color: #fff;">${p.nama}</div>
+              <div class="inv-card-code" style="color: rgba(255,255,255,0.8);">${code}</div>
+              <div style="margin-top: 2px;">
+                <span class="badge-kat" style="background: rgba(255,255,255,0.25); color: #fff; border:none;">${kat}</span> 
+                <span class="${stok > 0 ? 'badge-stok' : 'badge-stok-habis'}" style="background: ${stok > 0 ? 'rgba(34, 197, 94, 0.5)' : 'rgba(239, 68, 68, 0.5)'}; color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 2px 6px; border-radius: 6px;">${stok} ${sat === 'kg' ? 'Kg' : 'pcs'}</span>
+              </div>
             </div>
           </div>
-          <div class="inv-card-details">
-            <div class="inv-card-row"><span>Harga:</span><b>Rp ${displayHarga.toLocaleString('id-ID')}${unitLabel}</b></div>
+          <div class="inv-card-details" style="position: relative; z-index: 2; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 8px;">
+            <div class="inv-card-row">
+              <span style="color: rgba(255,255,255,0.9);">Harga:</span>
+              <b style="color: #fbbf24; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); font-size: 0.85rem;">Rp ${displayHarga.toLocaleString('id-ID')}${unitLabel}</b>
+            </div>
           </div>
         </div>
       `;
