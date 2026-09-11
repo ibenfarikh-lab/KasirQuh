@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.8">
+  <link rel="stylesheet" href="style.css?v=1.0.9">
 
   <style>
     .popup-menu-btn {
@@ -183,6 +183,105 @@
 
     @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
+  </style>
+  <style>
+
+    /* ============================================================
+       KASIRQUH PELANGGAN — TEMA LIGHT / DARK / COLORFUL
+       Colorful = solid bright cards, dark background, minimal gradients.
+       ============================================================ */
+    [data-theme="light"] .recipe-card,
+    [data-theme="light"] .reorder-card,
+    [data-theme="light"] .trending-card,
+    [data-theme="light"] .inv-card,
+    [data-theme="light"] .catalog-list-item,
+    [data-theme="light"] .card,
+    [data-theme="light"] .cust-list-item,
+    [data-theme="light"] .empty-state {
+      background: var(--card-bg) !important;
+      color: var(--text-color) !important;
+    }
+    [data-theme="dark"] .recipe-card,
+    [data-theme="dark"] .reorder-card,
+    [data-theme="dark"] .trending-card,
+    [data-theme="dark"] .inv-card,
+    [data-theme="dark"] .catalog-list-item,
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .cust-list-item,
+    [data-theme="dark"] .empty-state {
+      background: var(--card-bg) !important;
+      color: var(--text-color) !important;
+    }
+
+    [data-theme="colorful"] {
+      --bg-color: #070b14;
+      --card-bg: #111827;
+      --text-color: #f8fafc;
+      --text-muted: #cbd5e1;
+      --border-color: #334155;
+      --card-border-green: #22c55e;
+      --input-bg: #0f172a;
+      --input-border: #64748b;
+      --table-header: #172033;
+    }
+    [data-theme="colorful"] body { background: #070b14 !important; color: #f8fafc !important; }
+    [data-theme="colorful"] .main-content { background: #070b14; }
+    [data-theme="colorful"] .card,
+    [data-theme="colorful"] .recipe-card,
+    [data-theme="colorful"] .reorder-card,
+    [data-theme="colorful"] .trending-card,
+    [data-theme="colorful"] .inv-card,
+    [data-theme="colorful"] .catalog-list-item,
+    [data-theme="colorful"] .cust-list-item {
+      color: #fff !important;
+      border-color: rgba(255,255,255,0.22) !important;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.22) !important;
+    }
+    /* Solid palette — no heavy gradients in customer Colorful mode. */
+    [data-theme="colorful"] .recipe-card:nth-child(5n+1),
+    [data-theme="colorful"] .reorder-card:nth-child(5n+1),
+    [data-theme="colorful"] .trending-card:nth-child(5n+1),
+    [data-theme="colorful"] .inv-card:nth-child(5n+1),
+    [data-theme="colorful"] .catalog-list-item:nth-child(5n+1) { background: #2563eb !important; }
+    [data-theme="colorful"] .recipe-card:nth-child(5n+2),
+    [data-theme="colorful"] .reorder-card:nth-child(5n+2),
+    [data-theme="colorful"] .trending-card:nth-child(5n+2),
+    [data-theme="colorful"] .inv-card:nth-child(5n+2),
+    [data-theme="colorful"] .catalog-list-item:nth-child(5n+2) { background: #f59e0b !important; }
+    [data-theme="colorful"] .recipe-card:nth-child(5n+3),
+    [data-theme="colorful"] .reorder-card:nth-child(5n+3),
+    [data-theme="colorful"] .trending-card:nth-child(5n+3),
+    [data-theme="colorful"] .inv-card:nth-child(5n+3),
+    [data-theme="colorful"] .catalog-list-item:nth-child(5n+3) { background: #10b981 !important; }
+    [data-theme="colorful"] .recipe-card:nth-child(5n+4),
+    [data-theme="colorful"] .reorder-card:nth-child(5n+4),
+    [data-theme="colorful"] .trending-card:nth-child(5n+4),
+    [data-theme="colorful"] .inv-card:nth-child(5n+4),
+    [data-theme="colorful"] .catalog-list-item:nth-child(5n+4) { background: #8b5cf6 !important; }
+    [data-theme="colorful"] .recipe-card:nth-child(5n+5),
+    [data-theme="colorful"] .reorder-card:nth-child(5n+5),
+    [data-theme="colorful"] .trending-card:nth-child(5n+5),
+    [data-theme="colorful"] .inv-card:nth-child(5n+5),
+    [data-theme="colorful"] .catalog-list-item:nth-child(5n+5) { background: #ec4899 !important; }
+
+    [data-theme="colorful"] .promo-banner { background: #2563eb !important; box-shadow: 0 4px 12px rgba(37,99,235,.25) !important; }
+    [data-theme="colorful"] .permanent-bottom-bar { background: #111827 !important; border-top-color: #334155 !important; color: #fff !important; }
+    [data-theme="colorful"] .sub-tab-btn.active,
+    [data-theme="colorful"] .chip-btn.active,
+    [data-theme="colorful"] .btn-scan-toggle { background: #2563eb !important; border-color: #2563eb !important; }
+    [data-theme="colorful"] .popup-menu-btn.active-menu { color: #fff !important; background: #7c3aed !important; }
+    [data-theme="colorful"] .popup-menu-btn svg { fill: #60a5fa !important; }
+    [data-theme="colorful"] .floating-menu-popup { background: #111827 !important; border-color: #475569 !important; }
+    [data-theme="colorful"] .modal-content,
+    [data-theme="colorful"] .product-detail-box { background: #111827 !important; color: #fff !important; border-color: #475569 !important; }
+    [data-theme="colorful"] input,
+    [data-theme="colorful"] textarea,
+    [data-theme="colorful"] select { background: #0f172a !important; color: #fff !important; border-color: #64748b !important; }
+    [data-theme="colorful"] .empty-state { background: #111827 !important; color: #e2e8f0 !important; }
+    [data-theme="colorful"] .cart-table { background: #111827 !important; color: #fff !important; }
+    [data-theme="colorful"] .cart-table th { background: #172033 !important; color: #cbd5e1 !important; }
+    [data-theme="colorful"] .welcome-screen { background: #070b14 !important; }
+    [data-theme="colorful"] #welcomeScreen { background: #2563eb !important; }
   </style>
 </head>
 <body data-theme="light" style="font-size: 0.85rem;">
@@ -419,7 +518,7 @@
       <div class="card" style="padding: 12px; margin-bottom: 8px;">
         <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Tampilan & Tema</h3>
         <div class="form-vertical" style="display: flex; flex-direction: column; gap: 6px;">
-          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="auto">Auto (Sistem)</option></select>
+          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="colorful">Colorful</option></select>
           <label style="font-size: 0.75rem; margin-top: 4px;">Tampilan:</label><select id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="grid">Kotak</option><option value="list">Daftar</option></select>
         </div>
       </div>
@@ -768,7 +867,7 @@
     ];
 
     window.onload = function() {
-      applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'auto');
+      applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'light');
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; }
       initChatRumpiListener();
       renderRecipeCards();
@@ -1031,8 +1130,8 @@
     function playBeep() { playTone(1000, "sine"); } function playBeepDown() { playTone(600, "triangle"); }
     function playCustomerNotificationSound() { playTone(800, "sine"); setTimeout(() => playTone(1000, "sine"), 150); }
 
-    function applyThemePelanggan(theme) { document.body.setAttribute('data-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme); }
-    function gantiTemaPelanggan(theme) { localStorage.setItem('cust_theme_v13', theme); applyThemePelanggan(theme); }
+    function applyThemePelanggan(theme) { const safeTheme = ['light','dark','colorful'].includes(theme) ? theme : 'light'; document.body.setAttribute('data-theme', safeTheme); const sel = document.getElementById('setting-cust-theme'); if (sel) sel.value = safeTheme; }
+    function gantiTemaPelanggan(theme) { const safeTheme = ['light','dark','colorful'].includes(theme) ? theme : 'light'; localStorage.setItem('cust_theme_v13', safeTheme); applyThemePelanggan(safeTheme); }
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
     function toggleMenuModal() { document.getElementById("menuToggleModal").classList.toggle("show"); }
     function bukaKolomPencarian() { const searchContainer = document.getElementById("sticky-search-container"); if (searchContainer) { searchContainer.style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => document.getElementById("inventory-search-input")?.focus(), 200); } }
@@ -1287,7 +1386,7 @@
         let reorderWrapper = document.getElementById('reorder-section-wrapper'); if (reorderWrapper) reorderWrapper.style.display = 'none';
       }
 
-      if (tabId === 'pengaturan') { document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto'; document.getElementById('setting-cust-view').value = catalogViewMode; if (currentCustomerPhone) { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => { if (!snap.empty) { let data = snap.docs[0].data(); document.getElementById('setting-cust-name').value = data.nama || ""; document.getElementById('setting-cust-phone').value = data.phone || ""; document.getElementById('setting-cust-address').value = data.alamat || ""; } }); } }
+      if (tabId === 'pengaturan') { document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'light'; document.getElementById('setting-cust-view').value = catalogViewMode; if (currentCustomerPhone) { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => { if (!snap.empty) { let data = snap.docs[0].data(); document.getElementById('setting-cust-name').value = data.nama || ""; document.getElementById('setting-cust-phone').value = data.phone || ""; document.getElementById('setting-cust-address').value = data.alamat || ""; } }); } }
     }
 
     function muatBarangLarisHariIni() {
