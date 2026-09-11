@@ -1097,3 +1097,71 @@ body.theme-colorful-v2 .products-container {
   background: #000 !important;
   background-image: none !important;
 }
+
+
+/* =========================================================
+   ADMIN COLORFUL v1/v2 — CONTRAST + / -
+   Tombol quantity sengaja berbeda dari warna card.
+   ========================================================= */
+
+/* Default control colors */
+[data-theme="colorful"] .quantity-btn,
+[data-theme="colorful-v2"] .quantity-btn,
+[data-theme="colorful2"] .quantity-btn,
+[data-theme="colorful-v.2"] .quantity-btn,
+[data-theme="colorful"] .qty-btn,
+[data-theme="colorful-v2"] .qty-btn,
+[data-theme="colorful2"] .qty-btn,
+[data-theme="colorful-v.2"] .qty-btn {
+  background-image: none !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.45) !important;
+  font-weight: 800 !important;
+}
+
+/* If the existing markup uses common +/- buttons, color them by
+   button order rather than inheriting the product/card color. */
+[data-theme="colorful"] .quantity-btn:nth-of-type(odd),
+[data-theme="colorful-v2"] .quantity-btn:nth-of-type(odd),
+[data-theme="colorful2"] .quantity-btn:nth-of-type(odd),
+[data-theme="colorful-v.2"] .quantity-btn:nth-of-type(odd),
+[data-theme="colorful"] .qty-btn:nth-of-type(odd),
+[data-theme="colorful-v2"] .qty-btn:nth-of-type(odd),
+[data-theme="colorful2"] .qty-btn:nth-of-type(odd),
+[data-theme="colorful-v.2"] .qty-btn:nth-of-type(odd) {
+  background: #10b981 !important;
+}
+
+[data-theme="colorful"] .quantity-btn:nth-of-type(even),
+[data-theme="colorful-v2"] .quantity-btn:nth-of-type(even),
+[data-theme="colorful2"] .quantity-btn:nth-of-type(even),
+[data-theme="colorful-v.2"] .quantity-btn:nth-of-type(even),
+[data-theme="colorful"] .qty-btn:nth-of-type(even),
+[data-theme="colorful-v2"] .qty-btn:nth-of-type(even),
+[data-theme="colorful2"] .qty-btn:nth-of-type(even),
+[data-theme="colorful-v.2"] .qty-btn:nth-of-type(even) {
+  background: #f97316 !important;
+}
+
+/* Strong fallback for actual +/- text inside buttons. */
+[data-theme="colorful"] button[aria-label*="Tambah"],
+[data-theme="colorful"] button[aria-label*="Kurang"],
+[data-theme="colorful-v2"] button[aria-label*="Tambah"],
+[data-theme="colorful-v2"] button[aria-label*="Kurang"],
+[data-theme="colorful2"] button[aria-label*="Tambah"],
+[data-theme="colorful2"] button[aria-label*="Kurang"],
+[data-theme="colorful-v.2"] button[aria-label*="Tambah"],
+[data-theme="colorful-v.2"] button[aria-label*="Kurang"] {
+  color: #fff !important;
+  background-image: none !important;
+}
+
+/* Keep v2 strictly solid for these controls too. */
+[data-theme="colorful-v2"] .quantity-btn,
+[data-theme="colorful-v2"] .qty-btn,
+[data-theme="colorful2"] .quantity-btn,
+[data-theme="colorful2"] .qty-btn,
+[data-theme="colorful-v.2"] .quantity-btn,
+[data-theme="colorful-v.2"] .qty-btn {
+  background-image: none !important;
+}
