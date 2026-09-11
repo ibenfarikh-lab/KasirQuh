@@ -2914,7 +2914,9 @@ function refreshData() {
     if (custContainer) {
       custContainer.innerHTML = "";
       let grandTotalAllCustomersFinancial = 0;
-      databasePelanggan.forEach(c => {
+      
+      // FILTER AGAR PELANGGAN PENDING TIDAK MUNCUL DI DAFTAR UTAMA
+      databasePelanggan.filter(c => String(c.status || "").toLowerCase() !== "pending").forEach(c => {
         let catatanHtml = "";
         let custTotalNominal = 0;
         if (c.catatan && c.catatan.length > 0) {
@@ -2932,6 +2934,34 @@ function refreshData() {
       const custTotalFin = document.getElementById("customer-total-financial");
       if (custTotalFin) custTotalFin.innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
     }
+
+    // KODE TAMBAHAN UNTUK MENAMPILKAN PELANGGAN PENDING
+    const pendingContainer = document.getElementById("pending-customer-list-wrapper");
+    if (pendingContainer) {
+      pendingContainer.innerHTML = "";
+      
+      let pendingCustomers = databasePelanggan.filter(c => String(c.status || "").toLowerCase() === "pending");
+      
+      if (pendingCustomers.length === 0) {
+        pendingContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Tidak ada pelanggan yang menunggu persetujuan.</div>`;
+      } else {
+        pendingCustomers.forEach(c => {
+          pendingContainer.innerHTML += `
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;">
+              <div>
+                <div style="font-weight: bold; font-size: 0.9rem;">👤 ${c.nama}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone || '-'} | 📍 ${c.alamat || '-'}</div>
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <button onclick="setujuiAkunPelanggan('${c.id}')" style="background: #16a34a; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">✅ Setuju</button>
+                <button onclick="hapusPelanggan('${c.id}')" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">❌ Tolak</button>
+              </div>
+            </div>
+          `;
+        });
+      }
+    }
+    
     return;
   }
 }
