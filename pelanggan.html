@@ -41,6 +41,54 @@
       font-weight: bold;
       background: rgba(37, 99, 235, 0.08);
     }
+
+    /* DETAIL PRODUK - hanya untuk pelanggan.html */
+    #productDetailBackdrop {
+      position: fixed; inset: 0; z-index: 5000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px; box-sizing: border-box;
+      background: rgba(0,0,0,.42);
+      backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity .18s ease, visibility 0s linear .18s;
+    }
+    #productDetailBackdrop.show {
+      opacity: 1; visibility: visible; pointer-events: auto;
+      transition: opacity .18s ease;
+    }
+    #productDetailCard {
+      width: min(94vw, 430px); max-height: min(88vh, 760px);
+      overflow-y: auto; background: var(--card-bg); color: var(--text-color);
+      border: 1px solid var(--border-color); border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.28);
+      transform: translateY(10px) scale(.92); opacity: 0;
+      transition: transform .22s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+    #productDetailBackdrop.show #productDetailCard {
+      transform: translateY(0) scale(1); opacity: 1;
+    }
+    #productDetailPhoto {
+      width: 100%; height: 230px; object-fit: cover; display: block;
+      border-radius: 14px; background: var(--input-bg);
+    }
+    .product-detail-qty {
+      display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px;
+    }
+    .product-detail-qty button {
+      width: 42px; height: 42px; border: none; border-radius: 10px;
+      color: #fff; font-size: 1.35rem; font-weight: 800; cursor: pointer;
+    }
+    #productDetailQty { min-width: 55px; text-align: center; font-size: 1.05rem; font-weight: 800; }
+    #productDetailAskAdmin {
+      width: 100%; margin-top: 12px; padding: 11px 14px; border: none;
+      border-radius: 10px; background: #2563eb; color: #fff; font-weight: 800; cursor: pointer;
+    }
+    @media (max-width: 480px) {
+      #productDetailBackdrop { padding: 12px; }
+      #productDetailCard { width: min(94vw, 410px); max-height: 86vh; border-radius: 16px; }
+      #productDetailPhoto { height: 220px; }
+    }
   </style>
 </head>
 <body data-theme="light">
@@ -131,6 +179,28 @@
       <div class="pos-container">
         <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none;">
           <div id="pos-catalog-container"></div>
+        </div>
+      </div>
+
+
+      <!-- Floating Detail Produk -->
+      <div id="productDetailBackdrop" onclick="handleProductDetailBackdropClick(event)" aria-hidden="true">
+        <div id="productDetailCard" role="dialog" aria-modal="true" aria-label="Detail produk" onclick="event.stopPropagation()">
+          <div style="padding: 12px;">
+            <img id="productDetailPhoto" src="" alt="Produk">
+            <div style="padding: 10px 2px 2px;">
+              <div id="productDetailName" style="font-size:1.12rem;font-weight:800;margin-bottom:4px;"></div>
+              <div id="productDetailPrice" style="font-size:1rem;font-weight:800;color:#2563eb;margin-bottom:5px;"></div>
+              <div id="productDetailStock" style="font-size:.82rem;color:var(--text-muted);"></div>
+              <div id="productDetailDescription" style="font-size:.86rem;line-height:1.45;color:var(--text-muted);margin-top:10px;white-space:pre-line;"></div>
+              <div class="product-detail-qty">
+                <button type="button" style="background:#dc2626;" onclick="ubahQtyDetailProduk(-1)">−</button>
+                <span id="productDetailQty">0</span>
+                <button type="button" style="background:#16a34a;" onclick="ubahQtyDetailProduk(1)">+</button>
+              </div>
+              <button id="productDetailAskAdmin" type="button" onclick="tanyaAdminProdukDetail()">💬 Tanya Admin</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1084,7 +1154,7 @@
       }
     }
 
-    function refreshKatalogPelanggan() {
+\n    // --- Floating Detail Produk ---\n    let activeProductDetailCode = null;\n    let productDetailHistoryOpen = false;\n\n    function getDetailProductPrice(p) {\n      let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);\n      let harga = typeof valHarga === 'number' ? valHarga : parseInt(String(valHarga).replace(/[^0-9]/g, '')) || 0;\n      let sat = (p.satuan || 'Pcs').toLowerCase().trim();\n      if (sat === 'kg' || sat === 'kilogram') harga = p.hargaRtg || (harga * 10);\n      return harga;\n    }\n\n    function openProductDetail(code) {\n      const p = databaseProduk[code];\n      if (!p) return;\n      activeProductDetailCode = code;\n      const sat = (p.satuan || 'Pcs').toLowerCase() === 'rtg' ? 'pcs' : (p.satuan || 'Pcs');\n      const harga = getDetailProductPrice(p);\n      const fallback = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='1.5'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";\n      document.getElementById('productDetailPhoto').src = p.foto || fallback;\n      document.getElementById('productDetailName').innerText = p.nama || 'Produk';\n      document.getElementById('productDetailPrice').innerText = `Rp ${harga.toLocaleString('id-ID')} / ${sat}`;\n      document.getElementById('productDetailStock').innerText = `Stok: ${p.stok || 0} ${sat}`;\n      document.getElementById('productDetailDescription').innerText = p.deskripsi || p.description || 'Belum ada deskripsi produk.';\n      updateProductDetailQty();\n      const backdrop = document.getElementById('productDetailBackdrop');\n      backdrop.classList.add('show'); backdrop.setAttribute('aria-hidden','false');\n      if (!productDetailHistoryOpen) { history.pushState({productDetail:true}, ''); productDetailHistoryOpen = true; }\n    }\n\n    function closeProductDetail(fromPopState = false) {\n      const backdrop = document.getElementById('productDetailBackdrop');\n      if (!backdrop || !backdrop.classList.contains('show')) return;\n      backdrop.classList.remove('show'); backdrop.setAttribute('aria-hidden','true');\n      activeProductDetailCode = null;\n      if (!fromPopState && productDetailHistoryOpen) { productDetailHistoryOpen = false; history.back(); }\n      else if (fromPopState) productDetailHistoryOpen = false;\n    }\n\n    function handleProductDetailBackdropClick(event) {\n      if (event.target === document.getElementById('productDetailBackdrop')) closeProductDetail();\n    }\n\n    function updateProductDetailQty() {\n      const code = activeProductDetailCode;\n      const qtyEl = document.getElementById('productDetailQty');\n      if (!qtyEl || !code) return;\n      const item = cart.find(i => i.code === code);\n      qtyEl.innerText = item ? item.qty : 0;\n    }\n\n    function ubahQtyDetailProduk(delta) {\n      const code = activeProductDetailCode;\n      if (!code || !databaseProduk[code]) return;\n      if (delta > 0) {\n        tambahKeKeranjangPelanggan(code);\n      } else {\n        kurangiDariKeranjangPelanggan(code);\n      }\n      updateProductDetailQty();\n    }\n\n    function tanyaAdminProdukDetail() {\n      const code = activeProductDetailCode;\n      const p = databaseProduk[code];\n      if (!p) return;\n      if (!currentCustomerPhone) return alert('Silakan login terlebih dahulu!');\n      const satuan = p.satuan || 'Pcs';\n      const harga = getDetailProductPrice(p);\n      const pesan = `Halo Admin, saya mau tanya tentang produk: ${p.nama}. Harga Rp ${harga.toLocaleString('id-ID')} / ${satuan}, stok ${p.stok || 0} ${satuan}.`;\n      const nowStr = new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('id-ID');\n      db.collection('chats').doc(currentCustomerPhone).collection('messages').add({\n        pengirim:'customer', pesan, tipe:'produk', produkCode:code, produkNama:p.nama || '',\n        produkFoto:p.foto || '', produkHarga:harga, produkSatuan:satuan, produkStok:p.stok || 0,\n        produkDeskripsi:p.deskripsi || p.description || '', waktu:nowStr,\n        waktuTimestamp:firebase.firestore.FieldValue.serverTimestamp()\n      }).then(() => db.collection('chats').doc(currentCustomerPhone).set({\n        customerNama:currentCustomerName, lastMessage:currentCustomerName + ': ' + pesan,\n        lastTimestamp:firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin:firebase.firestore.FieldValue.increment(1)\n      }, {merge:true})).then(() => {\n        closeProductDetail();\n        switchTabPelanggan('live-chat');\n        switchSubTabLiveChat('admin');\n      }).catch(err => alert('Gagal mengirim produk ke Admin: ' + err.message));\n    }\n\n    window.addEventListener('popstate', function() {\n      const backdrop = document.getElementById('productDetailBackdrop');\n      if (backdrop && backdrop.classList.contains('show')) closeProductDetail(true);\n    });\n\n    function refreshKatalogPelanggan() {
       const container = document.getElementById("pos-catalog-container");
       const cardWrapper = document.getElementById("pos-card-wrapper");
       if (!container || !cardWrapper) return;
@@ -1130,11 +1200,11 @@
 
         if (catalogViewMode === 'grid') {
           container.innerHTML += `
-            <div class="inv-card" style="border: 2px solid #16a34a; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card-bg);">
+            <div class="inv-card" onclick="openProductDetail('${code}')" style="border: 2px solid #16a34a; cursor: pointer; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card-bg);">
               <div>
                 <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                  <button style="flex: 1; height: 38px; background: #16a34a; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
-                  <button style="flex: 1; height: 38px; background: #dc2626; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${code}')">-</button>
+                  <button style="flex: 1; height: 38px; background: #16a34a; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="event.stopPropagation(); tambahKeKeranjangPelanggan('${code}')">+</button>
+                  <button style="flex: 1; height: 38px; background: #dc2626; color: white; border-radius: 8px; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="event.stopPropagation(); kurangiDariKeranjangPelanggan('${code}')">-</button>
                 </div>
                 <div style="text-align: center; margin-bottom: 8px;"><img src="${fotoSrc}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px;"></div>
                 <div style="font-weight: bold; font-size: 0.95rem; color: var(--text-color); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
@@ -1145,10 +1215,10 @@
           `;
         } else {
           container.innerHTML += `
-            <div class="catalog-list-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); border-radius: 8px; margin-bottom: 6px;">
+            <div class="catalog-list-item" onclick="openProductDetail('${code}')" style="display: flex; cursor: pointer; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border-color); background: var(--card-bg); border-radius: 8px; margin-bottom: 6px;">
               <div style="display: flex; gap: 4px; flex-shrink: 0; align-items: center;">
-                <button style="width: 32px; height: 32px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer; font-weight: bold;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="tambahKeKeranjangPelanggan('${code}')">+</button>
-                <button style="width: 32px; height: 32px; border-radius: 6px; background: #dc2626; color: white; border: none; cursor: pointer; font-weight: bold;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="kurangiDariKeranjangPelanggan('${code}')">-</button>
+                <button style="width: 32px; height: 32px; border-radius: 6px; background: #16a34a; color: white; border: none; cursor: pointer; font-weight: bold;" ${isHabis ? 'disabled style="opacity:0.4;"' : ''} onclick="event.stopPropagation(); tambahKeKeranjangPelanggan('${code}')">+</button>
+                <button style="width: 32px; height: 32px; border-radius: 6px; background: #dc2626; color: white; border: none; cursor: pointer; font-weight: bold;" ${currentQtyInCart <= 0 ? 'disabled style="opacity:0.4;"' : ''} onclick="event.stopPropagation(); kurangiDariKeranjangPelanggan('${code}')">-</button>
               </div>
               <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
               <div style="min-width: 0; flex: 1;">
@@ -1261,6 +1331,7 @@
       if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 15px;">Keranjang kosong</td></tr>`;
       document.getElementById("cart-count").innerText = totalQty;
       document.getElementById("grand-total").innerText = total.toLocaleString('id-ID');
+      updateProductDetailQty();
     }
 
     function kosongkanKeranjang() {
