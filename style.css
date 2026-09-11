@@ -1183,3 +1183,25 @@ body.theme-colorful-v2 *,
   color: #fff !important;
   border-color: rgba(255,255,255,.45) !important;
 }
+
+
+/* ============================================================
+   KASIRQUH FINAL FIX — OUTER "DAFTAR BARANG TERSEDIA" BOX
+   Source: KasirQuh-main (57).zip
+   Colorful v.1 + Colorful v.2 = BLACK SOLID wrapper.
+   Product cards inside remain colorful.
+   ============================================================ */
+[data-theme="colorful"] #penjualan > .pos-container > .card,
+[data-theme="colorful-v2"] #penjualan > .pos-container > .card {
+  background: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+/* Also cover the wrapper if the theme class is applied to body. */
+body.theme-colorful #penjualan > .pos-container > .card,
+body.theme-colorful-v2 #penjualan > .pos-container > .card {
+  background: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
