@@ -23,6 +23,175 @@
   --table-header: #1e293b;
 }
 
+/* ============================================================
+   COLORFUL THEME
+   Full admin-panel card treatment inspired by the customer home page.
+   Light/Dark remain unchanged.
+   ============================================================ */
+[data-theme="colorful"] {
+  --bg-color: #fff7ed;
+  --card-bg: #ffffff;
+  --text-color: #172033;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --card-border-green: #8b5cf6;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --table-header: #f8f5ff;
+  --color-1: #8b5cf6;
+  --color-2: #ec4899;
+  --color-3: #f97316;
+  --color-4: #eab308;
+  --color-5: #22c55e;
+  --color-6: #06b6d4;
+  --color-7: #3b82f6;
+}
+
+[data-theme="colorful"] body {
+  background: linear-gradient(135deg, #fff7ed 0%, #fdf4ff 48%, #eff6ff 100%);
+}
+
+/* Every major card/list surface gets a lively gradient. */
+[data-theme="colorful"] .card,
+[data-theme="colorful"] .catalog-list-item,
+[data-theme="colorful"] .inv-list-item,
+[data-theme="colorful"] .inv-card,
+[data-theme="colorful"] .cust-list-item,
+[data-theme="colorful"] .empty-state {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+              linear-gradient(135deg, var(--color-1), var(--color-2), var(--color-6)) border-box !important;
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.10), 0 2px 7px rgba(236, 72, 153, 0.08);
+}
+
+/* Make cards visibly varied instead of one repeated color. */
+[data-theme="colorful"] .card:nth-child(6n+1),
+[data-theme="colorful"] .card-grid .card:nth-child(6n+1),
+[data-theme="colorful"] .catalog-list-item:nth-child(6n+1),
+[data-theme="colorful"] .inv-card:nth-child(6n+1),
+[data-theme="colorful"] .inv-list-item:nth-child(6n+1),
+[data-theme="colorful"] .cust-list-item:nth-child(6n+1) {
+  background: linear-gradient(145deg, #fff 0%, #f3e8ff 100%) !important;
+  border-image: linear-gradient(135deg, #8b5cf6, #ec4899) 1;
+}
+[data-theme="colorful"] .card:nth-child(6n+2),
+[data-theme="colorful"] .card-grid .card:nth-child(6n+2),
+[data-theme="colorful"] .catalog-list-item:nth-child(6n+2),
+[data-theme="colorful"] .inv-card:nth-child(6n+2),
+[data-theme="colorful"] .inv-list-item:nth-child(6n+2),
+[data-theme="colorful"] .cust-list-item:nth-child(6n+2) {
+  background: linear-gradient(145deg, #fff 0%, #dbeafe 100%) !important;
+  border-image: linear-gradient(135deg, #3b82f6, #06b6d4) 1;
+}
+[data-theme="colorful"] .card:nth-child(6n+3),
+[data-theme="colorful"] .card-grid .card:nth-child(6n+3),
+[data-theme="colorful"] .catalog-list-item:nth-child(6n+3),
+[data-theme="colorful"] .inv-card:nth-child(6n+3),
+[data-theme="colorful"] .inv-list-item:nth-child(6n+3),
+[data-theme="colorful"] .cust-list-item:nth-child(6n+3) {
+  background: linear-gradient(145deg, #fff 0%, #dcfce7 100%) !important;
+  border-image: linear-gradient(135deg, #22c55e, #14b8a6) 1;
+}
+[data-theme="colorful"] .card:nth-child(6n+4),
+[data-theme="colorful"] .card-grid .card:nth-child(6n+4),
+[data-theme="colorful"] .catalog-list-item:nth-child(6n+4),
+[data-theme="colorful"] .inv-card:nth-child(6n+4),
+[data-theme="colorful"] .inv-list-item:nth-child(6n+4),
+[data-theme="colorful"] .cust-list-item:nth-child(6n+4) {
+  background: linear-gradient(145deg, #fff 0%, #ffedd5 100%) !important;
+  border-image: linear-gradient(135deg, #f97316, #eab308) 1;
+}
+[data-theme="colorful"] .card:nth-child(6n+5),
+[data-theme="colorful"] .card-grid .card:nth-child(6n+5),
+[data-theme="colorful"] .catalog-list-item:nth-child(6n+5),
+[data-theme="colorful"] .inv-card:nth-child(6n+5),
+[data-theme="colorful"] .inv-list-item:nth-child(6n+5),
+[data-theme="colorful"] .cust-list-item:nth-child(6n+5) {
+  background: linear-gradient(145deg, #fff 0%, #fce7f3 100%) !important;
+  border-image: linear-gradient(135deg, #ec4899, #f43f5e) 1;
+}
+[data-theme="colorful"] .card:nth-child(6n),
+[data-theme="colorful"] .card-grid .card:nth-child(6n),
+[data-theme="colorful"] .catalog-list-item:nth-child(6n),
+[data-theme="colorful"] .inv-card:nth-child(6n),
+[data-theme="colorful"] .inv-list-item:nth-child(6n),
+[data-theme="colorful"] .cust-list-item:nth-child(6n) {
+  background: linear-gradient(145deg, #fff 0%, #cffafe 100%) !important;
+  border-image: linear-gradient(135deg, #06b6d4, #3b82f6) 1;
+}
+
+[data-theme="colorful"] .card h4,
+[data-theme="colorful"] .card .val,
+[data-theme="colorful"] .inv-list-price {
+  color: var(--text-color);
+}
+[data-theme="colorful"] .card h4 {
+  color: #7c3aed;
+}
+[data-theme="colorful"] .card .val {
+  background: linear-gradient(90deg, #7c3aed, #ec4899, #f97316);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Inner surfaces follow the colorful mode too. */
+[data-theme="colorful"] .cust-bookkeeping,
+[data-theme="colorful"] .inv-card-details,
+[data-theme="colorful"] .summary-box,
+[data-theme="colorful"] .inline-pagination {
+  background: linear-gradient(135deg, #faf5ff, #eff6ff, #ecfeff) !important;
+  border-color: #c4b5fd;
+}
+[data-theme="colorful"] .cart-table,
+[data-theme="colorful"] .cart-table th,
+[data-theme="colorful"] table {
+  background: #fff !important;
+}
+[data-theme="colorful"] .cart-table th {
+  background: linear-gradient(90deg, #f3e8ff, #fce7f3, #dbeafe) !important;
+  color: #6d28d9;
+}
+
+/* Colorful controls. */
+[data-theme="colorful"] button,
+[data-theme="colorful"] .btn-scan-toggle,
+[data-theme="colorful"] .inline-page-btn {
+  background: linear-gradient(135deg, #7c3aed, #ec4899, #f97316);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.20);
+}
+[data-theme="colorful"] button:hover,
+[data-theme="colorful"] .btn-scan-toggle:hover,
+[data-theme="colorful"] .inline-page-btn:hover {
+  filter: brightness(1.05) saturate(1.12);
+}
+[data-theme="colorful"] input:focus,
+[data-theme="colorful"] select:focus,
+[data-theme="colorful"] textarea:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+/* Chat Rumpi: each customer column/card can feel distinct. */
+[data-theme="colorful"] #wrapper-admin-chat-rumpi,
+[data-theme="colorful"] #admin-chat-rumpi > div,
+[data-theme="colorful"] #chat-rumpi-list {
+  background: linear-gradient(135deg, #fff7ed, #fdf4ff, #eff6ff) !important;
+  border-color: #c4b5fd !important;
+}
+[data-theme="colorful"] #admin-chat-rumpi > div:nth-child(3n+1) { border-color: #c4b5fd !important; }
+[data-theme="colorful"] #admin-chat-rumpi > div:nth-child(3n+2) { border-color: #67e8f9 !important; }
+[data-theme="colorful"] #admin-chat-rumpi > div:nth-child(3n) { border-color: #f9a8d4 !important; }
+
+[data-theme="colorful"] .permanent-bottom-bar {
+  background: linear-gradient(90deg, #f3e8ff, #fce7f3, #dbeafe) !important;
+  border-top-color: #c4b5fd;
+}
+[data-theme="colorful"] .floating-menu-popup {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: #c4b5fd;
+}
+
 * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
 body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-color); flex-direction: column; transition: background-color 0.3s, color 0.3s; overflow: hidden; }
 
