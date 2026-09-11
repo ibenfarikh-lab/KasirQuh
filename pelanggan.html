@@ -78,7 +78,7 @@
       padding: 6px; display: flex; flex-direction: column; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer;
     }
 
-    /* KARTU RESEP BANNER CANTIK WARNA-WARNI */
+    /* KARTU RESEP BANNER MULTI-WARNA 3 GRADASI */
     .recipe-card {
       min-width: 175px;
       max-width: 175px;
@@ -93,11 +93,11 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
       flex-shrink: 0;
     }
-    .recipe-card:nth-child(5n+1) { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-    .recipe-card:nth-child(5n+2) { background: linear-gradient(135deg, #d97706, #b45309); }
-    .recipe-card:nth-child(5n+3) { background: linear-gradient(135deg, #16a34a, #15803d); }
-    .recipe-card:nth-child(5n+4) { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
-    .recipe-card:nth-child(5n+5) { background: linear-gradient(135deg, #db2777, #be185d); }
+    .recipe-card:nth-child(5n+1) { background: linear-gradient(135deg, #2563eb, #1d4ed8, #1e40af); }
+    .recipe-card:nth-child(5n+2) { background: linear-gradient(135deg, #f59e0b, #d97706, #b45309); }
+    .recipe-card:nth-child(5n+3) { background: linear-gradient(135deg, #10b981, #059669, #047857); }
+    .recipe-card:nth-child(5n+4) { background: linear-gradient(135deg, #8b5cf6, #7c3aed, #5b21b6); }
+    .recipe-card:nth-child(5n+5) { background: linear-gradient(135deg, #ec4899, #db2777, #9d174d); }
 
     .recipe-btn-action {
       background: rgba(255, 255, 255, 0.25);
@@ -108,7 +108,6 @@
       font-weight: bold;
       font-size: 0.7rem;
       cursor: pointer;
-      width: 100%;
       text-align: center;
       transition: background 0.2s;
     }
@@ -254,7 +253,7 @@
         <button class="chip-btn" style="border-color: #d97706; color: #d97706;" onclick="pilihKategoriPelanggan('Titipan Warga')">📦 Titipan Warga</button>
       </div>
 
-      <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER CANTIK -->
+      <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
       <div id="recipe-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
         <div class="horizontal-scroll-container" id="recipe-scroll-container">
@@ -274,19 +273,19 @@
         </div>
       </div>
 
-      <!-- MODAL KERANJANG -->
+      <!-- MODAL KERANJANG (DIKAPIT / DIPADATKAN TANPA RUANG KOSONG) -->
       <div id="cartModal" class="modal-backdrop" onclick="if(event.target === this) closeCartModal()">
-        <div class="modal-content" style="max-width: 380px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 14px; background: var(--card-bg);">
-          <div class="modal-header no-print" style="margin-bottom: 8px;">
+        <div class="modal-content" style="max-width: 380px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 12px; background: var(--card-bg); display: flex; flex-direction: column; gap: 6px;">
+          <div class="modal-header no-print" style="margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
             <h3 style="font-size: 1rem; margin: 0;">Keranjang Belanja</h3>
-            <button class="btn-close-modal" onclick="closeCartModal()" style="font-size: 1.1rem;">&times;</button>
+            <button class="btn-close-modal" onclick="closeCartModal()" style="font-size: 1.1rem; background:none; border:none; cursor:pointer; color:var(--text-color);">&times;</button>
           </div>
-          <div class="receipt-header" style="margin-bottom: 8px;">
-            <h3 id="receipt-shop-name" style="margin: 0; font-size: 0.95rem;">Nama Toko</h3>
-            <p id="receipt-shop-address" style="margin: 2px 0 0 0; font-size: 0.75rem;">Alamat Toko</p>
+          <div class="receipt-header" style="margin-bottom: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+            <h3 id="receipt-shop-name" style="margin: 0; font-size: 0.9rem;">Nama Toko</h3>
+            <p id="receipt-shop-address" style="margin: 0; font-size: 0.7rem; color: var(--text-muted);">Alamat Toko</p>
           </div>
-          <div class="cart-table-wrapper" style="max-height: 35vh; overflow-y: auto;">
-            <table class="cart-table" style="font-size: 0.78rem;">
+          <div class="cart-table-wrapper" style="max-height: 30vh; overflow-y: auto;">
+            <table class="cart-table" style="font-size: 0.78rem; width: 100%;">
               <thead>
                 <tr>
                   <th style="width: 42%;">Barang</th>
@@ -297,44 +296,47 @@
               <tbody id="cart-body"></tbody>
             </table>
           </div>
-          <div class="summary-box" style="padding: 8px 0;">
-            <div style="font-size: 0.9rem; font-weight: bold; margin-bottom: 6px;">Total: Rp <span id="grand-total">0</span></div>
-            <div class="no-print" style="text-align: left; margin-top: 4px;">
-              <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 3px;">Pilih Metode Pembayaran:</label>
-              <select id="pay-method-cust" onchange="togglePayMethodCust()" style="width: 100%; font-size: 0.78rem; padding: 6px; border-radius: 6px; margin-bottom: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
-                <option value="COD">COD (Bayar di Tempat)</option>
-                <option value="TF">Transfer Bank (Upload Bukti)</option>
-                <option value="WhatsApp">Pesan via WhatsApp</option>
-              </select>
-              <div id="wrapper-tf-proof" style="display: none; margin-bottom: 6px; padding: 6px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: 6px;">
-                <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 3px;">Unggah Bukti Transfer (Foto):</label>
-                <input type="file" id="cust-proof-file" accept="image/*" onchange="handleProofUpload(event)" style="font-size: 0.7rem; width: 100%;">
+          
+          <div class="summary-box" style="padding: 2px 0; display: flex; flex-direction: column; gap: 4px;">
+            <div style="font-size: 0.85rem; font-weight: bold; display: flex; justify-content: space-between;"><span>Total:</span> <span style="color: #16a34a;">Rp <span id="grand-total">0</span></span></div>
+            
+            <div class="no-print" style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <label style="font-size: 0.72rem; font-weight: 600; width: 35%;">Pembayaran:</label>
+                <select id="pay-method-cust" onchange="togglePayMethodCust()" style="flex: 1; font-size: 0.75rem; padding: 4px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+                  <option value="COD">COD (Bayar di Tempat)</option>
+                  <option value="TF">Transfer Bank</option>
+                  <option value="WhatsApp">Pesan via WA</option>
+                </select>
+              </div>
+
+              <div id="wrapper-tf-proof" style="display: none; padding: 4px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: 4px;">
+                <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 2px;">Bukti Transfer:</label>
+                <input type="file" id="cust-proof-file" accept="image/*" onchange="handleProofUpload(event)" style="font-size: 0.68rem; width: 100%;">
                 <input type="hidden" id="cust-proof-base64" value="">
               </div>
 
-              <!-- Opsi Simpan Menu dari Keranjang & Bagikan ke Rumpi -->
-              <div style="margin-top: 6px; padding: 8px; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--input-border);">
-                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; color: var(--text-color);">
-                  <input type="checkbox" id="cust-save-recipe-toggle" onchange="toggleSaveRecipeOptions(this.checked)"> 🌟 Simpan keranjang ini jadi Menu Resep
+              <!-- Opsi Simpan Menu Kompak Tanpa Ruang Kosong -->
+              <div style="padding: 6px; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--input-border); display: flex; flex-direction: column; gap: 4px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 0.73rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
+                  <input type="checkbox" id="cust-save-recipe-toggle" onchange="toggleSaveRecipeOptions(this.checked)" style="margin: 0;"> 🌟 Simpan jadi Menu Resep & Berbagi
                 </label>
-                <div id="wrapper-save-recipe-fields" style="display: none; margin-top: 6px; display: none; flex-direction: column; gap: 4px;">
-                  <input type="text" id="cust-save-recipe-name" placeholder="Nama Menu (Cth: Sop Spesial Weekend)" style="width: 100%; font-size: 0.75rem; padding: 6px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;">
-                  <label style="display: flex; align-items: center; gap: 6px; font-size: 0.72rem; cursor: pointer; color: var(--text-color); margin-top: 2px;">
-                    <input type="checkbox" id="cust-share-rumpi-toggle" checked> 📢 Bagikan juga ke Chat Rumpi
+                <div id="wrapper-save-recipe-fields" style="display: none; flex-direction: column; gap: 4px; margin-top: 2px;">
+                  <input type="text" id="cust-save-recipe-name" placeholder="Nama Menu (Cth: Sop Spesial Weekend)" style="width: 100%; font-size: 0.73rem; padding: 5px 6px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;">
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 0.7rem; cursor: pointer; color: var(--text-color); margin: 0;">
+                    <input type="checkbox" id="cust-share-rumpi-toggle" checked style="margin: 0;"> 📢 Bagikan otomatis ke Chat Rumpi
                   </label>
                 </div>
               </div>
 
-              <div style="margin-top: 6px; margin-bottom: 4px;">
-                <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 3px;">Catatan untuk Toko (Opsional):</label>
-                <textarea id="cust-order-note" rows="2" placeholder="Cth: Ayamnya tolong dipotong 8 bagian..." style="width: 100%; font-size: 0.78rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;"></textarea>
-              </div>
+              <textarea id="cust-order-note" rows="1" placeholder="Catatan untuk toko (opsional)..." style="width: 100%; font-size: 0.75rem; padding: 5px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;"></textarea>
             </div>
           </div>
-          <button class="btn-success no-print" onclick="prosesCheckoutPelanggan()" style="background: #16a34a; margin-top: 6px; padding: 8px; font-size: 0.85rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Belanja Sekarang
+
+          <button class="btn-success no-print" onclick="prosesCheckoutPelanggan()" style="background: #16a34a; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; color: white; font-weight: bold; cursor: pointer;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Belanja Sekarang
           </button>
-          <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 4px; padding: 6px; font-size: 0.78rem;">🗑️ Kosongkan Keranjang</button>
+          <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 0; padding: 4px; font-size: 0.72rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">🗑️ Kosongkan Keranjang</button>
         </div>
       </div>
     </div>
@@ -532,6 +534,35 @@
       if (addedCount > 0) { showToast(`🥘 Bahan ${namaResep} berhasil dimasukkan!`); renderCartPelanggan(); openCartModal(); } else { showToast(`Maaf, bahan untuk ${namaResep} lagi kosong di toko.`, "error"); }
     }
     
+    function bagikanResepKeywordsKeRumpi(namaResep, keywords) {
+      if (!currentCustomerPhone) return showToast("Silakan login terlebih dahulu untuk berbagi resep!", "error");
+      if(!isProductsLoaded) return showToast("Tunggu katalog dimuat dulu ya kak.", "error");
+      let foundItemsText = "";
+      keywords.forEach(kw => {
+        let foundCode = Object.keys(databaseProduk).find(code => databaseProduk[code].nama.toLowerCase().includes(kw));
+        if (foundCode) {
+          let p = databaseProduk[foundCode];
+          foundItemsText += `- ${p.nama}\n`;
+        }
+      });
+      let pesanRumpi = `🍳 *Menu Resep dari ${currentCustomerName || 'Pelanggan'}*\nNama Menu: "${namaResep}"\nBahan-bahan:\n${foundItemsText || '- Sesuai paket resep'}`;
+      let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
+      
+      db.collection("db_chat_rumpi").add({
+        senderPhone: currentCustomerPhone,
+        senderName: currentCustomerName || 'Pelanggan',
+        pesan: pesanRumpi,
+        waktu: nowStr,
+        waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        showToast("📢 Resep berhasil dibagikan ke Chat Rumpi!");
+        switchTabPelanggan('live-chat');
+        switchSubTabLiveChat('rumpi');
+      }).catch(err => {
+        showToast("Gagal membagikan: " + err.message, "error");
+      });
+    }
+
     function beliPaketResepCustom(recipeObj) {
       if(!isProductsLoaded) return showToast("Tunggu katalog dimuat dulu ya kak.", "error");
       let addedCount = 0;
@@ -605,7 +636,7 @@
       else { if (qtyToAdd <= p.stok) { cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); } }
     }
 
-    // --- RENDER 5 MENU DEFAULT + CUSTOM SAVED RECIPES (BANNER CANTIK) ---
+    // --- RENDER 5 MENU DEFAULT + CUSTOM SAVED RECIPES ---
     function renderRecipeCards() {
       const container = document.getElementById('recipe-scroll-container');
       if(!container) return;
@@ -622,7 +653,10 @@
               <div style="font-weight: 800; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${escName}</div>
               <div style="font-size: 0.65rem; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2;">${escDesc}</div>
             </div>
-            <button class="recipe-btn-action" onclick='beliPaketResepByKeywords("${escName}", ${kwJson})'>+ Masukkan Bahan</button>
+            <div style="display: flex; gap: 4px; margin-top: auto;">
+              <button class="recipe-btn-action" style="flex: 1;" onclick='beliPaketResepByKeywords("${escName}", ${kwJson})'>+ Masukkan Bahan</button>
+              <button class="recipe-btn-action" style="flex: 0 0 30px; padding: 5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepKeywordsKeRumpi("${escName}", ${kwJson})'>📢</button>
+            </div>
           </div>`;
       });
 
@@ -634,6 +668,17 @@
       savedRecipes.forEach((sr, idx) => {
         let escName = escapeHtml(sr.nama);
         let srJson = JSON.stringify(sr).replace(/'/g, "&#39;");
+        
+        // Ambil nama-nama barang yang telah diracik/tersimpan
+        let itemNames = [];
+        if(sr.items) {
+          sr.items.forEach(it => {
+            let p = databaseProduk[it.code];
+            if(p) itemNames.push(p.nama);
+          });
+        }
+        let descItemText = itemNames.length > 0 ? itemNames.join(', ') : 'masukkan nama nama barang yang telah diracik /tersimpan';
+
         container.innerHTML += `
           <div class="recipe-card">
             <div>
@@ -641,23 +686,23 @@
                 <div style="font-weight: 800; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">⭐ ${escName}</div>
                 <button onclick="hapusSavedRecipe(${idx})" title="Hapus" style="background:none; border:none; color:#f87171; cursor:pointer; font-size:0.75rem; padding:0; font-weight:bold;">✕</button>
               </div>
-              <div style="font-size: 0.65rem; opacity: 0.9;">Racikan Kustom Saya</div>
+              <div style="font-size: 0.63rem; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2;">${escapeHtml(descItemText)}</div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <button class="recipe-btn-action" onclick='beliPaketResepCustom(${srJson})'>+ Masukkan Bahan</button>
-              <button class="recipe-btn-action" style="background: rgba(0,0,0,0.2);" onclick='bagikanResepCustomKeRumpi(${srJson})'>📢 Bagikan Rumpi</button>
+            <div style="display: flex; gap: 4px; margin-top: auto;">
+              <button class="recipe-btn-action" style="flex: 1;" onclick='beliPaketResepCustom(${srJson})'>+ Masukkan Bahan</button>
+              <button class="recipe-btn-action" style="flex: 0 0 30px; padding: 5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepCustomKeRumpi(${srJson})'>📢</button>
             </div>
           </div>`;
       });
 
-      // 3. Info Panduan / Bantuan Buat Menu Kustom di Checkout
+      // 3. Kartu Panduan Buat Menu Kustom
       container.innerHTML += `
-        <div class="recipe-card" style="background: linear-gradient(135deg, #0f172a, #334155); border: 1px dashed rgba(255,255,255,0.3);">
+        <div class="recipe-card" style="background: linear-gradient(135deg, #0f172a, #334155, #475569); border: 1px dashed rgba(255,255,255,0.3);">
           <div>
             <div style="font-weight: 800; font-size: 0.85rem; margin-bottom: 2px;">Simpan Menu Sendiri 👩‍🍳</div>
-            <div style="font-size: 0.65rem; opacity: 0.9;">Belanja bebas di keranjang, lalu centang simpan saat checkout!</div>
+            <div style="font-size: 0.65rem; opacity: 0.9; line-height: 1.2;">Pilih barang di keranjang, centang simpan saat checkout!</div>
           </div>
-          <div style="font-size: 0.65rem; opacity: 0.8; font-style: italic; text-align: center;">Otomatis tampil di sini</div>
+          <div style="font-size: 0.63rem; opacity: 0.8; font-style: italic; text-align: center; margin-top: auto;">Otomatis tersimpan & tampil di sini</div>
         </div>`;
     }
 
@@ -1058,7 +1103,7 @@
       let phoneToko = pengaturanToko.phone.replace(/[^0-9]/g, ''); if (phoneToko.startsWith('0')) phoneToko = '62' + phoneToko.slice(1);
       db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(async (snap) => {
         let namaCust = "Pelanggan", alamatCust = "-"; if (!snap.empty) { namaCust = snap.docs[0].data().nama || "Pelanggan"; alamatCust = snap.docs[0].data().alamat || "-"; }
-        let totalBelanja = cart.reduce((acc, i) => acc + i.subtotal, 0); let totalModal = cart.reduce((acc, i) => acc + (i.modal * i.qty), 0); let keuntungan = totalBelanja - totalModal; let totalQty = cart.reduce((acc, i) => acc + i.qty, 0); let namaMetode = payMethod === "TF" ? "Transfer Bank (Upload Bukti)" : (payMethod === "WhatsApp" ? "Pesan via WhatsApp" : "COD (Bayar di Tempat)");
+        let totalBelanja = cart.reduce((acc, i) => acc + i.subtotal, 0); let totalModal = cart.reduce((acc, i) => acc + (i.modal * i.qty), 0); let keuntungan = totalBelanja - totalModal; let totalQty = cart.reduce((acc, i) => acc + i.qty, 0); let namaMetode = payMethod === "TF" ? "Transfer Bank" : (payMethod === "WhatsApp" ? "Pesan via WhatsApp" : "COD (Bayar di Tempat)");
         try {
           let batch = db.batch(); cart.forEach(item => { let pData = databaseProduk[item.code]; if (pData) batch.update(db.collection("produk").doc(item.code), { stok: Math.max(0, parseFloat(((pData.stok || 0) - item.qty).toFixed(3))) }); }); let newTrxRef = db.collection("transaksi").doc(); batch.set(newTrxRef, { waktu: new Date().toLocaleString('id-ID'), waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp(), total: totalBelanja, modal: totalModal, untung: keuntungan, metode: namaMetode, qty: totalQty, customerNama: namaCust, customerPhone: currentCustomerPhone, customerAlamat: alamatCust, catatanPelanggan: catatanPelanggan, buktiTransfer: payMethod === "TF" ? proofBase64 : "", statusPesanan: "Menunggu Diproses", items: cart.map(i => ({ nama: i.nama, qty: i.qty, subtotal: i.subtotal, code: i.code })) }); await batch.commit();
 
