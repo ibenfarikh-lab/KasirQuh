@@ -246,7 +246,7 @@
 
       <div class="category-chips no-print" id="category-container">
         <button class="chip-btn active" onclick="pilihKategoriPelanggan('Semua')">Semua</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Sembako')">Sembako</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Umum')">Umum</button>
         <button class="chip-btn" onclick="pilihKategoriPelanggan('Minuman')">Minuman</button>
         <button class="chip-btn" onclick="pilihKategoriPelanggan('Snack')">Snack</button>
         <button class="chip-btn" onclick="pilihKategoriPelanggan('Bumbu')">Bumbu</button>
@@ -979,7 +979,7 @@
         let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let matchSearch = pNamaLower.includes(searchKeyword);
         let pKat = p.kategori ? p.kategori : "";
         if (!pKat) {
-           if(pNamaLower.includes('beras') || pNamaLower.includes('gula') || pNamaLower.includes('minyak') || pNamaLower.includes('telur')) pKat = 'Sembako';
+           if(pNamaLower.includes('beras') || pNamaLower.includes('gula') || pNamaLower.includes('minyak') || pNamaLower.includes('telur')) pKat = 'Umum';
            else if (pNamaLower.includes('kopi') || pNamaLower.includes('es') || pNamaLower.includes('teh') || pNamaLower.includes('air') || pNamaLower.includes('susu')) pKat = 'Minuman';
            else if (pNamaLower.includes('snack') || pNamaLower.includes('roti') || pNamaLower.includes('biskuit') || pNamaLower.includes('chiki')) pKat = 'Snack';
            else if (pNamaLower.includes('bumbu') || pNamaLower.includes('garam') || pNamaLower.includes('kecap') || pNamaLower.includes('bawang') || pNamaLower.includes('masako')) pKat = 'Bumbu';
