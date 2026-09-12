@@ -1338,6 +1338,18 @@
         isTrendingConfigLoaded = true;
         muatBarangLarisHariIni();
       });
+
+      // Listener transaksi untuk "Sedang Laris".
+      // Jika hari ini belum ada transaksi, tampilkan data dari tanggal transaksi
+      // terakhir yang tersedia. Begitu ada transaksi baru, kartu otomatis dihitung ulang.
+      db.collection("transaksi").onSnapshot((snapshot) => {
+        window.__trendingTransactionsSnapshot = snapshot;
+        muatBarangLarisHariIni();
+      }, (err) => {
+        console.warn("Listener transaksi Sedang Laris gagal:", err);
+        // muatBarangLarisHariIni() tetap boleh mencoba query langsung sebagai fallback.
+        muatBarangLarisHariIni();
+      });
     }
 
     function switchTabPelanggan(tabId) {
@@ -1376,82 +1388,117 @@
 
       const cfg = window.__sedangLarisConfig || {enabled:true, limit:5};
       if (cfg.enabled === false) { renderTrending([]); return; }
+
       const limit = Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5));
       const token = ++trendingLoadToken;
 
       try {
-        const startToday = new Date();
-        startToday.setHours(0,0,0,0);
-        const startTs = firebase.firestore.Timestamp.fromDate(startToday);
-        const snap = await db.collection("transaksi").where("waktuTimestamp", ">=", startTs).get();
+        let snap = window.__trendingTransactionsSnapshot;
+
+        // Listener adalah sumber utama. Jika belum tersedia (misalnya saat awal
+        // koneksi), ambil data sekali sebagai fallback.
+        if (!snap) {
+          snap = await db.collection("transaksi").get();
+        }
         if (token !== trendingLoadToken) return;
 
+        const docs = [];
+        snap.forEach(doc => docs.push({ id: doc.id, data: doc.data() || {} }));
+
+        // Tentukan tanggal transaksi yang dipakai:
+        // 1. Utamakan hari ini jika ada transaksi.
+        // 2. Jika hari ini kosong, otomatis pakai tanggal transaksi TERAKHIR.
+        // Jadi kartu tidak blank walaupun hari ini/kemarin belum ada penjualan.
+        const getDateKey = (data) => {
+          let d = null;
+
+          if (data.waktuTimestamp) {
+            try {
+              if (typeof data.waktuTimestamp.toDate === 'function') {
+                d = data.waktuTimestamp.toDate();
+              } else if (data.waktuTimestamp.seconds) {
+                d = new Date(Number(data.waktuTimestamp.seconds) * 1000);
+              }
+            } catch (_) {}
+          }
+
+          if (!d && data.waktu) {
+            const parsed = new Date(data.waktu);
+            if (!isNaN(parsed.getTime())) d = parsed;
+          }
+
+          if (!d) return null;
+
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}`;
+        };
+
+        const dateKeys = docs.map(x => getDateKey(x.data)).filter(Boolean);
+        const today = new Date();
+        const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+        let targetDateKey = null;
+        if (dateKeys.includes(todayKey)) {
+          targetDateKey = todayKey;
+        } else if (dateKeys.length) {
+          targetDateKey = dateKeys.sort().pop();
+        }
+
+        if (!targetDateKey) {
+          // Tidak ada transaksi sama sekali.
+          renderTrending([]);
+          return;
+        }
+
         const itemCounts = {};
-        snap.forEach(doc => {
-          const data = doc.data() || {};
-          if (!Array.isArray(data.items)) return;
+        const byName = {};
+
+        Object.keys(databaseProduk).forEach(code => {
+          const nama = String(databaseProduk[code]?.nama || '').trim().toLowerCase();
+          if (nama) byName[nama] = code;
+        });
+
+        docs.forEach(({data}) => {
+          if (getDateKey(data) !== targetDateKey || !Array.isArray(data.items)) return;
+
           data.items.forEach(it => {
             const qty = Number(it.qty) || 0;
             if (qty <= 0) return;
+
             const code = String(it.code || '').trim();
-            if (code) itemCounts[code] = (itemCounts[code] || 0) + qty;
+            if (code && databaseProduk[code]) {
+              itemCounts[code] = (itemCounts[code] || 0) + qty;
+              return;
+            }
+
+            // Data transaksi lama kadang punya code berbeda dari ID produk.
+            // Cocokkan berdasarkan nama produk.
+            const nama = String(it.nama || '').trim().toLowerCase();
+            const matchedCode = byName[nama];
+            if (matchedCode) {
+              itemCounts[matchedCode] = (itemCounts[matchedCode] || 0) + qty;
+            }
           });
         });
 
-        const sortedCodes = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]);
-        let top = sortedCodes.filter(code => databaseProduk[code]).slice(0, limit);
-
-        // Data transaksi lama/tertentu bisa menyimpan code yang berbeda dari ID
-        // dokumen produk. Cocokkan juga berdasarkan nama agar kartu tidak hilang.
-        if (top.length === 0 && sortedCodes.length > 0) {
-          const byName = {};
-          Object.keys(databaseProduk).forEach(code => {
-            const nama = String(databaseProduk[code]?.nama || '').trim().toLowerCase();
-            if (nama) byName[nama] = code;
-          });
-          const fallbackCodes = [];
-          snap.forEach(doc => {
-            const data = doc.data() || {};
-            if (!Array.isArray(data.items)) return;
-            data.items.forEach(it => {
-              const qty = Number(it.qty) || 0;
-              const nama = String(it.nama || '').trim().toLowerCase();
-              const code = byName[nama];
-              if (code && qty > 0) itemCounts['__name__'+code] = (itemCounts['__name__'+code] || 0) + qty;
-            });
-          });
-          top = Object.keys(itemCounts)
-            .filter(k => k.indexOf('__name__') === 0)
-            .sort((a,b) => itemCounts[b] - itemCounts[a])
-            .map(k => k.replace('__name__',''))
-            .slice(0, limit);
-        }
+        const top = Object.keys(itemCounts)
+          .sort((a,b) => itemCounts[b] - itemCounts[a])
+          .slice(0, limit);
 
         renderTrending(top);
+
+        // Simpan info tanggal yang sedang ditampilkan agar mudah dicek/debug.
+        window.__sedangLarisDateKey = targetDateKey;
+        window.__sedangLarisIsToday = targetDateKey === todayKey;
       } catch (err) {
-        // Fallback transaksi lama tanpa waktuTimestamp. Jangan langsung
-        // menyembunyikan section hanya karena query utama gagal.
-        try {
-          const snap = await db.collection("transaksi").limit(100).get();
-          if (token !== trendingLoadToken) return;
-          const itemCounts = {};
-          const today = new Date().toLocaleDateString('id-ID');
-          snap.forEach(doc => {
-            const data = doc.data() || {};
-            const waktu = String(data.waktu || '');
-            if (!waktu.includes(today) || !Array.isArray(data.items)) return;
-            data.items.forEach(it => {
-              const qty = Number(it.qty) || 0;
-              const code = String(it.code || '').trim();
-              if (code && qty > 0 && databaseProduk[code]) itemCounts[code] = (itemCounts[code] || 0) + qty;
-            });
-          });
-          const top = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]).slice(0, limit);
-          renderTrending(top);
-        } catch (fallbackErr) {
-          console.error('Gagal memuat Sedang Laris:', fallbackErr);
-          // Pertahankan tampilan yang sudah ada bila sebelumnya sudah berhasil.
-          if (!document.querySelector('#trending-container .trending-card')) renderTrending([]);
+        console.error('Gagal memuat Sedang Laris:', err);
+
+        // Jangan menghapus tampilan lama ketika ada error jaringan/query.
+        // Jika belum pernah ada tampilan sama sekali, baru sembunyikan section.
+        if (!document.querySelector('#trending-container .trending-card')) {
+          renderTrending([]);
         }
       }
     }
