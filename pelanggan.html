@@ -334,6 +334,88 @@
     .fab-ai-bounce { animation: aiBounceThree 4.8s ease-in-out infinite; will-change: transform; }
     .fab-ai-bounce:hover { animation-play-state: paused; }
     @media (prefers-reduced-motion: reduce) { .fab-ai-bounce { animation: none; } }
+    /* === BERANDA UTAMA V1 FINAL: header ramping + kategori ikon horizontal + card warna-warni === */
+    .customer-home-header {
+      margin: -8px -8px 7px !important;
+      padding: 9px 12px 10px !important;
+      min-height: 0 !important;
+      border-radius: 0 0 22px 22px;
+      box-shadow: 0 7px 18px rgba(37,99,235,.16);
+    }
+    .customer-home-title-row { min-height: 25px; }
+    .customer-home-title { font-size: 1.02rem !important; }
+    .customer-home-title::before { font-size: .9rem; }
+    .customer-home-greeting { margin: 1px 0 0 !important; font-size: .68rem !important; }
+    .customer-home-info-line {
+      margin-top: 7px !important;
+      display:flex; align-items:center; gap:6px; min-width:0;
+      padding:5px 8px !important;
+      border-radius:999px;
+      background:rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff !important; font-size:.68rem !important; font-weight:800;
+      overflow:hidden;
+    }
+    .customer-info-label { flex:0 0 auto; white-space:nowrap; }
+    .customer-running-window { min-width:0; flex:1; overflow:hidden; white-space:nowrap; display:block; }
+    .customer-running-text {
+      display:inline-block; min-width:max-content; padding-left:100%;
+      color:rgba(255,255,255,.9) !important; font-size:.66rem !important; font-weight:600;
+      animation: customerMarquee 14s linear infinite;
+    }
+    .customer-running-text.run-once { animation: customerMarquee 14s linear infinite; }
+
+    .category-chips {
+      display:flex !important; flex-wrap:nowrap !important; gap:10px !important;
+      overflow-x:auto !important; overflow-y:hidden !important;
+      padding:3px 4px 9px !important; margin:0 !important;
+      scrollbar-width:none; -webkit-overflow-scrolling:touch;
+    }
+    .category-chips::-webkit-scrollbar { display:none; }
+    .category-chips .chip-btn {
+      flex:0 0 52px !important; width:52px !important; min-width:52px !important; height:52px !important;
+      min-height:52px !important; padding:0 !important; border:0 !important;
+      border-radius:18px !important; background:var(--card-bg) !important;
+      color:var(--text-color) !important; box-shadow:0 4px 12px rgba(15,23,42,.09) !important;
+      font-size:0 !important; display:flex !important; align-items:center !important; justify-content:center !important;
+      position:relative; overflow:hidden;
+    }
+    .category-chips .chip-btn::before {
+      font-size:1.45rem !important; line-height:1 !important; margin:0 !important;
+    }
+    .category-chips .chip-btn:nth-child(1)::before { content:'🏪'; }
+    .category-chips .chip-btn:nth-child(2)::before { content:'🛒'; }
+    .category-chips .chip-btn:nth-child(3)::before { content:'🥤'; }
+    .category-chips .chip-btn:nth-child(4)::before { content:'🍪'; }
+    .category-chips .chip-btn:nth-child(5)::before { content:'🧂'; }
+    .category-chips .chip-btn:nth-child(6)::before { content:'📦'; }
+    .category-chips .chip-btn:nth-child(7)::before { content:'🧰'; }
+    .category-chips .chip-btn:nth-child(1) { background:#fff7ed !important; }
+    .category-chips .chip-btn:nth-child(2) { background:#eff6ff !important; }
+    .category-chips .chip-btn:nth-child(3) { background:#ecfdf5 !important; }
+    .category-chips .chip-btn:nth-child(4) { background:#fdf2f8 !important; }
+    .category-chips .chip-btn:nth-child(5) { background:#fefce8 !important; }
+    .category-chips .chip-btn:nth-child(6) { background:#f5f3ff !important; }
+    .category-chips .chip-btn:nth-child(7) { background:#f0fdfa !important; }
+    .category-chips .chip-btn.active { box-shadow:inset 0 0 0 2px #2563eb, 0 5px 14px rgba(37,99,235,.16) !important; transform:translateY(-1px); }
+
+    .product-catalog-grid { gap:9px !important; }
+    .product-catalog-grid .inv-card {
+      border:0 !important; border-radius:20px !important; padding:8px !important;
+      box-shadow:0 5px 15px rgba(15,23,42,.08) !important;
+      position:relative; overflow:hidden;
+    }
+    .product-catalog-grid .inv-card:nth-child(4n+1) { background:linear-gradient(145deg,#fff7ed,#ffffff) !important; }
+    .product-catalog-grid .inv-card:nth-child(4n+2) { background:linear-gradient(145deg,#eff6ff,#ffffff) !important; }
+    .product-catalog-grid .inv-card:nth-child(4n+3) { background:linear-gradient(145deg,#ecfdf5,#ffffff) !important; }
+    .product-catalog-grid .inv-card:nth-child(4n) { background:linear-gradient(145deg,#fdf2f8,#ffffff) !important; }
+    .product-catalog-grid .inv-card > div:first-of-type img {
+      border-radius:16px !important; border:0 !important; background:rgba(255,255,255,.75) !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .customer-running-text { animation:none !important; padding-left:0; }
+    }
+
 </style>
 
 <style id="customer-chat-subtabs-fix">
@@ -420,8 +502,7 @@
           <h1 class="customer-home-title">KasirQuh - <span id="customer-home-store-name">Nama Toko</span></h1>
         </div>
         <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
-        <div id="customer-home-info-line" style="margin-top:10px;font-size:.78rem;font-weight:800;color:var(--text-color);">Info Toko.... 📢</div>
-        <div id="customer-home-running-line" class="customer-running-wrap" aria-live="polite"><div id="customer-home-running-text" class="customer-running-text">&nbsp;</div></div>
+        <div id="customer-home-info-line" class="customer-home-info-line"><span class="customer-info-label">Info Toko:</span><span class="customer-running-window" aria-live="polite"><span id="customer-home-running-text" class="customer-running-text">&nbsp;</span></span></div>
         <div id="promo-banner-section" class="promo-banner no-print" aria-hidden="true" style="display:none !important;"><div id="promo-slide-content"></div></div>
       </div>
       <!-- Kategori: diletakkan setelah card Sedang Laris agar konten rekomendasi berada lebih dekat ke atas. -->
@@ -968,10 +1049,16 @@
     }
 
     function renderCustomerHomeInfo(cfg) {
-      const info=document.getElementById('customer-home-info-line');
       const running=document.getElementById('customer-home-running-text');
-      if(info) info.textContent = (cfg && typeof cfg.infoText === 'string' && cfg.infoText.trim()) ? cfg.infoText.trim() + ' 📢' : 'Info Toko.... 📢';
-      if(running) running.textContent = (cfg && typeof cfg.runningText === 'string') ? cfg.runningText.trim() : '';
+      const text = (cfg && typeof cfg.runningText === 'string' && cfg.runningText.trim())
+        ? cfg.runningText.trim()
+        : ((cfg && typeof cfg.infoText === 'string' && cfg.infoText.trim()) ? cfg.infoText.trim() : 'Selamat datang di toko kami 👋');
+      if(running) {
+        running.textContent = text;
+        running.classList.remove('run-once');
+        void running.offsetWidth;
+        running.classList.add('run-once');
+      }
     }
 
     function initCustomerHomeInfoListener() {
