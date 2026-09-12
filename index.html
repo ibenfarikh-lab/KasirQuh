@@ -581,6 +581,91 @@
 </div>
 
 
+<!-- =========================================================
+     KERANGKA: BERANDA PELANGGAN
+     Tahap 1: UI kerangka saja. Belum mengubah logika/data.
+     ========================================================= -->
+<section id="admin-beranda-pelanggan" class="admin-beranda-pelanggan" aria-hidden="true" style="margin-top:0;scroll-margin-top:12px;max-height:0;overflow:hidden;opacity:0;transform:translateY(-8px);transition:max-height .55s ease,opacity .4s ease,transform .55s ease;">
+  <div style="background:#000;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;color:#fff;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-weight:800;font-size:1rem;">📱 Beranda Pelanggan</div>
+        <div style="font-size:.78rem;opacity:.72;margin-top:3px;">Kelola fitur yang tampil di halaman utama pelanggan.</div>
+      </div>
+      <button type="button" onclick="adminPreviewCustomerHome()" style="border:1px solid rgba(255,255,255,.2);background:#fff;color:#111;border-radius:10px;padding:8px 11px;font-weight:700;cursor:pointer;">👁️ Preview</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🪙 Koin Warga</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pengaturan program koin.</div>
+        <button type="button" onclick="toggleAdminKoinWarga()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-koin-warga-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;"><span>Program aktif</span><input type="checkbox" id="admin-koin-enabled"></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;"><span>Bonus check-in harian</span><input type="number" id="admin-koin-daily" min="0" max="100000" step="1" style="width:90px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;"></label>
+          <button type="button" onclick="simpanPengaturanKoinWarga()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer;">Simpan Koin</button>
+          <div id="admin-koin-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🔥 Promo Toko Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pilih produk yang ingin dipromosikan.</div>
+        <button type="button" onclick="toggleAdminPromoToko()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-promo-toko-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Promo aktif</span><input type="checkbox" id="admin-promo-enabled">
+          </label>
+          <div style="font-size:.75rem;opacity:.7;margin-bottom:7px;">Pilih maksimal 5 barang dari katalog:</div>
+          <div id="admin-promo-product-list" style="max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:6px;"></div>
+          <button type="button" onclick="simpanPengaturanPromoToko()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#f59e0b;color:#111;font-weight:800;cursor:pointer;">Simpan Promo</button>
+          <div id="admin-promo-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🏠 Stok Rumah Habis</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan stok barang.</div>
+        <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
+          <span>Tampilkan</span>
+          <input type="checkbox" id="admin-home-stock-toggle" checked>
+        </label>
+      </div>
+
+<div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🍳 Ide Masak Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Menu, foto, deskripsi, dan bahan terkait.</div>
+        <button type="button" onclick="toggleAdminIdeMasak()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-ide-masak-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-recipe-enabled">
+          </label>
+          <div style="font-size:.75rem;opacity:.7;margin-bottom:7px;">Maksimal 5 menu aktif. Bahan dipilih langsung dari katalog.</div>
+          <div id="admin-recipe-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <button type="button" onclick="tambahAdminIdeMasak()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">＋ Tambah Menu</button>
+          <button type="button" onclick="simpanPengaturanIdeMasak()" style="width:100%;margin-top:7px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Ide Masak</button>
+          <div id="admin-recipe-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">📈 Sedang Laris Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan transaksi penjualan hari ini.</div>
+        <button type="button" onclick="toggleAdminSedangLaris()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-sedang-laris-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-trending-enabled">
+          </label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;">
+            <span>Jumlah produk</span><input type="number" id="admin-trending-limit" min="1" max="10" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
+          </label>
+          <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Urutan dihitung otomatis dari jumlah terjual hari ini.</div>
+          <button type="button" onclick="simpanPengaturanSedangLaris()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Laris</button>
+          <div id="admin-trending-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;" data-i18n="shop_identity">Identitas Toko</h3>
         <div class="form-vertical">
@@ -679,90 +764,7 @@
       </div>
     
 
-<!-- =========================================================
-     KERANGKA: BERANDA PELANGGAN
-     Tahap 1: UI kerangka saja. Belum mengubah logika/data.
-     ========================================================= -->
-<section id="admin-beranda-pelanggan" class="admin-beranda-pelanggan" style="margin-top:18px;scroll-margin-top:12px;">
-  <div style="background:#000;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;color:#fff;">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
-      <div>
-        <div style="font-weight:800;font-size:1rem;">📱 Beranda Pelanggan</div>
-        <div style="font-size:.78rem;opacity:.72;margin-top:3px;">Kelola fitur yang tampil di halaman utama pelanggan.</div>
-      </div>
-      <button type="button" onclick="adminPreviewCustomerHome()" style="border:1px solid rgba(255,255,255,.2);background:#fff;color:#111;border-radius:10px;padding:8px 11px;font-weight:700;cursor:pointer;">👁️ Preview</button>
-    </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
-      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
-        <div style="font-weight:800;">🪙 Koin Warga</div>
-        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pengaturan program koin.</div>
-        <button type="button" onclick="toggleAdminKoinWarga()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
-        <div id="admin-koin-warga-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
-          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;"><span>Program aktif</span><input type="checkbox" id="admin-koin-enabled"></label>
-          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;"><span>Bonus check-in harian</span><input type="number" id="admin-koin-daily" min="0" max="100000" step="1" style="width:90px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;"></label>
-          <button type="button" onclick="simpanPengaturanKoinWarga()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer;">Simpan Koin</button>
-          <div id="admin-koin-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
-        </div>
-      </div>
-
-      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
-        <div style="font-weight:800;">🔥 Promo Toko Hari Ini</div>
-        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pilih produk yang ingin dipromosikan.</div>
-        <button type="button" onclick="toggleAdminPromoToko()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
-        <div id="admin-promo-toko-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
-          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
-            <span>Promo aktif</span><input type="checkbox" id="admin-promo-enabled">
-          </label>
-          <div style="font-size:.75rem;opacity:.7;margin-bottom:7px;">Pilih maksimal 5 barang dari katalog:</div>
-          <div id="admin-promo-product-list" style="max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:6px;"></div>
-          <button type="button" onclick="simpanPengaturanPromoToko()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#f59e0b;color:#111;font-weight:800;cursor:pointer;">Simpan Promo</button>
-          <div id="admin-promo-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
-        </div>
-      </div>
-
-      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
-        <div style="font-weight:800;">🏠 Stok Rumah Habis</div>
-        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan stok barang.</div>
-        <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
-          <span>Tampilkan</span>
-          <input type="checkbox" id="admin-home-stock-toggle" checked>
-        </label>
-      </div>
-
-<div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
-        <div style="font-weight:800;">🍳 Ide Masak Hari Ini</div>
-        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Menu, foto, deskripsi, dan bahan terkait.</div>
-        <button type="button" onclick="toggleAdminIdeMasak()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
-        <div id="admin-ide-masak-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
-          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
-            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-recipe-enabled">
-          </label>
-          <div style="font-size:.75rem;opacity:.7;margin-bottom:7px;">Maksimal 5 menu aktif. Bahan dipilih langsung dari katalog.</div>
-          <div id="admin-recipe-list" style="display:flex;flex-direction:column;gap:8px;"></div>
-          <button type="button" onclick="tambahAdminIdeMasak()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">＋ Tambah Menu</button>
-          <button type="button" onclick="simpanPengaturanIdeMasak()" style="width:100%;margin-top:7px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Ide Masak</button>
-          <div id="admin-recipe-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
-        </div>
-      </div>      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
-        <div style="font-weight:800;">📈 Sedang Laris Hari Ini</div>
-        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan transaksi penjualan hari ini.</div>
-        <button type="button" onclick="toggleAdminSedangLaris()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
-        <div id="admin-sedang-laris-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
-          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
-            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-trending-enabled">
-          </label>
-          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;">
-            <span>Jumlah produk</span><input type="number" id="admin-trending-limit" min="1" max="10" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
-          </label>
-          <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Urutan dihitung otomatis dari jumlah terjual hari ini.</div>
-          <button type="button" onclick="simpanPengaturanSedangLaris()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Laris</button>
-          <div id="admin-trending-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <script>
 function getPengaturanKoinWarga() {
@@ -945,7 +947,22 @@ async function simpanPengaturanSedangLaris() {
 function scrollKePengaturanBerandaPelanggan() {
   const target = document.getElementById('admin-beranda-pelanggan');
   if (!target) return;
-  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const isOpen = target.getAttribute('aria-hidden') === 'false';
+  if (isOpen) {
+    // Jika sudah terbuka, jangan men-scroll halaman; cukup biarkan kontennya terlihat.
+    return;
+  }
+
+  target.setAttribute('aria-hidden', 'false');
+  target.style.maxHeight = target.scrollHeight + 'px';
+  target.style.opacity = '1';
+  target.style.transform = 'translateY(0)';
+
+  // Setelah transisi selesai, biarkan tinggi mengikuti isi agar aman bila panel berubah ukuran.
+  window.setTimeout(() => {
+    if (target.getAttribute('aria-hidden') === 'false') target.style.maxHeight = 'none';
+  }, 600);
 }
 function adminPreviewCustomerHome() {
   alert('Preview Beranda Pelanggan: kerangka sudah siap. Tampilan preview akan kita sambungkan pada tahap berikutnya.');
