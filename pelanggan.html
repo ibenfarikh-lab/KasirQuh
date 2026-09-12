@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.13">
+  <link rel="stylesheet" href="style.css?v=1.0.12">
 
   <style>
     .popup-menu-btn {
@@ -248,37 +248,6 @@
     }
     .customer-header-search-btn:active { transform: scale(.92); }
 
-    /* Promo header: berada di kanan area judul/sapaan, bukan floating di tengah layar. */
-    .customer-home-header { position: relative; min-height: 82px; padding-right: 112px !important; box-sizing: border-box; }
-    .customer-home-title-row { display: block; }
-    .promo-banner {
-      position: absolute !important; right: 0 !important; top: 0 !important; transform: none !important;
-      width: 98px !important; min-width: 98px !important; height: 78px !important; min-height: 78px !important;
-      padding: 7px 8px 7px 13px !important; border-radius: 42px 0 0 42px !important;
-      z-index: 12;
-    }
-    .promo-banner::before { width: 48px; height: 48px; left: -25px; }
-    .promo-stage { width: 100%; }
-    .promo-slide { transform-origin: 50% 50%; }
-    .promo-banner.promo-collapsed { width: 28px !important; min-width: 28px !important; height: 28px !important; min-height: 28px !important; right: 0 !important; top: 25px !important; }
-    .promo-banner.promo-collapsed::after { margin: 10px; }
-    .promo-spacer { display:none; }
-
-    /* Pencarian muncul sebagai bar fixed tepat di atas bottom navbar. */
-    .sticky-search-bar {
-      position: fixed !important; left: 8px; right: 8px; bottom: 52px; z-index: 101;
-      margin: 0 !important; padding: 6px !important; border-radius: 10px;
-      background: var(--card-bg, #fff) !important; border: 1px solid var(--border-color);
-      box-shadow: 0 -4px 16px rgba(0,0,0,.18); box-sizing: border-box;
-    }
-    .sticky-search-bar.search-open { display:block !important; }
-    #sticky-search-container input { min-width: 0; }
-
-    @media (max-width: 420px) {
-      .customer-home-header { min-height: 78px; padding-right: 106px !important; }
-      .promo-banner { width: 92px !important; min-width: 92px !important; height: 72px !important; min-height: 72px !important; }
-    }
-
     /* Asisten AI: 3 bounce berturut-turut, diam 3 detik, lalu mengulang. */
     @keyframes aiBounceThree {
       0%, 37.5%, 100% { transform: translateY(0) scale(1); }
@@ -364,7 +333,7 @@
   </div>
 
   <div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
-    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none;">
+    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 6px 0; margin-bottom: 8px;">
       <div style="display: flex; gap: 6px; align-items: center;">
         <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
         <button onclick="tutupKolomPencarian()" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">✕</button>
@@ -376,13 +345,19 @@
       <div class="customer-home-header no-print" id="customer-home-header">
         <div class="customer-home-title-row">
           <h1 class="customer-home-title">KasirQuh - <span id="customer-home-store-name">Nama Toko</span></h1>
+          <button id="customer-header-search-btn" class="customer-header-search-btn" onclick="bukaKolomPencarian()" title="Cari Barang" aria-label="Cari Barang">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" y1="15.17" x2="21" y2="21"></line>
+            </svg>
+          </button>
         </div>
         <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
-        <div class="promo-banner no-print" id="promo-banner-section" aria-label="Promo toko">
-          <div class="promo-stage" id="promo-stage">
-            <div id="promo-slide-content" class="promo-slide">Promo</div>
-            <div class="promo-dot-row" id="promo-dot-row"></div>
-          </div>
+      </div>
+
+      <div class="promo-banner no-print" id="promo-banner-section" aria-label="Promo toko">
+        <div class="promo-stage" id="promo-stage">
+          <div id="promo-slide-content" class="promo-slide">Promo</div>
+          <div class="promo-dot-row" id="promo-dot-row"></div>
         </div>
       </div>
 
@@ -657,12 +632,7 @@
       <span id="pos-page-indicator" style="font-size: 0.72rem; font-weight: bold; color: var(--text-color);">1/1</span>
       <button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
     </div>
-    <div style="display:flex; align-items:center; gap:6px;">
-      <button id="bottom-search-btn" onclick="bukaKolomPencarian()" style="background: #2563eb; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Cari Barang" aria-label="Cari Barang">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" y1="15.17" x2="21" y2="21"></line></svg>
-      </button>
-      <button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
-    </div>
+    <button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
   </div>
 
   <script>
@@ -1305,20 +1275,8 @@
     function gantiTemaPelanggan(theme) { localStorage.setItem('cust_theme_v13', theme); applyThemePelanggan(theme); }
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
     function toggleMenuModal() { document.getElementById("menuToggleModal").classList.toggle("show"); }
-    function bukaKolomPencarian() {
-      const searchContainer = document.getElementById("sticky-search-container");
-      if (!searchContainer) return;
-      searchContainer.style.display = "block";
-      searchContainer.classList.add("search-open");
-      setTimeout(() => document.getElementById("inventory-search-input")?.focus(), 120);
-    }
-    function tutupKolomPencarian() {
-      const input = document.getElementById("inventory-search-input");
-      const container = document.getElementById("sticky-search-container");
-      if (input) input.value = "";
-      if (container) { container.classList.remove("search-open"); container.style.display = "none"; }
-      filterKatalogPelanggan("");
-    }
+    function bukaKolomPencarian() { const searchContainer = document.getElementById("sticky-search-container"); if (searchContainer) { searchContainer.style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => document.getElementById("inventory-search-input")?.focus(), 200); } }
+    function tutupKolomPencarian() { document.getElementById("inventory-search-input").value = ""; document.getElementById("sticky-search-container").style.display = "none"; filterKatalogPelanggan(""); }
 
     function pilihKategoriPelanggan(kategori) {
       activeKategoriPelanggan = kategori;
