@@ -31,50 +31,43 @@
     }
     .chip-btn.active { background: #2563eb; color: white; border-color: #2563eb; font-weight: bold; }
 
-    /* PROMO PELANGGAN — sticky, morphing semicircle -> dot */
+    .customer-home-header {
+      padding: 4px 6px 7px; margin: 0 0 2px; line-height: 1.15;
+    }
+    .customer-home-title {
+      margin: 0; font-size: 1.05rem; font-weight: 800; letter-spacing: .1px;
+      color: var(--text-color);
+    }
+    .customer-home-greeting {
+      margin: 2px 0 0; font-size: .72rem; color: var(--text-muted); font-weight: 600;
+    }
     .promo-banner {
-      position: sticky; top: 8px; z-index: 80;
-      width: calc(100% - 20px); box-sizing: border-box;
-      min-height: 126px; margin: 8px 10px 12px; padding: 12px 14px;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      border-radius: 0 0 76px 76px / 0 0 58px 58px;
-      color: white; display: flex; align-items: flex-start; justify-content: space-between;
-      box-shadow: 0 5px 16px rgba(37, 99, 235, 0.25);
-      overflow: hidden; transform-origin: 88% 8px;
-      transition: width .42s cubic-bezier(.22,.8,.2,1), min-height .42s cubic-bezier(.22,.8,.2,1),
-                  height .42s cubic-bezier(.22,.8,.2,1), margin .42s cubic-bezier(.22,.8,.2,1),
-                  padding .42s cubic-bezier(.22,.8,.2,1), border-radius .42s cubic-bezier(.22,.8,.2,1),
-                  opacity .28s ease, box-shadow .42s ease;
-      will-change: width, height, transform;
+      position: fixed; right: -8px; top: 50%; transform: translateY(-50%);
+      width: 132px; min-height: 112px; padding: 12px 15px 12px 20px; box-sizing: border-box;
+      border-radius: 72px 0 0 72px; color: white; z-index: 180; overflow: hidden;
+      background: linear-gradient(145deg, #2563eb, #7c3aed);
+      box-shadow: 0 7px 22px rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.25);
+      display: none; align-items: center; justify-content: center;
     }
-    .promo-banner.is-collapsed {
-      width: 44px; min-height: 44px; height: 44px;
-      margin: 8px 8px 8px auto; padding: 0; border-radius: 50%;
-      align-items: center; justify-content: center; opacity: .98;
-      box-shadow: 0 4px 14px rgba(0,0,0,.28); cursor: pointer;
+    .promo-banner::before {
+      content: ''; position: absolute; width: 72px; height: 72px; border: 1px solid rgba(255,255,255,.18);
+      border-radius: 50%; left: -35px; top: 50%; transform: translateY(-50%);
     }
-    .promo-banner.is-collapsed > div:first-child { opacity: 0; transform: scale(.72) rotate(-8deg); pointer-events: none; }
-    .promo-banner.is-collapsed > div:last-child { font-size: 1.25rem !important; margin: 0 !important; transform: scale(1); }
-    .promo-banner.is-collapsed:active { transform: scale(.92); }
-    .promo-banner > div:first-child {
-      transition: opacity .22s ease, transform .38s cubic-bezier(.22,.8,.2,1);
-      min-width: 0; flex: 1;
+    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 220px; }
+    .promo-slide { animation: promoOrbitIn .62s cubic-bezier(.2,.75,.25,1) both; transform-origin: 100% 50%; }
+    @keyframes promoOrbitIn { 0% { opacity: 0; transform: translateX(34px) rotateY(70deg) rotateZ(8deg) scale(.72); } 55% { opacity: 1; transform: translateX(-5px) rotateY(-10deg) rotateZ(-2deg) scale(1.03); } 100% { opacity: 1; transform: translateX(0) rotateY(0) rotateZ(0) scale(1); } }
+    .promo-banner.promo-collapsed { width: 24px !important; min-height: 24px !important; height: 24px; padding: 0 !important; right: -2px; border-radius: 50%; box-shadow: 0 4px 14px rgba(0,0,0,.2); cursor: pointer; }
+    .promo-banner.promo-collapsed::before, .promo-banner.promo-collapsed .promo-stage { display: none; }
+    .promo-banner.promo-collapsed::after { content: '•'; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: #fff; font-size: 16px; line-height: 1; }
+    .promo-banner.promo-hidden { opacity: 0; pointer-events: none; transform: translate(30px,-50%) scale(.75); }
+    .promo-banner { transition: width .35s ease, min-height .35s ease, height .35s ease, right .35s ease, opacity .28s ease, transform .35s ease, border-radius .35s ease, padding .35s ease; }
+    .promo-dot-row { transition: opacity .25s ease; }
+    .promo-dot-row { display:flex; justify-content:center; gap:3px; margin-top:5px; }
+    .promo-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,.45); }
+    .promo-dot.active { background:#fff; }
+    @media (max-width: 420px) {
+      .promo-banner { width: 122px; min-height: 104px; padding-left: 16px; }
     }
-    #promo-products-container { position: relative; height: 64px; overflow: hidden !important; margin-top: 7px !important; }
-    .promo-product-card {
-      position: absolute; inset: 0; width: 100%; height: 62px; box-sizing: border-box;
-      display: flex; align-items: center; gap: 8px; padding: 5px 8px;
-      border: 1px solid rgba(255,255,255,.45); border-radius: 10px;
-      background: rgba(0,0,0,.16); color: inherit; text-align: left; cursor: pointer;
-      transform-style: preserve-3d; backface-visibility: hidden;
-      transition: transform .48s cubic-bezier(.2,.75,.2,1), opacity .32s ease;
-    }
-    .promo-product-card img { width: 64px !important; height: 52px !important; object-fit: cover; border-radius: 7px; flex: 0 0 64px; }
-    .promo-product-card.promo-current { transform: perspective(500px) rotateY(0deg) scale(1); opacity: 1; }
-    .promo-product-card.promo-exit { transform: perspective(500px) rotateY(90deg) scale(.82); opacity: 0; }
-    .promo-product-card.promo-enter { transform: perspective(500px) rotateY(-90deg) scale(.82); opacity: 0; }
-    .promo-product-card.promo-enter.promo-current { transform: perspective(500px) rotateY(0deg) scale(1); opacity: 1; }
-    .promo-restore-btn { display:none; }
     
     @keyframes cartBounce { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
     .cart-animating { animation: cartBounce 0.3s ease-in-out; }
@@ -109,7 +102,7 @@
     }
     @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-    .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 4px 10px 10px 10px; scrollbar-width: none; }
+    .horizontal-scroll-container { display: flex; gap: 8px; overflow-x: auto; padding: 2px 10px 4px 10px; scrollbar-width: none; }
     .horizontal-scroll-container::-webkit-scrollbar { display: none; }
 
     .auto-scroll-wrapper {
@@ -117,7 +110,7 @@
       overflow-y: hidden;
       width: 100%;
       position: relative;
-      padding: 4px 0 10px 0;
+      padding: 2px 0 4px 0;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
@@ -303,17 +296,20 @@
 
     <!-- 1. HALAMAN BELANJA -->
     <div id="belanja" class="tab-content active" style="display: block;">
-      <div class="promo-banner no-print" id="promo-banner-section">
-        <div style="min-width:0;flex:1;">
-          <div style="font-weight:800;font-size:.95rem;margin-bottom:2px;">Promo Toko Hari Ini! 🎉</div>
-          <div id="promo-banner-subtitle" style="font-size:.75rem;opacity:.9;">Cari barang incaranmu sekarang juga.</div>
-          <div id="promo-products-container" style="display:flex;gap:6px;overflow-x:auto;margin-top:7px;"></div>
+      <div class="customer-home-header no-print" id="customer-home-header">
+        <h1 class="customer-home-title">KasirQuh - <span id="customer-home-store-name">Nama Toko</span></h1>
+        <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
+      </div>
+
+      <div class="promo-banner no-print" id="promo-banner-section" aria-label="Promo toko">
+        <div class="promo-stage" id="promo-stage">
+          <div id="promo-slide-content" class="promo-slide">Promo</div>
+          <div class="promo-dot-row" id="promo-dot-row"></div>
         </div>
-        <div style="font-size:1.6rem;">🛍️</div>
       </div>
 
       <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 10px;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
         <div id="reorder-container" class="auto-scroll-wrapper"></div>
       </div>
 
@@ -327,22 +323,22 @@
       </div>
 
       <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
-      <div id="recipe-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
+      <div id="recipe-section-wrapper" class="no-print" style="margin: 1px 0 2px 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
         <div class="horizontal-scroll-container" id="recipe-scroll-container">
           <!-- Rendered via JavaScript -->
         </div>
       </div>
 
       <!-- Barang Laris Hari Ini -->
-      <div id="trending-section-wrapper" class="no-print" style="margin: 8px 0 10px 0;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
+      <div id="trending-section-wrapper" class="no-print" style="margin: 1px 0 2px 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
         <div id="trending-container" class="auto-scroll-wrapper"></div>
       </div>
 
-      <div class="pos-container">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 10px 0 4px 0; color: var(--text-color);">Semua Kebutuhan Harian 🛍️</div>
-        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 8px; background: transparent; border: none; box-shadow: none;">
+      <div class="pos-container" style="gap: 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 0 0 2px 0; color: var(--text-color);">Semua Kebutuhan Harian 🛍️</div>
+        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 0 6px 4px 6px; background: transparent; border: none; box-shadow: none;">
           <div id="pos-catalog-container"></div>
         </div>
       </div>
@@ -825,7 +821,8 @@
     window.onload = function() {
       muatIdeMasakAdminPelanggan();
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'auto');
-      const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; }
+      updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
+      const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
       initChatRumpiListener();
       renderRecipeCards();
       if (currentCustomerPhone) {
@@ -834,94 +831,93 @@
       } else { if (isStandalone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
       initFirebaseListeners();
       initPromoTokoPelanggan();
+      initPromoScrollBehavior();
     };
 
-    function initPromoTokoPelanggan() {
-      const render = (data) => {
-        const banner=document.getElementById('promo-banner-section');
-        const container=document.getElementById('promo-products-container');
-        const subtitle=document.getElementById('promo-banner-subtitle');
-        if(!banner || !container) return;
-        clearInterval(window.__promoRotateTimer);
-        window.__promoRotateTimer = null;
-        if(!data || data.enabled === false || !Array.isArray(data.codes) || data.codes.length === 0) {
-          banner.style.display = 'none'; return;
-        }
-        const codes=data.codes.slice(0,5);
-        const cards=codes.map(code=>{
-          const p=databaseProduk[code]; if(!p || Number(p.stok||0)<=0) return '';
-          const foto=p.foto || '';
-          const safeName=String(p.nama||'Barang').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-          const harga=p.hargaJual!==undefined?p.hargaJual:(p.harga||0);
-          const safeCode=String(code).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-          return `<button type="button" class="promo-product-card" onclick="openProductDetail('${safeCode}')">
-            ${foto?`<img src="${foto}" alt="">`:''}
-            <div style="min-width:0;flex:1;">
-              <div style="font-size:.72rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${safeName}</div>
-              <div style="font-size:.72rem;font-weight:800;margin-top:2px;">Rp ${Number(harga||0).toLocaleString('id-ID')}</div>
-            </div>
-            <span style="font-size:1rem;opacity:.9;">›</span>
-          </button>`;
-        }).filter(Boolean);
-        container.innerHTML=cards.join('');
-        banner.style.display=cards.length ? 'flex' : 'none';
-        banner.classList.remove('is-collapsed');
-        banner.onclick = null;
-        if(subtitle) subtitle.textContent=cards.length ? 'Pilihan promo toko hari ini — tap barangnya.' : 'Belum ada promo aktif.';
-        const items=[...container.querySelectorAll('.promo-product-card')];
-        if(!items.length) return;
-        let index=0;
-        items.forEach((el,i)=>el.classList.toggle('promo-current',i===0));
-        const showNext=()=>{
-          if(banner.classList.contains('is-collapsed')) return;
-          const current=items[index];
-          const nextIndex=(index+1)%items.length;
-          const next=items[nextIndex];
-          if(current===next) return;
-          next.classList.add('promo-enter');
-          requestAnimationFrame(()=>{
-            current.classList.remove('promo-current'); current.classList.add('promo-exit');
-            next.classList.remove('promo-enter'); next.classList.add('promo-current');
-          });
-          setTimeout(()=>current.classList.remove('promo-exit'),500);
-          index=nextIndex;
-        };
-        if(items.length>1) window.__promoRotateTimer=setInterval(showNext,4200);
-      };
-      db.collection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(snap=>render(snap.exists?snap.data():null),()=>{});
-      const oldRender=window.__promoRenderHook;
-      window.__promoRenderHook=()=>{ db.collection('pengaturan').doc('beranda_pelanggan_promo').get().then(s=>render(s.exists?s.data():null)).catch(()=>{}); };
+    function updateCustomerGreeting() {
+      const el = document.getElementById('customer-home-greeting');
+      if (!el) return;
+      const hour = Number(new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }).format(new Date()));
+      const greeting = hour >= 5 && hour < 11 ? 'Selamat pagi 👋' : hour >= 11 && hour < 15 ? 'Selamat siang ☀️' : hour >= 15 && hour < 18 ? 'Selamat sore 🌤️' : 'Selamat malam 🌙';
+      el.textContent = greeting;
+    }
 
-      // Promo hanya mengecil pada halaman Belanja + kategori Semua.
-      if(!window.__promoScrollReady) {
-        window.__promoScrollReady=true;
-        const setup=()=>{
-          const main=document.querySelector('.main-content');
-          const banner=document.getElementById('promo-banner-section');
-          if(!main || !banner) return;
-          let lastTop=main.scrollTop, ticking=false;
-          const update=()=>{
-            ticking=false;
-            const isHome=document.getElementById('belanja')?.classList.contains('active') && activeKategoriPelanggan==='Semua';
-            if(!isHome) { banner.classList.remove('is-collapsed'); return; }
-            const top=main.scrollTop;
-            if(top<=4) {
-              banner.classList.remove('is-collapsed');
-            } else if(top>lastTop+1) {
-              banner.classList.add('is-collapsed');
-            }
-            lastTop=top;
-          };
-          main.addEventListener('scroll',()=>{ if(!ticking){ticking=true;requestAnimationFrame(update);} },{passive:true});
-          banner.addEventListener('click',()=>{
-            if(banner.classList.contains('is-collapsed')) {
-              banner.classList.remove('is-collapsed');
-              main.scrollTo({top:Math.max(0,main.scrollTop-1),behavior:'smooth'});
-            }
+    function initPromoTokoPelanggan() {
+      let promoItems = [];
+      let promoIndex = 0;
+      let promoTimer = null;
+
+      const escape = (v) => String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      const render = (data) => {
+        const banner = document.getElementById('promo-banner-section');
+        const content = document.getElementById('promo-slide-content');
+        const dots = document.getElementById('promo-dot-row');
+        if (!banner || !content) return;
+        promoItems = [];
+        if (data && data.enabled !== false && Array.isArray(data.codes)) {
+          data.codes.slice(0, 5).forEach(code => {
+            const p = databaseProduk[code];
+            if (!p || Number(p.stok || 0) <= 0) return;
+            const harga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+            promoItems.push({ code, nama: p.nama || 'Produk', harga: Number(harga || 0), foto: p.foto || '' });
           });
+        }
+        clearInterval(promoTimer);
+        if (!promoItems.length) { banner.style.display = 'none'; return; }
+        banner.style.display = 'flex';
+        promoIndex = promoIndex % promoItems.length;
+        const show = () => {
+          const item = promoItems[promoIndex];
+          content.classList.remove('promo-slide'); void content.offsetWidth; content.classList.add('promo-slide');
+          content.innerHTML = `${item.foto ? `<img src="${escape(item.foto)}" alt="" style="width:48px;height:42px;object-fit:cover;border-radius:12px;display:block;margin:0 auto 4px;">` : `<div style="font-size:1.35rem;margin-bottom:3px;">🛍️</div>`}
+            <div style="font-size:.57rem;font-weight:800;opacity:.9;letter-spacing:.5px;">PROMO</div>
+            <div style="font-size:.68rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${escape(item.nama)}</div>
+            <div style="font-size:.66rem;font-weight:800;margin-top:2px;">Rp ${item.harga.toLocaleString('id-ID')}</div>`;
+          dots.innerHTML = promoItems.map((_, i) => `<span class="promo-dot ${i === promoIndex ? 'active' : ''}"></span>`).join('');
+          banner.onclick = () => openProductDetail(String(item.code).replace(/'/g, "\\'"));
+          promoIndex = (promoIndex + 1) % promoItems.length;
         };
-        setTimeout(setup,0);
-      }
+        show();
+        if (promoItems.length > 1) promoTimer = setInterval(show, 4500);
+      };
+      db.collection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(snap => render(snap.exists ? snap.data() : null), () => {});
+      window.__promoRenderHook = () => db.collection('pengaturan').doc('beranda_pelanggan_promo').get().then(s => render(s.exists ? s.data() : null)).catch(() => {});
+    }
+
+    function initPromoScrollBehavior() {
+      const banner = document.getElementById('promo-banner-section');
+      if (!banner || window.__promoScrollBound) return;
+      window.__promoScrollBound = true;
+      let lastY = window.scrollY || 0;
+      let ticking = false;
+      const update = () => {
+        ticking = false;
+        if (!document.getElementById('belanja')?.classList.contains('active')) {
+          banner.classList.remove('promo-collapsed', 'promo-hidden');
+          return;
+        }
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        const goingDown = y > lastY + 3;
+        const goingUp = y < lastY - 3;
+        if (y <= 8) {
+          banner.classList.remove('promo-collapsed', 'promo-hidden');
+        } else if (goingDown) {
+          banner.classList.add('promo-collapsed');
+          banner.classList.remove('promo-hidden');
+        } else if (goingUp) {
+          banner.classList.add('promo-collapsed');
+          banner.classList.remove('promo-hidden');
+        }
+        lastY = y;
+      };
+      window.addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+      banner.addEventListener('click', () => {
+        if (banner.classList.contains('promo-collapsed') && (window.scrollY || 0) > 8) {
+          banner.classList.remove('promo-collapsed');
+        }
+      });
     }
 
     function periksaCheckinHarian() { if(!currentCustomerPhone) return; if(localStorage.getItem('admin_koin_warga_enabled') === 'false') return; let today = new Date().toLocaleDateString('id-ID'); let lastCheckin = localStorage.getItem('last_checkin_date_' + currentCustomerPhone); if(lastCheckin !== today) { const bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); const p=document.querySelector('#dailyCheckinModal p'); if(p) p.innerText='Selamat! Kamu rajin buka aplikasi hari ini. Ini ' + bonus + ' Koin untukmu!'; setTimeout(() => { document.getElementById('dailyCheckinModal').style.display = 'flex'; }, 1500); } }
@@ -1215,7 +1211,7 @@
     
     function perbaruiTampilanKategori() {
       let isSemua = activeKategoriPelanggan === 'Semua';
-      const promoBanner = document.querySelector('.promo-banner'); if(promoBanner) { promoBanner.style.display = isSemua ? 'flex' : 'none'; if(isSemua) promoBanner.classList.remove('is-collapsed'); }
+      const promoBanner = document.querySelector('.promo-banner'); if(promoBanner && promoBanner.querySelector('#promo-slide-content')?.innerHTML && isSemua) promoBanner.style.display = 'flex';
       document.getElementById('recipe-section-wrapper').style.display = isSemua ? 'block' : 'none';
       document.getElementById('trending-section-wrapper').style.display = isSemua ? 'block' : 'none';
       let reorderWrapper = document.getElementById('reorder-section-wrapper');
@@ -1416,7 +1412,7 @@
     }
 
     function initFirebaseListeners() {
-      db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; } });
+      db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
       db.collection("produk").onSnapshot((snapshot) => { 
         databaseProduk = {}; 
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
@@ -1433,6 +1429,18 @@
         const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
         window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
         isTrendingConfigLoaded = true;
+        muatBarangLarisHariIni();
+      });
+
+      // Listener transaksi untuk "Sedang Laris".
+      // Jika hari ini belum ada transaksi, tampilkan data dari tanggal transaksi
+      // terakhir yang tersedia. Begitu ada transaksi baru, kartu otomatis dihitung ulang.
+      db.collection("transaksi").onSnapshot((snapshot) => {
+        window.__trendingTransactionsSnapshot = snapshot;
+        muatBarangLarisHariIni();
+      }, (err) => {
+        console.warn("Listener transaksi Sedang Laris gagal:", err);
+        // muatBarangLarisHariIni() tetap boleh mencoba query langsung sebagai fallback.
         muatBarangLarisHariIni();
       });
     }
@@ -1457,7 +1465,7 @@
       if(document.getElementById('fab-search-btn')) document.getElementById('fab-search-btn').style.display = d.fabSrc; if(document.getElementById('fab-cart-btn')) document.getElementById('fab-cart-btn').style.display = d.fabCart; if(document.getElementById('fab-ai-btn')) document.getElementById('fab-ai-btn').style.display = d.fabAi;
       const catContainer = document.getElementById('category-container'); if(catContainer) catContainer.style.display = d.cat;
 
-      if(tabId === 'belanja') { perbaruiTampilanKategori(); }
+      if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && document.getElementById('promo-slide-content')?.innerHTML) { pb.style.display = 'flex'; if((window.scrollY||0)<=8) pb.classList.remove('promo-collapsed','promo-hidden'); } }
       else { 
         document.querySelector('.promo-banner').style.display = 'none'; document.getElementById('recipe-section-wrapper').style.display = 'none'; document.getElementById('trending-section-wrapper').style.display = 'none';
         let reorderWrapper = document.getElementById('reorder-section-wrapper'); if (reorderWrapper) reorderWrapper.style.display = 'none';
@@ -1473,82 +1481,117 @@
 
       const cfg = window.__sedangLarisConfig || {enabled:true, limit:5};
       if (cfg.enabled === false) { renderTrending([]); return; }
+
       const limit = Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5));
       const token = ++trendingLoadToken;
 
       try {
-        const startToday = new Date();
-        startToday.setHours(0,0,0,0);
-        const startTs = firebase.firestore.Timestamp.fromDate(startToday);
-        const snap = await db.collection("transaksi").where("waktuTimestamp", ">=", startTs).get();
+        let snap = window.__trendingTransactionsSnapshot;
+
+        // Listener adalah sumber utama. Jika belum tersedia (misalnya saat awal
+        // koneksi), ambil data sekali sebagai fallback.
+        if (!snap) {
+          snap = await db.collection("transaksi").get();
+        }
         if (token !== trendingLoadToken) return;
 
+        const docs = [];
+        snap.forEach(doc => docs.push({ id: doc.id, data: doc.data() || {} }));
+
+        // Tentukan tanggal transaksi yang dipakai:
+        // 1. Utamakan hari ini jika ada transaksi.
+        // 2. Jika hari ini kosong, otomatis pakai tanggal transaksi TERAKHIR.
+        // Jadi kartu tidak blank walaupun hari ini/kemarin belum ada penjualan.
+        const getDateKey = (data) => {
+          let d = null;
+
+          if (data.waktuTimestamp) {
+            try {
+              if (typeof data.waktuTimestamp.toDate === 'function') {
+                d = data.waktuTimestamp.toDate();
+              } else if (data.waktuTimestamp.seconds) {
+                d = new Date(Number(data.waktuTimestamp.seconds) * 1000);
+              }
+            } catch (_) {}
+          }
+
+          if (!d && data.waktu) {
+            const parsed = new Date(data.waktu);
+            if (!isNaN(parsed.getTime())) d = parsed;
+          }
+
+          if (!d) return null;
+
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}`;
+        };
+
+        const dateKeys = docs.map(x => getDateKey(x.data)).filter(Boolean);
+        const today = new Date();
+        const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+        let targetDateKey = null;
+        if (dateKeys.includes(todayKey)) {
+          targetDateKey = todayKey;
+        } else if (dateKeys.length) {
+          targetDateKey = dateKeys.sort().pop();
+        }
+
+        if (!targetDateKey) {
+          // Tidak ada transaksi sama sekali.
+          renderTrending([]);
+          return;
+        }
+
         const itemCounts = {};
-        snap.forEach(doc => {
-          const data = doc.data() || {};
-          if (!Array.isArray(data.items)) return;
+        const byName = {};
+
+        Object.keys(databaseProduk).forEach(code => {
+          const nama = String(databaseProduk[code]?.nama || '').trim().toLowerCase();
+          if (nama) byName[nama] = code;
+        });
+
+        docs.forEach(({data}) => {
+          if (getDateKey(data) !== targetDateKey || !Array.isArray(data.items)) return;
+
           data.items.forEach(it => {
             const qty = Number(it.qty) || 0;
             if (qty <= 0) return;
+
             const code = String(it.code || '').trim();
-            if (code) itemCounts[code] = (itemCounts[code] || 0) + qty;
+            if (code && databaseProduk[code]) {
+              itemCounts[code] = (itemCounts[code] || 0) + qty;
+              return;
+            }
+
+            // Data transaksi lama kadang punya code berbeda dari ID produk.
+            // Cocokkan berdasarkan nama produk.
+            const nama = String(it.nama || '').trim().toLowerCase();
+            const matchedCode = byName[nama];
+            if (matchedCode) {
+              itemCounts[matchedCode] = (itemCounts[matchedCode] || 0) + qty;
+            }
           });
         });
 
-        const sortedCodes = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]);
-        let top = sortedCodes.filter(code => databaseProduk[code]).slice(0, limit);
-
-        // Data transaksi lama/tertentu bisa menyimpan code yang berbeda dari ID
-        // dokumen produk. Cocokkan juga berdasarkan nama agar kartu tidak hilang.
-        if (top.length === 0 && sortedCodes.length > 0) {
-          const byName = {};
-          Object.keys(databaseProduk).forEach(code => {
-            const nama = String(databaseProduk[code]?.nama || '').trim().toLowerCase();
-            if (nama) byName[nama] = code;
-          });
-          const fallbackCodes = [];
-          snap.forEach(doc => {
-            const data = doc.data() || {};
-            if (!Array.isArray(data.items)) return;
-            data.items.forEach(it => {
-              const qty = Number(it.qty) || 0;
-              const nama = String(it.nama || '').trim().toLowerCase();
-              const code = byName[nama];
-              if (code && qty > 0) itemCounts['__name__'+code] = (itemCounts['__name__'+code] || 0) + qty;
-            });
-          });
-          top = Object.keys(itemCounts)
-            .filter(k => k.indexOf('__name__') === 0)
-            .sort((a,b) => itemCounts[b] - itemCounts[a])
-            .map(k => k.replace('__name__',''))
-            .slice(0, limit);
-        }
+        const top = Object.keys(itemCounts)
+          .sort((a,b) => itemCounts[b] - itemCounts[a])
+          .slice(0, limit);
 
         renderTrending(top);
+
+        // Simpan info tanggal yang sedang ditampilkan agar mudah dicek/debug.
+        window.__sedangLarisDateKey = targetDateKey;
+        window.__sedangLarisIsToday = targetDateKey === todayKey;
       } catch (err) {
-        // Fallback transaksi lama tanpa waktuTimestamp. Jangan langsung
-        // menyembunyikan section hanya karena query utama gagal.
-        try {
-          const snap = await db.collection("transaksi").limit(100).get();
-          if (token !== trendingLoadToken) return;
-          const itemCounts = {};
-          const today = new Date().toLocaleDateString('id-ID');
-          snap.forEach(doc => {
-            const data = doc.data() || {};
-            const waktu = String(data.waktu || '');
-            if (!waktu.includes(today) || !Array.isArray(data.items)) return;
-            data.items.forEach(it => {
-              const qty = Number(it.qty) || 0;
-              const code = String(it.code || '').trim();
-              if (code && qty > 0 && databaseProduk[code]) itemCounts[code] = (itemCounts[code] || 0) + qty;
-            });
-          });
-          const top = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]).slice(0, limit);
-          renderTrending(top);
-        } catch (fallbackErr) {
-          console.error('Gagal memuat Sedang Laris:', fallbackErr);
-          // Pertahankan tampilan yang sudah ada bila sebelumnya sudah berhasil.
-          if (!document.querySelector('#trending-container .trending-card')) renderTrending([]);
+        console.error('Gagal memuat Sedang Laris:', err);
+
+        // Jangan menghapus tampilan lama ketika ada error jaringan/query.
+        // Jika belum pernah ada tampilan sama sekali, baru sembunyikan section.
+        if (!document.querySelector('#trending-container .trending-card')) {
+          renderTrending([]);
         }
       }
     }
