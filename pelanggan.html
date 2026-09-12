@@ -53,14 +53,27 @@
       content: ''; position: absolute; width: 72px; height: 72px; border: 1px solid rgba(255,255,255,.18);
       border-radius: 50%; left: -35px; top: 50%; transform: translateY(-50%);
     }
-    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 220px; }
-    .promo-slide { animation: promoOrbitIn .62s cubic-bezier(.2,.75,.25,1) both; transform-origin: 100% 50%; }
-    @keyframes promoOrbitIn { 0% { opacity: 0; transform: translateX(34px) rotateY(70deg) rotateZ(8deg) scale(.72); } 55% { opacity: 1; transform: translateX(-5px) rotateY(-10deg) rotateZ(-2deg) scale(1.03); } 100% { opacity: 1; transform: translateX(0) rotateY(0) rotateZ(0) scale(1); } }
-    .promo-banner.promo-collapsed { width: 24px !important; min-height: 24px !important; height: 24px; padding: 0 !important; right: -2px; border-radius: 50%; box-shadow: 0 4px 14px rgba(0,0,0,.2); cursor: pointer; }
+    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; }
+    .promo-slide { animation: promoOrbitIn .72s cubic-bezier(.22,.78,.2,1) both; transform-origin: 50% 50%; backface-visibility: hidden; }
+    @keyframes promoOrbitIn {
+      0%   { opacity: 0; transform: rotate(145deg) translateX(58px) rotate(-145deg) scale(.58); }
+      35%  { opacity: .9; transform: rotate(55deg) translateX(42px) rotate(-55deg) scale(.78); }
+      68%  { opacity: 1; transform: rotate(-14deg) translateX(9px) rotate(14deg) scale(1.04); }
+      100% { opacity: 1; transform: rotate(0deg) translateX(0) rotate(0deg) scale(1); }
+    }
+    .promo-banner.promo-collapsed {
+      width: 28px !important; min-width: 28px !important; min-height: 28px !important; height: 28px;
+      padding: 0 !important; right: -2px; border-radius: 50%;
+      box-shadow: 0 4px 14px rgba(0,0,0,.2); cursor: pointer;
+    }
     .promo-banner.promo-collapsed::before, .promo-banner.promo-collapsed .promo-stage { display: none; }
-    .promo-banner.promo-collapsed::after { content: '•'; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: #fff; font-size: 16px; line-height: 1; }
+    .promo-banner.promo-collapsed::after {
+      content: ''; display: block; width: 8px; height: 8px; margin: 10px;
+      border-radius: 50%; background: rgba(255,255,255,.95);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.16);
+    }
     .promo-banner.promo-hidden { opacity: 0; pointer-events: none; transform: translate(30px,-50%) scale(.75); }
-    .promo-banner { transition: width .35s ease, min-height .35s ease, height .35s ease, right .35s ease, opacity .28s ease, transform .35s ease, border-radius .35s ease, padding .35s ease; }
+    .promo-banner { transition: width .38s cubic-bezier(.2,.8,.2,1), min-height .38s cubic-bezier(.2,.8,.2,1), height .38s cubic-bezier(.2,.8,.2,1), right .38s cubic-bezier(.2,.8,.2,1), opacity .28s ease, transform .38s cubic-bezier(.2,.8,.2,1), border-radius .38s ease, padding .38s ease; }
     .promo-dot-row { transition: opacity .25s ease; }
     .promo-dot-row { display:flex; justify-content:center; gap:3px; margin-top:5px; }
     .promo-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,.45); }
@@ -868,13 +881,24 @@
         promoIndex = promoIndex % promoItems.length;
         const show = () => {
           const item = promoItems[promoIndex];
-          content.classList.remove('promo-slide'); void content.offsetWidth; content.classList.add('promo-slide');
+
+          // Ganti isi setelah reflow agar setiap produk mendapat animasi orbit baru.
+          content.classList.remove('promo-slide');
           content.innerHTML = `${item.foto ? `<img src="${escape(item.foto)}" alt="" style="width:48px;height:42px;object-fit:cover;border-radius:12px;display:block;margin:0 auto 4px;">` : `<div style="font-size:1.35rem;margin-bottom:3px;">🛍️</div>`}
             <div style="font-size:.57rem;font-weight:800;opacity:.9;letter-spacing:.5px;">PROMO</div>
             <div style="font-size:.68rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${escape(item.nama)}</div>
             <div style="font-size:.66rem;font-weight:800;margin-top:2px;">Rp ${item.harga.toLocaleString('id-ID')}</div>`;
+          void content.offsetWidth;
+          content.classList.add('promo-slide');
+
           dots.innerHTML = promoItems.map((_, i) => `<span class="promo-dot ${i === promoIndex ? 'active' : ''}"></span>`).join('');
-          banner.onclick = () => openProductDetail(String(item.code).replace(/'/g, "\\'"));
+          banner.onclick = () => {
+            if (banner.classList.contains('promo-collapsed')) {
+              banner.classList.remove('promo-collapsed');
+              return;
+            }
+            openProductDetail(String(item.code).replace(/'/g, "\'"));
+          };
           promoIndex = (promoIndex + 1) % promoItems.length;
         };
         show();
@@ -892,22 +916,26 @@
       let ticking = false;
       const update = () => {
         ticking = false;
-        if (!document.getElementById('belanja')?.classList.contains('active')) {
+
+        // Promo hanya aktif sebagai floating UI di halaman Belanja/Home.
+        const isHome = document.getElementById('belanja')?.classList.contains('active');
+        if (!isHome) {
           banner.classList.remove('promo-collapsed', 'promo-hidden');
           return;
         }
-        const y = window.scrollY || document.documentElement.scrollTop || 0;
-        const goingDown = y > lastY + 3;
-        const goingUp = y < lastY - 3;
+
+        const y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+
+        // Mentok paling atas = kembali menjadi setengah lingkaran penuh.
+        // Setelah meninggalkan posisi atas, baik turun maupun naik, promo
+        // tetap kecil supaya tidak mengganggu isi halaman.
         if (y <= 8) {
           banner.classList.remove('promo-collapsed', 'promo-hidden');
-        } else if (goingDown) {
-          banner.classList.add('promo-collapsed');
-          banner.classList.remove('promo-hidden');
-        } else if (goingUp) {
+        } else {
           banner.classList.add('promo-collapsed');
           banner.classList.remove('promo-hidden');
         }
+
         lastY = y;
       };
       window.addEventListener('scroll', () => {
