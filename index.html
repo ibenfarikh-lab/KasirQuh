@@ -1848,6 +1848,70 @@
       }
     })();
   </script>
+
+<!-- =========================================================
+     KERANGKA: BERANDA PELANGGAN
+     Tahap 1: UI kerangka saja. Belum mengubah logika/data.
+     ========================================================= -->
+<section id="admin-beranda-pelanggan" class="admin-beranda-pelanggan" style="margin-top:18px;">
+  <div style="background:#000;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;color:#fff;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-weight:800;font-size:1rem;">📱 Beranda Pelanggan</div>
+        <div style="font-size:.78rem;opacity:.72;margin-top:3px;">Kelola fitur yang tampil di halaman utama pelanggan.</div>
+      </div>
+      <button type="button" onclick="adminPreviewCustomerHome()" style="border:1px solid rgba(255,255,255,.2);background:#fff;color:#111;border-radius:10px;padding:8px 11px;font-weight:700;cursor:pointer;">👁️ Preview</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🪙 Koin Warga</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pengaturan program koin.</div>
+        <button type="button" onclick="adminHomeFeaturePlaceholder('Koin Warga')" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🔥 Promo Toko Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pilih produk yang ingin dipromosikan.</div>
+        <button type="button" onclick="adminHomeFeaturePlaceholder('Promo Toko Hari Ini')" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🏠 Stok Rumah Habis</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan stok barang.</div>
+        <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
+          <span>Tampilkan</span>
+          <input type="checkbox" id="admin-home-stock-toggle" checked>
+        </label>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🍳 Ide Masak Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Menu, foto, deskripsi, dan bahan terkait.</div>
+        <button type="button" onclick="adminHomeFeaturePlaceholder('Ide Masak Hari Ini')" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">📈 Sedang Laris Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis dari transaksi penjualan.</div>
+        <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
+          <span>Mode otomatis</span>
+          <input type="checkbox" checked disabled>
+        </label>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function adminHomeFeaturePlaceholder(name) {
+  alert(name + ': kerangka sudah siap. Detail pengaturan akan kita isi pada tahap berikutnya.');
+}
+function adminPreviewCustomerHome() {
+  alert('Preview Beranda Pelanggan: kerangka sudah siap. Tampilan preview akan kita sambungkan pada tahap berikutnya.');
+}
+</script>
+
 </body>
 </html>
 
