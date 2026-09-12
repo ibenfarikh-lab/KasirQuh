@@ -42,32 +42,43 @@
       margin: 2px 0 0; font-size: .72rem; color: var(--text-muted); font-weight: 600;
     }
     .promo-banner {
-      position: absolute; right: 6px; top: 4px;
-      width: 122px; min-height: 92px; padding: 8px 10px; box-sizing: border-box;
-      border-radius: 16px; color: white; z-index: 10; overflow: hidden;
-      background: linear-gradient(145deg, #2563eb, #7c3aed);
-      box-shadow: 0 5px 16px rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.25);
+      position: absolute; right: 4px; top: 2px;
+      width: 124px; min-height: 104px; padding: 7px; box-sizing: border-box;
+      border-radius: 17px; color: #111827; z-index: 10; overflow: hidden; cursor: pointer;
+      background: linear-gradient(145deg, #fff7cf 0%, #fff 58%, #ffe6b0 100%);
+      box-shadow: 0 6px 18px rgba(37,99,235,.18); border: 1px solid rgba(245,158,11,.45);
       display: none; align-items: center; justify-content: center;
     }
     .promo-banner::before {
-      content: ''; position: absolute; width: 52px; height: 52px; border: 1px solid rgba(255,255,255,.18);
-      border-radius: 50%; left: -25px; top: 50%; transform: translateY(-50%);
+      content: ''; position: absolute; width: 62px; height: 62px;
+      border: 1px solid rgba(245,158,11,.18); border-radius: 50%;
+      left: -30px; bottom: -30px;
     }
-    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; }
+    .promo-banner::after {
+      content: '🔥 PROMO'; position: absolute; left: 7px; top: 6px;
+      background: linear-gradient(90deg,#ef4444,#f97316); color: #fff;
+      font-size: .54rem; font-weight: 900; letter-spacing: .3px;
+      padding: 3px 7px; border-radius: 10px; box-shadow: 0 2px 6px rgba(239,68,68,.22);
+    }
+    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; padding-top: 10px; }
     .promo-slide {
       animation: promoSpin3x 3.2s linear both;
       transform-origin: 50% 50%; backface-visibility: visible; will-change: transform;
     }
+    .promo-product-img { width: 46px; height: 42px; object-fit: cover; border-radius: 10px; display: block; margin: 0 auto 3px; background: #fff; box-shadow: 0 2px 7px rgba(0,0,0,.1); }
+    .promo-product-name { font-size: .66rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+    .promo-price-label { font-size: .5rem; color: #64748b; font-weight: 700; margin-top: 1px; }
+    .promo-new-price { font-size: .78rem; font-weight: 900; color: #dc2626; line-height: 1.05; }
+    .promo-save { display:inline-block; margin-top:3px; padding:2px 5px; border-radius:7px; background:#fbbf24; color:#7c2d12; font-size:.5rem; font-weight:900; }
     @keyframes promoSpin3x {
       0% { opacity: 0; transform: rotate(0deg); }
       8% { opacity: 1; transform: rotate(86.4deg); }
       100% { opacity: 1; transform: rotate(1080deg); }
     }
-    .promo-dot-row { display:flex; justify-content:center; gap:3px; margin-top:5px; }
-    .promo-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,.45); }
-    .promo-dot.active { background:#fff; }
     @media (max-width: 420px) {
-      .promo-banner { width: 108px; min-height: 84px; padding: 7px 8px; right: 2px; }
+      .customer-home-header { padding-right: 126px; min-height: 108px; }
+      .promo-banner { width: 116px; min-height: 102px; right: 2px; padding: 6px; }
+      .promo-product-img { width: 42px; height: 39px; }
     }
 
     .customer-running-wrap { overflow:hidden; white-space:nowrap; margin-top:5px; padding:2px 0; max-width:100%; }
@@ -325,7 +336,6 @@
         <div class="promo-banner no-print" id="promo-banner-section" aria-label="Promo toko">
           <div class="promo-stage" id="promo-stage">
             <div id="promo-slide-content" class="promo-slide">Promo</div>
-            <div class="promo-dot-row" id="promo-dot-row"></div>
           </div>
         </div>
       </div>
@@ -893,7 +903,6 @@
       const render = (data) => {
         const banner = document.getElementById('promo-banner-section');
         const content = document.getElementById('promo-slide-content');
-        const dots = document.getElementById('promo-dot-row');
         if (!banner || !content) return;
         promoItems = [];
         if (data && data.enabled !== false && Array.isArray(data.codes)) {
@@ -913,14 +922,15 @@
 
           // Ganti isi setelah reflow agar setiap produk mendapat animasi orbit baru.
           content.classList.remove('promo-slide');
-          content.innerHTML = `${item.foto ? `<img src="${escape(item.foto)}" alt="" style="width:48px;height:42px;object-fit:cover;border-radius:12px;display:block;margin:0 auto 4px;">` : `<div style="font-size:1.35rem;margin-bottom:3px;">🛍️</div>`}
-            <div style="font-size:.57rem;font-weight:800;opacity:.9;letter-spacing:.5px;">PROMO</div>
-            <div style="font-size:.68rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">${escape(item.nama)}</div>
-            <div style="font-size:.66rem;font-weight:800;margin-top:2px;">Rp ${item.harga.toLocaleString('id-ID')}</div>`;
+          const harga = Number(item.harga || 0);
+          content.innerHTML = `${item.foto ? `<img class="promo-product-img" src="${escape(item.foto)}" alt="${escape(item.nama)}">` : `<div class="promo-product-img" style="font-size:1.35rem;display:flex;align-items:center;justify-content:center;">🛍️</div>`}
+            <div class="promo-product-name">${escape(item.nama)}</div>
+            <div class="promo-price-label">Harga saat ini</div>
+            <div class="promo-new-price">Rp ${harga.toLocaleString('id-ID')}</div>
+            <div class="promo-save">Tap untuk lihat produk</div>`;
           void content.offsetWidth;
           content.classList.add('promo-slide');
 
-          dots.innerHTML = promoItems.map((_, i) => `<span class="promo-dot ${i === promoIndex ? 'active' : ''}"></span>`).join('');
           banner.onclick = () => {
             openProductDetail(String(item.code).replace(/'/g, "\'"));
           };
