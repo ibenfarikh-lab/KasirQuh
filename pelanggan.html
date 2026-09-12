@@ -499,18 +499,18 @@
         <button onclick="tutupKolomPencarian()" style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;">✕</button>
       </div>
     </div>
-    <div id="promoTokoModal" class="modal-backdrop" onclick="if(event.target === this) tutupPromoTokoPelanggan()">
-    <div class="modal-content" style="width:100%;max-width:430px;max-height:82vh;overflow:auto;border-radius:20px;padding:14px;background:var(--card-bg);border:1px solid var(--border-color);box-shadow:0 18px 45px rgba(0,0,0,.28);">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">
-        <div>
-          <div style="font-size:1.05rem;font-weight:900;color:var(--text-color);">🎁 Ada Promo Nih!</div>
-          <div style="font-size:.7rem;color:var(--text-muted);margin-top:2px;">Penawaran pilihan dari toko hari ini.</div>
+    <div id="promoTokoModal" class="modal-backdrop promo-floating-backdrop" onclick="if(event.target === this) tutupPromoTokoPelanggan()">
+      <div class="promo-floating-card" role="dialog" aria-modal="true" aria-label="Promo toko">
+        <button type="button" class="promo-floating-close" onclick="tutupPromoTokoPelanggan()" aria-label="Tutup promo">✕</button>
+        <div class="promo-floating-badge">🎁 PROMO</div>
+        <div id="promo-toko-slider" class="promo-toko-slider"></div>
+        <div class="promo-floating-nav">
+          <button type="button" id="promo-prev-btn" onclick="geserPromoTokoPelanggan(-1)" aria-label="Promo sebelumnya">‹</button>
+          <span id="promo-counter">1 / 1</span>
+          <button type="button" id="promo-next-btn" onclick="geserPromoTokoPelanggan(1)" aria-label="Promo berikutnya">›</button>
         </div>
-        <button type="button" onclick="tutupPromoTokoPelanggan()" aria-label="Tutup promo" style="width:32px;height:32px;border:0;border-radius:50%;background:var(--input-bg);color:var(--text-color);font-size:1rem;cursor:pointer;">✕</button>
       </div>
-      <div id="promo-toko-list" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
-  </div>
 
   <!-- 1. HALAMAN BELANJA -->
     <div id="belanja" class="tab-content active" style="display: block;">
@@ -1094,33 +1094,46 @@
 
     let promoTokoPelangganCfg = { enabled: false, codes: [] };
 
+    let promoTokoPelangganIndex = 0;
+
+    function getPromoTokoPelangganCodes() {
+      return Array.isArray(promoTokoPelangganCfg.codes) ? promoTokoPelangganCfg.codes.filter(code => databaseProduk[code] && Number(databaseProduk[code].stok || 0) > 0) : [];
+    }
+
     function renderPromoTokoPelanggan() {
       const banner = document.getElementById('promo-banner-section');
-      const content = document.getElementById('promo-slide-content');
-      const list = document.getElementById('promo-toko-list');
-      const codes = Array.isArray(promoTokoPelangganCfg.codes) ? promoTokoPelangganCfg.codes.filter(code => databaseProduk[code] && Number(databaseProduk[code].stok || 0) > 0) : [];
+      const slider = document.getElementById('promo-toko-slider');
+      const codes = getPromoTokoPelangganCodes();
       const active = promoTokoPelangganCfg.enabled !== false && codes.length > 0;
       if (banner) { banner.style.display = active ? 'flex' : 'none'; banner.setAttribute('aria-hidden', active ? 'false' : 'true'); }
-      if (content) content.innerHTML = active ? `<span>${codes.length} ${codes.length === 1 ? 'produk pilihan' : 'produk pilihan'}</span>` : '';
-      if (list) {
-        list.innerHTML = active ? codes.map(code => {
-          const p = databaseProduk[code];
-          const hargaRaw = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
-          const harga = typeof hargaRaw === 'number' ? hargaRaw : (parseInt(String(hargaRaw).replace(/[^0-9]/g,''),10) || 0);
-          const foto = p.foto || '';
-          const safeCode = escapeHtml(String(code));
-          return `<div style="display:flex;gap:10px;align-items:center;padding:9px;border-radius:13px;background:var(--input-bg);border:1px solid var(--border-color);">
-            ${foto ? `<img src="${escapeHtml(foto)}" alt="" style="width:58px;height:58px;object-fit:cover;border-radius:10px;flex-shrink:0;" onerror="this.style.display='none'">` : '<div style="width:58px;height:58px;border-radius:10px;background:var(--card-bg);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;">🎁</div>'}
-            <div style="min-width:0;flex:1;">
-              <div style="font-size:.82rem;font-weight:900;color:var(--text-color);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(String(p.nama || 'Produk'))}</div>
-              <div style="font-size:.68rem;color:var(--text-muted);margin-top:2px;">Harga hari ini</div>
-              <div style="font-size:.88rem;font-weight:900;color:#e11d48;margin-top:1px;">Rp ${harga.toLocaleString('id-ID')}</div>
-            </div>
-            <button type="button" data-promo-code="${safeCode}" class="promo-add-btn" style="border:0;border-radius:9px;padding:7px 8px;background:#16a34a;color:#fff;font-size:.65rem;font-weight:900;cursor:pointer;">+ Keranjang</button>
-          </div>`;
-        }).join('') : '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:.78rem;">Belum ada promo aktif.</div>';
-        list.querySelectorAll('.promo-add-btn').forEach(btn => btn.addEventListener('click', () => beliPromoTokoPelanggan(btn.getAttribute('data-promo-code'))));
-      }
+      if (!slider) return;
+      if (!active) { slider.innerHTML=''; promoTokoPelangganIndex=0; return; }
+      if (promoTokoPelangganIndex >= codes.length) promoTokoPelangganIndex = 0;
+      slider.innerHTML = '<div class="promo-toko-track">' + codes.map(code => {
+        const p=databaseProduk[code];
+        const raw=p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
+        let harga=typeof raw==='number' ? raw : (parseInt(String(raw).replace(/[^0-9]/g,''),10)||0);
+        const satuan=(p.satuan||'Pcs').toLowerCase();
+        if(satuan==='kg'||satuan==='kilogram') harga*=10;
+        const foto=p.foto||'';
+        return `<div class="promo-detail">${foto ? `<img src="${escapeHtml(foto)}" alt="${escapeHtml(String(p.nama||'Produk promo'))}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}<div class="promo-detail-placeholder" style="${foto?'display:none;':''}">🎁</div><div class="promo-detail-name">${escapeHtml(String(p.nama||'Produk'))}</div><div class="promo-detail-price-label">Harga promo hari ini</div><div class="promo-detail-price">Rp ${harga.toLocaleString('id-ID')}</div><div class="promo-detail-stock">Tersedia: ${p.stok||0} ${escapeHtml(String(p.satuan||'Pcs'))}</div><button class="promo-detail-add" type="button" data-promo-code="${escapeHtml(String(code))}">+ Masukkan Keranjang</button></div>`;
+      }).join('') + '</div>';
+      slider.querySelectorAll('.promo-detail-add').forEach(btn => btn.addEventListener('click', () => beliPromoTokoPelanggan(btn.getAttribute('data-promo-code'))));
+      updatePromoTokoSlider();
+    }
+
+    function updatePromoTokoSlider() {
+      const track=document.querySelector('#promo-toko-slider .promo-toko-track');
+      const codes=getPromoTokoPelangganCodes();
+      if(track) track.style.transform=`translateX(-${promoTokoPelangganIndex*100}%)`;
+      const counter=document.getElementById('promo-counter'); if(counter) counter.textContent=`${codes.length ? promoTokoPelangganIndex+1 : 1} / ${codes.length||1}`;
+      const prev=document.getElementById('promo-prev-btn'), next=document.getElementById('promo-next-btn');
+      if(prev) prev.disabled=promoTokoPelangganIndex<=0; if(next) next.disabled=promoTokoPelangganIndex>=codes.length-1;
+    }
+
+    function geserPromoTokoPelanggan(dir) {
+      const codes=getPromoTokoPelangganCodes(); if(!codes.length) return;
+      promoTokoPelangganIndex=Math.max(0,Math.min(codes.length-1,promoTokoPelangganIndex+dir)); updatePromoTokoSlider();
     }
 
     function initPromoTokoPelanggan() {
@@ -1145,8 +1158,16 @@
     }
 
     function bukaPromoTokoPelanggan() {
+      promoTokoPelangganIndex = 0;
       renderPromoTokoPelanggan();
       const modal = document.getElementById('promoTokoModal');
+      const slider = document.getElementById('promo-toko-slider');
+      if (slider && !slider.dataset.swipeReady) {
+        let sx=0;
+        slider.addEventListener('touchstart', e => { sx=e.touches[0].clientX; }, {passive:true});
+        slider.addEventListener('touchend', e => { const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>45) geserPromoTokoPelanggan(dx<0?1:-1); }, {passive:true});
+        slider.dataset.swipeReady='1';
+      }
       if (modal) modal.classList.add('show');
     }
 
@@ -2418,4 +2439,42 @@ body.theme-colorful-v2 .products-container {
   background-image: none !important;
 }
 
+
+    /* PROMO PELANGGAN — tombol kecil, detail baru muncul saat diklik */
+    .customer-home-header { padding-right: 112px !important; min-height: 104px !important; }
+    .promo-banner { width: 104px !important; min-height: 42px !important; height: 42px !important; right: 7px !important; top: 10px !important; padding: 5px 7px !important; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(225,29,72,.22) !important; }
+    .promo-banner::before, .promo-banner::after { display:none !important; }
+    .promo-stage { padding-top:0 !important; }
+    .promo-stage > div:first-child { font-size:.68rem !important; }
+    .promo-stage > div:nth-child(2), .promo-slide-content { display:none !important; }
+    .promo-floating-backdrop { z-index: 9999 !important; background: rgba(2,6,23,.52) !important; backdrop-filter: blur(3px); padding: 16px !important; }
+    .promo-floating-card { position:relative; width:min(330px,92vw); max-height:82vh; overflow:hidden; border-radius:24px; padding:14px; background:var(--card-bg); color:var(--text-color); box-shadow:0 22px 60px rgba(0,0,0,.34); border:1px solid var(--border-color); }
+    .promo-floating-close { position:absolute; right:10px; top:10px; z-index:4; width:32px; height:32px; border:0; border-radius:50%; background:var(--input-bg); color:var(--text-color); font-weight:900; cursor:pointer; }
+    .promo-floating-badge { display:inline-flex; align-items:center; padding:5px 9px; border-radius:999px; background:#ef4444; color:#fff; font-size:.62rem; font-weight:900; margin-bottom:8px; }
+    .promo-toko-slider { width:100%; overflow:hidden; touch-action:pan-y; }
+    .promo-toko-track { display:flex; transition:transform .28s ease; will-change:transform; }
+    .promo-detail { flex:0 0 100%; min-width:100%; box-sizing:border-box; text-align:center; padding:4px 4px 8px; }
+    .promo-detail img, .promo-detail-placeholder { width:100%; height:190px; object-fit:cover; border-radius:18px; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-size:3rem; }
+    .promo-detail-name { margin:10px 4px 3px; font-size:1.05rem; font-weight:900; }
+    .promo-detail-price-label { font-size:.68rem; color:var(--text-muted); }
+    .promo-detail-price { margin-top:2px; font-size:1.15rem; font-weight:900; color:#e11d48; }
+    .promo-detail-stock { margin-top:3px; font-size:.68rem; color:var(--text-muted); }
+    .promo-detail-add { margin-top:10px; width:100%; border:0; border-radius:12px; padding:10px; background:#16a34a; color:#fff; font-size:.78rem; font-weight:900; cursor:pointer; }
+    .promo-floating-nav { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:2px; }
+    .promo-floating-nav button { width:32px; height:32px; border:0; border-radius:50%; background:#2563eb; color:#fff; font-size:1.35rem; line-height:1; cursor:pointer; }
+    .promo-floating-nav button:disabled { opacity:.3; cursor:default; }
+    .promo-floating-nav span { min-width:48px; text-align:center; font-size:.68rem; font-weight:900; color:var(--text-muted); }
+
+    /* Semua card pelanggan: colorful solid, tanpa gradient */
+    .recipe-card, .reorder-card, .trending-card, .inv-card, .catalog-list-item { background-image:none !important; }
+    .recipe-card:nth-child(5n+1), .reorder-card:nth-child(5n+1), .trending-card:nth-child(5n+1), .inv-card:nth-child(5n+1), .catalog-list-item:nth-child(5n+1) { background:#2563eb !important; color:#fff !important; }
+    .recipe-card:nth-child(5n+2), .reorder-card:nth-child(5n+2), .trending-card:nth-child(5n+2), .inv-card:nth-child(5n+2), .catalog-list-item:nth-child(5n+2) { background:#f97316 !important; color:#fff !important; }
+    .recipe-card:nth-child(5n+3), .reorder-card:nth-child(5n+3), .trending-card:nth-child(5n+3), .inv-card:nth-child(5n+3), .catalog-list-item:nth-child(5n+3) { background:#10b981 !important; color:#fff !important; }
+    .recipe-card:nth-child(5n+4), .reorder-card:nth-child(5n+4), .trending-card:nth-child(5n+4), .inv-card:nth-child(5n+4), .catalog-list-item:nth-child(5n+4) { background:#8b5cf6 !important; color:#fff !important; }
+    .recipe-card:nth-child(5n+5), .reorder-card:nth-child(5n+5), .trending-card:nth-child(5n+5), .inv-card:nth-child(5n+5), .catalog-list-item:nth-child(5n+5) { background:#ec4899 !important; color:#fff !important; }
+    .trending-card *, .reorder-card *, .recipe-card *, .inv-card *, .catalog-list-item * { }
+    .trending-card > div:first-of-type, .reorder-card > div { }
+    .inv-card [style*="color: #fde047"], .trending-card [style*="color: #fde047"], .reorder-card [style*="color: #fde047"] { color:#fff !important; }
+    .recipe-card .recipe-btn-action { background:#111827 !important; color:#fff !important; border:none !important; }
+    .btn-quick-cart-icon { background:#111827 !important; color:#fff !important; }
 </style>
