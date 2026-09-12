@@ -437,7 +437,10 @@ const translations = {
 };
 
 let currentLang = localStorage.getItem('setting_lang_v13') || 'id';
-let currentTheme = localStorage.getItem('setting_theme_v13') || 'light';
+// Jika belum ada preferensi tema tersimpan (device baru / cache dibersihkan),
+// gunakan Colorful v.2 sebagai tema awal. Setelah admin memilih manual,
+// pilihan tersebut disimpan di localStorage seperti biasa.
+let currentTheme = localStorage.getItem('setting_theme_v13') || 'colorful-v2';
 
 function applyTranslations() {
   const lang = currentLang;

@@ -54,12 +54,14 @@
       border-radius: 50%; left: -35px; top: 50%; transform: translateY(-50%);
     }
     .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; }
-    .promo-slide { animation: promoOrbitIn .72s cubic-bezier(.22,.78,.2,1) both; transform-origin: 50% 50%; backface-visibility: hidden; }
-    @keyframes promoOrbitIn {
-      0%   { opacity: 0; transform: rotate(145deg) translateX(58px) rotate(-145deg) scale(.58); }
-      35%  { opacity: .9; transform: rotate(55deg) translateX(42px) rotate(-55deg) scale(.78); }
-      68%  { opacity: 1; transform: rotate(-14deg) translateX(9px) rotate(14deg) scale(1.04); }
-      100% { opacity: 1; transform: rotate(0deg) translateX(0) rotate(0deg) scale(1); }
+    .promo-slide { animation: promoOrbit3x 3.2s cubic-bezier(.22,.78,.2,1) both; transform-origin: 50% 50%; backface-visibility: hidden; }
+    @keyframes promoOrbit3x {
+      0%   { opacity: 0; transform: rotate(0deg) translateX(58px) rotate(0deg) scale(.58); }
+      8%   { opacity: .9; transform: rotate(180deg) translateX(42px) rotate(-180deg) scale(.76); }
+      25%  { opacity: 1; transform: rotate(360deg) translateX(28px) rotate(-360deg) scale(.86); }
+      50%  { opacity: 1; transform: rotate(720deg) translateX(18px) rotate(-720deg) scale(.96); }
+      75%  { opacity: 1; transform: rotate(900deg) translateX(8px) rotate(-900deg) scale(1.03); }
+      100% { opacity: 1; transform: rotate(1080deg) translateX(0) rotate(-1080deg) scale(1); }
     }
     .promo-banner.promo-collapsed {
       width: 28px !important; min-width: 28px !important; min-height: 28px !important; height: 28px;
@@ -902,7 +904,7 @@
           promoIndex = (promoIndex + 1) % promoItems.length;
         };
         show();
-        if (promoItems.length > 1) promoTimer = setInterval(show, 4500);
+        if (promoItems.length > 1) promoTimer = setInterval(show, 4500); // 3 putaran selesai dulu (3.2s), lalu jeda singkat sebelum produk berikutnya
       };
       db.collection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(snap => render(snap.exists ? snap.data() : null), () => {});
       window.__promoRenderHook = () => db.collection('pengaturan').doc('beranda_pelanggan_promo').get().then(s => render(s.exists ? s.data() : null)).catch(() => {});
