@@ -769,7 +769,7 @@
 
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "TokoQuh", phone: "089" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
-    let isProductsLoaded = false; let currentPosPage = 1; let itemsPerPagePos = 24; let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
+    let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24; let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
     let activeKategoriPelanggan = 'Semua'; let toastTimeout;
     let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = true;
 
@@ -1335,6 +1335,7 @@
       db.collection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
         window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        isTrendingConfigLoaded = true;
         muatBarangLarisHariIni();
       });
     }
@@ -1368,42 +1369,91 @@
       if (tabId === 'pengaturan') { document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto'; document.getElementById('setting-cust-view').value = catalogViewMode; if (currentCustomerPhone) { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => { if (!snap.empty) { let data = snap.docs[0].data(); document.getElementById('setting-cust-name').value = data.nama || ""; document.getElementById('setting-cust-phone').value = data.phone || ""; document.getElementById('setting-cust-address').value = data.alamat || ""; } }); } }
     }
 
-    function muatBarangLarisHariIni() {
+    async function muatBarangLarisHariIni() {
+      // Jangan pernah mengosongkan section hanya karena listener Firebase datang
+      // dalam urutan yang berbeda. Produk dan konfigurasi harus siap lebih dulu.
+      if (!isProductsLoaded || !isTrendingConfigLoaded) return;
+
       const cfg = window.__sedangLarisConfig || {enabled:true, limit:5};
       if (cfg.enabled === false) { renderTrending([]); return; }
       const limit = Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5));
-      const startToday = new Date();
-      startToday.setHours(0,0,0,0);
-      const startTs = firebase.firestore.Timestamp.fromDate(startToday);
-      db.collection("transaksi").where("waktuTimestamp", ">=", startTs).get().then(snap => {
-        let itemCounts = {};
+      const token = ++trendingLoadToken;
+
+      try {
+        const startToday = new Date();
+        startToday.setHours(0,0,0,0);
+        const startTs = firebase.firestore.Timestamp.fromDate(startToday);
+        const snap = await db.collection("transaksi").where("waktuTimestamp", ">=", startTs).get();
+        if (token !== trendingLoadToken) return;
+
+        const itemCounts = {};
         snap.forEach(doc => {
-          const data = doc.data();
-          if (data.items) data.items.forEach(it => {
+          const data = doc.data() || {};
+          if (!Array.isArray(data.items)) return;
+          data.items.forEach(it => {
             const qty = Number(it.qty) || 0;
-            if (it.code && qty > 0) itemCounts[it.code] = (itemCounts[it.code] || 0) + qty;
+            if (qty <= 0) return;
+            const code = String(it.code || '').trim();
+            if (code) itemCounts[code] = (itemCounts[code] || 0) + qty;
           });
         });
+
         const sortedCodes = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]);
-        const top = sortedCodes.filter(c => databaseProduk[c] && Number(databaseProduk[c].stok || 0) > 0).slice(0, limit);
-        renderTrending(top);
-      }).catch(() => {
-        // Fallback untuk transaksi lama yang belum memiliki waktuTimestamp.
-        db.collection("transaksi").orderBy("waktuTimestamp", "desc").limit(50).get().then(snap => {
-          let itemCounts = {};
+        let top = sortedCodes.filter(code => databaseProduk[code]).slice(0, limit);
+
+        // Data transaksi lama/tertentu bisa menyimpan code yang berbeda dari ID
+        // dokumen produk. Cocokkan juga berdasarkan nama agar kartu tidak hilang.
+        if (top.length === 0 && sortedCodes.length > 0) {
+          const byName = {};
+          Object.keys(databaseProduk).forEach(code => {
+            const nama = String(databaseProduk[code]?.nama || '').trim().toLowerCase();
+            if (nama) byName[nama] = code;
+          });
+          const fallbackCodes = [];
           snap.forEach(doc => {
-            const data = doc.data();
-            const isToday = (data.waktu || "").includes(new Date().toLocaleDateString('id-ID'));
-            if (isToday && data.items) data.items.forEach(it => {
+            const data = doc.data() || {};
+            if (!Array.isArray(data.items)) return;
+            data.items.forEach(it => {
               const qty = Number(it.qty) || 0;
-              if (it.code && qty > 0) itemCounts[it.code] = (itemCounts[it.code] || 0) + qty;
+              const nama = String(it.nama || '').trim().toLowerCase();
+              const code = byName[nama];
+              if (code && qty > 0) itemCounts['__name__'+code] = (itemCounts['__name__'+code] || 0) + qty;
             });
           });
-          const sortedCodes = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]);
-          const top = sortedCodes.filter(c => databaseProduk[c] && Number(databaseProduk[c].stok || 0) > 0).slice(0, limit);
+          top = Object.keys(itemCounts)
+            .filter(k => k.indexOf('__name__') === 0)
+            .sort((a,b) => itemCounts[b] - itemCounts[a])
+            .map(k => k.replace('__name__',''))
+            .slice(0, limit);
+        }
+
+        renderTrending(top);
+      } catch (err) {
+        // Fallback transaksi lama tanpa waktuTimestamp. Jangan langsung
+        // menyembunyikan section hanya karena query utama gagal.
+        try {
+          const snap = await db.collection("transaksi").limit(100).get();
+          if (token !== trendingLoadToken) return;
+          const itemCounts = {};
+          const today = new Date().toLocaleDateString('id-ID');
+          snap.forEach(doc => {
+            const data = doc.data() || {};
+            const waktu = String(data.waktu || '');
+            if (!waktu.includes(today) || !Array.isArray(data.items)) return;
+            data.items.forEach(it => {
+              const qty = Number(it.qty) || 0;
+              const code = String(it.code || '').trim();
+              if (code && qty > 0 && databaseProduk[code]) itemCounts[code] = (itemCounts[code] || 0) + qty;
+            });
+          });
+          const top = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]).slice(0, limit);
           renderTrending(top);
-        }).catch(() => renderTrending([]));
-      });
+        } catch (fallbackErr) {
+          console.error('Gagal memuat Sedang Laris:', fallbackErr);
+          // Pertahankan tampilan yang sudah ada bila sebelumnya sudah berhasil.
+          if (!document.querySelector('#trending-container .trending-card')) renderTrending([]);
+        }
+      }
     }
 
     function setupAutoScrollInteraction(containerId) {
