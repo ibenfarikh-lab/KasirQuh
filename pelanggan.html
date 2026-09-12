@@ -306,6 +306,13 @@
   </div>
 
   <div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
+    
+    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
+        <button onclick="tutupKolomPencarian()" style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;">✕</button>
+      </div>
+    </div>
     <!-- 1. HALAMAN BELANJA -->
     <div id="belanja" class="tab-content active" style="display: block;">
       <div class="customer-home-header no-print" id="customer-home-header">
@@ -512,6 +519,9 @@
 
   <div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
     <button id="fab-ai-btn" class="fab-main fab-ai-bounce" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;">😀</button>
+    <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;">
+      <svg viewBox="0 0 24 24" width="20" height="20" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg>
+    </button>
     <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.89-2-1.99-2z"/></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
   </div>
 
@@ -1204,6 +1214,23 @@
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
     function toggleMenuModal() { document.getElementById("menuToggleModal").classList.toggle("show"); }
 
+    function bukaKolomPencarian() {
+      const searchContainer = document.getElementById("sticky-search-container");
+      if (searchContainer) {
+        searchContainer.style.display = "block";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => document.getElementById("inventory-search-input")?.focus(), 200);
+      }
+    }
+
+    function tutupKolomPencarian() {
+      const input = document.getElementById("inventory-search-input");
+      const searchContainer = document.getElementById("sticky-search-container");
+      if (input) input.value = "";
+      if (searchContainer) searchContainer.style.display = "none";
+      filterKatalogPelanggan("");
+    }
+
     function pilihKategoriPelanggan(kategori) {
       activeKategoriPelanggan = kategori;
       document.querySelectorAll('.chip-btn').forEach(btn => { if(btn.innerText.includes(kategori) && (kategori !== 'Semua' || btn.innerText === 'Semua')) btn.classList.add('active'); else btn.classList.remove('active'); });
@@ -1497,6 +1524,14 @@
       let d = displays[tabId];
       document.getElementById('bottom-bar-title').innerText = d.title; document.getElementById('pagination-box').style.display = d.pBox;
       if(document.getElementById('fab-cart-btn')) document.getElementById('fab-cart-btn').style.display = d.fabCart; if(document.getElementById('fab-ai-btn')) document.getElementById('fab-ai-btn').style.display = d.fabAi;
+      const searchContainer = document.getElementById('sticky-search-container');
+      const searchFab = document.getElementById('fab-search-btn');
+      if (tabId === 'belanja') {
+        if (searchFab) searchFab.style.display = 'flex';
+      } else {
+        if (searchContainer) searchContainer.style.display = 'none';
+        if (searchFab) searchFab.style.display = 'none';
+      }
       const catContainer = document.getElementById('category-container'); if(catContainer) catContainer.style.display = d.cat;
 
       if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && document.getElementById('promo-slide-content')?.innerHTML) pb.style.display = 'flex'; }
@@ -1740,8 +1775,10 @@
            else if (pNamaLower.includes('titip') || pNamaLower.includes('kue')) pKat = 'Titipan Warga';
            else pKat = 'Lainnya';
         }
+        let searchKeyword = (document.getElementById("inventory-search-input")?.value || "").toLowerCase().trim();
+        let matchSearch = !searchKeyword || pNamaLower.includes(searchKeyword);
         let matchCategory = (activeKategoriPelanggan === 'Semua') || (pKat.toLowerCase() === activeKategoriPelanggan.toLowerCase());
-        if (matchCategory) matchedProducts.push({ code, ...p });
+        if (matchCategory && matchSearch) matchedProducts.push({ code, ...p });
       }
       
       matchedProducts.sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
@@ -1793,6 +1830,8 @@
     }
 
     function ubahHalamanPos(d) { currentPosPage += d; refreshKatalogPelanggan(); const mainContent = document.querySelector('.main-content'); if (mainContent) mainContent.scrollTop = 0; window.scrollTo(0, 0); }
+
+    function filterKatalogPelanggan(v) { currentPosPage = 1; refreshKatalogPelanggan(); }
 
     function renderCartPelanggan() {
       const tbody = document.getElementById("cart-body"); tbody.innerHTML = ""; let total = 0, totalQty = 0;
