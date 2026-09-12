@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.10">
+  <link rel="stylesheet" href="style.css?v=1.0.11">
 
   <style>
     .popup-menu-btn {
@@ -234,7 +234,34 @@
 
     @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
-  </style>
+  
+    /* Header pelanggan: tombol pencarian berada di pojok kanan setelah nama toko. */
+    .customer-home-title-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;
+    }
+    .customer-home-title-row .customer-home-title { flex: 1 1 auto; min-width: 0; }
+    .customer-header-search-btn {
+      flex: 0 0 38px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+      border: 0; border-radius: 50%; background: #2563eb; color: #fff;
+      box-shadow: 0 3px 10px rgba(0,0,0,.25); cursor: pointer; padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .customer-header-search-btn:active { transform: scale(.92); }
+
+    /* Asisten AI: 3 bounce berturut-turut, diam 3 detik, lalu mengulang. */
+    @keyframes aiBounceThree {
+      0%, 37.5%, 100% { transform: translateY(0) scale(1); }
+      5% { transform: translateY(-9px) scale(1.03); }
+      10% { transform: translateY(0) scale(1); }
+      15% { transform: translateY(-9px) scale(1.03); }
+      20% { transform: translateY(0) scale(1); }
+      25% { transform: translateY(-9px) scale(1.03); }
+      30% { transform: translateY(0) scale(1); }
+    }
+    .fab-ai-bounce { animation: aiBounceThree 4.8s ease-in-out infinite; will-change: transform; }
+    .fab-ai-bounce:hover { animation-play-state: paused; }
+    @media (prefers-reduced-motion: reduce) { .fab-ai-bounce { animation: none; } }
+</style>
 
 <style id="customer-chat-subtabs-fix">
   .customer-chat-subtabs button {
@@ -316,7 +343,14 @@
     <!-- 1. HALAMAN BELANJA -->
     <div id="belanja" class="tab-content active" style="display: block;">
       <div class="customer-home-header no-print" id="customer-home-header">
-        <h1 class="customer-home-title">KasirQuh - <span id="customer-home-store-name">Nama Toko</span></h1>
+        <div class="customer-home-title-row">
+          <h1 class="customer-home-title">KasirQuh - <span id="customer-home-store-name">Nama Toko</span></h1>
+          <button id="customer-header-search-btn" class="customer-header-search-btn" onclick="bukaKolomPencarian()" title="Cari Barang" aria-label="Cari Barang">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" y1="15.17" x2="21" y2="21"></line>
+            </svg>
+          </button>
+        </div>
         <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
       </div>
 
@@ -515,9 +549,8 @@
   </div>
 
   <div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
-    <button id="fab-ai-btn" class="fab-main" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;">😀</button>
-    <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;"><svg viewBox="0 0 24 24" width="20" height="20" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg></button>
-    <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
+    <button id="fab-ai-btn" class="fab-main fab-ai-bounce" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;">😀</button>
+    <button id="fab-cart-btn" class="fab-main" onclick="openCartModal()" title="Buka Keranjang" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.89-2-1.99-2z"/></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
   </div>
 
   <div id="aiChatModal" class="modal-backdrop" onclick="if(event.target === this) toggleAIChatModal()">
