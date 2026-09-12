@@ -655,6 +655,19 @@
       </div>
 
       <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">📢 Info Toko & Running Text</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Atur informasi toko dan teks berjalan di Beranda Pelanggan.</div>
+        <button type="button" onclick="toggleAdminHomeInfo()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-home-info-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <div style="font-size:.75rem;opacity:.75;margin-bottom:8px;">Baris tetap: <strong>Info Toko.... 📢</strong></div>
+          <label style="display:block;font-size:.8rem;margin-bottom:5px;">Teks Running</label>
+          <textarea id="admin-home-running-text" placeholder="Hari ini ada gratis ongkir sampai jam 12.00. Yuk gas buruan order... Bestie...!!!" style="width:100%;box-sizing:border-box;min-height:72px;padding:7px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;"></textarea>
+          <button type="button" onclick="simpanPengaturanHomeInfo()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Info</button>
+          <div id="admin-home-info-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
         <div style="font-weight:800;">🏠 Stok Rumah Habis</div>
         <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan stok barang.</div>
         <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
@@ -857,6 +870,21 @@ async function simpanPengaturanPromoToko() {
   } catch(err) {
     const st=document.getElementById('admin-promo-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
   }
+}
+function getAdminHomeInfoConfig() {
+  try { const c=JSON.parse(localStorage.getItem('admin_home_info_v1') || '{}'); return {runningText:c.runningText || ''}; }
+  catch(e) { return {runningText:''}; }
+}
+function toggleAdminHomeInfo() {
+  const panel=document.getElementById('admin-home-info-panel'); if(!panel) return;
+  const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
+  if(!open) { const c=getAdminHomeInfoConfig(); document.getElementById('admin-home-running-text').value=c.runningText; }
+}
+async function simpanPengaturanHomeInfo() {
+  const cfg={infoText:'Info Toko....', runningText:(document.getElementById('admin-home-running-text')?.value || '').trim(), updatedAt:Date.now()};
+  localStorage.setItem('admin_home_info_v1',JSON.stringify(cfg));
+  try { await db.collection('pengaturan').doc('beranda_pelanggan_home').set(cfg,{merge:true}); const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='✓ Info toko & running text tersimpan dan siap tampil di pelanggan.'; }
+  catch(err) { const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.'; }
 }
 function getAdminIdeMasakConfig() {
   try {

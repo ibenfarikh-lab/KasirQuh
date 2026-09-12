@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.13">
+  <link rel="stylesheet" href="style.css?v=1.0.12">
 
   <style>
     .popup-menu-btn {
@@ -32,7 +32,7 @@
     .chip-btn.active { background: #2563eb; color: white; border-color: #2563eb; font-weight: bold; }
 
     .customer-home-header {
-      padding: 4px 6px 7px; margin: 0 0 2px; line-height: 1.15;
+      position: relative; padding: 4px 116px 7px 6px; margin: 0 0 8px; line-height: 1.15; min-height: 108px; box-sizing: border-box;
     }
     .customer-home-title {
       margin: 0; font-size: 1.05rem; font-weight: 800; letter-spacing: .1px;
@@ -42,52 +42,38 @@
       margin: 2px 0 0; font-size: .72rem; color: var(--text-muted); font-weight: 600;
     }
     .promo-banner {
-      position: fixed; right: -8px; top: 50%; transform: translateY(-50%);
-      width: 132px; min-height: 112px; padding: 12px 15px 12px 20px; box-sizing: border-box;
-      border-radius: 72px 0 0 72px; color: white; z-index: 180; overflow: hidden;
+      position: absolute; right: 6px; top: 4px;
+      width: 122px; min-height: 92px; padding: 8px 10px; box-sizing: border-box;
+      border-radius: 16px; color: white; z-index: 10; overflow: hidden;
       background: linear-gradient(145deg, #2563eb, #7c3aed);
-      box-shadow: 0 7px 22px rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.25);
+      box-shadow: 0 5px 16px rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.25);
       display: none; align-items: center; justify-content: center;
     }
     .promo-banner::before {
-      content: ''; position: absolute; width: 72px; height: 72px; border: 1px solid rgba(255,255,255,.18);
-      border-radius: 50%; left: -35px; top: 50%; transform: translateY(-50%);
+      content: ''; position: absolute; width: 52px; height: 52px; border: 1px solid rgba(255,255,255,.18);
+      border-radius: 50%; left: -25px; top: 50%; transform: translateY(-50%);
     }
     .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; }
-    /* Promo: satu poros di tengah. Isi (gambar + teks) bergerak sebagai satu kesatuan,
-       tanpa orbit/geser/scale, sehingga tidak terlihat melompat saat 3x putaran. */
     .promo-slide {
       animation: promoSpin3x 3.2s linear both;
-      transform-origin: 50% 50%;
-      backface-visibility: visible;
-      will-change: transform;
+      transform-origin: 50% 50%; backface-visibility: visible; will-change: transform;
     }
     @keyframes promoSpin3x {
-      0%   { opacity: 0; transform: rotate(0deg); }
-      8%   { opacity: 1; transform: rotate(86.4deg); }
+      0% { opacity: 0; transform: rotate(0deg); }
+      8% { opacity: 1; transform: rotate(86.4deg); }
       100% { opacity: 1; transform: rotate(1080deg); }
     }
-    .promo-banner.promo-collapsed {
-      width: 28px !important; min-width: 28px !important; min-height: 28px !important; height: 28px;
-      padding: 0 !important; right: -2px; border-radius: 50%;
-      box-shadow: 0 4px 14px rgba(0,0,0,.2); cursor: pointer;
-    }
-    .promo-banner.promo-collapsed::before, .promo-banner.promo-collapsed .promo-stage { display: none; }
-    .promo-banner.promo-collapsed::after {
-      content: ''; display: block; width: 8px; height: 8px; margin: 10px;
-      border-radius: 50%; background: rgba(255,255,255,.95);
-      box-shadow: 0 0 0 3px rgba(255,255,255,.16);
-    }
-    .promo-banner.promo-hidden { opacity: 0; pointer-events: none; transform: translate(30px,-50%) scale(.75); }
-    .promo-banner { transition: width .38s cubic-bezier(.2,.8,.2,1), min-height .38s cubic-bezier(.2,.8,.2,1), height .38s cubic-bezier(.2,.8,.2,1), right .38s cubic-bezier(.2,.8,.2,1), opacity .28s ease, transform .38s cubic-bezier(.2,.8,.2,1), border-radius .38s ease, padding .38s ease; }
-    .promo-dot-row { transition: opacity .25s ease; }
     .promo-dot-row { display:flex; justify-content:center; gap:3px; margin-top:5px; }
     .promo-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,.45); }
     .promo-dot.active { background:#fff; }
     @media (max-width: 420px) {
-      .promo-banner { width: 122px; min-height: 104px; padding-left: 16px; }
+      .promo-banner { width: 108px; min-height: 84px; padding: 7px 8px; right: 2px; }
     }
-    
+
+    .customer-running-wrap { overflow:hidden; white-space:nowrap; margin-top:5px; padding:2px 0; max-width:100%; }
+    .customer-running-text { display:inline-block; min-width:100%; font-size:.72rem; color:var(--text-muted); font-weight:600; animation: customerMarquee 14s linear infinite; padding-left:100%; }
+    @keyframes customerMarquee { from { transform:translateX(0); } to { transform:translateX(-100%); } }
+
     @keyframes cartBounce { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
     .cart-animating { animation: cartBounce 0.3s ease-in-out; }
 
@@ -235,50 +221,6 @@
     @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
   
-    /* Header pelanggan: tombol pencarian berada di pojok kanan setelah nama toko. */
-    .customer-home-title-row {
-      display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;
-    }
-    .customer-home-title-row .customer-home-title { flex: 1 1 auto; min-width: 0; }
-    .customer-header-search-btn {
-      flex: 0 0 38px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
-      border: 0; border-radius: 50%; background: #2563eb; color: #fff;
-      box-shadow: 0 3px 10px rgba(0,0,0,.25); cursor: pointer; padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .customer-header-search-btn:active { transform: scale(.92); }
-
-    /* Promo header: berada di kanan area judul/sapaan, bukan floating di tengah layar. */
-    .customer-home-header { position: relative; min-height: 82px; padding-right: 112px !important; box-sizing: border-box; }
-    .customer-home-title-row { display: block; }
-    .promo-banner {
-      position: absolute !important; right: 0 !important; top: 0 !important; transform: none !important;
-      width: 98px !important; min-width: 98px !important; height: 78px !important; min-height: 78px !important;
-      padding: 7px 8px 7px 13px !important; border-radius: 42px 0 0 42px !important;
-      z-index: 12;
-    }
-    .promo-banner::before { width: 48px; height: 48px; left: -25px; }
-    .promo-stage { width: 100%; }
-    .promo-slide { transform-origin: 50% 50%; }
-    .promo-banner.promo-collapsed { width: 28px !important; min-width: 28px !important; height: 28px !important; min-height: 28px !important; right: 0 !important; top: 25px !important; }
-    .promo-banner.promo-collapsed::after { margin: 10px; }
-    .promo-spacer { display:none; }
-
-    /* Pencarian muncul sebagai bar fixed tepat di atas bottom navbar. */
-    .sticky-search-bar {
-      position: fixed !important; left: 8px; right: 8px; bottom: 52px; z-index: 101;
-      margin: 0 !important; padding: 6px !important; border-radius: 10px;
-      background: var(--card-bg, #fff) !important; border: 1px solid var(--border-color);
-      box-shadow: 0 -4px 16px rgba(0,0,0,.18); box-sizing: border-box;
-    }
-    .sticky-search-bar.search-open { display:block !important; }
-    #sticky-search-container input { min-width: 0; }
-
-    @media (max-width: 420px) {
-      .customer-home-header { min-height: 78px; padding-right: 106px !important; }
-      .promo-banner { width: 92px !important; min-width: 92px !important; height: 72px !important; min-height: 72px !important; }
-    }
-
     /* Asisten AI: 3 bounce berturut-turut, diam 3 detik, lalu mengulang. */
     @keyframes aiBounceThree {
       0%, 37.5%, 100% { transform: translateY(0) scale(1); }
@@ -364,7 +306,7 @@
   </div>
 
   <div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
-    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none;">
+    <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: fixed; left: 8px; right: 8px; bottom: 52px; z-index: 190; background: var(--card-bg, #111827); padding: 6px; margin: 0; border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.25); box-sizing: border-box;">
       <div style="display: flex; gap: 6px; align-items: center;">
         <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
         <button onclick="tutupKolomPencarian()" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">✕</button>
@@ -378,6 +320,8 @@
           <h1 class="customer-home-title">KasirQuh - <span id="customer-home-store-name">Nama Toko</span></h1>
         </div>
         <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
+        <div id="customer-home-info-line" style="margin-top:10px;font-size:.78rem;font-weight:800;color:var(--text-color);">Info Toko.... 📢</div>
+        <div id="customer-home-running-line" class="customer-running-wrap" aria-live="polite"><div id="customer-home-running-text" class="customer-running-text">&nbsp;</div></div>
         <div class="promo-banner no-print" id="promo-banner-section" aria-label="Promo toko">
           <div class="promo-stage" id="promo-stage">
             <div id="promo-slide-content" class="promo-slide">Promo</div>
@@ -657,10 +601,8 @@
       <span id="pos-page-indicator" style="font-size: 0.72rem; font-weight: bold; color: var(--text-color);">1/1</span>
       <button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
     </div>
-    <div style="display:flex; align-items:center; gap:6px;">
-      <button id="bottom-search-btn" onclick="bukaKolomPencarian()" style="background: #2563eb; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Cari Barang" aria-label="Cari Barang">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" y1="15.17" x2="21" y2="21"></line></svg>
-      </button>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <button id="bottom-search-btn" onclick="toggleStickySearchBar()" style="background:#2563eb;color:white;border:none;width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;" title="Cari Barang" aria-label="Cari Barang"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" y1="15.17" x2="21" y2="21"></line></svg></button>
       <button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
     </div>
   </div>
@@ -915,7 +857,8 @@
       } else { if (isStandalone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
       initFirebaseListeners();
       initPromoTokoPelanggan();
-      initPromoScrollBehavior();
+      initCustomerHomeInfoListener();
+      document.getElementById('inventory-search-input')?.addEventListener('input', function(){ filterKatalogPelanggan(this.value); });
     };
 
     function updateCustomerGreeting() {
@@ -924,6 +867,20 @@
       const hour = Number(new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', hour12: false }).format(new Date()));
       const greeting = hour >= 5 && hour < 11 ? 'Selamat pagi 👋' : hour >= 11 && hour < 15 ? 'Selamat siang ☀️' : hour >= 15 && hour < 18 ? 'Selamat sore 🌤️' : 'Selamat malam 🌙';
       el.textContent = greeting;
+    }
+
+    function renderCustomerHomeInfo(cfg) {
+      const info=document.getElementById('customer-home-info-line');
+      const running=document.getElementById('customer-home-running-text');
+      if(info) info.textContent = (cfg && typeof cfg.infoText === 'string' && cfg.infoText.trim()) ? cfg.infoText.trim() + ' 📢' : 'Info Toko.... 📢';
+      if(running) running.textContent = (cfg && typeof cfg.runningText === 'string') ? cfg.runningText.trim() : '';
+    }
+
+    function initCustomerHomeInfoListener() {
+      db.collection('pengaturan').doc('beranda_pelanggan_home').onSnapshot(snap => {
+        const cfg=snap.exists ? snap.data() : {};
+        renderCustomerHomeInfo(cfg);
+      }, () => renderCustomerHomeInfo({}));
     }
 
     function initPromoTokoPelanggan() {
@@ -964,10 +921,6 @@
 
           dots.innerHTML = promoItems.map((_, i) => `<span class="promo-dot ${i === promoIndex ? 'active' : ''}"></span>`).join('');
           banner.onclick = () => {
-            if (banner.classList.contains('promo-collapsed')) {
-              banner.classList.remove('promo-collapsed');
-              return;
-            }
             openProductDetail(String(item.code).replace(/'/g, "\'"));
           };
           promoIndex = (promoIndex + 1) % promoItems.length;
@@ -977,52 +930,6 @@
       };
       db.collection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(snap => render(snap.exists ? snap.data() : null), () => {});
       window.__promoRenderHook = () => db.collection('pengaturan').doc('beranda_pelanggan_promo').get().then(s => render(s.exists ? s.data() : null)).catch(() => {});
-    }
-
-    function initPromoScrollBehavior() {
-      const banner = document.getElementById('promo-banner-section');
-      const scroller = document.querySelector('.main-content');
-      if (!banner || !scroller || window.__promoScrollBound) return;
-      window.__promoScrollBound = true;
-      let ticking = false;
-
-      const update = () => {
-        ticking = false;
-
-        // Promo hanya aktif sebagai floating UI di halaman Belanja/Home.
-        const isHome = document.getElementById('belanja')?.classList.contains('active');
-        if (!isHome) {
-          banner.classList.remove('promo-collapsed', 'promo-hidden');
-          return;
-        }
-
-        // PENTING: halaman KasirQuh menggulir .main-content, bukan window.
-        const y = Math.max(0, scroller.scrollTop || 0);
-
-        // Hanya saat benar-benar kembali ke posisi paling atas promo membesar.
-        // Saat turun ATAU naik tetapi belum sampai atas, promo tetap berupa dot.
-        if (y <= 8) {
-          banner.classList.remove('promo-collapsed', 'promo-hidden');
-        } else {
-          banner.classList.add('promo-collapsed');
-          banner.classList.remove('promo-hidden');
-        }
-      };
-
-      scroller.addEventListener('scroll', () => {
-        if (!ticking) { ticking = true; requestAnimationFrame(update); }
-      }, { passive: true });
-
-      // Saat berpindah tab, cek ulang posisi scroll container.
-      window.addEventListener('resize', update, { passive: true });
-      update();
-
-      banner.addEventListener('click', (e) => {
-        if (banner.classList.contains('promo-collapsed') && scroller.scrollTop > 8) {
-          e.stopPropagation();
-          banner.classList.remove('promo-collapsed');
-        }
-      });
     }
 
     function periksaCheckinHarian() { if(!currentCustomerPhone) return; if(localStorage.getItem('admin_koin_warga_enabled') === 'false') return; let today = new Date().toLocaleDateString('id-ID'); let lastCheckin = localStorage.getItem('last_checkin_date_' + currentCustomerPhone); if(lastCheckin !== today) { const bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); const p=document.querySelector('#dailyCheckinModal p'); if(p) p.innerText='Selamat! Kamu rajin buka aplikasi hari ini. Ini ' + bonus + ' Koin untukmu!'; setTimeout(() => { document.getElementById('dailyCheckinModal').style.display = 'flex'; }, 1500); } }
@@ -1305,20 +1212,18 @@
     function gantiTemaPelanggan(theme) { localStorage.setItem('cust_theme_v13', theme); applyThemePelanggan(theme); }
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
     function toggleMenuModal() { document.getElementById("menuToggleModal").classList.toggle("show"); }
-    function bukaKolomPencarian() {
-      const searchContainer = document.getElementById("sticky-search-container");
-      if (!searchContainer) return;
-      searchContainer.style.display = "block";
-      searchContainer.classList.add("search-open");
-      setTimeout(() => document.getElementById("inventory-search-input")?.focus(), 120);
+    function toggleStickySearchBar(forceState) {
+      const searchBar = document.getElementById('sticky-search-container');
+      const input = document.getElementById('inventory-search-input');
+      if (!searchBar) return;
+      const show = typeof forceState === 'boolean' ? forceState : searchBar.style.display !== 'block';
+      searchBar.style.display = show ? 'block' : 'none';
+      if (show) { setTimeout(() => input?.focus(), 80); }
+      else { if (input) input.value = ''; activeKategoriPelanggan = 'Semua'; perbaruiTampilanKategori(); refreshKatalogPelanggan(); }
     }
-    function tutupKolomPencarian() {
-      const input = document.getElementById("inventory-search-input");
-      const container = document.getElementById("sticky-search-container");
-      if (input) input.value = "";
-      if (container) { container.classList.remove("search-open"); container.style.display = "none"; }
-      filterKatalogPelanggan("");
-    }
+
+    function bukaKolomPencarian() { toggleStickySearchBar(true); }
+    function tutupKolomPencarian() { toggleStickySearchBar(false); }
 
     function pilihKategoriPelanggan(kategori) {
       activeKategoriPelanggan = kategori;
@@ -1611,11 +1516,11 @@
       };
       
       let d = displays[tabId];
-      document.getElementById('bottom-bar-title').innerText = d.title; document.getElementById('pagination-box').style.display = d.pBox; document.getElementById('sticky-search-container').style.display = "none";
+      document.getElementById('bottom-bar-title').innerText = d.title; document.getElementById('pagination-box').style.display = d.pBox; document.getElementById('sticky-search-container').style.display = "none"; const bottomSearch=document.getElementById('bottom-search-btn'); if(bottomSearch) bottomSearch.style.display=d.cat;
       if(document.getElementById('fab-search-btn')) document.getElementById('fab-search-btn').style.display = d.fabSrc; if(document.getElementById('fab-cart-btn')) document.getElementById('fab-cart-btn').style.display = d.fabCart; if(document.getElementById('fab-ai-btn')) document.getElementById('fab-ai-btn').style.display = d.fabAi;
       const catContainer = document.getElementById('category-container'); if(catContainer) catContainer.style.display = d.cat;
 
-      if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && document.getElementById('promo-slide-content')?.innerHTML) { pb.style.display = 'flex'; if((window.scrollY||0)<=8) pb.classList.remove('promo-collapsed','promo-hidden'); } }
+      if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && document.getElementById('promo-slide-content')?.innerHTML) pb.style.display = 'flex'; }
       else { 
         document.querySelector('.promo-banner').style.display = 'none'; document.getElementById('recipe-section-wrapper').style.display = 'none'; document.getElementById('trending-section-wrapper').style.display = 'none';
         let reorderWrapper = document.getElementById('reorder-section-wrapper'); if (reorderWrapper) reorderWrapper.style.display = 'none';
@@ -1844,10 +1749,10 @@
       if (!container || !cardWrapper) return; container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
       if (!isProductsLoaded) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
 
-      let searchKeyword = (document.getElementById("sticky-search-container").style.display === "block") ? (document.getElementById("inventory-search-input").value.toLowerCase()) : "";
+      let searchKeyword = (document.getElementById("inventory-search-input")?.value || "").trim().toLowerCase();
       let matchedProducts = [];
       for (let code in databaseProduk) {
-        let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let matchSearch = pNamaLower.includes(searchKeyword);
+        let p = databaseProduk[code]; let pNamaLower = String(p.nama || '').toLowerCase(); let pCodeLower = String(code || '').toLowerCase(); let matchSearch = !searchKeyword || pNamaLower.includes(searchKeyword) || pCodeLower.includes(searchKeyword);
         let pKat = p.kategori ? p.kategori : "";
         if (!pKat) {
            if(pNamaLower.includes('beras') || pNamaLower.includes('gula') || pNamaLower.includes('minyak') || pNamaLower.includes('telur')) pKat = 'Umum';
@@ -1857,7 +1762,7 @@
            else if (pNamaLower.includes('titip') || pNamaLower.includes('kue')) pKat = 'Titipan Warga';
            else pKat = 'Lainnya';
         }
-        let matchCategory = (activeKategoriPelanggan === 'Semua') || (pKat.toLowerCase() === activeKategoriPelanggan.toLowerCase());
+        let matchCategory = !!searchKeyword || (activeKategoriPelanggan === 'Semua') || (pKat.toLowerCase() === activeKategoriPelanggan.toLowerCase());
         if (matchSearch && matchCategory) matchedProducts.push({ code, ...p });
       }
       
@@ -1910,7 +1815,7 @@
     }
 
     function ubahHalamanPos(d) { currentPosPage += d; refreshKatalogPelanggan(); const mainContent = document.querySelector('.main-content'); if (mainContent) mainContent.scrollTop = 0; window.scrollTo(0, 0); }
-    function filterKatalogPelanggan(v) { currentPosPage = 1; refreshKatalogPelanggan(); }
+    function filterKatalogPelanggan(v) { currentPosPage = 1; const val = String(v || ""); const input=document.getElementById("inventory-search-input"); if(input && input.value !== val) input.value=val; if(val.trim()) { activeKategoriPelanggan="Semua"; perbaruiTampilanKategori(); } refreshKatalogPelanggan(); }
 
     function renderCartPelanggan() {
       const tbody = document.getElementById("cart-body"); tbody.innerHTML = ""; let total = 0, totalQty = 0;
