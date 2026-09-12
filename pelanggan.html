@@ -53,9 +53,15 @@
       content: ''; position: absolute; width: 72px; height: 72px; border: 1px solid rgba(255,255,255,.18);
       border-radius: 50%; left: -35px; top: 50%; transform: translateY(-50%);
     }
-    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; }
-    .promo-slide { animation: promoSlideIn .45s ease both; }
-    @keyframes promoSlideIn { from { opacity: 0; transform: translateX(18px) scale(.96); } to { opacity: 1; transform: translateX(0) scale(1); } }
+    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 220px; }
+    .promo-slide { animation: promoOrbitIn .62s cubic-bezier(.2,.75,.25,1) both; transform-origin: 100% 50%; }
+    @keyframes promoOrbitIn { 0% { opacity: 0; transform: translateX(34px) rotateY(70deg) rotateZ(8deg) scale(.72); } 55% { opacity: 1; transform: translateX(-5px) rotateY(-10deg) rotateZ(-2deg) scale(1.03); } 100% { opacity: 1; transform: translateX(0) rotateY(0) rotateZ(0) scale(1); } }
+    .promo-banner.promo-collapsed { width: 24px !important; min-height: 24px !important; height: 24px; padding: 0 !important; right: -2px; border-radius: 50%; box-shadow: 0 4px 14px rgba(0,0,0,.2); cursor: pointer; }
+    .promo-banner.promo-collapsed::before, .promo-banner.promo-collapsed .promo-stage { display: none; }
+    .promo-banner.promo-collapsed::after { content: '•'; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: #fff; font-size: 16px; line-height: 1; }
+    .promo-banner.promo-hidden { opacity: 0; pointer-events: none; transform: translate(30px,-50%) scale(.75); }
+    .promo-banner { transition: width .35s ease, min-height .35s ease, height .35s ease, right .35s ease, opacity .28s ease, transform .35s ease, border-radius .35s ease, padding .35s ease; }
+    .promo-dot-row { transition: opacity .25s ease; }
     .promo-dot-row { display:flex; justify-content:center; gap:3px; margin-top:5px; }
     .promo-dot { width:4px; height:4px; border-radius:50%; background:rgba(255,255,255,.45); }
     .promo-dot.active { background:#fff; }
@@ -825,6 +831,7 @@
       } else { if (isStandalone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
       initFirebaseListeners();
       initPromoTokoPelanggan();
+      initPromoScrollBehavior();
     };
 
     function updateCustomerGreeting() {
@@ -875,6 +882,42 @@
       };
       db.collection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(snap => render(snap.exists ? snap.data() : null), () => {});
       window.__promoRenderHook = () => db.collection('pengaturan').doc('beranda_pelanggan_promo').get().then(s => render(s.exists ? s.data() : null)).catch(() => {});
+    }
+
+    function initPromoScrollBehavior() {
+      const banner = document.getElementById('promo-banner-section');
+      if (!banner || window.__promoScrollBound) return;
+      window.__promoScrollBound = true;
+      let lastY = window.scrollY || 0;
+      let ticking = false;
+      const update = () => {
+        ticking = false;
+        if (!document.getElementById('belanja')?.classList.contains('active')) {
+          banner.classList.remove('promo-collapsed', 'promo-hidden');
+          return;
+        }
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        const goingDown = y > lastY + 3;
+        const goingUp = y < lastY - 3;
+        if (y <= 8) {
+          banner.classList.remove('promo-collapsed', 'promo-hidden');
+        } else if (goingDown) {
+          banner.classList.add('promo-collapsed');
+          banner.classList.remove('promo-hidden');
+        } else if (goingUp) {
+          banner.classList.add('promo-collapsed');
+          banner.classList.remove('promo-hidden');
+        }
+        lastY = y;
+      };
+      window.addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(update); }
+      }, { passive: true });
+      banner.addEventListener('click', () => {
+        if (banner.classList.contains('promo-collapsed') && (window.scrollY || 0) > 8) {
+          banner.classList.remove('promo-collapsed');
+        }
+      });
     }
 
     function periksaCheckinHarian() { if(!currentCustomerPhone) return; if(localStorage.getItem('admin_koin_warga_enabled') === 'false') return; let today = new Date().toLocaleDateString('id-ID'); let lastCheckin = localStorage.getItem('last_checkin_date_' + currentCustomerPhone); if(lastCheckin !== today) { const bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); const p=document.querySelector('#dailyCheckinModal p'); if(p) p.innerText='Selamat! Kamu rajin buka aplikasi hari ini. Ini ' + bonus + ' Koin untukmu!'; setTimeout(() => { document.getElementById('dailyCheckinModal').style.display = 'flex'; }, 1500); } }
@@ -1422,7 +1465,7 @@
       if(document.getElementById('fab-search-btn')) document.getElementById('fab-search-btn').style.display = d.fabSrc; if(document.getElementById('fab-cart-btn')) document.getElementById('fab-cart-btn').style.display = d.fabCart; if(document.getElementById('fab-ai-btn')) document.getElementById('fab-ai-btn').style.display = d.fabAi;
       const catContainer = document.getElementById('category-container'); if(catContainer) catContainer.style.display = d.cat;
 
-      if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && document.getElementById('promo-slide-content')?.innerHTML) pb.style.display = 'flex'; }
+      if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && document.getElementById('promo-slide-content')?.innerHTML) { pb.style.display = 'flex'; if((window.scrollY||0)<=8) pb.classList.remove('promo-collapsed','promo-hidden'); } }
       else { 
         document.querySelector('.promo-banner').style.display = 'none'; document.getElementById('recipe-section-wrapper').style.display = 'none'; document.getElementById('trending-section-wrapper').style.display = 'none';
         let reorderWrapper = document.getElementById('reorder-section-wrapper'); if (reorderWrapper) reorderWrapper.style.display = 'none';
