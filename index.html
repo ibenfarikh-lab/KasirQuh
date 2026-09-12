@@ -706,13 +706,21 @@
         </label>
       </div>
 
-      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+<div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
         <div style="font-weight:800;">🍳 Ide Masak Hari Ini</div>
         <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Menu, foto, deskripsi, dan bahan terkait.</div>
-        <button type="button" onclick="adminHomeFeaturePlaceholder('Ide Masak Hari Ini')" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
-      </div>
-
-      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <button type="button" onclick="toggleAdminIdeMasak()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-ide-masak-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-recipe-enabled">
+          </label>
+          <div style="font-size:.75rem;opacity:.7;margin-bottom:7px;">Maksimal 5 menu aktif. Bahan dipilih langsung dari katalog.</div>
+          <div id="admin-recipe-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <button type="button" onclick="tambahAdminIdeMasak()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">＋ Tambah Menu</button>
+          <button type="button" onclick="simpanPengaturanIdeMasak()" style="width:100%;margin-top:7px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Ide Masak</button>
+          <div id="admin-recipe-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
         <div style="font-weight:800;">📈 Sedang Laris Hari Ini</div>
         <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis dari transaksi penjualan.</div>
         <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
@@ -785,8 +793,99 @@ async function simpanPengaturanPromoToko() {
     const st=document.getElementById('admin-promo-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
   }
 }
-function adminHomeFeaturePlaceholder(name) {
-  alert(name + ': kerangka sudah siap. Detail pengaturan akan kita isi pada tahap berikutnya.');
+function getAdminIdeMasakConfig() {
+  try {
+    const c = JSON.parse(localStorage.getItem('admin_ide_masak_v1') || '{}');
+    return { enabled: c.enabled !== false, recipes: Array.isArray(c.recipes) ? c.recipes : [] };
+  } catch(e) { return {enabled:true, recipes:[]}; }
+}
+function escapeAdminRecipe(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function renderAdminIdeMasakList(recipes) {
+  const box=document.getElementById('admin-recipe-list'); if(!box) return;
+  const list=Array.isArray(recipes)?recipes:[];
+  if(!list.length) {
+    box.innerHTML='<div style="font-size:.75rem;opacity:.7;padding:8px;border:1px dashed #444;border-radius:8px;">Belum ada menu. Tekan “Tambah Menu”.</div>';
+    return;
+  }
+  const products=Object.keys(databaseProduk||{}).map(code=>({code,p:databaseProduk[code]})).filter(x=>x.p&&x.p.nama)
+    .sort((a,b)=>String(a.p.nama).localeCompare(String(b.p.nama),'id'));
+  const options='<option value="">-- pilih bahan --</option>'+products.map(x=>`<option value="${escapeAdminRecipe(x.code)}">${escapeAdminRecipe(x.p.nama)}</option>`).join('');
+  box.innerHTML=list.map((r,i)=>{
+    const items=Array.isArray(r.items)?r.items:[];
+    return `<div class="admin-recipe-editor" data-index="${i}" style="padding:9px;border-radius:9px;background:#222;border:1px solid #3a3a3a;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px;">
+        <strong style="font-size:.8rem;">Menu ${i+1}</strong>
+        <button type="button" onclick="hapusAdminIdeMasak(${i})" style="border:0;border-radius:6px;background:#dc2626;color:#fff;padding:5px 8px;font-weight:700;">Hapus</button>
+      </div>
+      <input class="admin-recipe-name" value="${escapeAdminRecipe(r.nama)}" placeholder="Nama menu" style="width:100%;box-sizing:border-box;padding:7px;border-radius:7px;border:1px solid #555;margin-bottom:6px;background:#fff;color:#111;">
+      <input class="admin-recipe-photo" value="${escapeAdminRecipe(r.foto||'')}" placeholder="URL foto menu (opsional)" style="width:100%;box-sizing:border-box;padding:7px;border-radius:7px;border:1px solid #555;margin-bottom:6px;background:#fff;color:#111;">
+      <textarea class="admin-recipe-desc" placeholder="Deskripsi singkat" style="width:100%;box-sizing:border-box;min-height:55px;padding:7px;border-radius:7px;border:1px solid #555;margin-bottom:6px;background:#fff;color:#111;">${escapeAdminRecipe(r.desc||'')}</textarea>
+      <div style="font-size:.72rem;font-weight:700;margin-bottom:4px;">Bahan:</div>
+      <div class="admin-recipe-items" style="display:flex;flex-direction:column;gap:5px;">
+        ${items.map((it,j)=>`<div class="admin-recipe-item" style="display:flex;gap:5px;align-items:center;">
+          <select class="admin-recipe-product" style="flex:1;min-width:0;padding:6px;border-radius:6px;background:#fff;color:#111;border:1px solid #555;">${options.replace(`value="${escapeAdminRecipe(it.code)}"`,`value="${escapeAdminRecipe(it.code)}" selected`)}</select>
+          <input class="admin-recipe-qty" type="number" min="0.001" step="0.001" value="${Number(it.qty)||1}" style="width:58px;padding:6px;border-radius:6px;border:1px solid #555;background:#fff;color:#111;">
+          <button type="button" onclick="this.parentElement.remove()" style="border:0;border-radius:6px;background:#555;color:#fff;padding:6px 8px;">✕</button>
+        </div>`).join('')}
+      </div>
+      <button type="button" onclick="tambahBahanAdminIdeMasak(${i})" style="width:100%;margin-top:6px;border:1px solid #555;border-radius:7px;padding:6px;background:#333;color:#fff;font-weight:700;">＋ Tambah Bahan</button>
+    </div>`;
+  }).join('');
+}
+function toggleAdminIdeMasak() {
+  const panel=document.getElementById('admin-ide-masak-panel'); if(!panel) return;
+  const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
+  if(!open) {
+    const cfg=getAdminIdeMasakConfig();
+    document.getElementById('admin-recipe-enabled').checked=cfg.enabled;
+    renderAdminIdeMasakList(cfg.recipes);
+  }
+}
+function tambahAdminIdeMasak() {
+  const cfg=getAdminIdeMasakConfig();
+  if(cfg.recipes.length>=5) return alert('Maksimal 5 menu Ide Masak Hari Ini.');
+  cfg.recipes.push({id:'recipe_'+Date.now(),nama:'',desc:'',foto:'',items:[]});
+  renderAdminIdeMasakList(cfg.recipes);
+}
+function hapusAdminIdeMasak(index) {
+  const cfg=getAdminIdeMasakConfig();
+  cfg.recipes.splice(index,1);
+  renderAdminIdeMasakList(cfg.recipes);
+}
+function tambahBahanAdminIdeMasak(index) {
+  const box=document.querySelector(`.admin-recipe-editor[data-index="${index}"] .admin-recipe-items`);
+  if(!box) return;
+  const selects=document.querySelectorAll('#admin-recipe-list .admin-recipe-editor')[index].querySelectorAll('.admin-recipe-product');
+  const products=Object.keys(databaseProduk||{}).map(code=>({code,p:databaseProduk[code]})).filter(x=>x.p&&x.p.nama).sort((a,b)=>String(a.p.nama).localeCompare(String(b.p.nama),'id'));
+  const options='<option value="">-- pilih bahan --</option>'+products.map(x=>`<option value="${escapeAdminRecipe(x.code)}">${escapeAdminRecipe(x.p.nama)}</option>`).join('');
+  box.insertAdjacentHTML('beforeend',`<div class="admin-recipe-item" style="display:flex;gap:5px;align-items:center;">
+    <select class="admin-recipe-product" style="flex:1;min-width:0;padding:6px;border-radius:6px;background:#fff;color:#111;border:1px solid #555;">${options}</select>
+    <input class="admin-recipe-qty" type="number" min="0.001" step="0.001" value="1" style="width:58px;padding:6px;border-radius:6px;border:1px solid #555;background:#fff;color:#111;">
+    <button type="button" onclick="this.parentElement.remove()" style="border:0;border-radius:6px;background:#555;color:#fff;padding:6px 8px;">✕</button>
+  </div>`);
+}
+function collectAdminIdeMasak() {
+  return [...document.querySelectorAll('#admin-recipe-list .admin-recipe-editor')].map((el,i)=>({
+    id: el.dataset.index ? (getAdminIdeMasakConfig().recipes[Number(el.dataset.index)]?.id || ('recipe_'+Date.now()+i)) : ('recipe_'+Date.now()+i),
+    nama: el.querySelector('.admin-recipe-name')?.value.trim() || '',
+    foto: el.querySelector('.admin-recipe-photo')?.value.trim() || '',
+    desc: el.querySelector('.admin-recipe-desc')?.value.trim() || '',
+    items: [...el.querySelectorAll('.admin-recipe-item')].map(row=>({code:row.querySelector('.admin-recipe-product')?.value||'',qty:parseFloat(row.querySelector('.admin-recipe-qty')?.value)||1})).filter(x=>x.code)
+  }));
+}
+async function simpanPengaturanIdeMasak() {
+  const enabled=document.getElementById('admin-recipe-enabled')?.checked!==false;
+  const recipes=collectAdminIdeMasak().filter(r=>r.nama).slice(0,5);
+  const cfg={enabled,recipes,updatedAt:Date.now()};
+  localStorage.setItem('admin_ide_masak_v1',JSON.stringify(cfg));
+  try {
+    await db.collection('pengaturan').doc('beranda_pelanggan_resep').set(cfg,{merge:true});
+    const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='✓ Ide Masak tersimpan dan siap tampil di pelanggan.';
+  } catch(err) {
+    const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
+  }
 }
 function adminPreviewCustomerHome() {
   alert('Preview Beranda Pelanggan: kerangka sudah siap. Tampilan preview akan kita sambungkan pada tahap berikutnya.');

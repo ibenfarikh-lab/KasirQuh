@@ -771,6 +771,7 @@
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let currentPosPage = 1; let itemsPerPagePos = 24; let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
     let activeKategoriPelanggan = 'Semua'; let toastTimeout;
+    let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = true;
 
     let currentDetailCode = null; let currentDetailQty = 1; let currentDetailStep = 1;
 
@@ -783,6 +784,7 @@
     ];
 
     window.onload = function() {
+      muatIdeMasakAdminPelanggan();
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'auto');
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; }
       initChatRumpiListener();
@@ -939,10 +941,33 @@
       else { if (qtyToAdd <= p.stok) { cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); } }
     }
 
+    async function muatIdeMasakAdminPelanggan() {
+      try {
+        const snap = await db.collection("pengaturan").doc("beranda_pelanggan_resep").get();
+        const data = snap.exists ? snap.data() : {};
+        adminCustomerRecipesEnabled = data.enabled !== false;
+        adminCustomerRecipes = Array.isArray(data.recipes) ? data.recipes : [];
+      } catch(e) {
+        adminCustomerRecipesEnabled = true;
+        adminCustomerRecipes = [];
+      }
+      renderRecipeCards();
+    }
+
     function renderRecipeCards() {
       const container = document.getElementById('recipe-scroll-container');
       if(!container) return;
       container.innerHTML = "";
+
+      if (adminCustomerRecipesEnabled && adminCustomerRecipes.length) {
+        adminCustomerRecipes.forEach(r => {
+          const escName=escapeHtml(r.nama||'Menu Warga');
+          const escDesc=escapeHtml(r.desc||'Ide masak pilihan toko.');
+          const rJson=JSON.stringify(r).replace(/'/g,"&#39;");
+          const foto=r.foto ? `<img src="${escapeHtml(r.foto)}" alt="" style="width:100%;height:62px;object-fit:cover;border-radius:7px;margin-bottom:5px;" onerror="this.style.display='none'">` : '';
+          container.innerHTML += `<div class="recipe-card">${foto}<div><div style="font-weight:800;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">${escName}</div><div style="font-size:.65rem;opacity:.9;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;">${escDesc}</div></div><div style="display:flex;gap:4px;margin-top:auto;"><button class="recipe-btn-action" style="flex:1;" onclick='beliPaketResepCustom(${rJson})'>+ Masukkan Bahan</button><button class="recipe-btn-action" style="flex:0 0 30px;padding:5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepCustomKeRumpi(${rJson})'>📢</button></div></div>`;
+        });
+      }
 
       defaultRecipes.forEach(r => {
         let escName = escapeHtml(r.nama);
