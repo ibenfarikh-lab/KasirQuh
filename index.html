@@ -567,9 +567,10 @@
      class="admin-beranda-shortcut"
      role="button"
      tabindex="0"
+     aria-expanded="false"
      onclick="scrollKePengaturanBerandaPelanggan()"
      onkeydown="if(event.key==='Enter' || event.key===' '){event.preventDefault();scrollKePengaturanBerandaPelanggan();}"
-     style="margin-top:0;cursor:pointer;background:#111;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);">
+     style="margin-top:0;margin-bottom:10px;cursor:pointer;background:#111;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);">
   <div style="display:flex;align-items:center;gap:14px;">
     <div style="width:46px;height:46px;min-width:46px;border-radius:12px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;font-size:1.45rem;">📱</div>
     <div style="flex:1;">
@@ -585,7 +586,7 @@
      KERANGKA: BERANDA PELANGGAN
      Tahap 1: UI kerangka saja. Belum mengubah logika/data.
      ========================================================= -->
-<section id="admin-beranda-pelanggan" class="admin-beranda-pelanggan" aria-hidden="true" style="margin-top:0;scroll-margin-top:12px;max-height:0;overflow:hidden;opacity:0;transform:translateY(-8px);transition:max-height .55s ease,opacity .4s ease,transform .55s ease;">
+<section id="admin-beranda-pelanggan" class="admin-beranda-pelanggan" aria-hidden="true" style="margin-top:0;margin-bottom:10px;scroll-margin-top:12px;max-height:0;overflow:hidden;opacity:0;transform:translateY(-8px);transition:max-height .55s ease,opacity .4s ease,transform .55s ease;">
   <div style="background:#000;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;color:#fff;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
       <div>
@@ -946,18 +947,38 @@ async function simpanPengaturanSedangLaris() {
 }
 function scrollKePengaturanBerandaPelanggan() {
   const target = document.getElementById('admin-beranda-pelanggan');
+  const shortcut = document.getElementById('shortcut-beranda-pelanggan');
   if (!target) return;
 
   const isOpen = target.getAttribute('aria-hidden') === 'false';
+
   if (isOpen) {
-    // Jika sudah terbuka, jangan men-scroll halaman; cukup biarkan kontennya terlihat.
+    // Klik kedua: tutup kembali dengan animasi naik/fade.
+    // Gunakan tinggi aktual dulu agar transisi max-height tetap halus.
+    target.style.maxHeight = target.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      target.setAttribute('aria-hidden', 'true');
+      target.style.maxHeight = '0px';
+      target.style.opacity = '0';
+      target.style.transform = 'translateY(-8px)';
+    });
+    if (shortcut) shortcut.setAttribute('aria-expanded', 'false');
     return;
   }
 
+  // Klik pertama: buka konten tepat di bawah card Beranda Pelanggan.
   target.setAttribute('aria-hidden', 'false');
-  target.style.maxHeight = target.scrollHeight + 'px';
-  target.style.opacity = '1';
-  target.style.transform = 'translateY(0)';
+  target.style.maxHeight = '0px';
+  target.style.opacity = '0';
+  target.style.transform = 'translateY(-8px)';
+
+  requestAnimationFrame(() => {
+    target.style.maxHeight = target.scrollHeight + 'px';
+    target.style.opacity = '1';
+    target.style.transform = 'translateY(0)';
+  });
+
+  if (shortcut) shortcut.setAttribute('aria-expanded', 'true');
 
   // Setelah transisi selesai, biarkan tinggi mengikuti isi agar aman bila panel berubah ukuran.
   window.setTimeout(() => {
