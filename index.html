@@ -557,6 +557,21 @@
 
     <!-- 7. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
+
+      <!-- =========================================================
+     SHORTCUT: BERANDA PELANGGAN
+     Klik card ini untuk smooth-scroll ke seluruh pengaturan
+     Beranda Pelanggan di bawah.
+     ========================================================= -->
+<div id="shortcut-beranda-pelanggan"
+     class="admin-beranda-shortcut"
+     role="button"
+     tabindex="0"
+     onclick="scrollKePengaturanBerandaPelanggan()"
+     onkeydown="if(event.key==='Enter' || event.key===' '){event.preventDefault();scrollKePengaturanBerandaPelanggan();}"
+     style="margin-top:0; margin-bottom:18px;cursor:pointer;background:#111;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div style="width:46px;height:46px;min-width:46px;border-radius:12px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;font-size:1.45rem;">📱</div>
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;" data-i18n="shop_identity">Identitas Toko</h3>
         <div class="form-vertical">
@@ -653,35 +668,12 @@
       <div class="developer-info">
         Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)
       </div>
-    
-
-<!-- =========================================================
-     SHORTCUT: BERANDA PELANGGAN
-     Klik card ini untuk smooth-scroll ke seluruh pengaturan
-     Beranda Pelanggan di bawah.
-     ========================================================= -->
-<div id="shortcut-beranda-pelanggan"
-     class="admin-beranda-shortcut"
-     role="button"
-     tabindex="0"
-     onclick="scrollKePengaturanBerandaPelanggan()"
-     onkeydown="if(event.key==='Enter' || event.key===' '){event.preventDefault();scrollKePengaturanBerandaPelanggan();}"
-     style="margin-top:18px;cursor:pointer;background:#111;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);">
-  <div style="display:flex;align-items:center;gap:14px;">
-    <div style="width:46px;height:46px;min-width:46px;border-radius:12px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;font-size:1.45rem;">📱</div>
-    <div style="flex:1;">
-      <div style="font-weight:800;font-size:1.02rem;">Beranda Pelanggan</div>
-      <div style="font-size:.8rem;opacity:.72;margin-top:4px;">Kelola fitur yang tampil di halaman utama pelanggan.</div>
-    </div>
-    <div style="font-size:1.35rem;opacity:.9;">↓</div>
-  </div>
-</div>
 
 <!-- =========================================================
      KERANGKA: BERANDA PELANGGAN
      Tahap 1: UI kerangka saja. Belum mengubah logika/data.
      ========================================================= -->
-<section id="admin-beranda-pelanggan" class="admin-beranda-pelanggan" style="margin-top:18px;">
+<section id="admin-beranda-pelanggan" class="admin-beranda-pelanggan" style="margin-top:18px;scroll-margin-top:12px;">
   <div style="background:#000;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;color:#fff;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
       <div>
