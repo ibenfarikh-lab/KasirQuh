@@ -685,7 +685,16 @@
       <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
         <div style="font-weight:800;">🔥 Promo Toko Hari Ini</div>
         <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pilih produk yang ingin dipromosikan.</div>
-        <button type="button" onclick="adminHomeFeaturePlaceholder('Promo Toko Hari Ini')" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <button type="button" onclick="toggleAdminPromoToko()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-promo-toko-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Promo aktif</span><input type="checkbox" id="admin-promo-enabled">
+          </label>
+          <div style="font-size:.75rem;opacity:.7;margin-bottom:7px;">Pilih maksimal 5 barang dari katalog:</div>
+          <div id="admin-promo-product-list" style="max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:6px;"></div>
+          <button type="button" onclick="simpanPengaturanPromoToko()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#f59e0b;color:#111;font-weight:800;cursor:pointer;">Simpan Promo</button>
+          <div id="admin-promo-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
       </div>
 
       <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
@@ -730,6 +739,51 @@ function simpanPengaturanKoinWarga() {
   localStorage.setItem('admin_koin_warga_enabled', String(enabled));
   localStorage.setItem('admin_koin_warga_daily', String(daily));
   const st=document.getElementById('admin-koin-status'); if(st) st.textContent='✓ Pengaturan Koin Warga tersimpan.';
+}
+function getPengaturanPromoTokoLocal() {
+  try { return JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{"enabled":true,"codes":[]}'); }
+  catch(e) { return {enabled:true,codes:[]}; }
+}
+function renderAdminPromoProductList(selectedCodes) {
+  const box=document.getElementById('admin-promo-product-list'); if(!box) return;
+  const codes=selectedCodes || [];
+  const items=Object.keys(databaseProduk || {}).map(code => ({code,p:databaseProduk[code]}))
+    .filter(x => x.p && x.p.nama).sort((a,b)=>String(a.p.nama).localeCompare(String(b.p.nama),'id'));
+  if(!items.length){ box.innerHTML='<div style="font-size:.75rem;opacity:.7;">Katalog belum dimuat.</div>'; return; }
+  box.innerHTML=items.map(({code,p})=>{
+    const checked=codes.includes(code);
+    const stok=Number(p.stok||0);
+    return `<label style="display:flex;align-items:center;gap:8px;padding:7px;border-radius:8px;background:#222;border:1px solid #333;font-size:.78rem;">
+      <input type="checkbox" class="admin-promo-product" value="${code}" ${checked?'checked':''} ${stok<=0?'disabled':''}>
+      <span style="flex:1;">${String(p.nama).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}</span>
+      <span style="opacity:.65;">${stok>0?('stok '+stok):'habis'}</span>
+    </label>`;
+  }).join('');
+  box.querySelectorAll('.admin-promo-product').forEach(el=>el.addEventListener('change',()=>{
+    const checked=[...box.querySelectorAll('.admin-promo-product:checked')];
+    if(checked.length>5){ el.checked=false; alert('Maksimal 5 barang untuk Promo Toko Hari Ini.'); }
+  }));
+}
+function toggleAdminPromoToko() {
+  const panel=document.getElementById('admin-promo-toko-panel'); if(!panel) return;
+  const open=panel.style.display !== 'none'; panel.style.display=open?'none':'block';
+  if(!open){
+    const cfg=getPengaturanPromoTokoLocal();
+    document.getElementById('admin-promo-enabled').checked=cfg.enabled !== false;
+    renderAdminPromoProductList(cfg.codes || []);
+  }
+}
+async function simpanPengaturanPromoToko() {
+  const enabled=document.getElementById('admin-promo-enabled')?.checked !== false;
+  const codes=[...document.querySelectorAll('.admin-promo-product:checked')].map(el=>el.value).slice(0,5);
+  const cfg={enabled,codes,updatedAt:Date.now()};
+  localStorage.setItem('admin_promo_toko_v1',JSON.stringify(cfg));
+  try {
+    await db.collection('pengaturan').doc('beranda_pelanggan_promo').set(cfg,{merge:true});
+    const st=document.getElementById('admin-promo-status'); if(st) st.textContent='✓ Promo tersimpan dan siap tampil di pelanggan.';
+  } catch(err) {
+    const st=document.getElementById('admin-promo-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
+  }
 }
 function adminHomeFeaturePlaceholder(name) {
   alert(name + ': kerangka sudah siap. Detail pengaturan akan kita isi pada tahap berikutnya.');
