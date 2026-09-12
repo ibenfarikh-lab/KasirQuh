@@ -405,10 +405,12 @@
       box-shadow:0 5px 15px rgba(15,23,42,.08) !important;
       position:relative; overflow:hidden;
     }
-    .product-catalog-grid .inv-card:nth-child(4n+1) { background:linear-gradient(145deg,#fff7ed,#ffffff) !important; }
-    .product-catalog-grid .inv-card:nth-child(4n+2) { background:linear-gradient(145deg,#eff6ff,#ffffff) !important; }
-    .product-catalog-grid .inv-card:nth-child(4n+3) { background:linear-gradient(145deg,#ecfdf5,#ffffff) !important; }
-    .product-catalog-grid .inv-card:nth-child(4n) { background:linear-gradient(145deg,#fdf2f8,#ffffff) !important; }
+    .product-catalog-grid .inv-card:nth-child(5n+1) { background:linear-gradient(145deg,#2563eb,#06b6d4) !important; }
+    .product-catalog-grid .inv-card:nth-child(5n+2) { background:linear-gradient(145deg,#f97316,#facc15) !important; }
+    .product-catalog-grid .inv-card:nth-child(5n+3) { background:linear-gradient(145deg,#10b981,#14b8a6) !important; }
+    .product-catalog-grid .inv-card:nth-child(5n+4) { background:linear-gradient(145deg,#8b5cf6,#ec4899) !important; }
+    .product-catalog-grid .inv-card:nth-child(5n+5) { background:linear-gradient(145deg,#ef4444,#f43f5e) !important; }
+    .product-catalog-grid .inv-card { color:#fff !important; }
     .product-catalog-grid .inv-card > div:first-of-type img {
       border-radius:16px !important; border:0 !important; background:rgba(255,255,255,.75) !important;
     }
@@ -1351,10 +1353,19 @@
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
     function toggleMenuModal() { document.getElementById("menuToggleModal").classList.toggle("show"); }
 
+    function setModePencarianPelanggan(aktif) {
+      const ids = ['category-container','reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'];
+      ids.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = aktif ? 'none' : ''; });
+      const pos = document.querySelector('#belanja .pos-container');
+      if (pos) pos.style.display = 'block';
+    }
+
     function bukaKolomPencarian() {
       const searchContainer = document.getElementById("sticky-search-container");
       if (searchContainer) {
         searchContainer.style.display = "block";
+        setModePencarianPelanggan(true);
+        filterKatalogPelanggan("");
         window.scrollTo({ top: 0, behavior: 'smooth' });
         setTimeout(() => document.getElementById("inventory-search-input")?.focus(), 200);
       }
@@ -1365,6 +1376,8 @@
       const searchContainer = document.getElementById("sticky-search-container");
       if (input) input.value = "";
       if (searchContainer) searchContainer.style.display = "none";
+      setModePencarianPelanggan(false);
+      perbaruiTampilanKategori();
       filterKatalogPelanggan("");
     }
 
@@ -1375,7 +1388,12 @@
     }
     
     function perbaruiTampilanKategori() {
+      const searchOpen = document.getElementById('sticky-search-container')?.style.display === 'block';
       let isSemua = activeKategoriPelanggan === 'Semua';
+      if (searchOpen) {
+        ['category-container','reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+        return;
+      }
       const promoBanner = document.querySelector('.promo-banner'); if(promoBanner && promoBanner.querySelector('#promo-slide-content')?.innerHTML && isSemua) promoBanner.style.display = 'flex';
       document.getElementById('recipe-section-wrapper').style.display = isSemua ? 'block' : 'none';
       document.getElementById('trending-section-wrapper').style.display = isSemua ? 'block' : 'none';
