@@ -158,6 +158,36 @@
 [data-theme="colorful-v.2"] .menu-card * {
   color: #fff !important;
 }
+
+/* Login tetap memakai permukaan putih dengan teks gelap pada Colorful v.2.
+   Selector global tema tidak boleh membuat isi card putih ikut menjadi putih. */
+[data-theme="colorful-v2"] .login-card,
+[data-theme="colorful2"] .login-card,
+[data-theme="colorful-v.2"] .login-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  background-image: none !important;
+}
+[data-theme="colorful-v2"] .login-card h2,
+[data-theme="colorful2"] .login-card h2,
+[data-theme="colorful-v.2"] .login-card h2 { color: #0f172a !important; }
+[data-theme="colorful-v2"] .login-card p,
+[data-theme="colorful2"] .login-card p,
+[data-theme="colorful-v.2"] .login-card p { color: #64748b !important; }
+[data-theme="colorful-v2"] .login-card input,
+[data-theme="colorful2"] .login-card input,
+[data-theme="colorful-v.2"] .login-card input {
+  background: #172554 !important; color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+[data-theme="colorful-v2"] .login-card input::placeholder,
+[data-theme="colorful2"] .login-card input::placeholder,
+[data-theme="colorful-v.2"] .login-card input::placeholder { color: #cbd5e1 !important; }
+[data-theme="colorful-v2"] .login-card button,
+[data-theme="colorful2"] .login-card button,
+[data-theme="colorful-v.2"] .login-card button {
+  background: #7c3aed !important; color: #ffffff !important;
+}
 </style>
 </head>
 <body data-theme="colorful-v2">

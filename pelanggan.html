@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.9">
+  <link rel="stylesheet" href="style.css?v=1.0.10">
 
   <style>
     .popup-menu-btn {
@@ -54,14 +54,18 @@
       border-radius: 50%; left: -35px; top: 50%; transform: translateY(-50%);
     }
     .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; }
-    .promo-slide { animation: promoOrbit3x 3.2s cubic-bezier(.22,.78,.2,1) both; transform-origin: 50% 50%; backface-visibility: hidden; }
-    @keyframes promoOrbit3x {
-      0%   { opacity: 0; transform: rotate(0deg) translateX(58px) rotate(0deg) scale(.58); }
-      8%   { opacity: .9; transform: rotate(180deg) translateX(42px) rotate(-180deg) scale(.76); }
-      25%  { opacity: 1; transform: rotate(360deg) translateX(28px) rotate(-360deg) scale(.86); }
-      50%  { opacity: 1; transform: rotate(720deg) translateX(18px) rotate(-720deg) scale(.96); }
-      75%  { opacity: 1; transform: rotate(900deg) translateX(8px) rotate(-900deg) scale(1.03); }
-      100% { opacity: 1; transform: rotate(1080deg) translateX(0) rotate(-1080deg) scale(1); }
+    /* Promo: satu poros di tengah. Isi (gambar + teks) bergerak sebagai satu kesatuan,
+       tanpa orbit/geser/scale, sehingga tidak terlihat melompat saat 3x putaran. */
+    .promo-slide {
+      animation: promoSpin3x 3.2s linear both;
+      transform-origin: 50% 50%;
+      backface-visibility: visible;
+      will-change: transform;
+    }
+    @keyframes promoSpin3x {
+      0%   { opacity: 0; transform: rotate(0deg); }
+      8%   { opacity: 1; transform: rotate(86.4deg); }
+      100% { opacity: 1; transform: rotate(1080deg); }
     }
     .promo-banner.promo-collapsed {
       width: 28px !important; min-width: 28px !important; min-height: 28px !important; height: 28px;
