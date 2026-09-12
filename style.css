@@ -312,7 +312,7 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
 .card h4 { margin: 0 0 6px 0; color: var(--text-muted); font-size: 0.78rem; letter-spacing: 0.5px; }
 .card .val { font-size: 1.2rem; font-weight: bold; color: var(--text-color); }
 
-.pos-container { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+.pos-container { display: flex; flex-direction: column; gap: 6px; width: 100%; }
 .input-with-btn { display: flex; gap: 8px; align-items: stretch; width: 100%; margin-bottom: 5px; }
 .input-with-btn input { flex: 1; padding: 10px 12px; font-size: 0.9rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); outline: none; transition: border-color 0.2s; min-width: 0; }
 .input-with-btn input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
@@ -320,7 +320,7 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
 .btn-scan-toggle:hover { background: #1d4ed8; }
 .btn-scan-toggle svg { width: 22px; height: 22px; fill: currentColor; display: block; }
 
-.product-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 5px; width: 100%; }
+.product-catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; margin-top: 2px; width: 100%; }
 
 .product-catalog-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
 .catalog-list-item { background: var(--card-bg); border: 1.5px solid var(--card-border-green); border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
@@ -345,7 +345,7 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
 .inv-list-sub { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .inv-list-price { font-size: 0.78rem; font-weight: 600; color: #2563eb; }
 
-.inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 5px; width: 100%; }
+.inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; margin-top: 2px; width: 100%; }
 .inv-card { background: var(--card-bg); border: 1.5px solid var(--card-border-green); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
 .inv-card-top { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; margin-bottom: 6px; }
 .inv-card-img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); background: var(--border-color); }
