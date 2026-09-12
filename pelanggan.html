@@ -43,42 +43,44 @@
     }
     .promo-banner {
       position: absolute; right: 4px; top: 2px;
-      width: 124px; min-height: 104px; padding: 7px; box-sizing: border-box;
-      border-radius: 17px; color: #111827; z-index: 10; overflow: hidden; cursor: pointer;
-      background: linear-gradient(145deg, #fff7cf 0%, #fff 58%, #ffe6b0 100%);
-      box-shadow: 0 6px 18px rgba(37,99,235,.18); border: 1px solid rgba(245,158,11,.45);
+      width: 142px; min-height: 118px; padding: 7px; box-sizing: border-box;
+      border-radius: 18px; color: #111827; z-index: 10; overflow: hidden; cursor: pointer;
+      background: linear-gradient(145deg, #eff6ff 0%, #ffffff 52%, #fff7ed 100%);
+      box-shadow: 0 7px 20px rgba(37,99,235,.20); border: 1px solid rgba(37,99,235,.20);
       display: none; align-items: center; justify-content: center;
     }
     .promo-banner::before {
-      content: ''; position: absolute; width: 62px; height: 62px;
-      border: 1px solid rgba(245,158,11,.18); border-radius: 50%;
-      left: -30px; bottom: -30px;
+      content: ''; position: absolute; width: 78px; height: 78px;
+      border: 1px solid rgba(37,99,235,.12); border-radius: 50%;
+      left: -38px; bottom: -38px;
     }
     .promo-banner::after {
-      content: '🔥 PROMO'; position: absolute; left: 7px; top: 6px;
-      background: linear-gradient(90deg,#ef4444,#f97316); color: #fff;
-      font-size: .54rem; font-weight: 900; letter-spacing: .3px;
-      padding: 3px 7px; border-radius: 10px; box-shadow: 0 2px 6px rgba(239,68,68,.22);
+      content: ''; position: absolute; right: -18px; top: -20px; width: 58px; height: 58px;
+      border-radius: 50%; background: rgba(251,191,36,.16);
     }
-    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; padding-top: 10px; }
+    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; padding-top: 13px; }
     .promo-slide {
       animation: promoSpin3x 3.2s linear both;
       transform-origin: 50% 50%; backface-visibility: visible; will-change: transform;
     }
-    .promo-product-img { width: 46px; height: 42px; object-fit: cover; border-radius: 10px; display: block; margin: 0 auto 3px; background: #fff; box-shadow: 0 2px 7px rgba(0,0,0,.1); }
+    .promo-mode-badge { display:inline-block; max-width:88%; padding:3px 7px; border-radius:999px; background:linear-gradient(90deg,#ef4444,#f97316); color:#fff; font-size:.51rem; font-weight:900; letter-spacing:.15px; box-shadow:0 2px 7px rgba(239,68,68,.22); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .promo-surprise { display:inline-block; margin:2px 0 3px; font-size:.58rem; font-weight:900; color:#2563eb; }
+    .promo-product-img { width: 48px; height: 43px; object-fit: cover; border-radius: 10px; display: block; margin: 3px auto 3px; background: #fff; box-shadow: 0 2px 7px rgba(0,0,0,.1); }
     .promo-product-name { font-size: .66rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-    .promo-price-label { font-size: .5rem; color: #64748b; font-weight: 700; margin-top: 1px; }
-    .promo-new-price { font-size: .78rem; font-weight: 900; color: #dc2626; line-height: 1.05; }
-    .promo-save { display:inline-block; margin-top:3px; padding:2px 5px; border-radius:7px; background:#fbbf24; color:#7c2d12; font-size:.5rem; font-weight:900; }
+    .promo-price-label { font-size: .49rem; color: #64748b; font-weight: 700; margin-top: 1px; }
+    .promo-new-price { font-size: .80rem; font-weight: 900; color: #dc2626; line-height: 1.05; }
+    .promo-save { display:inline-block; margin-top:3px; padding:3px 6px; border-radius:8px; background:#2563eb; color:#fff; font-size:.49rem; font-weight:900; border:none; cursor:pointer; }
+    .promo-stock { font-size:.48rem; color:#b45309; font-weight:800; margin-top:2px; }
+    .promo-banner.is-surprise .promo-slide { animation-duration: 3.2s; }
     @keyframes promoSpin3x {
       0% { opacity: 0; transform: rotate(0deg); }
       8% { opacity: 1; transform: rotate(86.4deg); }
       100% { opacity: 1; transform: rotate(1080deg); }
     }
     @media (max-width: 420px) {
-      .customer-home-header { padding-right: 126px; min-height: 108px; }
-      .promo-banner { width: 116px; min-height: 102px; right: 2px; padding: 6px; }
-      .promo-product-img { width: 42px; height: 39px; }
+      .customer-home-header { padding-right: 148px; min-height: 118px; }
+      .promo-banner { width: 140px; min-height: 116px; right: 2px; padding: 6px; }
+      .promo-product-img { width: 44px; height: 40px; }
     }
 
     .customer-running-wrap { overflow:hidden; white-space:nowrap; margin-top:5px; padding:2px 0; max-width:100%; }
@@ -897,9 +899,19 @@
     function initPromoTokoPelanggan() {
       let promoItems = [];
       let promoIndex = 0;
+      let promoMode = 0;
       let promoTimer = null;
+      let surpriseOpen = false;
 
+      const modes = [
+        { badge: '🔥 PROMO PILIHAN', intro: 'Pilihan terbaik hari ini' },
+        { badge: '🎁 PROMO KEJUTAN', intro: 'Ada promo nih! Tap kartunya 😆' },
+        { badge: '⚡ PILIHAN HARI INI', intro: 'Jangan sampai kelewatan' },
+        { badge: '🛒 REKOMENDASI', intro: 'Buat kamu nih!' }
+      ];
       const escape = (v) => String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      const getHarga = (p) => { const v = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); return Number(v || 0); };
+
       const render = (data) => {
         const banner = document.getElementById('promo-banner-section');
         const content = document.getElementById('promo-slide-content');
@@ -909,35 +921,67 @@
           data.codes.slice(0, 5).forEach(code => {
             const p = databaseProduk[code];
             if (!p || Number(p.stok || 0) <= 0) return;
-            const harga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
-            promoItems.push({ code, nama: p.nama || 'Produk', harga: Number(harga || 0), foto: p.foto || '' });
+            promoItems.push({ code, nama: p.nama || 'Produk', harga: getHarga(p), foto: p.foto || '', stok: Number(p.stok || 0) });
           });
         }
         clearInterval(promoTimer);
         if (!promoItems.length) { banner.style.display = 'none'; return; }
         banner.style.display = 'flex';
         promoIndex = promoIndex % promoItems.length;
+        promoMode = promoMode % modes.length;
+
         const show = () => {
           const item = promoItems[promoIndex];
-
-          // Ganti isi setelah reflow agar setiap produk mendapat animasi orbit baru.
+          const mode = modes[promoMode];
+          surpriseOpen = false;
+          banner.classList.toggle('is-surprise', promoMode === 1);
           content.classList.remove('promo-slide');
-          const harga = Number(item.harga || 0);
-          content.innerHTML = `${item.foto ? `<img class="promo-product-img" src="${escape(item.foto)}" alt="${escape(item.nama)}">` : `<div class="promo-product-img" style="font-size:1.35rem;display:flex;align-items:center;justify-content:center;">🛍️</div>`}
+          const foto = item.foto ? `<img class="promo-product-img" src="${escape(item.foto)}" alt="${escape(item.nama)}">` : `<div class="promo-product-img" style="font-size:1.35rem;display:flex;align-items:center;justify-content:center;">🛍️</div>`;
+          const stockText = item.stok <= 5 ? `⚠️ Sisa ${item.stok}` : '✨ Stok tersedia';
+          const detail = `<div class="promo-mode-badge">${mode.badge}</div>
+            <div class="promo-surprise">${mode.intro}</div>
+            ${foto}
             <div class="promo-product-name">${escape(item.nama)}</div>
             <div class="promo-price-label">Harga saat ini</div>
-            <div class="promo-new-price">Rp ${harga.toLocaleString('id-ID')}</div>
-            <div class="promo-save">Tap untuk lihat produk</div>`;
+            <div class="promo-new-price">Rp ${item.harga.toLocaleString('id-ID')}</div>
+            <div class="promo-stock">${stockText}</div>
+            <button type="button" class="promo-save" id="promo-action-btn">${promoMode === 3 ? '+ Tambah ke Keranjang' : (promoMode === 1 ? '🎁 Buka Kejutan' : '👆 Lihat Produk')}</button>`;
+          content.innerHTML = detail;
           void content.offsetWidth;
           content.classList.add('promo-slide');
 
-          banner.onclick = () => {
-            openProductDetail(String(item.code).replace(/'/g, "\'"));
+          banner.onclick = (ev) => {
+            if (ev.target && ev.target.closest && ev.target.closest('#promo-action-btn')) return;
+            if (promoMode === 1 && !surpriseOpen) {
+              surpriseOpen = true;
+              const btn = document.getElementById('promo-action-btn');
+              if (btn) btn.innerText = '🛒 Beli Sekarang';
+              const intro = content.querySelector('.promo-surprise');
+              if (intro) intro.innerText = '🎉 Ketemu! Produk pilihan buat kamu';
+              return;
+            }
+            openProductDetail(String(item.code));
+          };
+          const actionBtn = document.getElementById('promo-action-btn');
+          if (actionBtn) actionBtn.onclick = (ev) => {
+            ev.stopPropagation();
+            if (promoMode === 3 || (promoMode === 1 && surpriseOpen)) {
+              tambahKeKeranjangCepat(item.code);
+            } else if (promoMode === 1) {
+              surpriseOpen = true;
+              actionBtn.innerText = '🛒 Beli Sekarang';
+              const intro = content.querySelector('.promo-surprise');
+              if (intro) intro.innerText = '🎉 Ketemu! Produk pilihan buat kamu';
+            } else {
+              openProductDetail(String(item.code));
+            }
           };
           promoIndex = (promoIndex + 1) % promoItems.length;
+          promoMode = (promoMode + 1) % modes.length;
         };
+
         show();
-        if (promoItems.length > 1) promoTimer = setInterval(show, 4500); // 3 putaran selesai dulu (3.2s), lalu jeda singkat sebelum produk berikutnya
+        if (promoItems.length > 1 || modes.length > 1) promoTimer = setInterval(show, 4500);
       };
       db.collection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(snap => render(snap.exists ? snap.data() : null), () => {});
       window.__promoRenderHook = () => db.collection('pengaturan').doc('beranda_pelanggan_promo').get().then(s => render(s.exists ? s.data() : null)).catch(() => {});
