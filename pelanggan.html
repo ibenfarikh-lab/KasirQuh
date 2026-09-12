@@ -308,7 +308,7 @@
   <div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
     <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: fixed; left: 8px; right: 8px; bottom: 52px; z-index: 190; background: var(--card-bg, #111827); padding: 6px; margin: 0; border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.25); box-sizing: border-box;">
       <div style="display: flex; gap: 6px; align-items: center;">
-        <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="filterKatalogPelanggan(this.value)" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
+        <input type="text" id="inventory-search-input" placeholder="🔍 Cari nama barang..." oninput="syncAndFilterGlobalPelanggan(this.value)" style="width: 100%; padding: 8px 10px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;">
         <button onclick="tutupKolomPencarian()" style="background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;">✕</button>
       </div>
     </div>
@@ -858,7 +858,6 @@
       initFirebaseListeners();
       initPromoTokoPelanggan();
       initCustomerHomeInfoListener();
-      document.getElementById('inventory-search-input')?.addEventListener('input', function(){ filterKatalogPelanggan(this.value); });
     };
 
     function updateCustomerGreeting() {
@@ -1212,14 +1211,37 @@
     function gantiTemaPelanggan(theme) { localStorage.setItem('cust_theme_v13', theme); applyThemePelanggan(theme); }
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
     function toggleMenuModal() { document.getElementById("menuToggleModal").classList.toggle("show"); }
+    // Alur pencarian pelanggan disamakan dengan pencarian Admin: satu sumber nilai input, debounce 300ms, lalu render ulang katalog.
+    let searchDebounceTimerPelanggan = null;
+
     function toggleStickySearchBar(forceState) {
       const searchBar = document.getElementById('sticky-search-container');
       const input = document.getElementById('inventory-search-input');
       if (!searchBar) return;
       const show = typeof forceState === 'boolean' ? forceState : searchBar.style.display !== 'block';
       searchBar.style.display = show ? 'block' : 'none';
-      if (show) { setTimeout(() => input?.focus(), 80); }
-      else { if (input) input.value = ''; activeKategoriPelanggan = 'Semua'; perbaruiTampilanKategori(); refreshKatalogPelanggan(); }
+      if (show) {
+        setTimeout(() => input?.focus(), 100);
+      } else {
+        if (input) input.value = '';
+        activeKategoriPelanggan = 'Semua';
+        perbaruiTampilanKategori();
+        refreshKatalogPelanggan();
+      }
+    }
+
+    function syncAndFilterGlobalPelanggan(val) {
+      clearTimeout(searchDebounceTimerPelanggan);
+      searchDebounceTimerPelanggan = setTimeout(() => {
+        currentPosPage = 1;
+        const input = document.getElementById('inventory-search-input');
+        const keyword = input ? input.value.trim() : String(val || '').trim();
+        if (keyword) {
+          activeKategoriPelanggan = 'Semua';
+          perbaruiTampilanKategori();
+        }
+        refreshKatalogPelanggan();
+      }, 300);
     }
 
     function bukaKolomPencarian() { toggleStickySearchBar(true); }
