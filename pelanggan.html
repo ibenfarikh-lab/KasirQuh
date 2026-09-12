@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.8">
+  <link rel="stylesheet" href="style.css?v=1.0.9">
 
   <style>
     .popup-menu-btn {
@@ -910,10 +910,11 @@
 
     function initPromoScrollBehavior() {
       const banner = document.getElementById('promo-banner-section');
-      if (!banner || window.__promoScrollBound) return;
+      const scroller = document.querySelector('.main-content');
+      if (!banner || !scroller || window.__promoScrollBound) return;
       window.__promoScrollBound = true;
-      let lastY = window.scrollY || 0;
       let ticking = false;
+
       const update = () => {
         ticking = false;
 
@@ -924,25 +925,30 @@
           return;
         }
 
-        const y = Math.max(0, window.scrollY || document.documentElement.scrollTop || 0);
+        // PENTING: halaman KasirQuh menggulir .main-content, bukan window.
+        const y = Math.max(0, scroller.scrollTop || 0);
 
-        // Mentok paling atas = kembali menjadi setengah lingkaran penuh.
-        // Setelah meninggalkan posisi atas, baik turun maupun naik, promo
-        // tetap kecil supaya tidak mengganggu isi halaman.
+        // Hanya saat benar-benar kembali ke posisi paling atas promo membesar.
+        // Saat turun ATAU naik tetapi belum sampai atas, promo tetap berupa dot.
         if (y <= 8) {
           banner.classList.remove('promo-collapsed', 'promo-hidden');
         } else {
           banner.classList.add('promo-collapsed');
           banner.classList.remove('promo-hidden');
         }
-
-        lastY = y;
       };
-      window.addEventListener('scroll', () => {
+
+      scroller.addEventListener('scroll', () => {
         if (!ticking) { ticking = true; requestAnimationFrame(update); }
       }, { passive: true });
-      banner.addEventListener('click', () => {
-        if (banner.classList.contains('promo-collapsed') && (window.scrollY || 0) > 8) {
+
+      // Saat berpindah tab, cek ulang posisi scroll container.
+      window.addEventListener('resize', update, { passive: true });
+      update();
+
+      banner.addEventListener('click', (e) => {
+        if (banner.classList.contains('promo-collapsed') && scroller.scrollTop > 8) {
+          e.stopPropagation();
           banner.classList.remove('promo-collapsed');
         }
       });
