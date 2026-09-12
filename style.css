@@ -312,7 +312,7 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
 .card h4 { margin: 0 0 6px 0; color: var(--text-muted); font-size: 0.78rem; letter-spacing: 0.5px; }
 .card .val { font-size: 1.2rem; font-weight: bold; color: var(--text-color); }
 
-.pos-container { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.pos-container { display: flex; flex-direction: column; gap: 0; width: 100%; }
 .input-with-btn { display: flex; gap: 8px; align-items: stretch; width: 100%; margin-bottom: 5px; }
 .input-with-btn input { flex: 1; padding: 10px 12px; font-size: 0.9rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); outline: none; transition: border-color 0.2s; min-width: 0; }
 .input-with-btn input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
