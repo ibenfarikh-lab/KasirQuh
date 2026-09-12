@@ -58,10 +58,10 @@
       content: ''; position: absolute; right: -18px; top: -20px; width: 58px; height: 58px;
       border-radius: 50%; background: rgba(251,191,36,.16);
     }
-    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; perspective: 700px; padding-top: 13px; }
+    .promo-stage { width: 100%; min-width: 0; position: relative; z-index: 1; text-align: center; overflow: hidden; padding-top: 13px; }
     .promo-slide {
-      animation: promoSpin3x 3.2s linear both;
-      transform-origin: 50% 50%; backface-visibility: visible; will-change: transform;
+      animation: promoSlideUp .65s ease-out both;
+      will-change: transform, opacity;
     }
     .promo-mode-badge { display:inline-block; max-width:88%; padding:3px 7px; border-radius:999px; background:linear-gradient(90deg,#ef4444,#f97316); color:#fff; font-size:.51rem; font-weight:900; letter-spacing:.15px; box-shadow:0 2px 7px rgba(239,68,68,.22); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .promo-surprise { display:inline-block; margin:2px 0 3px; font-size:.58rem; font-weight:900; color:#2563eb; }
@@ -71,11 +71,11 @@
     .promo-new-price { font-size: .80rem; font-weight: 900; color: #dc2626; line-height: 1.05; }
     .promo-save { display:inline-block; margin-top:3px; padding:3px 6px; border-radius:8px; background:#2563eb; color:#fff; font-size:.49rem; font-weight:900; border:none; cursor:pointer; }
     .promo-stock { font-size:.48rem; color:#b45309; font-weight:800; margin-top:2px; }
-    .promo-banner.is-surprise .promo-slide { animation-duration: 3.2s; }
-    @keyframes promoSpin3x {
-      0% { opacity: 0; transform: rotate(0deg); }
-      8% { opacity: 1; transform: rotate(86.4deg); }
-      100% { opacity: 1; transform: rotate(1080deg); }
+    .promo-banner.is-surprise .promo-slide { animation-duration: .72s; }
+    @keyframes promoSlideUp {
+      0% { opacity: 0; transform: translateY(42px); }
+      70% { opacity: 1; transform: translateY(-3px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
     @media (max-width: 420px) {
       .customer-home-header { padding-right: 148px; min-height: 118px; }
