@@ -673,7 +673,13 @@
       <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
         <div style="font-weight:800;">🪙 Koin Warga</div>
         <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pengaturan program koin.</div>
-        <button type="button" onclick="adminHomeFeaturePlaceholder('Koin Warga')" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <button type="button" onclick="toggleAdminKoinWarga()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-koin-warga-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;"><span>Program aktif</span><input type="checkbox" id="admin-koin-enabled"></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;"><span>Bonus check-in harian</span><input type="number" id="admin-koin-daily" min="0" max="100000" step="1" style="width:90px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;"></label>
+          <button type="button" onclick="simpanPengaturanKoinWarga()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer;">Simpan Koin</button>
+          <div id="admin-koin-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
       </div>
 
       <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
@@ -710,6 +716,21 @@
 </section>
 
 <script>
+function getPengaturanKoinWarga() {
+  return { enabled: localStorage.getItem('admin_koin_warga_enabled') !== 'false', daily: Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'), 10) || 10) };
+}
+function toggleAdminKoinWarga() {
+  const panel=document.getElementById('admin-koin-warga-panel'); if(!panel) return;
+  const open=panel.style.display !== 'none'; panel.style.display=open?'none':'block';
+  if(!open){ const c=getPengaturanKoinWarga(); document.getElementById('admin-koin-enabled').checked=c.enabled; document.getElementById('admin-koin-daily').value=c.daily; }
+}
+function simpanPengaturanKoinWarga() {
+  const enabled=document.getElementById('admin-koin-enabled').checked;
+  const daily=Math.max(0, parseInt(document.getElementById('admin-koin-daily').value,10) || 0);
+  localStorage.setItem('admin_koin_warga_enabled', String(enabled));
+  localStorage.setItem('admin_koin_warga_daily', String(daily));
+  const st=document.getElementById('admin-koin-status'); if(st) st.textContent='✓ Pengaturan Koin Warga tersimpan.';
+}
 function adminHomeFeaturePlaceholder(name) {
   alert(name + ': kerangka sudah siap. Detail pengaturan akan kita isi pada tahap berikutnya.');
 }
