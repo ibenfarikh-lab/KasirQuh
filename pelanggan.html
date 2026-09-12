@@ -184,6 +184,20 @@
     @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
   </style>
+
+<style id="customer-chat-subtabs-fix">
+  .customer-chat-subtabs button {
+    transition: transform .15s ease, background-color .15s ease, border-color .15s ease;
+  }
+  .customer-chat-subtabs button:active {
+    transform: scale(.98);
+  }
+  @media (max-width: 420px) {
+    .customer-chat-subtabs { gap: 6px !important; padding: 7px !important; }
+    .customer-chat-subtabs button { font-size: .74rem !important; padding: 9px 5px !important; }
+  }
+</style>
+
 </head>
 <body data-theme="light" style="font-size: 0.85rem;">
 
@@ -385,9 +399,9 @@
 
     <!-- 3. HALAMAN LIVE CHAT -->
     <div id="live-chat" class="tab-content" style="height: calc(100vh - 110px); padding: 0; display: none; flex-direction: column;">
-      <div style="display: flex; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
-        <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; padding: 10px; background: none; border: none; font-weight: bold; font-size: 0.8rem; color: #2563eb; border-bottom: 2px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;"><span>Chat Rumpi</span><span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px;">0</span></button>
-        <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; padding: 10px; background: none; border: none; font-weight: bold; font-size: 0.8rem; color: var(--text-muted); border-bottom: 2px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;"><span>Chat Admin Toko</span><span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px;">0</span></button>
+      <div class="customer-chat-subtabs" style="display: flex; gap: 8px; padding: 8px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; box-sizing: border-box;">
+        <button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; min-width: 0; padding: 10px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; font-weight: bold; font-size: 0.8rem; color: #2563eb; border-bottom: 3px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-sizing: border-box;"><span>Chat Rumpi</span><span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px;">0</span></button>
+        <button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; min-width: 0; padding: 10px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; font-weight: bold; font-size: 0.8rem; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-sizing: border-box;"><span>Chat Admin Toko</span><span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px;">0</span></button>
       </div>
       <div id="subtab-rumpi-content" class="subtab-content-pane" style="display: flex; flex-direction: column; flex: 1; padding: 8px; box-sizing: border-box; overflow: hidden; height: 100%;">
         <div id="chat-rumpi-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color); padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);"><div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Memuat obrolan warga...</div></div>
