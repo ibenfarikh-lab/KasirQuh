@@ -1332,6 +1332,11 @@
           renderQuickReorder(lastFetchedOrders);
         }
       });
+      db.collection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
+        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
+        window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        muatBarangLarisHariIni();
+      });
     }
 
     function switchTabPelanggan(tabId) {
@@ -1364,17 +1369,41 @@
     }
 
     function muatBarangLarisHariIni() {
-      db.collection("transaksi").orderBy("waktuTimestamp", "desc").limit(50).get().then(snap => {
+      const cfg = window.__sedangLarisConfig || {enabled:true, limit:5};
+      if (cfg.enabled === false) { renderTrending([]); return; }
+      const limit = Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5));
+      const startToday = new Date();
+      startToday.setHours(0,0,0,0);
+      const startTs = firebase.firestore.Timestamp.fromDate(startToday);
+      db.collection("transaksi").where("waktuTimestamp", ">=", startTs).get().then(snap => {
         let itemCounts = {};
         snap.forEach(doc => {
-          let data = doc.data(); let isToday = (data.waktu || "").includes(new Date().toLocaleDateString('id-ID'));
-          if (isToday && data.items) { data.items.forEach(it => { if(it.code) itemCounts[it.code] = (itemCounts[it.code] || 0) + it.qty; }); }
+          const data = doc.data();
+          if (data.items) data.items.forEach(it => {
+            const qty = Number(it.qty) || 0;
+            if (it.code && qty > 0) itemCounts[it.code] = (itemCounts[it.code] || 0) + qty;
+          });
         });
-        let sortedCodes = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]);
-        let top5 = sortedCodes.filter(c => databaseProduk[c] && databaseProduk[c].stok > 0).slice(0, 5);
-        if(top5.length === 0) { let allCodes = Object.keys(databaseProduk).filter(c => databaseProduk[c].stok > 0); top5 = allCodes.sort(() => 0.5 - Math.random()).slice(0, 5); }
-        renderTrending(top5);
-      }).catch(()=>{});
+        const sortedCodes = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]);
+        const top = sortedCodes.filter(c => databaseProduk[c] && Number(databaseProduk[c].stok || 0) > 0).slice(0, limit);
+        renderTrending(top);
+      }).catch(() => {
+        // Fallback untuk transaksi lama yang belum memiliki waktuTimestamp.
+        db.collection("transaksi").orderBy("waktuTimestamp", "desc").limit(50).get().then(snap => {
+          let itemCounts = {};
+          snap.forEach(doc => {
+            const data = doc.data();
+            const isToday = (data.waktu || "").includes(new Date().toLocaleDateString('id-ID'));
+            if (isToday && data.items) data.items.forEach(it => {
+              const qty = Number(it.qty) || 0;
+              if (it.code && qty > 0) itemCounts[it.code] = (itemCounts[it.code] || 0) + qty;
+            });
+          });
+          const sortedCodes = Object.keys(itemCounts).sort((a,b) => itemCounts[b] - itemCounts[a]);
+          const top = sortedCodes.filter(c => databaseProduk[c] && Number(databaseProduk[c].stok || 0) > 0).slice(0, limit);
+          renderTrending(top);
+        }).catch(() => renderTrending([]));
+      });
     }
 
     function setupAutoScrollInteraction(containerId) {

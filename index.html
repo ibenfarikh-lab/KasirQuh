@@ -722,11 +722,19 @@
         </div>
       </div>      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
         <div style="font-weight:800;">📈 Sedang Laris Hari Ini</div>
-        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis dari transaksi penjualan.</div>
-        <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
-          <span>Mode otomatis</span>
-          <input type="checkbox" checked disabled>
-        </label>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan transaksi penjualan hari ini.</div>
+        <button type="button" onclick="toggleAdminSedangLaris()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-sedang-laris-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-trending-enabled">
+          </label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;">
+            <span>Jumlah produk</span><input type="number" id="admin-trending-limit" min="1" max="10" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
+          </label>
+          <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Urutan dihitung otomatis dari jumlah terjual hari ini.</div>
+          <button type="button" onclick="simpanPengaturanSedangLaris()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Laris</button>
+          <div id="admin-trending-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -885,6 +893,29 @@ async function simpanPengaturanIdeMasak() {
     const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='✓ Ide Masak tersimpan dan siap tampil di pelanggan.';
   } catch(err) {
     const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
+  }
+}
+function getAdminSedangLarisConfig() {
+  try {
+    const c=JSON.parse(localStorage.getItem('admin_sedang_laris_v1') || '{}');
+    return {enabled:c.enabled !== false, limit:Math.min(10,Math.max(1,parseInt(c.limit,10)||5))};
+  } catch(e) { return {enabled:true,limit:5}; }
+}
+function toggleAdminSedangLaris() {
+  const panel=document.getElementById('admin-sedang-laris-panel'); if(!panel) return;
+  const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
+  if(!open){ const c=getAdminSedangLarisConfig(); document.getElementById('admin-trending-enabled').checked=c.enabled; document.getElementById('admin-trending-limit').value=c.limit; }
+}
+async function simpanPengaturanSedangLaris() {
+  const enabled=document.getElementById('admin-trending-enabled')?.checked!==false;
+  const limit=Math.min(10,Math.max(1,parseInt(document.getElementById('admin-trending-limit')?.value,10)||5));
+  const cfg={enabled,limit,updatedAt:Date.now()};
+  localStorage.setItem('admin_sedang_laris_v1',JSON.stringify(cfg));
+  try {
+    await db.collection('pengaturan').doc('beranda_pelanggan_laris').set(cfg,{merge:true});
+    const st=document.getElementById('admin-trending-status'); if(st) st.textContent='✓ Pengaturan Sedang Laris tersimpan.';
+  } catch(err) {
+    const st=document.getElementById('admin-trending-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
   }
 }
 function adminPreviewCustomerHome() {
