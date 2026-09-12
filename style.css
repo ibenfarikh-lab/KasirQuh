@@ -1259,3 +1259,33 @@ body.theme-colorful-v2 #penjualan > .pos-container > .card {
   opacity: .55 !important;
   background-image: none !important;
 }
+
+/* Mobile browser toolbar fix: fixed navigation follows the visible viewport. */
+.permanent-bottom-bar {
+  bottom: var(--browser-bottom-offset, 0px) !important;
+}
+
+
+/* CUSTOMER MOBILE BOTTOM NAV - robust Android Chrome visibility */
+#customerBottomBar {
+  display: flex !important;
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: var(--browser-bottom-offset, 0px) !important;
+  width: 100% !important;
+  min-height: 54px !important;
+  z-index: 2147483000 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+
+#customerBottomBar button {
+  pointer-events: auto !important;
+}
+
+@media print {
+  #customerBottomBar { display: none !important; }
+}
