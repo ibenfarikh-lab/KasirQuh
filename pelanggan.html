@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=1.0.11">
+  <link rel="stylesheet" href="style.css?v=1.0.12">
 
   <style>
     .popup-menu-btn {
@@ -1294,7 +1294,40 @@
     }
 
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
-    function toggleAIChatModal() { document.getElementById("aiChatModal").classList.toggle("show"); }
+    async function toggleAIChatModal() {
+      const modal = document.getElementById("aiChatModal");
+      const willOpen = !modal.classList.contains("show");
+      modal.classList.toggle("show");
+      if (willOpen && isAiSoundOn) {
+        await putarSuaraSambutanAI();
+      }
+    }
+
+    async function putarSuaraSambutanAI() {
+      if (!isAiSoundOn) return;
+      const namaToko = (pengaturanToko && pengaturanToko.nama) ? pengaturanToko.nama : "KasirQuh";
+      const teksSambutan = `HALOOOO BESTIE! WELCOME... di ${namaToko}! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari ${namaToko} siap baturi belanja makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget!`;
+      try {
+        if (window._aiWelcomeAudio) {
+          try { window._aiWelcomeAudio.pause(); } catch (e) {}
+          try { URL.revokeObjectURL(window._aiWelcomeAudioUrl); } catch (e) {}
+        }
+        const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(teksSambutan)}`);
+        if (!ttsResponse.ok) throw new Error("TTS gagal");
+        const audioUrl = URL.createObjectURL(await ttsResponse.blob());
+        const audio = new Audio(audioUrl);
+        window._aiWelcomeAudio = audio;
+        window._aiWelcomeAudioUrl = audioUrl;
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+          window._aiWelcomeAudio = null;
+          window._aiWelcomeAudioUrl = null;
+        };
+        await audio.play();
+      } catch (err) {
+        console.error("TTS sambutan AI:", err);
+      }
+    }
 
     function openProductDetail(code) {
       let p = databaseProduk[code]; if(!p) return;
