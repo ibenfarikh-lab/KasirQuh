@@ -23,7 +23,7 @@
     .popup-menu-btn svg { width: 16px; height: 16px; fill: currentColor; }
     .popup-menu-btn.active-menu { color: #2563eb !important; font-weight: bold; background: rgba(37, 99, 235, 0.08); }
     
-    .category-chips { display: flex; gap: 6px; overflow-x: auto; padding: 6px 10px; margin-bottom: 4px; scrollbar-width: none; }
+    .category-chips { display: flex; gap: 6px; overflow-x: auto; padding: 5px 10px 6px; margin: 2px 0 5px; scrollbar-width: none; }
     .category-chips::-webkit-scrollbar { display: none; }
     .chip-btn {
       white-space: nowrap; padding: 4px 12px; border-radius: 16px; border: 1px solid var(--border-color);
@@ -332,15 +332,6 @@
         <div id="reorder-container" class="auto-scroll-wrapper"></div>
       </div>
 
-      <div class="category-chips no-print" id="category-container">
-        <button class="chip-btn active" onclick="pilihKategoriPelanggan('Semua')">Semua</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Umum')">Umum</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Minuman')">Minuman</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Snack')">Snack</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Bumbu')">Bumbu</button>
-        <button class="chip-btn" style="border-color: #d97706; color: #d97706;" onclick="pilihKategoriPelanggan('Titipan Warga')">📦 Titipan Warga</button>
-      </div>
-
       <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
       <div id="recipe-section-wrapper" class="no-print" style="margin: 1px 0 2px 0;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">Ide Masak Warga Hari Ini 🍳</div>
@@ -353,6 +344,17 @@
       <div id="trending-section-wrapper" class="no-print" style="margin: 1px 0 2px 0;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
         <div id="trending-container" class="auto-scroll-wrapper"></div>
+      </div>
+
+      <!-- Kategori: diletakkan setelah card Sedang Laris agar konten rekomendasi berada lebih dekat ke atas. -->
+      <div class="category-chips no-print" id="category-container">
+        <button class="chip-btn active" onclick="pilihKategoriPelanggan('Semua')">Semua</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Umum')">Umum</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Minuman')">Minuman</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Snack')">Snack</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Bumbu')">Bumbu</button>
+        <button class="chip-btn" style="border-color: #d97706; color: #d97706;" onclick="pilihKategoriPelanggan('Titipan Warga')">📦 Titipan Warga</button>
+        <button class="chip-btn" onclick="pilihKategoriPelanggan('Lainnya')">Lainnya</button>
       </div>
 
       <div class="pos-container" style="gap: 0;">
