@@ -609,6 +609,11 @@
   }
 
 </style>
+<style id="home-feature-transition-v73">
+#reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper { overflow:hidden; transform-origin:top center; transition:max-height .28s cubic-bezier(.4,0,.2,1),opacity .22s ease,transform .28s cubic-bezier(.4,0,.2,1),margin .28s cubic-bezier(.4,0,.2,1); }
+.home-feature-closing { max-height:0 !important; opacity:0 !important; transform:translateY(-16px) scaleY(.96); margin-top:0 !important; margin-bottom:0 !important; pointer-events:none; }
+</style>
+<style id="customer-developer-footer-style-v73">.customer-developer-footer{text-align:center;margin:16px 0 10px;padding:6px 0;font-size:.7rem;color:var(--text-muted);}.customer-developer-footer a{color:inherit;text-decoration:none;}</style>
 </head>
 <body data-theme="light" style="font-size: 0.85rem;">
 
@@ -971,6 +976,8 @@
           💬 Tanya Admin soal barang ini
         </button>
       </div>
+      <div class="customer-developer-footer" aria-label="Developer">Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)</div>
+
     </div>
   </div>
 
@@ -1801,8 +1808,11 @@
     }
 
     function pilihKategoriPelanggan(kategori) {
+      const wasHome = activeKategoriPelanggan === 'Home';
       if (!appNavRestoring) appPushState({ category:kategori, search:false, modal:null });
+      if (wasHome && kategori !== 'Home') setHomeFeatureTransition(false);
       activeKategoriPelanggan = kategori;
+      if (!wasHome && kategori === 'Home') setTimeout(() => setHomeFeatureTransition(true), 20);
       document.querySelectorAll('#category-container .chip-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.category === kategori);
       });
@@ -2111,6 +2121,12 @@
       });
     }
 
+
+    function setHomeFeatureTransition(showHome) {
+      const ids = ['reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'];
+      ids.forEach(id => { const el=document.getElementById(id); if(!el) return; if(showHome){ el.classList.remove('home-feature-closing'); el.style.maxHeight=el.scrollHeight+'px'; el.style.opacity='1'; el.style.transform='translateY(0) scaleY(1)'; } else { if(!el.classList.contains('home-feature-closing')) el.style.maxHeight=el.scrollHeight+'px'; requestAnimationFrame(()=>el.classList.add('home-feature-closing')); } });
+    }
+
     function switchTabPelanggan(tabId) {
       if (!appNavRestoring) {
         const nextState = Object.assign({}, appGetState(), { tab:tabId, category:tabId === 'belanja' ? (activeKategoriPelanggan || 'Home') : 'Home', search:false, modal:null, detailCode:null });
@@ -2120,9 +2136,12 @@
         else if (cur && cur.modal === 'productDetailModal') history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
         else history.pushState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
       }
+      const previousTab = document.querySelector('.tab-content.active')?.id;
+      if (previousTab === 'belanja' && tabId !== 'belanja') setHomeFeatureTransition(false);
       document.querySelectorAll('.tab-content').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
       const activeEl = document.getElementById(tabId); if (activeEl) { activeEl.classList.add('active'); activeEl.style.display = tabId === 'live-chat' ? 'flex' : 'block'; }
       if (tabId === 'live-chat') { unreadRumpiCust = 0; document.getElementById("badge-rumpi-subtab").style.display = "none"; document.getElementById("badge-livechat-cust").style.display = "none"; }
+      if (tabId === 'belanja' && activeKategoriPelanggan === 'Home') setTimeout(() => setHomeFeatureTransition(true), 20);
       document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
       const activeBtnMap = { 'belanja': 'pop-btn-belanja', 'data-pelanggan': 'pop-btn-datapelanggan', 'live-chat': 'pop-btn-livechat', 'pengaturan': 'pop-btn-pengaturan' };
       if (activeBtnMap[tabId]) { document.getElementById(activeBtnMap[tabId])?.classList.add('active-menu'); }
