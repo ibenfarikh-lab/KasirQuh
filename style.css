@@ -1446,3 +1446,188 @@ body.theme-colorful-v2 {
   background-image: none !important;
   color: #fff !important;
 }
+
+
+/* =========================================================
+   KASIRQUH COLORFUL V.2 — DARK / BOLD / SOLID
+   Final palette: no purple, no magenta, no gradients.
+   ========================================================= */
+body.colorful-v2,
+body.theme-colorful-v2,
+.colorful-v2 {
+  --cv2-blue: #163F66;
+  --cv2-green: #205B3A;
+  --cv2-red: #6E2929;
+  --cv2-orange: #7B431F;
+  --cv2-mustard: #6B5917;
+  --cv2-teal: #15565A;
+  --cv2-brown: #51351F;
+  --cv2-black: #000000;
+}
+
+/* Solid surfaces for v2 — deliberately no gradients. */
+body.colorful-v2 .card,
+body.theme-colorful-v2 .card,
+body.colorful-v2 .modal-content,
+body.theme-colorful-v2 .modal-content,
+body.colorful-v2 .modal,
+body.theme-colorful-v2 .modal,
+body.colorful-v2 .popup,
+body.theme-colorful-v2 .popup,
+body.colorful-v2 .menu,
+body.theme-colorful-v2 .menu {
+  background-image: none !important;
+}
+
+/* Explicit dark palette for common colorful elements. */
+body.colorful-v2 .color-blue, body.theme-colorful-v2 .color-blue { background: #163F66 !important; }
+body.colorful-v2 .color-green, body.theme-colorful-v2 .color-green { background: #205B3A !important; }
+body.colorful-v2 .color-red, body.theme-colorful-v2 .color-red { background: #6E2929 !important; }
+body.colorful-v2 .color-orange, body.theme-colorful-v2 .color-orange { background: #7B431F !important; }
+body.colorful-v2 .color-yellow, body.theme-colorful-v2 .color-yellow { background: #6B5917 !important; }
+body.colorful-v2 .color-teal, body.theme-colorful-v2 .color-teal { background: #15565A !important; }
+body.colorful-v2 .color-brown, body.theme-colorful-v2 .color-brown { background: #51351F !important; }
+
+/* Remove legacy purple/magenta only inside the v2 scope. */
+body.colorful-v2 [style*="#8b5cf6"],
+body.colorful-v2 [style*="#7c3aed"],
+body.colorful-v2 [style*="#312e81"],
+body.colorful-v2 [style*="#3730a3"],
+body.colorful-v2 [style*="#db2777"],
+body.colorful-v2 [style*="#ec4899"],
+body.theme-colorful-v2 [style*="#8b5cf6"],
+body.theme-colorful-v2 [style*="#7c3aed"],
+body.theme-colorful-v2 [style*="#312e81"],
+body.theme-colorful-v2 [style*="#3730a3"],
+body.theme-colorful-v2 [style*="#db2777"],
+body.theme-colorful-v2 [style*="#ec4899"] {
+  background-image: none !important;
+}
+
+
+/* Category checklist: checkbox and label aligned on one baseline. */
+.category-checkbox-list label,
+.category-list label,
+.category-option,
+.category-dropdown label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  line-height: 1.25;
+  text-align: left;
+}
+.category-checkbox-list input[type="checkbox"],
+.category-list input[type="checkbox"],
+.category-option input[type="checkbox"],
+.category-dropdown input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+}
+.category-checkbox-list label span,
+.category-list label span,
+.category-option span,
+.category-dropdown label span {
+  flex: 0 1 auto;
+  text-align: left;
+  white-space: normal;
+}
+
+
+/* ============================================================
+   FINAL COLORFUL V.2 OVERRIDES
+   Dark/bold/solid palette only. Purple & magenta removed from V2.
+   Main wrappers/popups/modals are solid black.
+   ============================================================ */
+[data-theme="colorful-v2"] {
+  --bg-color: #080b12 !important;
+  --card-bg: #163F66 !important;
+  --text-color: #ffffff !important;
+  --text-muted: #d1d5db !important;
+  --border-color: rgba(255,255,255,.28) !important;
+  --card-border-green: #205B3A !important;
+  --input-bg: #111827 !important;
+  --input-border: rgba(255,255,255,.55) !important;
+  --table-header: #163F66 !important;
+}
+
+/* Product/list cards: dark colorful sequence. */
+[data-theme="colorful-v2"] .card:nth-child(5n+1),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+1),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+1),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+1),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+1) { background:#163F66 !important; }
+[data-theme="colorful-v2"] .card:nth-child(5n+2),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+2),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+2),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+2),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+2) { background:#7B431F !important; }
+[data-theme="colorful-v2"] .card:nth-child(5n+3),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+3),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+3),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+3),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+3) { background:#205B3A !important; }
+[data-theme="colorful-v2"] .card:nth-child(5n+4),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+4),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+4),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+4),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+4) { background:#6E2929 !important; }
+[data-theme="colorful-v2"] .card:nth-child(5n+5),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(5n+5),
+[data-theme="colorful-v2"] .inv-card:nth-child(5n+5),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(5n+5),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(5n+5) { background:#15565A !important; }
+
+/* Main wrappers / overlays / modal surfaces: black solid. */
+[data-theme="colorful-v2"] .main-content,
+[data-theme="colorful-v2"] .tab-content,
+[data-theme="colorful-v2"] .modal-content,
+[data-theme="colorful-v2"] .floating-menu-popup,
+[data-theme="colorful-v2"] .admin-private-chat-drawer,
+[data-theme="colorful-v2"] .permanent-bottom-bar {
+  background:#000 !important;
+  background-image:none !important;
+}
+
+/* Tables/pagination use dark blue rather than indigo/purple. */
+[data-theme="colorful-v2"] table,
+[data-theme="colorful-v2"] .cart-table,
+[data-theme="colorful-v2"] .inline-pagination { background:#163F66 !important; }
+[data-theme="colorful-v2"] table tr,
+[data-theme="colorful-v2"] .cart-table tr { background:#111827 !important; }
+[data-theme="colorful-v2"] .cart-table th { background:#205B3A !important; }
+
+/* Buttons/active controls: dark teal/red/orange, never purple. */
+[data-theme="colorful-v2"] button,
+[data-theme="colorful-v2"] .btn-scan-toggle,
+[data-theme="colorful-v2"] .inline-page-btn,
+[data-theme="colorful-v2"] .sub-tab-btn.active {
+  background:#15565A !important;
+  background-image:none !important;
+  color:#fff !important;
+}
+[data-theme="colorful-v2"] .sub-tab-btn { background:#163F66 !important; background-image:none !important; }
+[data-theme="colorful-v2"] .sub-tab-btn.active { background:#7B431F !important; }
+
+/* Common navigation/list controls. */
+[data-theme="colorful-v2"] #admin-chat-list > div,
+[data-theme="colorful-v2"] .admin-private-chat-list > div { background:#163F66 !important; }
+[data-theme="colorful-v2"] #admin-chat-list > div:nth-child(3n+2),
+[data-theme="colorful-v2"] .admin-private-chat-list > div:nth-child(3n+2) { background:#205B3A !important; }
+[data-theme="colorful-v2"] #admin-chat-list > div:nth-child(3n+3),
+[data-theme="colorful-v2"] .admin-private-chat-list > div:nth-child(3n+3) { background:#7B431F !important; }
+
+/* Any remaining legacy V2-specific purple/magenta selectors are neutralized. */
+[data-theme="colorful-v2"] [style*="#8b5cf6"],
+[data-theme="colorful-v2"] [style*="#7c3aed"],
+[data-theme="colorful-v2"] [style*="#312e81"],
+[data-theme="colorful-v2"] [style*="#3730a3"],
+[data-theme="colorful-v2"] [style*="#db2777"],
+[data-theme="colorful-v2"] [style*="#ec4899"] {
+  background:#163F66 !important;
+  background-image:none !important;
+}
+
+/* Never allow a gradient image to survive in V2. */
+[data-theme="colorful-v2"] * { background-image:none !important; }
