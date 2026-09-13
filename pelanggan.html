@@ -609,46 +609,45 @@
   }
 
 </style>
-<style id="home-feature-transition-v75">
-#reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper {
+<style id="customer-developer-footer-style-v73">.customer-developer-footer{text-align:center;margin:16px 0 14px;padding:8px 0 12px;font-size:.7rem;color:var(--text-muted);border-top:1px solid var(--border-color);}.customer-developer-footer a{color:inherit;text-decoration:none;}</style>
+
+<style id="smooth-transisi-home-kategori-final">
+#reorder-section-wrapper,
+#recipe-section-wrapper,
+#trending-section-wrapper {
   overflow: hidden;
   transform-origin: top center;
-  max-height: 3000px;
-  opacity: 1;
-  transform: translateY(0) scaleY(1);
+  will-change: max-height, opacity, transform;
   transition:
-    max-height .72s cubic-bezier(.16,1,.3,1),
-    opacity .48s ease,
-    transform .72s cubic-bezier(.16,1,.3,1),
-    margin .72s cubic-bezier(.16,1,.3,1),
-    padding .72s cubic-bezier(.16,1,.3,1);
-  will-change: max-height, opacity, transform, margin, padding;
+    max-height 820ms cubic-bezier(.22,.61,.36,1),
+    opacity 520ms ease,
+    transform 820ms cubic-bezier(.22,.61,.36,1),
+    margin-top 820ms cubic-bezier(.22,.61,.36,1),
+    margin-bottom 820ms cubic-bezier(.22,.61,.36,1);
 }
 .home-feature-closing {
   max-height: 0 !important;
   opacity: 0 !important;
-  transform: translateY(-42px) scaleY(.94);
+  transform: translateY(-34px) scaleY(.97) !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   pointer-events: none;
 }
-/* Katalog ikut terasa tertarik naik saat 3 panel Home ditutup. */
 .home-catalog-transition {
-  transform: translateY(0);
-  transition: transform .72s cubic-bezier(.16,1,.3,1);
   will-change: transform;
+  transition: transform 560ms cubic-bezier(.22,.61,.36,1);
 }
 .home-catalog-transition.catalog-lifting {
-  transform: translateY(-18px);
+  transform: translateY(-12px);
 }
 @media (prefers-reduced-motion: reduce) {
-  #reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper,
-  .home-catalog-transition { transition: none !important; }
+  #reorder-section-wrapper,#recipe-section-wrapper,#trending-section-wrapper,
+  .home-catalog-transition { transition:none !important; }
 }
 </style>
-<style id="customer-developer-footer-style-v73">.customer-developer-footer{text-align:center;margin:16px 0 14px;padding:8px 0 12px;font-size:.7rem;color:var(--text-muted);border-top:1px solid var(--border-color);}.customer-developer-footer a{color:inherit;text-decoration:none;}</style>
+
 </head>
 <body data-theme="light" style="font-size: 0.85rem;">
 
@@ -1843,6 +1842,8 @@
 
     function pilihKategoriPelanggan(kategori) {
       const wasHome = activeKategoriPelanggan === 'Home';
+      if (wasHome && kategori !== 'Home' && window.smoothHomeToCategory) window.smoothHomeToCategory();
+      if (!wasHome && kategori === 'Home' && window.smoothCategoryToHome) window.smoothCategoryToHome();
       if (!appNavRestoring) appPushState({ category:kategori, search:false, modal:null });
       if (wasHome && kategori !== 'Home') setHomeFeatureTransition(false);
       activeKategoriPelanggan = kategori;
@@ -2486,10 +2487,14 @@
       let matchedProducts = [];
       for (let code in databaseProduk) {
         let p = databaseProduk[code]; let pNamaLower = String(p.nama || '').toLowerCase();
-        let pKat = String(p.kategori || '').trim();
+        let pKat = p.kategori;
+        let kategoriProduk = Array.isArray(pKat)
+          ? pKat.flatMap(k => String(k || '').split(/[,;|]+/)).map(k => k.trim()).filter(Boolean)
+          : String(pKat || '').split(/[,;|]+/).map(k => k.trim()).filter(Boolean);
       let searchKeyword = (document.getElementById("inventory-search-input")?.value || "").toLowerCase().trim();
         let matchSearch = !searchKeyword || pNamaLower.includes(searchKeyword);
-        let matchCategory = (activeKategoriPelanggan === 'Home' || activeKategoriPelanggan === 'Produk') || (pKat.toLowerCase().trim() === activeKategoriPelanggan.toLowerCase().trim());
+        let matchCategory = (activeKategoriPelanggan === 'Home' || activeKategoriPelanggan === 'Produk') ||
+          kategoriProduk.some(k => k.toLowerCase() === activeKategoriPelanggan.toLowerCase().trim());
         if (matchCategory && matchSearch) matchedProducts.push({ code, ...p });
       }
       
@@ -2782,6 +2787,61 @@
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
   </script>
+
+<script id="smooth-transisi-home-kategori-js-final">
+(function () {
+  const IDS = ['reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'];
+
+  function els() {
+    return IDS.map(id => document.getElementById(id)).filter(Boolean);
+  }
+
+  window.smoothHomeToCategory = function () {
+    const blocks = els();
+    blocks.forEach(el => {
+      if (getComputedStyle(el).display === 'none') return;
+      el.style.maxHeight = el.scrollHeight + 'px';
+      void el.offsetHeight;
+      el.classList.add('home-feature-closing');
+    });
+
+    const catalog = document.getElementById('pos-card-wrapper');
+    if (catalog) {
+      catalog.classList.add('home-catalog-transition');
+      requestAnimationFrame(() => catalog.classList.add('catalog-lifting'));
+      setTimeout(() => catalog.classList.remove('catalog-lifting'), 560);
+    }
+  };
+
+  window.smoothCategoryToHome = function () {
+    const blocks = els();
+    blocks.forEach(el => {
+      el.style.display = 'block';
+      el.classList.remove('home-feature-closing');
+      el.style.maxHeight = '0px';
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(-34px) scaleY(.97)';
+    });
+
+    requestAnimationFrame(() => {
+      blocks.forEach(el => {
+        el.style.maxHeight = el.scrollHeight + 'px';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0) scaleY(1)';
+      });
+    });
+
+    setTimeout(() => {
+      blocks.forEach(el => {
+        el.style.maxHeight = '';
+        el.style.opacity = '';
+        el.style.transform = '';
+      });
+    }, 850);
+  };
+})();
+</script>
+
 </body>
 </html>
 
