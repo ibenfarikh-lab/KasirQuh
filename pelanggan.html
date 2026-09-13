@@ -427,6 +427,13 @@
   animation: promoBounceThree 7.8s ease-in-out infinite !important;
   will-change: transform;
 }
+
+/* Safe FAB visibility fix:
+   Login/welcome controls remain untouched; FAB visibility follows their actual display state. */
+body.fab-auth-hidden .fab-container {
+  display: none !important;
+}
+
 </style>
 
 <style id="customer-chat-subtabs-fix">
@@ -904,6 +911,41 @@
 </style>
 
 </head>
+
+<script>
+(function () {
+  function updateFabAuthVisibility() {
+    const welcome = document.getElementById('welcomeScreen');
+    const login = document.getElementById('customerLoginModal');
+
+    const welcomeVisible = !!welcome && getComputedStyle(welcome).display !== 'none';
+    const loginVisible = !!login && getComputedStyle(login).display !== 'none';
+
+    document.body.classList.toggle('fab-auth-hidden', welcomeVisible || loginVisible);
+  }
+
+  function installFabAuthGuard() {
+    updateFabAuthVisibility();
+
+    ['welcomeScreen', 'customerLoginModal'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      new MutationObserver(updateFabAuthVisibility)
+        .observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+    });
+
+    // Menangkap perubahan display dari kode lama tanpa mengubah alur login.
+    setInterval(updateFabAuthVisibility, 250);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installFabAuthGuard);
+  } else {
+    installFabAuthGuard();
+  }
+})();
+</script>
+
 <body data-theme="light" style="font-size: 0.85rem;">
 
   <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 15px; box-sizing: border-box;">
