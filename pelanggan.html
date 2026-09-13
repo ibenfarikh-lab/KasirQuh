@@ -563,6 +563,51 @@
     .category-chips .chip-btn { width: 26px !important; min-width: 26px !important; height: 26px !important; min-height: 26px !important; font-size: .94rem !important; }
     .category-chips .chip-btn.active { transform: scale(1.35) !important; }
   }
+
+  /* === FINAL CATEGORY ICON CLEANUP: no theme/button wrapper === */
+  .category-chips .chip-btn,
+  [data-theme="dark"] .category-chips .chip-btn,
+  [data-theme="light"] .category-chips .chip-btn {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: 0 !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    border-radius: 0 !important;
+  }
+  .category-chips .chip-btn::before,
+  .category-chips .chip-btn::after {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .category-chips .chip-btn.active {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    transform: scale(1.42) !important;
+    filter: drop-shadow(0 2px 3px rgba(37,99,235,.30));
+  }
+  .category-chips .chip-btn.active::after {
+    content: '' !important;
+    position: absolute !important;
+    width: 5px !important;
+    height: 5px !important;
+    border-radius: 50% !important;
+    background: #2563eb !important;
+    box-shadow: none !important;
+    left: 50% !important;
+    bottom: -6px !important;
+    transform: translateX(-50%) !important;
+  }
+  @media (max-width: 420px) {
+    .category-chips .chip-btn.active { transform: scale(1.35) !important; }
+  }
+
 </style>
 </head>
 <body data-theme="light" style="font-size: 0.85rem;">
