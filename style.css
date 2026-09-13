@@ -1259,3 +1259,190 @@ body.theme-colorful-v2 #penjualan > .pos-container > .card {
   opacity: .55 !important;
   background-image: none !important;
 }
+
+
+/* ============================================================
+   KASIRQUH 68 — CATEGORY ROW + COLORFUL V.2 GARANG
+   Only the two requested visual revisions.
+   ============================================================ */
+
+/* 1) Category checklist: checkbox and label text stay aligned. */
+#db-category-menu > label {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-height: 32px !important;
+  margin: 0 !important;
+  padding: 6px 8px !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+}
+#db-category-menu > label > input[type="checkbox"] {
+  display: block !important;
+  flex: 0 0 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#db-category-menu > label > span {
+  display: block !important;
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  line-height: 1.2 !important;
+}
+
+/* 2) Colorful v.2 = dark, bold, colorful, solid. No purple/magenta. */
+[data-theme="colorful-v2"],
+[data-theme="colorful2"],
+[data-theme="colorful-v.2"] {
+  --v2-blue: #173B63 !important;
+  --v2-green: #1E5638 !important;
+  --v2-red: #6A2929 !important;
+  --v2-orange: #75401E !important;
+  --v2-mustard: #655515 !important;
+  --v2-teal: #15545A !important;
+  --v2-brown: #50341F !important;
+  --bg-color: #080808 !important;
+  --card-bg: #111111 !important;
+  --input-bg: #171717 !important;
+  --table-header: #173B63 !important;
+  --text-color: #ffffff !important;
+  --text-muted: #d7d7d7 !important;
+  --border-color: rgba(255,255,255,.24) !important;
+  background-image: none !important;
+}
+
+[data-theme="colorful-v2"] body,
+[data-theme="colorful2"] body,
+[data-theme="colorful-v.2"] body,
+body.theme-colorful-v2 {
+  background: #080808 !important;
+  background-image: none !important;
+}
+
+/* Main wrappers remain black; only inner cards carry the dark colors. */
+[data-theme="colorful-v2"] .main-page,
+[data-theme="colorful-v2"] .catalog-section,
+[data-theme="colorful-v2"] .available-products,
+[data-theme="colorful-v2"] .products-container,
+[data-theme="colorful-v2"] .product-list-container,
+[data-theme="colorful-v2"] .catalog-container,
+[data-theme="colorful-v2"] .barang-tersedia,
+[data-theme="colorful-v2"] .daftar-barang,
+[data-theme="colorful-v2"] .product-section,
+[data-theme="colorful-v2"] .section-card,
+[data-theme="colorful2"] .main-page,
+[data-theme="colorful2"] .catalog-section,
+[data-theme="colorful2"] .available-products,
+[data-theme="colorful2"] .products-container,
+[data-theme="colorful2"] .section-card,
+[data-theme="colorful-v.2"] .main-page,
+[data-theme="colorful-v.2"] .catalog-section,
+[data-theme="colorful-v.2"] .available-products,
+[data-theme="colorful-v.2"] .products-container,
+[data-theme="colorful-v.2"] .section-card {
+  background: #000000 !important;
+  background-image: none !important;
+}
+
+/* Cards cycle through dark colors: blue, green, red, orange, mustard, teal, brown. */
+[data-theme="colorful-v2"] .card:nth-child(7n+1),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(7n+1),
+[data-theme="colorful-v2"] .inv-card:nth-child(7n+1),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(7n+1),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(7n+1),
+[data-theme="colorful2"] .card:nth-child(7n+1),
+[data-theme="colorful-v.2"] .card:nth-child(7n+1) { background: var(--v2-blue) !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(7n+2),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(7n+2),
+[data-theme="colorful-v2"] .inv-card:nth-child(7n+2),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(7n+2),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(7n+2),
+[data-theme="colorful2"] .card:nth-child(7n+2),
+[data-theme="colorful-v.2"] .card:nth-child(7n+2) { background: var(--v2-green) !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(7n+3),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(7n+3),
+[data-theme="colorful-v2"] .inv-card:nth-child(7n+3),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(7n+3),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(7n+3),
+[data-theme="colorful2"] .card:nth-child(7n+3),
+[data-theme="colorful-v.2"] .card:nth-child(7n+3) { background: var(--v2-red) !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(7n+4),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(7n+4),
+[data-theme="colorful-v2"] .inv-card:nth-child(7n+4),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(7n+4),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(7n+4),
+[data-theme="colorful2"] .card:nth-child(7n+4),
+[data-theme="colorful-v.2"] .card:nth-child(7n+4) { background: var(--v2-orange) !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(7n+5),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(7n+5),
+[data-theme="colorful-v2"] .inv-card:nth-child(7n+5),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(7n+5),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(7n+5),
+[data-theme="colorful2"] .card:nth-child(7n+5),
+[data-theme="colorful-v.2"] .card:nth-child(7n+5) { background: var(--v2-mustard) !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(7n+6),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(7n+6),
+[data-theme="colorful-v2"] .inv-card:nth-child(7n+6),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(7n+6),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(7n+6),
+[data-theme="colorful2"] .card:nth-child(7n+6),
+[data-theme="colorful-v.2"] .card:nth-child(7n+6) { background: var(--v2-teal) !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(7n+7),
+[data-theme="colorful-v2"] .catalog-list-item:nth-child(7n+7),
+[data-theme="colorful-v2"] .inv-card:nth-child(7n+7),
+[data-theme="colorful-v2"] .inv-list-item:nth-child(7n+7),
+[data-theme="colorful-v2"] .cust-list-item:nth-child(7n+7),
+[data-theme="colorful2"] .card:nth-child(7n+7),
+[data-theme="colorful-v.2"] .card:nth-child(7n+7) { background: var(--v2-brown) !important; }
+
+/* V2 controls use the same dark-bold family. */
+[data-theme="colorful-v2"] button,
+[data-theme="colorful-v2"] .btn,
+[data-theme="colorful-v2"] .button,
+[data-theme="colorful2"] button,
+[data-theme="colorful-v.2"] button {
+  background: var(--v2-blue) !important;
+  background-image: none !important;
+  color: #fff !important;
+}
+[data-theme="colorful-v2"] input,
+[data-theme="colorful-v2"] select,
+[data-theme="colorful-v2"] textarea,
+[data-theme="colorful2"] input,
+[data-theme="colorful-v.2"] input,
+[data-theme="colorful-v.2"] select,
+[data-theme="colorful-v.2"] textarea {
+  background: #171717 !important;
+  background-image: none !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.45) !important;
+}
+
+/* Remove any old V2 purple/magenta card colors that may win by specificity. */
+[data-theme="colorful-v2"] .card,
+[data-theme="colorful-v2"] .catalog-list-item,
+[data-theme="colorful-v2"] .inv-card,
+[data-theme="colorful-v2"] .inv-list-item,
+[data-theme="colorful-v2"] .cust-list-item,
+[data-theme="colorful2"] .card,
+[data-theme="colorful-v.2"] .card {
+  background-image: none !important;
+  color: #fff !important;
+}
