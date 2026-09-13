@@ -793,7 +793,6 @@ body.fab-auth-hidden .fab-container {
   position:absolute !important;
   right:0 !important;
   top:50% !important;
-  transform:translateY(-50%) !important;
   width:68px !important;
   min-width:68px !important;
   height:68px !important;
@@ -880,7 +879,7 @@ body.fab-auth-hidden .fab-container {
   overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
 }
 #customer-home-header #promo-banner-section {
-  position: relative !important; right: auto !important; top: auto !important; transform: none !important;
+  position: relative !important; right: auto !important; top: auto !important;
   justify-self: end !important; align-self: center !important;
   width: 68px !important; min-width: 68px !important;
   height: 68px !important; min-height: 68px !important;
@@ -907,6 +906,20 @@ body.fab-auth-hidden .fab-container {
   #customer-home-header .customer-home-greeting { font-size: .72rem !important; }
   #customer-home-header #customer-home-info-line { margin-top: 5px !important; padding: 5px 7px !important; }
   #customer-home-header #promo-banner-section { width: 60px !important; min-width: 60px !important; height: 60px !important; min-height: 60px !important; }
+}
+</style>
+
+
+<style id="promo-bounce-final-fix">
+/* FINAL FIX: promo uses the same 3-bounce rhythm as the AI FAB.
+   No transform declaration on the button may lock the animation. */
+#promo-banner-section {
+  animation: aiBounceThree 4.8s ease-in-out infinite !important;
+  will-change: transform;
+}
+#promo-banner-section:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  #promo-banner-section { animation: none !important; }
 }
 </style>
 
@@ -1047,7 +1060,7 @@ body.fab-auth-hidden .fab-container {
           <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
           <div id="customer-home-info-line" class="customer-home-info-line"><span class="customer-info-label">📢  Info Toko:</span><span class="customer-running-window" aria-live="polite"><span id="customer-home-running-text" class="customer-running-text">&nbsp;</span></span></div>
         </div>
-        <button id="promo-banner-section" class="promo-banner no-print fab-ai-bounce" aria-label="Lihat promo toko" onclick="bukaPromoTokoPelanggan()" style="display:none;">
+        <button id="promo-banner-section" class="promo-banner no-print" aria-label="Lihat promo toko" onclick="bukaPromoTokoPelanggan()" style="display:none;">
           <div class="promo-stage">
             <div style="font-size:2rem;line-height:1;margin-bottom:10px;">🎁</div>
             <div style="font-size:.82rem;font-weight:900;line-height:1.05;">Ada Promo Nih!</div>
@@ -3293,18 +3306,4 @@ body.theme-colorful-v2 .products-container {
     .inv-card [style*="color: #fde047"], .trending-card [style*="color: #fde047"], .reorder-card [style*="color: #fde047"] { color:#fff !important; }
     .recipe-card .recipe-btn-action { background:#111827 !important; color:#fff !important; border:none !important; }
     .btn-quick-cart-icon { background:#111827 !important; color:#fff !important; }
-
-/* PROMO BOUNCE — samakan dengan efek Asisten AI */
-#promo-banner-section.fab-ai-bounce {
-  animation: aiBounceThree 4.8s ease-in-out infinite !important;
-  will-change: transform;
-}
-#promo-banner-section.fab-ai-bounce:hover {
-  animation-play-state: paused;
-}
-@media (prefers-reduced-motion: reduce) {
-  #promo-banner-section.fab-ai-bounce {
-    animation: none !important;
-  }
-}
 </style>
