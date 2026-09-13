@@ -407,7 +407,9 @@
 
 
 /* Promo: same rhythm as AI FAB — 3 bounces, 3 seconds rest, repeat */
-4%  { transform: translateY(-9px); }
+@keyframes promoBounceThree {
+  0%, 62.5%, 100% { transform: translateY(0); }
+  4%  { transform: translateY(-9px); }
   8%  { transform: translateY(0); }
   12% { transform: translateY(-7px); }
   16% { transform: translateY(0); }
@@ -425,7 +427,6 @@
   animation: promoBounceThree 7.8s ease-in-out infinite !important;
   will-change: transform;
 }
-
 </style>
 
 <style id="customer-chat-subtabs-fix">
@@ -485,7 +486,9 @@
   }
   #promo-banner-section .promo-stage > div:not(:first-child) { display: none !important; }
   #promo-banner-section::before, #promo-banner-section::after { display: none !important; }
-  5% { transform: translateY(-9px) scale(1.03); }
+  @keyframes promoBounceThree {
+    0%, 37.5%, 100% { transform: translateY(0) scale(1); }
+    5% { transform: translateY(-9px) scale(1.03); }
     10% { transform: translateY(0) scale(1); }
     15% { transform: translateY(-9px) scale(1.03); }
     20% { transform: translateY(0) scale(1); }
@@ -1205,7 +1208,7 @@
     </div>
   </div>
 
-  <div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: none; flex-direction: column; gap: 8px; z-index: 99;">
+  <div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
     <button id="fab-ai-btn" class="fab-main fab-ai-bounce" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;">😀</button>
     <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="20" height="20" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg>
@@ -1659,20 +1662,13 @@
       initChatRumpiListener();
       renderRecipeCards();
       if (currentCustomerPhone) {
-        setCustomerAuthScreen(false);
         document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); periksaCheckinHarian(); tampilkanKoinDiProfil();
-      } else { setCustomerAuthScreen(true); if (isStandalone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
+      } else { if (isStandalone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
       initFirebaseListeners();
       initPromoTokoPelanggan();
       initCustomerHomeInfoListener();
     };
-
-
-    function setCustomerAuthScreen(isAuthScreen) {
-      const fab = document.querySelector('.fab-container');
-      if (fab) fab.style.display = isAuthScreen ? 'none' : 'flex';
-    }
 
     function updateCustomerGreeting() {
       const el = document.getElementById('customer-home-greeting');
@@ -2340,7 +2336,6 @@
             muatRiwayatPesananOnlinePelanggan();
             initCustomerChatListener();
             refreshKatalogPelanggan();
-            setCustomerAuthScreen(false);
 
             showToast("Berhasil Masuk! Selamat Berbelanja 🛒");
             periksaCheckinHarian();
@@ -2398,7 +2393,6 @@
       if (confirm("Keluar dari sesi ini?")) { 
         localStorage.removeItem('cust_phone_v13'); 
         currentCustomerPhone = ''; 
-        setCustomerAuthScreen(true);
         document.getElementById('customerLoginModal').style.display = 'flex'; 
         gantiFormAuth('login'); 
         location.reload(); 
@@ -3257,25 +3251,4 @@ body.theme-colorful-v2 .products-container {
     .inv-card [style*="color: #fde047"], .trending-card [style*="color: #fde047"], .reorder-card [style*="color: #fde047"] { color:#fff !important; }
     .recipe-card .recipe-btn-action { background:#111827 !important; color:#fff !important; border:none !important; }
     .btn-quick-cart-icon { background:#111827 !important; color:#fff !important; }
-
-/* PROMO V3 — exactly the same 3-bounce rhythm as Asisten AI */
-@keyframes promoBounceThree {
-  0%, 37.5%, 100% { transform: translateY(0) scale(1); }
-  5%  { transform: translateY(-9px) scale(1.03); }
-  10% { transform: translateY(0) scale(1); }
-  15% { transform: translateY(-9px) scale(1.03); }
-  20% { transform: translateY(0) scale(1); }
-  25% { transform: translateY(-9px) scale(1.03); }
-  30% { transform: translateY(0) scale(1); }
-}
-#promo-banner-section {
-  animation: promoBounceThree 4.8s ease-in-out infinite !important;
-  will-change: transform;
-}
-#promo-banner-section:hover {
-  animation-play-state: paused;
-}
-@media (prefers-reduced-motion: reduce) {
-  #promo-banner-section { animation: none !important; }
-}
 </style>
