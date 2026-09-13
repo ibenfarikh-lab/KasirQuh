@@ -1020,6 +1020,7 @@
     }
 
     function bukaModalQRCode() {
+      appOpenModal('qrCodeModal');
       const currentUrl = getPelangganVercelUrl();
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
       document.getElementById('qr-code-img').src = qrApiUrl;
@@ -1030,6 +1031,7 @@
     }
 
     function tutupModalQRCode() {
+      if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'qrCodeModal') { history.back(); return; }
       document.getElementById('qrCodeModal').classList.remove('show');
     }
 
@@ -1215,7 +1217,109 @@
     let activeKategoriPelanggan = 'Home'; let toastTimeout;
     let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = true;
 
+    // ============================================================
+    // NAVIGASI INTERNAL ANDROID BACK
+    // Back Android digunakan untuk mundur satu langkah di dalam aplikasi.
+    // State awal tetap Home; jika sudah di Home dan tidak ada riwayat internal,
+    // Android/browser boleh menangani Back secara normal.
+    // ============================================================
     let currentDetailCode = null; let currentDetailQty = 1; let currentDetailStep = 1;
+    let appNavRestoring = false;
+    let appNavReady = false;
+
+    function appGetState() {
+      const modalIds = ['customerLoginModal','dailyCheckinModal','menuToggleModal','promoTokoModal','cartModal','aiChatModal','qrCodeModal','productDetailModal'];
+      let modal = null;
+      for (const id of modalIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const visible = id === 'customerLoginModal' ? getComputedStyle(el).display !== 'none' : el.classList.contains('show') || getComputedStyle(el).display !== 'none';
+        if (visible) { modal = id; break; }
+      }
+      const searchOpen = document.getElementById('sticky-search-container')?.style.display === 'block';
+      return {
+        tab: document.querySelector('.tab-content.active')?.id || 'belanja',
+        category: activeKategoriPelanggan || 'Home',
+        search: !!searchOpen,
+        modal: modal,
+        detailCode: modal === 'productDetailModal' ? currentDetailCode : null
+      };
+    }
+
+    function appNormalizeState(state) {
+      const base = { tab:'belanja', category:'Home', search:false, modal:null, detailCode:null };
+      return Object.assign(base, state || {});
+    }
+
+    function appPushState(patch) {
+      if (!appNavReady || appNavRestoring) return;
+      const next = Object.assign({}, appGetState(), patch || {});
+      const current = history.state && history.state.__kasirquhState;
+      // Hindari entry duplikat yang sama persis.
+      if (current && JSON.stringify(current) === JSON.stringify(next)) return;
+      history.pushState({ __kasirquh: true, __kasirquhState: next }, '', location.href);
+    }
+
+    function appGoBackIf(stateKey, fallbackClose) {
+      if (appNavRestoring) { if (fallbackClose) fallbackClose(); return true; }
+      const state = history.state && history.state.__kasirquhState;
+      if (state && stateKey && state[stateKey]) { history.back(); return true; }
+      if (fallbackClose) fallbackClose();
+      return false;
+    }
+
+    function appCloseAllOverlays() {
+      const ids = ['menuToggleModal','promoTokoModal','cartModal','aiChatModal','qrCodeModal','productDetailModal'];
+      ids.forEach(id => document.getElementById(id)?.classList.remove('show'));
+      const login = document.getElementById('customerLoginModal'); if (login) login.style.display = 'none';
+      const checkin = document.getElementById('dailyCheckinModal'); if (checkin) checkin.style.display = 'none';
+    }
+
+    function appRestoreState(rawState) {
+      const state = appNormalizeState(rawState);
+      appNavRestoring = true;
+      try {
+        appCloseAllOverlays();
+        if (state.tab && document.getElementById(state.tab)) switchTabPelanggan(state.tab);
+        activeKategoriPelanggan = state.category || 'Home';
+        document.querySelectorAll('#category-container .chip-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.category === activeKategoriPelanggan));
+        currentPosPage = 1;
+        perbaruiTampilanKategori();
+        refreshKatalogPelanggan();
+        if (state.search) bukaKolomPencarian();
+        if (state.modal === 'productDetailModal' && state.detailCode) openProductDetail(state.detailCode);
+        else if (state.modal === 'cartModal') document.getElementById('cartModal')?.classList.add('show');
+        else if (state.modal === 'aiChatModal') document.getElementById('aiChatModal')?.classList.add('show');
+        else if (state.modal === 'menuToggleModal') document.getElementById('menuToggleModal')?.classList.add('show');
+        else if (state.modal === 'qrCodeModal') document.getElementById('qrCodeModal')?.classList.add('show');
+        else if (state.modal === 'promoTokoModal') document.getElementById('promoTokoModal')?.classList.add('show');
+        else if (state.modal === 'customerLoginModal') document.getElementById('customerLoginModal').style.display = 'flex';
+        else if (state.modal === 'dailyCheckinModal') document.getElementById('dailyCheckinModal').style.display = 'flex';
+      } finally {
+        appNavRestoring = false;
+      }
+    }
+
+    function initAndroidBackNavigation() {
+      const initial = { tab:'belanja', category: activeKategoriPelanggan || 'Home', search:false, modal:null, detailCode:null };
+      history.replaceState({ __kasirquh: true, __kasirquhState: initial }, '', location.href);
+      appNavReady = true;
+      window.addEventListener('popstate', function(event) {
+        const state = event.state && event.state.__kasirquhState;
+        if (state) {
+          appRestoreState(state);
+          return;
+        }
+        // Jika browser mengirim popstate tanpa state internal, kembalikan ke Home.
+        appRestoreState(initial);
+      });
+    }
+
+    function appOpenModal(id, detailCode = null) {
+      appPushState({ modal:id, detailCode:detailCode });
+    }
+
+
 
     const defaultRecipes = [
       { nama: "Sayur Sop Bening", desc: "Praktis, tinggal cemplung. Isian kol, wortel, bumbu kaldu.", keywords: ['kol', 'wortel', 'royco', 'bawang'] },
@@ -1228,6 +1332,7 @@
     window.onload = function() {
       muatIdeMasakAdminPelanggan();
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'auto');
+      initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
       initChatRumpiListener();
@@ -1335,6 +1440,7 @@
     }
 
     function bukaPromoTokoPelanggan() {
+      appOpenModal('promoTokoModal');
       promoTokoPelangganIndex = 0;
       renderPromoTokoPelanggan();
       const modal = document.getElementById('promoTokoModal');
@@ -1349,6 +1455,7 @@
     }
 
     function tutupPromoTokoPelanggan() {
+      if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'promoTokoModal') { history.back(); return; }
       const modal = document.getElementById('promoTokoModal');
       if (modal) modal.classList.remove('show');
     }
@@ -1362,8 +1469,8 @@
       openCartModal();
     }
 
-    function periksaCheckinHarian() { if(!currentCustomerPhone) return; if(localStorage.getItem('admin_koin_warga_enabled') === 'false') return; let today = new Date().toLocaleDateString('id-ID'); let lastCheckin = localStorage.getItem('last_checkin_date_' + currentCustomerPhone); if(lastCheckin !== today) { const bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); const p=document.querySelector('#dailyCheckinModal p'); if(p) p.innerText='Selamat! Kamu rajin buka aplikasi hari ini. Ini ' + bonus + ' Koin untukmu!'; setTimeout(() => { document.getElementById('dailyCheckinModal').style.display = 'flex'; }, 1500); } }
-    function klaimKoinHarian() { let today = new Date().toLocaleDateString('id-ID'); localStorage.setItem('last_checkin_date_' + currentCustomerPhone, today); let bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); let currentCoins = parseInt(localStorage.getItem('koin_warga_' + currentCustomerPhone)) || 0; localStorage.setItem('koin_warga_' + currentCustomerPhone, currentCoins + bonus); document.getElementById('dailyCheckinModal').style.display = 'none'; showToast('🪙 Yey! ' + bonus + ' Koin berhasil ditambahkan ke dompetmu.'); playBeep(); tampilkanKoinDiProfil(); }
+    function periksaCheckinHarian() { if(!currentCustomerPhone) return; if(localStorage.getItem('admin_koin_warga_enabled') === 'false') return; let today = new Date().toLocaleDateString('id-ID'); let lastCheckin = localStorage.getItem('last_checkin_date_' + currentCustomerPhone); if(lastCheckin !== today) { const bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); const p=document.querySelector('#dailyCheckinModal p'); if(p) p.innerText='Selamat! Kamu rajin buka aplikasi hari ini. Ini ' + bonus + ' Koin untukmu!'; setTimeout(() => { appOpenModal('dailyCheckinModal'); document.getElementById('dailyCheckinModal').style.display = 'flex'; }, 1500); } }
+    function klaimKoinHarian() { let today = new Date().toLocaleDateString('id-ID'); localStorage.setItem('last_checkin_date_' + currentCustomerPhone, today); let bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); let currentCoins = parseInt(localStorage.getItem('koin_warga_' + currentCustomerPhone)) || 0; localStorage.setItem('koin_warga_' + currentCustomerPhone, currentCoins + bonus); if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'dailyCheckinModal') history.back(); else document.getElementById('dailyCheckinModal').style.display = 'none'; showToast('🪙 Yey! ' + bonus + ' Koin berhasil ditambahkan ke dompetmu.'); playBeep(); tampilkanKoinDiProfil(); }
     function klaimKoinHarian() { let today = new Date().toLocaleDateString('id-ID'); localStorage.setItem('last_checkin_date_' + currentCustomerPhone, today); let currentCoins = parseInt(localStorage.getItem('koin_warga_' + currentCustomerPhone)) || 0; localStorage.setItem('koin_warga_' + currentCustomerPhone, currentCoins + 10); document.getElementById('dailyCheckinModal').style.display = 'none'; showToast("🪙 Yey! 10 Koin berhasil ditambahkan ke dompetmu."); playBeep(); tampilkanKoinDiProfil(); }
     function tampilkanKoinDiProfil() { let coins = localStorage.getItem('koin_warga_' + currentCustomerPhone) || 0; document.getElementById('profile-coins').innerText = coins; }
 
@@ -1643,7 +1750,13 @@
     function applyThemePelanggan(theme) { document.body.setAttribute('data-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme); }
     function gantiTemaPelanggan(theme) { localStorage.setItem('cust_theme_v13', theme); applyThemePelanggan(theme); }
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
-    function toggleMenuModal() { document.getElementById("menuToggleModal").classList.toggle("show"); }
+    function toggleMenuModal() {
+      const modal = document.getElementById('menuToggleModal');
+      const isOpen = modal.classList.contains('show');
+      if (!isOpen) { appOpenModal('menuToggleModal'); modal.classList.add('show'); }
+      else if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'menuToggleModal') { history.back(); }
+      else { modal.classList.remove('show'); }
+    }
 
     function setModePencarianPelanggan(aktif) {
       const ids = ['category-container','reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'];
@@ -1653,6 +1766,7 @@
     }
 
     function bukaKolomPencarian() {
+      if (!appNavRestoring) appPushState({ search:true, modal:null });
       const searchContainer = document.getElementById("sticky-search-container");
       if (searchContainer) {
         searchContainer.style.display = "block";
@@ -1664,6 +1778,7 @@
     }
 
     function tutupKolomPencarian() {
+      if (!appNavRestoring && history.state?.__kasirquhState?.search) { history.back(); return; }
       const input = document.getElementById("inventory-search-input");
       const searchContainer = document.getElementById("sticky-search-container");
       if (input) input.value = "";
@@ -1674,6 +1789,7 @@
     }
 
     function pilihKategoriPelanggan(kategori) {
+      if (!appNavRestoring) appPushState({ category:kategori, search:false, modal:null });
       activeKategoriPelanggan = kategori;
       document.querySelectorAll('#category-container .chip-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.category === kategori);
@@ -1715,11 +1831,16 @@
 
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
     async function toggleAIChatModal() {
-      const modal = document.getElementById("aiChatModal");
-      const willOpen = !modal.classList.contains("show");
-      modal.classList.toggle("show");
-      if (willOpen && isAiSoundOn) {
-        await putarSuaraSambutanAI();
+      const modal = document.getElementById('aiChatModal');
+      const willOpen = !modal.classList.contains('show');
+      if (willOpen) {
+        appOpenModal('aiChatModal');
+        modal.classList.add('show');
+        if (isAiSoundOn) await putarSuaraSambutanAI();
+      } else if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'aiChatModal') {
+        history.back();
+      } else {
+        modal.classList.remove('show');
       }
     }
 
@@ -1750,6 +1871,7 @@
     }
 
     function openProductDetail(code) {
+      if (!appNavRestoring) appOpenModal('productDetailModal', code);
       let p = databaseProduk[code]; if(!p) return;
       currentDetailCode = code;
       let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
@@ -1778,7 +1900,10 @@
       document.getElementById("productDetailModal").classList.add("show");
     }
     
-    function closeProductDetail() { document.getElementById("productDetailModal").classList.remove("show"); }
+    function closeProductDetail(skipHistory = false) {
+      if (!skipHistory && !appNavRestoring && history.state?.__kasirquhState?.modal === 'productDetailModal') { history.back(); return; }
+      document.getElementById('productDetailModal').classList.remove('show');
+    }
 
     function ubahQtyDetail(dir) {
       if(!currentDetailCode) return;
@@ -1809,13 +1934,13 @@
       }
       playBeep(); showToast("🛒 " + p.nama + " ditambahkan.");
       const cartFab = document.getElementById("fab-cart-btn"); if (cartFab) { cartFab.classList.remove("cart-animating"); void cartFab.offsetWidth; cartFab.classList.add("cart-animating"); }
-      renderCartPelanggan(); closeProductDetail();
+      renderCartPelanggan(); closeProductDetail(true);
     }
 
     function tanyaAdminBarang() {
       if(!currentDetailCode) return;
       let p = databaseProduk[currentDetailCode];
-      closeProductDetail();
+      closeProductDetail(true);
       switchTabPelanggan('live-chat'); switchSubTabLiveChat('admin');
       let inputEl = document.getElementById("customer-chat-input");
       if(inputEl) { inputEl.value = `Halo admin, saya mau tanya soal barang ${p.nama}... `; setTimeout(() => inputEl.focus(), 500); }
@@ -1975,6 +2100,14 @@
     }
 
     function switchTabPelanggan(tabId) {
+      if (!appNavRestoring) {
+        const nextState = Object.assign({}, appGetState(), { tab:tabId, category:tabId === 'belanja' ? (activeKategoriPelanggan || 'Home') : 'Home', search:false, modal:null, detailCode:null });
+        const cur = history.state && history.state.__kasirquhState;
+        const menuIsOpen = document.getElementById('menuToggleModal')?.classList.contains('show');
+        if (menuIsOpen && cur && cur.modal === 'menuToggleModal') history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
+        else if (cur && cur.modal === 'productDetailModal') history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
+        else history.pushState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
+      }
       document.querySelectorAll('.tab-content').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
       const activeEl = document.getElementById(tabId); if (activeEl) { activeEl.classList.add('active'); activeEl.style.display = tabId === 'live-chat' ? 'flex' : 'block'; }
       if (tabId === 'live-chat') { unreadRumpiCust = 0; document.getElementById("badge-rumpi-subtab").style.display = "none"; document.getElementById("badge-livechat-cust").style.display = "none"; }
@@ -2335,8 +2468,8 @@
     }
 
     function kosongkanKeranjang() { if (cart.length === 0) return alert("Keranjang sudah kosong!"); if (confirm("Kosongkan keranjang?")) { cart = []; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal(); } }
-    function openCartModal() { document.getElementById("cartModal").classList.add("show"); }
-    function closeCartModal() { document.getElementById("cartModal").classList.remove("show"); }
+    function openCartModal() { appOpenModal('cartModal'); document.getElementById('cartModal').classList.add('show'); }
+    function closeCartModal() { if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'cartModal') { history.back(); return; } document.getElementById('cartModal').classList.remove('show'); }
     function togglePayMethodCust() { document.getElementById("wrapper-tf-proof").style.display = (document.getElementById("pay-method-cust").value === "TF") ? "block" : "none"; }
     function handleProofUpload(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { const img = new Image(); img.onload = function() { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); let w = img.width, h = img.height; if (w > h) { if (w > 600) { h *= 600 / w; w = 600; } } else { if (h > 600) { w *= 600 / h; h = 600; } } canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h); document.getElementById("cust-proof-base64").value = canvas.toDataURL('image/jpeg', 0.8); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
 
