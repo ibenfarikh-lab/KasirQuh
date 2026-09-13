@@ -502,6 +502,18 @@
       <div id="restock-grid-wrapper" class="inventory-grid" style="display: none;"></div>
     </div>
 
+
+    <!-- Fullscreen POS QR/Barcode Scanner -->
+    <div id="scannerModal" class="fab-scanner-modal" aria-hidden="true">
+      <div class="scanner-fullscreen-box">
+        <div id="reader-pos" class="scanner-wrapper"></div>
+        <div class="scanner-focus-frame"></div>
+        <div class="scanner-laser-line"></div>
+        <button type="button" class="btn-close-scanner-absolute" onclick="toggleScannerPos()" title="Tutup Scanner" aria-label="Tutup Scanner">&times;</button>
+        <div id="scan-status-pos" class="scan-status-floating"></div>
+      </div>
+    </div>
+
     <!-- Tombol-tombol FAB Melayang -->
     <div class="fab-container no-print">
       <button id="fab-scan-btn" class="fab-scanner" onclick="toggleScannerPos()" title="Buka/Tutup Scanner">

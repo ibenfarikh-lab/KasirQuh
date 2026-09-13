@@ -2324,8 +2324,14 @@ function playBeep() {
 
 function toggleScannerPos() {
   const modal = document.getElementById("scannerModal");
+  if (!modal) {
+    console.error("scannerModal tidak ditemukan");
+    showNotif("Scanner belum tersedia pada halaman ini.");
+    return;
+  }
   if (!isScannerPosOpen) {
     modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
     isScannerPosOpen = true;
     history.pushState({tab: activeTab, scanner: true}, "", "");
     if (!html5QrCodePos) html5QrCodePos = new Html5Qrcode("reader-pos");
@@ -2338,6 +2344,7 @@ function toggleScannerPos() {
   } else {
     if (scannerTimeoutTimer) { clearTimeout(scannerTimeoutTimer); scannerTimeoutTimer = null; }
     modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
     isScannerPosOpen = false;
     if (html5QrCodePos && html5QrCodePos.isScanning) html5QrCodePos.stop().catch(err => {});
   }
