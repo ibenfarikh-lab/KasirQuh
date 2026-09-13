@@ -1,3 +1,4 @@
+let activeDashboardCategory = "Produk";
 const translations = {
   id: {
     app_title: "KasirQuh",
@@ -2698,6 +2699,59 @@ function hapusPelanggan(id) {
   }
 }
 
+const DASHBOARD_CATEGORY_ORDER = [
+  { name: "Titipan Warga", icon: "🏘️" },
+  { name: "Sembako", icon: "🍚" },
+  { name: "Minuman", icon: "🥤" },
+  { name: "Makanan", icon: "🍜" },
+  { name: "Snack", icon: "🍪" },
+  { name: "Bumbu", icon: "🧂" },
+  { name: "Perawatan", icon: "🧼" },
+  { name: "Kebutuhan Rumah", icon: "🧴" },
+  { name: "Lainnya", icon: "📦" }
+];
+
+function getDashboardCategoryIcon(name) {
+  const found = DASHBOARD_CATEGORY_ORDER.find(c => c.name.toLowerCase() === String(name).toLowerCase());
+  return found ? found.icon : "📦";
+}
+
+function renderDashboardCategories(kategoriList) {
+  const bar = document.getElementById("dashboard-category-bar");
+  const title = document.getElementById("dashboard-category-title");
+  if (!bar) return;
+
+  const unique = [...new Set((kategoriList || []).map(k => String(k || "").trim()).filter(Boolean))];
+  const known = [];
+  DASHBOARD_CATEGORY_ORDER.forEach(def => {
+    const actual = unique.find(k => k.toLowerCase() === def.name.toLowerCase());
+    if (actual) known.push({ name: actual, icon: def.icon });
+  });
+  const unknown = unique.filter(k => !DASHBOARD_CATEGORY_ORDER.some(def => def.name.toLowerCase() === k.toLowerCase()));
+  const items = [{ name: "Produk", icon: "🏠" }, ...known, ...unknown.map(name => ({ name, icon: "📦" }))];
+
+  if (!items.some(x => x.name.toLowerCase() === activeDashboardCategory.toLowerCase())) {
+    activeDashboardCategory = "Produk";
+  }
+
+  bar.innerHTML = items.map(item => {
+    const active = item.name.toLowerCase() === activeDashboardCategory.toLowerCase();
+    const safeName = item.name.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    return `<button type="button" class="dashboard-category-icon ${active ? "active" : ""}" onclick="pilihKategoriDashboard('${safeName}')" title="${item.name}" aria-label="${item.name}">${item.icon}</button>`;
+  }).join("");
+
+  if (title) {
+    const selected = items.find(x => x.name.toLowerCase() === activeDashboardCategory.toLowerCase()) || items[0];
+    title.textContent = `${selected.icon} ${selected.name}`;
+  }
+}
+
+function pilihKategoriDashboard(kategori) {
+  activeDashboardCategory = kategori || "Produk";
+  posCurrentPage = 1;
+  refreshData();
+}
+
 function updateDropdowns(kategoriList) {
   const filterSelect = document.getElementById("filter-category");
   if(filterSelect) {
@@ -2797,20 +2851,20 @@ function refreshData() {
 
   let categories = new Set();
 
-  const filterKatPosEl = document.getElementById("filter-category-pos");
-  const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
-
   let filteredItemsPos = [];
   for (let code in databaseProduk) {
     let item = databaseProduk[code];
-    let kat = item.kategori || "Umum";
-    categories.add(kat);
+    let kat = String(item.kategori || "").trim();
+    if (kat) categories.add(kat);
 
-    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || kat === filterKatPos)) {
+    const cocokKategori = activeDashboardCategory === "Produk" || kat.toLowerCase() === activeDashboardCategory.toLowerCase();
+    const namaProduk = String(item.nama || "");
+    if (namaProduk.toLowerCase().includes(searchKeyword) && cocokKategori) {
       filteredItemsPos.push({ code, ...item });
     }
   }
-  filteredItemsPos.sort((a, b) => a.nama.localeCompare(b.nama));
+  filteredItemsPos.sort((a, b) => String(a.nama || "").localeCompare(String(b.nama || "")));
+  renderDashboardCategories(Array.from(categories));
   updateDropdowns(Array.from(categories));
 
   if (activeTab === 'penjualan') {
