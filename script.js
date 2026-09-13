@@ -1317,10 +1317,12 @@ function renderProductCategoryPicker() {
 
   const options = getAvailableProductCategories();
   menu.innerHTML = options.map(kat => {
-    const checked = selected.includes(kat) ? "checked" : "";
-    return `<button type="button" class="category-option" onclick="toggleProductCategory(${JSON.stringify(kat)}); event.stopPropagation();">
-      <input type="checkbox" ${checked} tabindex="-1"><span>${escapeHtmlAdmin(kat)}</span>
-    </button>`;
+    const checked = selected.includes(kat) ? " checked" : "";
+    const safeKat = escapeHtmlAdmin(kat);
+    return `<label class="category-option">
+      <input type="checkbox"${checked} onchange="toggleProductCategory(${JSON.stringify(kat)}, this.checked); event.stopPropagation();">
+      <span>${safeKat}</span>
+    </label>`;
   }).join("") + `
     <div class="category-add">
       <button type="button" onclick="addNewProductCategory(event)">＋ Tambah kategori baru</button>
@@ -1340,10 +1342,11 @@ function toggleCategoryPicker(event) {
   menu.style.display = willShow ? "block" : "none";
 }
 
-function toggleProductCategory(category) {
+function toggleProductCategory(category, checked) {
   const selected = getSelectedProductCategories();
   const idx = selected.indexOf(category);
-  if (idx >= 0) selected.splice(idx, 1); else selected.push(category);
+  if (checked && idx < 0) selected.push(category);
+  if (!checked && idx >= 0) selected.splice(idx, 1);
   setSelectedProductCategories(selected);
   const menu = document.getElementById("db-category-menu");
   if (menu) menu.style.display = "block";
