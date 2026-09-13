@@ -609,11 +609,31 @@
   }
 
 </style>
-<style id="home-feature-transition-v73">
-#reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper { overflow:hidden; transform-origin:top center; transition:max-height .28s cubic-bezier(.4,0,.2,1),opacity .22s ease,transform .28s cubic-bezier(.4,0,.2,1),margin .28s cubic-bezier(.4,0,.2,1); }
-.home-feature-closing { max-height:0 !important; opacity:0 !important; transform:translateY(-16px) scaleY(.96); margin-top:0 !important; margin-bottom:0 !important; pointer-events:none; }
+<style id="home-feature-transition-v74">
+#reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper {
+  overflow: hidden;
+  transform-origin: top center;
+  max-height: 3000px;
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+  transition: max-height .42s cubic-bezier(.22,1,.36,1), opacity .30s ease, transform .42s cubic-bezier(.22,1,.36,1), margin .42s cubic-bezier(.22,1,.36,1), padding .42s cubic-bezier(.22,1,.36,1);
+  will-change: max-height, opacity, transform, margin, padding;
+}
+.home-feature-closing {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  transform: translateY(-28px) scaleY(.92);
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper { transition: none !important; }
+}
 </style>
-<style id="customer-developer-footer-style-v73">.customer-developer-footer{text-align:center;margin:16px 0 10px;padding:6px 0;font-size:.7rem;color:var(--text-muted);}.customer-developer-footer a{color:inherit;text-decoration:none;}</style>
+<style id="customer-developer-footer-style-v73">.customer-developer-footer{text-align:center;margin:16px 0 14px;padding:8px 0 12px;font-size:.7rem;color:var(--text-muted);border-top:1px solid var(--border-color);}.customer-developer-footer a{color:inherit;text-decoration:none;}</style>
 </head>
 <body data-theme="light" style="font-size: 0.85rem;">
 
@@ -898,6 +918,7 @@
         <button onclick="bersihkanCacheTotal()" style="background: #dc2626; color: white; padding: 8px; font-weight: bold; border-radius: 6px; width: 100%; border: none; cursor: pointer; font-size: 0.8rem;">🧹 Bersihkan Cache & Muat Ulang</button>
       </div>
       <div class="card" style="padding: 12px;"><h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Sesi Aplikasi</h3><button class="btn-logout" onclick="logoutPelanggan()" style="background: #dc2626; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 0.8rem;">🚪 Keluar / Ganti Akun</button></div>
+      <div class="customer-developer-footer" aria-label="Developer">Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)</div>
     </div>
   </div>
 
@@ -976,8 +997,6 @@
           💬 Tanya Admin soal barang ini
         </button>
       </div>
-      <div class="customer-developer-footer" aria-label="Developer">Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)</div>
-
     </div>
   </div>
 
@@ -1839,16 +1858,22 @@
       }
 
       if (searchOpen) {
-        ['category-container','reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+        ['category-container'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
+        setHomeFeatureTransition(false);
         return;
       }
 
       const promoBanner = document.getElementById('promo-banner-section');
       if (promoBanner) promoBanner.style.display = (promoBanner.getAttribute('aria-hidden') === 'false' && isHome) ? 'flex' : 'none';
-      document.getElementById('recipe-section-wrapper').style.display = isHome ? 'block' : 'none';
-      document.getElementById('trending-section-wrapper').style.display = isHome ? 'block' : 'none';
-      let reorderWrapper = document.getElementById('reorder-section-wrapper');
-      if (reorderWrapper) { reorderWrapper.style.display = (isHome && document.getElementById('reorder-container').children.length > 0) ? 'block' : 'none'; }
+      const reorderHasItems = !!document.getElementById('reorder-container')?.children.length;
+      if (!isHome) {
+        ['reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'].forEach(id => { const el=document.getElementById(id); if (el && !el.classList.contains('home-feature-closing')) el.style.display='block'; });
+        setHomeFeatureTransition(false);
+      } else {
+        const reorderWrapper = document.getElementById('reorder-section-wrapper');
+        if (reorderWrapper && !reorderHasItems) reorderWrapper.style.display = 'none';
+        setHomeFeatureTransition(true);
+      }
     }
 
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
@@ -2124,7 +2149,41 @@
 
     function setHomeFeatureTransition(showHome) {
       const ids = ['reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'];
-      ids.forEach(id => { const el=document.getElementById(id); if(!el) return; if(showHome){ el.classList.remove('home-feature-closing'); el.style.maxHeight=el.scrollHeight+'px'; el.style.opacity='1'; el.style.transform='translateY(0) scaleY(1)'; } else { if(!el.classList.contains('home-feature-closing')) el.style.maxHeight=el.scrollHeight+'px'; requestAnimationFrame(()=>el.classList.add('home-feature-closing')); } });
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        // A section may be genuinely empty (e.g. reorder), so keep its normal display logic.
+        if (!showHome) {
+          if (getComputedStyle(el).display === 'none') {
+            el.style.display = 'block';
+            el.style.maxHeight = el.scrollHeight + 'px';
+            void el.offsetHeight;
+          } else {
+            el.style.maxHeight = el.scrollHeight + 'px';
+            void el.offsetHeight;
+          }
+          el.classList.add('home-feature-closing');
+          el.addEventListener('transitionend', function(ev) {
+            if (ev.propertyName !== 'max-height' || !el.classList.contains('home-feature-closing')) return;
+            el.style.display = 'none';
+          }, {once:true});
+        } else {
+          // Open from a truly closed state: display first, then animate max-height upward.
+          el.style.display = 'block';
+          el.classList.add('home-feature-closing');
+          el.style.maxHeight = '0px';
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(-28px) scaleY(.92)';
+          void el.offsetHeight;
+          requestAnimationFrame(() => {
+            el.classList.remove('home-feature-closing');
+            el.style.maxHeight = el.scrollHeight + 'px';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0) scaleY(1)';
+          });
+        }
+      });
     }
 
     function switchTabPelanggan(tabId) {
@@ -2168,8 +2227,8 @@
 
       if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && pb.getAttribute('aria-hidden') === 'false' && activeKategoriPelanggan === 'Home') pb.style.display = 'flex'; }
       else { 
-        const promoBanner = document.getElementById('promo-banner-section'); if (promoBanner) promoBanner.style.display = 'none'; document.getElementById('recipe-section-wrapper').style.display = 'none'; document.getElementById('trending-section-wrapper').style.display = 'none';
-        let reorderWrapper = document.getElementById('reorder-section-wrapper'); if (reorderWrapper) reorderWrapper.style.display = 'none';
+        const promoBanner = document.getElementById('promo-banner-section'); if (promoBanner) promoBanner.style.display = 'none';
+        setHomeFeatureTransition(false);
       }
 
       if (tabId === 'pengaturan') { document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto'; document.getElementById('setting-cust-view').value = catalogViewMode; if (currentCustomerPhone) { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => { if (!snap.empty) { let data = snap.docs[0].data(); document.getElementById('setting-cust-name').value = data.nama || ""; document.getElementById('setting-cust-phone').value = data.phone || ""; document.getElementById('setting-cust-address').value = data.alamat || ""; } }); } }
