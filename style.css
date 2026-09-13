@@ -1260,46 +1260,51 @@ body.theme-colorful-v2 #penjualan > .pos-container > .card {
   background-image: none !important;
 }
 
-
-/* Dashboard kategori: ikon saja, nama muncul saat kategori dipilih */
-.dashboard-category-bar {
+/* Dashboard POS category icon menu */
+.pos-category-menu {
   display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
-  margin-bottom: 8px;
-  padding: 6px 2px;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 1px 7px;
   scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
-.dashboard-category-icon {
+.pos-category-menu::-webkit-scrollbar { height: 4px; }
+.pos-category-icon {
+  flex: 0 0 42px;
   width: 42px;
   height: 42px;
-  min-width: 42px;
   padding: 0;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  background: var(--card-bg);
+  background: var(--input-bg);
   color: var(--text-color);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
-  cursor: pointer;
-  box-shadow: none;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
-.dashboard-category-icon.active {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+.pos-category-icon:active { transform: scale(.94); }
+.pos-category-icon.active {
+  border: 2px solid currentColor;
+  box-shadow: 0 0 0 2px rgba(127,127,127,.18);
   transform: translateY(-1px);
 }
-.dashboard-category-title {
+.pos-category-title {
   width: 100%;
+  box-sizing: border-box;
   margin: 0 0 10px;
   padding: 7px 10px;
-  border-radius: 8px;
-  background: var(--table-header);
+  border-radius: 9px;
+  background: var(--input-bg);
   color: var(--text-color);
-  font-size: 0.9rem;
+  border: 1px solid var(--border-color);
   font-weight: 700;
+  font-size: .9rem;
 }

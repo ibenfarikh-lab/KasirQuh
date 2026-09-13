@@ -1,4 +1,3 @@
-let activeDashboardCategory = "Produk";
 const translations = {
   id: {
     app_title: "KasirQuh",
@@ -2699,56 +2698,38 @@ function hapusPelanggan(id) {
   }
 }
 
-const DASHBOARD_CATEGORY_ORDER = [
-  { name: "Titipan Warga", icon: "🏘️" },
-  { name: "Sembako", icon: "🍚" },
-  { name: "Minuman", icon: "🥤" },
-  { name: "Makanan", icon: "🍜" },
-  { name: "Snack", icon: "🍪" },
-  { name: "Bumbu", icon: "🧂" },
-  { name: "Perawatan", icon: "🧼" },
-  { name: "Kebutuhan Rumah", icon: "🧴" },
-  { name: "Lainnya", icon: "📦" }
+const POS_CATEGORIES = [
+  { key: "__ALL__", label: "Produk", icon: "🏠" },
+  { key: "Titipan Warga", label: "Titipan Warga", icon: "🏘️" },
+  { key: "Sembako", label: "Sembako", icon: "🍚" },
+  { key: "Minuman", label: "Minuman", icon: "🥤" },
+  { key: "Makanan", label: "Makanan", icon: "🍜" },
+  { key: "Snack", label: "Snack", icon: "🍪" },
+  { key: "Bumbu", label: "Bumbu", icon: "🧂" },
+  { key: "Perawatan", label: "Perawatan", icon: "🧼" },
+  { key: "Kebutuhan Rumah", label: "Kebutuhan Rumah", icon: "🧴" },
+  { key: "Lainnya", label: "Lainnya", icon: "📦" }
 ];
+let activePosCategory = "__ALL__";
 
-function getDashboardCategoryIcon(name) {
-  const found = DASHBOARD_CATEGORY_ORDER.find(c => c.name.toLowerCase() === String(name).toLowerCase());
-  return found ? found.icon : "📦";
+function renderPosCategoryMenu() {
+  const menu = document.getElementById("pos-category-menu");
+  const title = document.getElementById("pos-category-title");
+  if (!menu) return;
+
+  menu.innerHTML = POS_CATEGORIES.map(cat => `
+    <button type="button" class="pos-category-icon ${activePosCategory === cat.key ? 'active' : ''}"
+      title="${cat.label}" aria-label="${cat.label}" onclick="selectPosCategory('${cat.key.replace(/'/g, "\\'")}')">${cat.icon}</button>
+  `).join('');
+
+  const active = POS_CATEGORIES.find(c => c.key === activePosCategory) || POS_CATEGORIES[0];
+  if (title) title.textContent = `${active.icon} ${active.label}`;
 }
 
-function renderDashboardCategories(kategoriList) {
-  const bar = document.getElementById("dashboard-category-bar");
-  const title = document.getElementById("dashboard-category-title");
-  if (!bar) return;
-
-  const unique = [...new Set((kategoriList || []).map(k => String(k || "").trim()).filter(Boolean))];
-  const known = [];
-  DASHBOARD_CATEGORY_ORDER.forEach(def => {
-    const actual = unique.find(k => k.toLowerCase() === def.name.toLowerCase());
-    if (actual) known.push({ name: actual, icon: def.icon });
-  });
-  const unknown = unique.filter(k => !DASHBOARD_CATEGORY_ORDER.some(def => def.name.toLowerCase() === k.toLowerCase()));
-  const items = [{ name: "Produk", icon: "🏠" }, ...known, ...unknown.map(name => ({ name, icon: "📦" }))];
-
-  if (!items.some(x => x.name.toLowerCase() === activeDashboardCategory.toLowerCase())) {
-    activeDashboardCategory = "Produk";
-  }
-
-  bar.innerHTML = items.map(item => {
-    const active = item.name.toLowerCase() === activeDashboardCategory.toLowerCase();
-    const safeName = item.name.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-    return `<button type="button" class="dashboard-category-icon ${active ? "active" : ""}" onclick="pilihKategoriDashboard('${safeName}')" title="${item.name}" aria-label="${item.name}">${item.icon}</button>`;
-  }).join("");
-
-  if (title) {
-    const selected = items.find(x => x.name.toLowerCase() === activeDashboardCategory.toLowerCase()) || items[0];
-    title.textContent = `${selected.icon} ${selected.name}`;
-  }
-}
-
-function pilihKategoriDashboard(kategori) {
-  activeDashboardCategory = kategori || "Produk";
+function selectPosCategory(categoryKey) {
+  activePosCategory = categoryKey || "__ALL__";
   posCurrentPage = 1;
+  renderPosCategoryMenu();
   refreshData();
 }
 
@@ -2849,23 +2830,29 @@ function refreshData() {
   const searchInputEl = document.getElementById("inventory-search-input");
   const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
-  let categories = new Set();
+  // Kategori POS selalu dibangun dari seluruh dataset yang sudah dimuat dari DB `produk`.
+  // Tidak pernah memakai isi halaman aktif sebagai sumber filter.
+  const kategoriDb = new Set();
+  Object.values(databaseProduk).forEach(item => {
+    const kat = String(item.kategori || "").trim();
+    if (kat) kategoriDb.add(kat);
+  });
 
   let filteredItemsPos = [];
   for (let code in databaseProduk) {
-    let item = databaseProduk[code];
-    let kat = String(item.kategori || "").trim();
-    if (kat) categories.add(kat);
+    const item = databaseProduk[code] || {};
+    const nama = String(item.nama || "");
+    const kat = String(item.kategori || "").trim();
+    const cocokPencarian = nama.toLowerCase().includes(searchKeyword) || String(code).toLowerCase().includes(searchKeyword);
+    const cocokKategori = activePosCategory === "__ALL__" || kat === activePosCategory;
 
-    const cocokKategori = activeDashboardCategory === "Produk" || kat.toLowerCase() === activeDashboardCategory.toLowerCase();
-    const namaProduk = String(item.nama || "");
-    if (namaProduk.toLowerCase().includes(searchKeyword) && cocokKategori) {
+    if (cocokPencarian && cocokKategori) {
       filteredItemsPos.push({ code, ...item });
     }
   }
-  filteredItemsPos.sort((a, b) => String(a.nama || "").localeCompare(String(b.nama || "")));
-  renderDashboardCategories(Array.from(categories));
-  updateDropdowns(Array.from(categories));
+  filteredItemsPos.sort((a, b) => String(a.nama || '').localeCompare(String(b.nama || '')));
+  renderPosCategoryMenu();
+  updateDropdowns(Array.from(kategoriDb));
 
   if (activeTab === 'penjualan') {
     renderKatalogKasirPaginated(filteredItemsPos);
