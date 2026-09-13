@@ -1631,3 +1631,9 @@ body.theme-colorful-v2 [style*="#ec4899"] {
 
 /* Never allow a gradient image to survive in V2. */
 [data-theme="colorful-v2"] * { background-image:none !important; }
+
+/* POS scanner FAB hit-area: keep it above page content/overlays. */
+.fab-container { z-index: 10020 !important; pointer-events: none; }
+.fab-container > button { pointer-events: auto; position: relative; z-index: 10021; }
+#fab-scan-btn { pointer-events: auto !important; touch-action: manipulation; }
+#scannerModal { pointer-events: auto; }
