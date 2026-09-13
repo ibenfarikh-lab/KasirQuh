@@ -2698,41 +2698,6 @@ function hapusPelanggan(id) {
   }
 }
 
-const POS_CATEGORIES = [
-  { key: "__ALL__", label: "Produk", icon: "🏠" },
-  { key: "Titipan Warga", label: "Titipan Warga", icon: "🏘️" },
-  { key: "Sembako", label: "Sembako", icon: "🍚" },
-  { key: "Minuman", label: "Minuman", icon: "🥤" },
-  { key: "Makanan", label: "Makanan", icon: "🍜" },
-  { key: "Snack", label: "Snack", icon: "🍪" },
-  { key: "Bumbu", label: "Bumbu", icon: "🧂" },
-  { key: "Perawatan", label: "Perawatan", icon: "🧼" },
-  { key: "Kebutuhan Rumah", label: "Kebutuhan Rumah", icon: "🧴" },
-  { key: "Lainnya", label: "Lainnya", icon: "📦" }
-];
-let activePosCategory = "__ALL__";
-
-function renderPosCategoryMenu() {
-  const menu = document.getElementById("pos-category-menu");
-  const title = document.getElementById("pos-category-title");
-  if (!menu) return;
-
-  menu.innerHTML = POS_CATEGORIES.map(cat => `
-    <button type="button" class="pos-category-icon ${activePosCategory === cat.key ? 'active' : ''}"
-      title="${cat.label}" aria-label="${cat.label}" onclick="selectPosCategory('${cat.key.replace(/'/g, "\\'")}')">${cat.icon}</button>
-  `).join('');
-
-  const active = POS_CATEGORIES.find(c => c.key === activePosCategory) || POS_CATEGORIES[0];
-  if (title) title.textContent = `${active.icon} ${active.label}`;
-}
-
-function selectPosCategory(categoryKey) {
-  activePosCategory = categoryKey || "__ALL__";
-  posCurrentPage = 1;
-  renderPosCategoryMenu();
-  refreshData();
-}
-
 function updateDropdowns(kategoriList) {
   const filterSelect = document.getElementById("filter-category");
   if(filterSelect) {
@@ -2830,29 +2795,23 @@ function refreshData() {
   const searchInputEl = document.getElementById("inventory-search-input");
   const searchKeyword = searchInputEl ? searchInputEl.value.toLowerCase() : "";
 
-  // Kategori POS selalu dibangun dari seluruh dataset yang sudah dimuat dari DB `produk`.
-  // Tidak pernah memakai isi halaman aktif sebagai sumber filter.
-  const kategoriDb = new Set();
-  Object.values(databaseProduk).forEach(item => {
-    const kat = String(item.kategori || "").trim();
-    if (kat) kategoriDb.add(kat);
-  });
+  let categories = new Set();
+
+  const filterKatPosEl = document.getElementById("filter-category-pos");
+  const filterKatPos = filterKatPosEl ? filterKatPosEl.value : "Semua";
 
   let filteredItemsPos = [];
   for (let code in databaseProduk) {
-    const item = databaseProduk[code] || {};
-    const nama = String(item.nama || "");
-    const kat = String(item.kategori || "").trim();
-    const cocokPencarian = nama.toLowerCase().includes(searchKeyword) || String(code).toLowerCase().includes(searchKeyword);
-    const cocokKategori = activePosCategory === "__ALL__" || kat === activePosCategory;
+    let item = databaseProduk[code];
+    let kat = item.kategori || "Umum";
+    categories.add(kat);
 
-    if (cocokPencarian && cocokKategori) {
+    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || kat === filterKatPos)) {
       filteredItemsPos.push({ code, ...item });
     }
   }
-  filteredItemsPos.sort((a, b) => String(a.nama || '').localeCompare(String(b.nama || '')));
-  renderPosCategoryMenu();
-  updateDropdowns(Array.from(kategoriDb));
+  filteredItemsPos.sort((a, b) => a.nama.localeCompare(b.nama));
+  updateDropdowns(Array.from(categories));
 
   if (activeTab === 'penjualan') {
     renderKatalogKasirPaginated(filteredItemsPos);
