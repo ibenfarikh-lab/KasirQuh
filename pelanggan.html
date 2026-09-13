@@ -125,7 +125,15 @@
       font-size:.66rem !important; font-weight:800; display:flex; flex-direction:column;
       align-items:center; justify-content:center; gap:4px; white-space:normal;
     }
+    .category-chips .chip-btn::first-letter { font-size:1.25rem; }
     .category-chips .chip-btn.active { color:#2563eb !important; background:#eff6ff !important; box-shadow:inset 0 0 0 2px rgba(37,99,235,.12), 0 5px 15px rgba(37,99,235,.10); }
+    .category-chips .chip-btn:nth-child(1)::before { content:'▦'; }
+    .category-chips .chip-btn:nth-child(2)::before { content:'🍚'; }
+    .category-chips .chip-btn:nth-child(3)::before { content:'🥤'; }
+    .category-chips .chip-btn:nth-child(4)::before { content:'🍪'; }
+    .category-chips .chip-btn:nth-child(5)::before { content:'🧂'; }
+    .category-chips .chip-btn:nth-child(6)::before { content:'📦'; }
+    .category-chips .chip-btn:nth-child(7)::before { content:'🧰'; }
     .category-chips .chip-btn::before { font-size:1.2rem; line-height:1; }
 
     #reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper { margin-left:0 !important; margin-right:0 !important; }
@@ -377,6 +385,13 @@
     .category-chips .chip-btn::before {
       font-size:1.45rem !important; line-height:1 !important; margin:0 !important;
     }
+    .category-chips .chip-btn:nth-child(1)::before { content:'🏪'; }
+    .category-chips .chip-btn:nth-child(2)::before { content:'🏠'; }
+    .category-chips .chip-btn:nth-child(3)::before { content:'🥤'; }
+    .category-chips .chip-btn:nth-child(4)::before { content:'🍪'; }
+    .category-chips .chip-btn:nth-child(5)::before { content:'🧂'; }
+    .category-chips .chip-btn:nth-child(6)::before { content:'📦'; }
+    .category-chips .chip-btn:nth-child(7)::before { content:'🧰'; }
     .category-chips .chip-btn:nth-child(1) { background:#fff7ed !important; }
     .category-chips .chip-btn:nth-child(2) { background:#eff6ff !important; }
     .category-chips .chip-btn:nth-child(3) { background:#ecfdf5 !important; }
@@ -405,34 +420,6 @@
       .customer-running-text { animation:none !important; padding-left:0; }
     }
 
-
-/* Promo: same rhythm as AI FAB — 3 bounces, 3 seconds rest, repeat */
-@keyframes promoBounceThree {
-  0%, 62.5%, 100% { transform: translateY(0); }
-  4%  { transform: translateY(-9px); }
-  8%  { transform: translateY(0); }
-  12% { transform: translateY(-7px); }
-  16% { transform: translateY(0); }
-  20% { transform: translateY(-5px); }
-  24% { transform: translateY(0); }
-}
-
-/* Keep promo geometry exactly as-is; animation only */
-.customer-promo,
-.customerPromo,
-.promo-trigger,
-.promo-float,
-#customerPromo,
-#promoTrigger {
-  animation: promoBounceThree 7.8s ease-in-out infinite !important;
-  will-change: transform;
-}
-
-/* Safe FAB visibility fix:
-   Login/welcome controls remain untouched; FAB visibility follows their actual display state. */
-body.fab-auth-hidden .fab-container {
-  display: none !important;
-}
 
 </style>
 
@@ -478,7 +465,7 @@ body.fab-auth-hidden .fab-container {
     background: #2563eb !important;
     box-shadow: 0 7px 18px rgba(37,99,235,.28) !important;
     overflow: visible !important;
-    animation: promoBounceThree 4.8s ease-in-out infinite !important;
+    animation: customerPromoBounce 1.9s ease-in-out infinite !important;
   }
   #promo-banner-section .promo-stage {
     padding: 0 !important;
@@ -493,14 +480,12 @@ body.fab-auth-hidden .fab-container {
   }
   #promo-banner-section .promo-stage > div:not(:first-child) { display: none !important; }
   #promo-banner-section::before, #promo-banner-section::after { display: none !important; }
-  @keyframes promoBounceThree {
-    0%, 37.5%, 100% { transform: translateY(0) scale(1); }
-    5% { transform: translateY(-9px) scale(1.03); }
-    10% { transform: translateY(0) scale(1); }
-    15% { transform: translateY(-9px) scale(1.03); }
-    20% { transform: translateY(0) scale(1); }
-    25% { transform: translateY(-9px) scale(1.03); }
-    30% { transform: translateY(0) scale(1); }
+  @keyframes customerPromoBounce {
+    0%,100% { transform: translateY(0); }
+    8% { transform: translateY(-5px); }
+    16% { transform: translateY(0); }
+    24% { transform: translateY(-3px); }
+    32% { transform: translateY(0); }
   }
 
   /* Category strip: tiny icon-only controls, one horizontal row, no wrapper */
@@ -663,289 +648,7 @@ body.fab-auth-hidden .fab-container {
 }
 </style>
 
-
-<style id="kategori-svg-line-art-light-dark">
-/* Ikon kategori: satu gaya line-art, warna mengikuti tema. */
-.category-chips .chip-btn .category-line-icon {
-  width: 24px !important;
-  height: 24px !important;
-  display: block !important;
-  flex: 0 0 24px !important;
-  color: var(--category-icon-color, #000) !important;
-  stroke: currentColor !important;
-  fill: none !important;
-  stroke-width: 1.9 !important;
-  stroke-linecap: round !important;
-  stroke-linejoin: round !important;
-  pointer-events: none !important;
-}
-[data-theme="light"] .category-chips .chip-btn .category-line-icon {
-  --category-icon-color: #000;
-  color: #000 !important;
-}
-[data-theme="dark"] .category-chips .chip-btn .category-line-icon {
-  --category-icon-color: #fff;
-  color: #fff !important;
-}
-.category-chips .chip-btn.active .category-line-icon {
-  stroke-width: 2.15 !important;
-}
-@media (max-width: 420px) {
-  .category-chips .chip-btn .category-line-icon {
-    width: 23px !important;
-    height: 23px !important;
-    flex-basis: 23px !important;
-  }
-}
-</style>
-
-
-<style id="kq-warunge-mimi-header-refresh">
-/* Header: logo aset asli, teks existing, tanpa teks tambahan. */
-.customer-home-header {
-  position:relative !important; display:grid !important;
-  grid-template-columns:86px minmax(0,1fr) 54px !important;
-  align-items:center !important; column-gap:12px !important;
-  padding:14px 14px 16px !important; margin:0 -8px 10px !important;
-  min-height:116px !important; box-sizing:border-box !important; overflow:hidden !important;
-}
-.customer-home-logo-wrap { width:86px !important; height:86px !important; display:flex !important; align-items:center !important; justify-content:center !important; background:transparent !important; border:0 !important; box-shadow:none !important; }
-.customer-home-logo { width:86px !important; height:86px !important; object-fit:contain !important; display:block !important; background:transparent !important; }
-.customer-home-logo-dark { display:none !important; }
-[data-theme="dark"] .customer-home-logo-light { display:none !important; }
-[data-theme="dark"] .customer-home-logo-dark { display:block !important; }
-.customer-home-header .customer-home-title-row { min-width:0 !important; min-height:0 !important; display:block !important; }
-.customer-home-header .customer-home-title { margin:0 !important; font-size:1.12rem !important; line-height:1.15 !important; letter-spacing:-.2px !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; }
-.customer-home-header .customer-home-title::before { content:none !important; }
-.customer-home-header .customer-home-greeting { margin:5px 0 0 !important; font-size:.78rem !important; line-height:1.2 !important; }
-.customer-home-header #customer-home-info-line { width:100% !important; max-width:none !important; margin:7px 0 0 !important; padding:6px 8px !important; box-sizing:border-box !important; border-radius:12px !important; min-width:0 !important; }
-.customer-home-header .customer-running-window { min-width:0 !important; }
-.customer-home-header .customer-running-text { font-size:.64rem !important; }
-.customer-home-header #promo-banner-section { position:static !important; width:54px !important; min-width:54px !important; height:54px !important; min-height:54px !important; padding:0 !important; margin:0 !important; border-radius:50% !important; display:flex !important; align-items:center !important; justify-content:center !important; }
-.customer-home-header #promo-banner-section .promo-stage { padding:0 !important; width:auto !important; }
-.customer-home-header #promo-banner-section .promo-stage > div:not(:first-child) { display:none !important; }
-.customer-home-header #promo-banner-section .promo-stage > div:first-child { margin:0 !important; font-size:1.9rem !important; }
-@media (max-width:480px){
- .customer-home-header { grid-template-columns:72px minmax(0,1fr) 48px !important; column-gap:9px !important; padding:11px 10px 13px !important; min-height:96px !important; }
- .customer-home-logo-wrap,.customer-home-logo { width:72px !important; height:72px !important; }
- .customer-home-header .customer-home-title { font-size:1rem !important; }
- .customer-home-header .customer-home-greeting { font-size:.73rem !important; }
- .customer-home-header #customer-home-info-line { margin-top:5px !important; padding:5px 7px !important; font-size:.63rem !important; }
- .customer-home-header #promo-banner-section { width:48px !important; min-width:48px !important; height:48px !important; min-height:48px !important; }
-}
-</style>
-
-
-<style id="kq-header-final-fix">
-/* Header final: keep existing data, only refine placement. */
-#customer-home-header{
-  position:relative !important;
-  display:flex !important;
-  align-items:center !important;
-  width:100% !important;
-  box-sizing:border-box !important;
-  overflow:hidden !important;
-}
-#customer-home-header .customer-home-logo-wrap{
-  flex:0 0 auto !important;
-  background:transparent !important;
-  padding:0 !important;
-  margin:0 10px 0 0 !important;
-  box-shadow:none !important;
-  border:0 !important;
-}
-#customer-home-header .customer-home-logo{
-  display:block !important;
-  width:88px !important;
-  height:88px !important;
-  object-fit:contain !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-}
-#customer-home-header .customer-home-title-row{
-  flex:1 1 auto !important;
-  min-width:0 !important;
-  max-width:none !important;
-  padding-right:76px !important;
-  box-sizing:border-box !important;
-}
-#customer-home-header .customer-home-title{
-  white-space:nowrap !important;
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-  margin-right:0 !important;
-}
-#customer-home-header .customer-home-info-line{
-  max-width:100% !important;
-  overflow:hidden !important;
-}
-#customer-home-header .customer-running-window{
-  min-width:0 !important;
-  max-width:100% !important;
-  overflow:hidden !important;
-}
-#customer-home-header .customer-running-text{
-  display:inline-block !important;
-  max-width:100% !important;
-}
-#customer-home-header #promo-banner-section{
-  position:absolute !important;
-  right:0 !important;
-  top:50% !important;
-  transform:translateY(-50%) !important;
-  width:68px !important;
-  min-width:68px !important;
-  height:68px !important;
-  min-height:68px !important;
-  margin:0 !important;
-  padding:0 !important;
-  border-radius:50% !important;
-  z-index:20 !important;
-}
-#customer-home-header #promo-banner-section .promo-stage{
-  width:100% !important;
-  height:100% !important;
-  padding:0 !important;
-  display:grid !important;
-  place-items:center !important;
-  overflow:hidden !important;
-}
-#customer-home-header #promo-banner-section .promo-stage > div:first-child{
-  margin:0 !important;
-  font-size:2rem !important;
-}
-#customer-home-header #promo-banner-section .promo-stage > div:nth-child(2),
-#customer-home-header #promo-banner-section .promo-stage > div:nth-child(3){display:none !important;}
-@media(max-width:480px){
-  #customer-home-header .customer-home-logo{width:78px !important;height:78px !important;}
-  #customer-home-header .customer-home-title-row{padding-right:66px !important;}
-  #customer-home-header #promo-banner-section{width:60px !important;height:60px !important;min-width:60px !important;min-height:60px !important;}
-}
-</style>
-
-<style id="kq-header-lightweight-final">
-/* Lightweight header fix: single inline SVG, no base64 assets, no new data/text. */
-#customer-home-header {
-  width: calc(100% + 16px) !important;
-  margin-left: -8px !important;
-  margin-right: -8px !important;
-  padding: 12px 14px 13px !important;
-  min-height: 118px !important;
-  display: grid !important;
-  grid-template-columns: 92px minmax(0,1fr) 68px !important;
-  column-gap: 12px !important;
-  align-items: center !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
-#customer-home-header .customer-home-logo-wrap {
-  width: 92px !important; height: 92px !important;
-  margin: 0 !important; padding: 0 !important;
-  display: flex !important; align-items: center !important; justify-content: center !important;
-  background: transparent !important; border: 0 !important; box-shadow: none !important;
-  color: #111827 !important;
-}
-#customer-home-header .customer-home-logo {
-  width: 92px !important; height: 92px !important;
-  display: block !important; object-fit: contain !important;
-  background: transparent !important;
-  color: #111827 !important;
-}
-[data-theme="dark"] #customer-home-header .customer-home-logo-wrap,
-[data-theme="dark"] #customer-home-header .customer-home-logo { color: #fff !important; }
-#customer-home-header .customer-home-title-row {
-  min-width: 0 !important; width: 100% !important;
-  display: block !important; padding: 0 !important; margin: 0 !important;
-}
-#customer-home-header .customer-home-title {
-  margin: 0 !important; padding: 0 !important;
-  font-size: 1.12rem !important; line-height: 1.15 !important;
-  white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;
-}
-#customer-home-header .customer-home-title::before { content: none !important; }
-#customer-home-header .customer-home-greeting {
-  margin: 5px 0 0 !important; font-size: .78rem !important; line-height: 1.2 !important;
-  white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;
-}
-#customer-home-header #customer-home-info-line {
-  width: 100% !important; max-width: 100% !important;
-  margin: 7px 0 0 !important; padding: 6px 9px !important;
-  box-sizing: border-box !important; min-width: 0 !important;
-  overflow: hidden !important; white-space: nowrap !important;
-}
-#customer-home-header .customer-running-window { min-width: 0 !important; overflow: hidden !important; }
-#customer-home-header .customer-running-text {
-  display: inline-block !important; max-width: 100% !important;
-  overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
-}
-#customer-home-header #promo-banner-section {
-  position: relative !important; right: auto !important; top: auto !important; transform: none !important;
-  justify-self: end !important; align-self: center !important;
-  width: 68px !important; min-width: 68px !important;
-  height: 68px !important; min-height: 68px !important;
-  margin: 0 !important; padding: 0 !important;
-  border-radius: 50% !important; overflow: hidden !important;
-  z-index: 20 !important;
-}
-#customer-home-header #promo-banner-section .promo-stage {
-  width: 100% !important; height: 100% !important; padding: 0 !important;
-  display: flex !important; align-items: center !important; justify-content: center !important;
-}
-#customer-home-header #promo-banner-section .promo-stage > div:first-child {
-  margin: 0 !important; font-size: 2rem !important; line-height: 1 !important;
-}
-#customer-home-header #promo-banner-section .promo-stage > div:not(:first-child) { display: none !important; }
-@media (max-width: 480px) {
-  #customer-home-header {
-    grid-template-columns: 78px minmax(0,1fr) 60px !important;
-    column-gap: 9px !important; padding: 10px 10px 12px !important; min-height: 104px !important;
-  }
-  #customer-home-header .customer-home-logo-wrap,
-  #customer-home-header .customer-home-logo { width: 78px !important; height: 78px !important; }
-  #customer-home-header .customer-home-title { font-size: 1rem !important; }
-  #customer-home-header .customer-home-greeting { font-size: .72rem !important; }
-  #customer-home-header #customer-home-info-line { margin-top: 5px !important; padding: 5px 7px !important; }
-  #customer-home-header #promo-banner-section { width: 60px !important; min-width: 60px !important; height: 60px !important; min-height: 60px !important; }
-}
-</style>
-
 </head>
-
-<script>
-(function () {
-  function updateFabAuthVisibility() {
-    const welcome = document.getElementById('welcomeScreen');
-    const login = document.getElementById('customerLoginModal');
-
-    const welcomeVisible = !!welcome && getComputedStyle(welcome).display !== 'none';
-    const loginVisible = !!login && getComputedStyle(login).display !== 'none';
-
-    document.body.classList.toggle('fab-auth-hidden', welcomeVisible || loginVisible);
-  }
-
-  function installFabAuthGuard() {
-    updateFabAuthVisibility();
-
-    ['welcomeScreen', 'customerLoginModal'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      new MutationObserver(updateFabAuthVisibility)
-        .observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
-    });
-
-    // Menangkap perubahan display dari kode lama tanpa mengubah alur login.
-    setInterval(updateFabAuthVisibility, 250);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', installFabAuthGuard);
-  } else {
-    installFabAuthGuard();
-  }
-})();
-</script>
-
 <body data-theme="light" style="font-size: 0.85rem;">
 
   <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 15px; box-sizing: border-box;">
@@ -1025,28 +728,11 @@ body.fab-auth-hidden .fab-container {
   <!-- 1. HALAMAN BELANJA -->
     <div id="belanja" class="tab-content active" style="display: block;">
       <div class="customer-home-header no-print" id="customer-home-header">
-        <div class="customer-home-logo-wrap" aria-hidden="true">
-          <svg class="customer-home-logo" viewBox="0 0 260 260" role="img" aria-label="KasirQuh Warunge Mimi" xmlns="http://www.w3.org/2000/svg">
-  <g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M48 78h164l-18-26H66L48 78Z"/>
-    <path d="M48 78c4 27 22 35 39 13 17 22 35 22 52 0 17 22 35 22 52 0 17 22 35 14 39-13"/>
-    <path d="M72 92v74M188 92v74M60 166h140"/>
-    <path d="M91 166v-47h39v47M91 128h39M153 166v-31h36"/>
-    <path d="M154 129c0-18 36-18 36 0"/>
-    <path d="M157 111c-3-10 5-13 4-21M171 111c-3-10 5-13 4-21M185 111c-3-10 5-13 4-21"/>
-    <path d="M39 190l-12-8M39 204l-15 2M39 218l-12 8M221 190l12-8M221 204l15 2M221 218l12 8"/>
-  </g>
-  <g fill="currentColor" font-family="Arial,Helvetica,sans-serif" text-anchor="middle">
-    <text x="130" y="203" font-size="35" font-weight="900" letter-spacing="-1.5">KasirQuh</text>
-    <text x="130" y="228" font-size="21" font-weight="900" letter-spacing="-0.8">Warunge Mimi</text>
-  </g>
-</svg>
-        </div>
         <div class="customer-home-title-row">
-          <h1 class="customer-home-title"><span id="customer-home-store-name">Nama Toko</span></h1>
-          <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
-          <div id="customer-home-info-line" class="customer-home-info-line"><span class="customer-info-label">📢  Info Toko:</span><span class="customer-running-window" aria-live="polite"><span id="customer-home-running-text" class="customer-running-text">&nbsp;</span></span></div>
+          <h1 class="customer-home-title">KasirQuh - <span id="customer-home-store-name">Nama Toko</span></h1>
         </div>
+        <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
+        <div id="customer-home-info-line" class="customer-home-info-line"><span class="customer-info-label">📢  Info Toko:</span><span class="customer-running-window" aria-live="polite"><span id="customer-home-running-text" class="customer-running-text">&nbsp;</span></span></div>
         <button id="promo-banner-section" class="promo-banner no-print" aria-label="Lihat promo toko" onclick="bukaPromoTokoPelanggan()" style="display:none;">
           <div class="promo-stage">
             <div style="font-size:2rem;line-height:1;margin-bottom:10px;">🎁</div>
@@ -1079,17 +765,17 @@ body.fab-auth-hidden .fab-container {
 
       <!-- Kategori katalog: ikon saja; judul muncul hanya setelah masuk mode Produk/kategori. -->
       <div class="category-chips no-print" id="category-container" aria-label="Kategori produk">
-        <button type="button" class="chip-btn active" data-category="Home" aria-label="Home" title="Home" onclick="pilihKategoriPelanggan('Home')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8"/><path d="M6 10v10h12V10"/><path d="M9 20v-6h6v6"/><path d="M8 8.5h.01"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Produk" aria-label="Produk" title="Produk" onclick="pilihKategoriPelanggan('Produk')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5h16l-1.2 11H5.2L4 8.5Z"/><path d="M8 8.5c.2-3 1.7-4.5 4-4.5s3.8 1.5 4 4.5"/><path d="M9 12.5h.01M15 12.5h.01"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Titipan Warga" aria-label="Titipan Warga" title="Titipan Warga" onclick="pilihKategoriPelanggan('Titipan Warga')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 12 3l8 6.5"/><path d="M6 9v11h12V9"/><path d="M8.5 20v-5h7v5"/><path d="M4 20h16"/><path d="M9 11.5h6"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Sembako" aria-label="Sembako" title="Sembako" onclick="pilihKategoriPelanggan('Sembako')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14l-1 11H6l-1-11Z"/><path d="M8 8.5c.3-2.8 1.7-4.2 4-4.2s3.7 1.4 4 4.2"/><path d="M8.5 12.5c1.2.8 2.2.8 3.5 0s2.3-.8 3.5 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Minuman" aria-label="Minuman" title="Minuman" onclick="pilihKategoriPelanggan('Minuman')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10"/><path d="M8 4.5 9.2 20h5.6L16 4.5"/><path d="M9 10h6"/><path d="M10 14c1 .7 2 .7 3 0s2-.7 3 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Makanan" aria-label="Makanan" title="Makanan" onclick="pilihKategoriPelanggan('Makanan')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h16"/><path d="M6 13a6 6 0 0 1 12 0"/><path d="M7 17h10"/><path d="M9 17v3M15 17v3"/><path d="M8 10h.01M16 10h.01"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Snack" aria-label="Snack" title="Snack" onclick="pilihKategoriPelanggan('Snack')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10h12l-1 10H7L6 10Z"/><path d="M8 10c0-2 1-3 2-3 0-2 1-3 2-3s2 1 2 3c1 0 2 1 2 3"/><path d="M9 14h.01M12 14h.01M15 14h.01"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Bumbu" aria-label="Bumbu" title="Bumbu" onclick="pilihKategoriPelanggan('Bumbu')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10v12H7z"/><path d="M8.5 8c.3-2.1 1.5-3.3 3.5-3.3S15.2 5.9 15.5 8"/><path d="M9.5 12.5h5M9.5 16h3.5"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Perawatan" aria-label="Perawatan" title="Perawatan" onclick="pilihKategoriPelanggan('Perawatan')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v3H9z"/><path d="M8 6h8l1 15H7L8 6Z"/><path d="M10 11h4M10 15h4"/><path d="M12 8v.01"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Kebutuhan Rumah" aria-label="Kebutuhan Rumah" title="Kebutuhan Rumah" onclick="pilihKategoriPelanggan('Kebutuhan Rumah')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h14l-1 11H6L5 10Z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M9 14c1 .7 2 .7 3 0s2-.7 3 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Lainnya" aria-label="Lainnya" title="Lainnya" onclick="pilihKategoriPelanggan('Lainnya')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14v14H5z"/><path d="M8 7V4h8v3"/><path d="M9 12h6M9 16h4"/><path d="M12 9.5v.01"/></svg></button>
+        <button type="button" class="chip-btn active" data-category="Home" aria-label="Home" title="Home" onclick="pilihKategoriPelanggan('Home')">🏠</button>
+        <button type="button" class="chip-btn" data-category="Produk" aria-label="Produk" title="Produk" onclick="pilihKategoriPelanggan('Produk')">🛍️</button>
+        <button type="button" class="chip-btn" data-category="Titipan Warga" aria-label="Titipan Warga" title="Titipan Warga" onclick="pilihKategoriPelanggan('Titipan Warga')">🏘️</button>
+        <button type="button" class="chip-btn" data-category="Sembako" aria-label="Sembako" title="Sembako" onclick="pilihKategoriPelanggan('Sembako')">🍚</button>
+        <button type="button" class="chip-btn" data-category="Minuman" aria-label="Minuman" title="Minuman" onclick="pilihKategoriPelanggan('Minuman')">🥤</button>
+        <button type="button" class="chip-btn" data-category="Makanan" aria-label="Makanan" title="Makanan" onclick="pilihKategoriPelanggan('Makanan')">🍜</button>
+        <button type="button" class="chip-btn" data-category="Snack" aria-label="Snack" title="Snack" onclick="pilihKategoriPelanggan('Snack')">🍪</button>
+        <button type="button" class="chip-btn" data-category="Bumbu" aria-label="Bumbu" title="Bumbu" onclick="pilihKategoriPelanggan('Bumbu')">🧂</button>
+        <button type="button" class="chip-btn" data-category="Perawatan" aria-label="Perawatan" title="Perawatan" onclick="pilihKategoriPelanggan('Perawatan')">🧼</button>
+        <button type="button" class="chip-btn" data-category="Kebutuhan Rumah" aria-label="Kebutuhan Rumah" title="Kebutuhan Rumah" onclick="pilihKategoriPelanggan('Kebutuhan Rumah')">🧴</button>
+        <button type="button" class="chip-btn" data-category="Lainnya" aria-label="Lainnya" title="Lainnya" onclick="pilihKategoriPelanggan('Lainnya')">📦</button>
       </div>
 
       <div class="pos-container" style="gap: 0;">
