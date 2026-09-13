@@ -185,49 +185,70 @@
     .modal-checkin-content { animation: bounceIn 0.5s ease-out forwards; text-align: center; padding: 20px !important; border-radius: 16px !important; }
   </style>
 
-<style id="customer-home-category-transition-v76">
-  /* v76: vertical close/open only for the three Home feature sections */
-  #recipe-section-wrapper,
-  #trending-section-wrapper,
-  #reorder-section-wrapper {
-    overflow: hidden;
-    transform-origin: top center;
-    transition: max-height 760ms cubic-bezier(.22,.8,.2,1),
-                opacity 560ms ease,
-                transform 760ms cubic-bezier(.22,.8,.2,1),
-                margin 760ms cubic-bezier(.22,.8,.2,1),
-                padding 760ms cubic-bezier(.22,.8,.2,1);
-  }
-  #recipe-section-wrapper.home-feature-closing,
-  #trending-section-wrapper.home-feature-closing,
-  #reorder-section-wrapper.home-feature-closing {
-    max-height: 0 !important;
-    opacity: 0;
-    transform: translateY(-26px) scaleY(.96);
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    pointer-events: none;
-  }
-  #recipe-section-wrapper.home-feature-opening,
-  #trending-section-wrapper.home-feature-opening,
-  #reorder-section-wrapper.home-feature-opening {
-    opacity: 1;
-    transform: translateY(0) scaleY(1);
-  }
-  #pos-card-wrapper.home-catalog-moving {
-    will-change: transform, opacity;
-    transition: transform 420ms cubic-bezier(.22,.8,.2,1), opacity 260ms ease;
-  }
-  #pos-card-wrapper.home-catalog-lift {
-    transform: translateY(-28px);
-    opacity: .98;
-  }
-  #pos-card-wrapper.home-catalog-settle {
-    transform: translateY(0);
-    opacity: 1;
-  }
+<script id="customer-multi-category-v76">
+(function () {
+  window.normalisasiKategoriPelanggan = function (value) {
+    if (Array.isArray(value)) {
+      return value.flatMap(v => window.normalisasiKategoriPelanggan(v));
+    }
+    if (value === null || value === undefined) return [];
+    const raw = String(value).trim();
+    if (!raw) return [];
+    return raw.split(/[,|;]+/).map(v => v.trim()).filter(Boolean);
+  };
+
+  window.produkMemilikiKategoriPelanggan = function (produk, kategoriAktif) {
+    if (kategoriAktif === 'Semua') return true;
+    const wanted = String(kategoriAktif || '').trim().toLowerCase();
+    if (!wanted) return false;
+    const categories = window.normalisasiKategoriPelanggan(produk && produk.kategori);
+    return categories.some(k => String(k).trim().toLowerCase() === wanted);
+  };
+})();
+</script>
+
+
+<style id="customer-home-category-smooth-v76">
+/* Behavior-only transition: layout dimensions/design remain untouched. */
+#reorder-section-wrapper,
+#recipe-section-wrapper,
+#trending-section-wrapper {
+  overflow: hidden;
+  transform-origin: top center;
+  transition:
+    max-height 620ms cubic-bezier(.22,.61,.36,1),
+    opacity 420ms ease,
+    transform 620ms cubic-bezier(.22,.61,.36,1),
+    margin-top 620ms cubic-bezier(.22,.61,.36,1),
+    margin-bottom 620ms cubic-bezier(.22,.61,.36,1);
+}
+
+#reorder-section-wrapper.home-cat-closing,
+#recipe-section-wrapper.home-cat-closing,
+#trending-section-wrapper.home-cat-closing {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  transform: translateY(-28px) scaleY(.96);
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  pointer-events: none;
+}
+
+#reorder-section-wrapper.home-cat-opening,
+#recipe-section-wrapper.home-cat-opening,
+#trending-section-wrapper.home-cat-opening {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+}
+
+#pos-card-wrapper.home-catalog-lift {
+  transition: transform 430ms cubic-bezier(.22,.61,.36,1);
+  transform: translateY(-10px);
+}
+#pos-card-wrapper.home-catalog-settle {
+  transition: transform 320ms cubic-bezier(.22,.61,.36,1);
+  transform: translateY(0);
+}
 </style>
 
 </head>
@@ -1084,95 +1105,30 @@
     function bukaKolomPencarian() { const searchContainer = document.getElementById("sticky-search-container"); if (searchContainer) { searchContainer.style.display = "block"; window.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => document.getElementById("inventory-search-input")?.focus(), 200); } }
     function tutupKolomPencarian() { document.getElementById("inventory-search-input").value = ""; document.getElementById("sticky-search-container").style.display = "none"; filterKatalogPelanggan(""); }
 
-    let customerCategoryTransitionTimer = null;
-    function getHomeFeatureWrappers() {
-      return [
-        document.getElementById('reorder-section-wrapper'),
-        document.getElementById('recipe-section-wrapper'),
-        document.getElementById('trending-section-wrapper')
-      ].filter(Boolean);
-    }
-    function prepareHomeFeatureHeights() {
-      getHomeFeatureWrappers().forEach(el => {
-        if (el.style.display !== 'none') el.style.maxHeight = el.scrollHeight + 'px';
-      });
-    }
-    function closeHomeFeaturesSmooth(done) {
-      clearTimeout(customerCategoryTransitionTimer);
-      const wrappers = getHomeFeatureWrappers();
-      prepareHomeFeatureHeights();
-      requestAnimationFrame(() => {
-        wrappers.forEach(el => el.classList.add('home-feature-closing'));
-      });
-      const catalog = document.getElementById('pos-card-wrapper');
-      if (catalog) {
-        catalog.classList.add('home-catalog-moving', 'home-catalog-lift');
-      }
-      customerCategoryTransitionTimer = setTimeout(() => {
-        if (typeof done === 'function') done();
-      }, 720);
-    }
-    function openHomeFeaturesSmooth() {
-      clearTimeout(customerCategoryTransitionTimer);
-      const wrappers = getHomeFeatureWrappers();
-      wrappers.forEach(el => {
-        el.style.display = 'block';
-        el.classList.remove('home-feature-closing');
-        el.classList.add('home-feature-opening');
-        el.style.maxHeight = el.scrollHeight + 'px';
-      });
-      const catalog = document.getElementById('pos-card-wrapper');
-      if (catalog) {
-        catalog.classList.add('home-catalog-moving', 'home-catalog-lift');
-        requestAnimationFrame(() => catalog.classList.add('home-catalog-settle'));
-        setTimeout(() => catalog.classList.remove('home-catalog-lift', 'home-catalog-settle'), 450);
-      }
-      setTimeout(() => wrappers.forEach(el => el.classList.remove('home-feature-opening')), 780);
-    }
-
     function pilihKategoriPelanggan(kategori) {
-      const sebelumnyaHome = activeKategoriPelanggan === 'Semua';
-      const menujuHome = kategori === 'Semua';
+      const wasHome = activeKategoriPelanggan === 'Semua';
+      const willBeHome = kategori === 'Semua';
       activeKategoriPelanggan = kategori;
       document.querySelectorAll('.chip-btn').forEach(btn => { if(btn.innerText.includes(kategori) && (kategori !== 'Semua' || btn.innerText === 'Semua')) btn.classList.add('active'); else btn.classList.remove('active'); });
       currentPosPage = 1;
-
-      if (sebelumnyaHome && !menujuHome) {
-        closeHomeFeaturesSmooth(() => {
-          perbaruiTampilanKategori();
-          refreshKatalogPelanggan();
-          const catalog = document.getElementById('pos-card-wrapper');
-          if (catalog) {
-            catalog.classList.add('home-catalog-moving', 'home-catalog-lift');
-            requestAnimationFrame(() => catalog.classList.remove('home-catalog-lift'));
-            setTimeout(() => catalog.classList.remove('home-catalog-moving'), 450);
-          }
-        });
-      } else if (!sebelumnyaHome && menujuHome) {
-        // Render first while the catalog is still in place, then open Home downward.
-        perbaruiTampilanKategori();
-        refreshKatalogPelanggan();
-        openHomeFeaturesSmooth();
+      if (wasHome && !willBeHome && window.transisiKategoriPelangganV76) {
+        window.transisiKategoriPelangganV76(false);
+        setTimeout(() => { perbaruiTampilanKategori(); refreshKatalogPelanggan(); }, 430);
+      } else if (!wasHome && willBeHome && window.transisiKategoriPelangganV76) {
+        perbaruiTampilanKategori(); refreshKatalogPelanggan();
+        window.transisiKategoriPelangganV76(true);
       } else {
-        perbaruiTampilanKategori();
-        refreshKatalogPelanggan();
+        perbaruiTampilanKategori(); refreshKatalogPelanggan();
       }
     }
     
     function perbaruiTampilanKategori() {
       let isSemua = activeKategoriPelanggan === 'Semua';
       const promoBanner = document.querySelector('.promo-banner'); if(promoBanner) promoBanner.style.display = isSemua ? 'flex' : 'none';
-      const recipe = document.getElementById('recipe-section-wrapper');
-      const trending = document.getElementById('trending-section-wrapper');
-      if (isSemua) {
-        if (recipe) { recipe.style.display = 'block'; recipe.style.maxHeight = recipe.scrollHeight + 'px'; }
-        if (trending) { trending.style.display = 'block'; trending.style.maxHeight = trending.scrollHeight + 'px'; }
-        let reorderWrapper = document.getElementById('reorder-section-wrapper');
-        if (reorderWrapper) { const show = document.getElementById('reorder-container').children.length > 0; reorderWrapper.style.display = show ? 'block' : 'none'; if(show) reorderWrapper.style.maxHeight = reorderWrapper.scrollHeight + 'px'; }
-      } else {
-        [recipe, trending].forEach(el => { if(el) el.style.display = 'none'; });
-        let reorderWrapper = document.getElementById('reorder-section-wrapper'); if (reorderWrapper) reorderWrapper.style.display = 'none';
-      }
+      document.getElementById('recipe-section-wrapper').style.display = isSemua ? 'block' : 'none';
+      document.getElementById('trending-section-wrapper').style.display = isSemua ? 'block' : 'none';
+      let reorderWrapper = document.getElementById('reorder-section-wrapper');
+      if (reorderWrapper) { reorderWrapper.style.display = (isSemua && document.getElementById('reorder-container').children.length > 0) ? 'block' : 'none'; }
     }
 
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
@@ -1528,20 +1484,16 @@
       let matchedProducts = [];
       for (let code in databaseProduk) {
         let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let matchSearch = pNamaLower.includes(searchKeyword);
-        let rawKategori = p.kategori;
-        let kategoriList = Array.isArray(rawKategori) ? rawKategori : (typeof rawKategori === 'string' ? rawKategori.split(/[,|;]+/).map(x => x.trim()).filter(Boolean) : []);
-        let pKat = kategoriList.join(', ');
-        if (kategoriList.length === 0) {
+        let pKat = p.kategori ? p.kategori : "";
+        if (!pKat) {
            if(pNamaLower.includes('beras') || pNamaLower.includes('gula') || pNamaLower.includes('minyak') || pNamaLower.includes('telur')) pKat = 'Umum';
            else if (pNamaLower.includes('kopi') || pNamaLower.includes('es') || pNamaLower.includes('teh') || pNamaLower.includes('air') || pNamaLower.includes('susu')) pKat = 'Minuman';
            else if (pNamaLower.includes('snack') || pNamaLower.includes('roti') || pNamaLower.includes('biskuit') || pNamaLower.includes('chiki')) pKat = 'Snack';
            else if (pNamaLower.includes('bumbu') || pNamaLower.includes('garam') || pNamaLower.includes('kecap') || pNamaLower.includes('bawang') || pNamaLower.includes('masako')) pKat = 'Bumbu';
            else if (pNamaLower.includes('titip') || pNamaLower.includes('kue')) pKat = 'Titipan Warga';
            else pKat = 'Lainnya';
-           kategoriList = [pKat];
         }
-        const targetKategori = (activeKategoriPelanggan || '').trim().toLowerCase();
-        let matchCategory = (activeKategoriPelanggan === 'Semua') || kategoriList.some(k => String(k).trim().toLowerCase() === targetKategori);
+        let matchCategory = window.produkMemilikiKategoriPelanggan(p, activeKategoriPelanggan) || (!p.kategori && pKat.toLowerCase() === activeKategoriPelanggan.toLowerCase());
         if (matchSearch && matchCategory) matchedProducts.push({ code, ...p });
       }
       
@@ -1833,5 +1785,98 @@
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
   </script>
+
+<script id="customer-home-category-smooth-js-v76">
+(function () {
+  const HOME_IDS = [
+    'reorder-section-wrapper',
+    'recipe-section-wrapper',
+    'trending-section-wrapper'
+  ];
+  let transitionTimer = null;
+
+  function homeEls() {
+    return HOME_IDS.map(id => document.getElementById(id)).filter(Boolean);
+  }
+
+  function closeHomeSmooth() {
+    const els = homeEls();
+    if (!els.length) return;
+
+    els.forEach(el => {
+      el.classList.remove('home-cat-opening');
+      // Keep the element in layout while it animates.
+      el.style.display = el.id === 'reorder-section-wrapper' ? el.style.display : 'block';
+      el.style.maxHeight = el.scrollHeight + 'px';
+      void el.offsetHeight;
+      el.classList.add('home-cat-closing');
+    });
+
+    const catalog = document.getElementById('pos-card-wrapper');
+    if (catalog) {
+      catalog.classList.remove('home-catalog-settle');
+      catalog.classList.add('home-catalog-lift');
+      setTimeout(() => {
+        catalog.classList.remove('home-catalog-lift');
+        catalog.classList.add('home-catalog-settle');
+      }, 430);
+    }
+
+    clearTimeout(transitionTimer);
+    transitionTimer = setTimeout(() => {
+      els.forEach(el => {
+        el.style.display = 'none';
+        el.style.maxHeight = '';
+      });
+    }, 640);
+  }
+
+  function openHomeSmooth() {
+    const els = homeEls();
+    if (!els.length) return;
+
+    clearTimeout(transitionTimer);
+    els.forEach(el => {
+      el.classList.remove('home-cat-closing');
+      el.style.display = 'block';
+      el.style.maxHeight = '0px';
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(-28px) scaleY(.96)';
+    });
+
+    // Force a frame so the browser sees the closed state before opening.
+    requestAnimationFrame(() => {
+      els.forEach(el => {
+        el.classList.add('home-cat-opening');
+        el.style.maxHeight = el.scrollHeight + 'px';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0) scaleY(1)';
+      });
+    });
+
+    const catalog = document.getElementById('pos-card-wrapper');
+    if (catalog) {
+      catalog.classList.remove('home-catalog-lift');
+      catalog.classList.add('home-catalog-settle');
+      setTimeout(() => catalog.classList.remove('home-catalog-settle'), 330);
+    }
+
+    setTimeout(() => {
+      els.forEach(el => {
+        el.style.maxHeight = '';
+        el.style.opacity = '';
+        el.style.transform = '';
+      });
+    }, 650);
+  }
+
+  // Called by the existing category selector without changing its UI/layout.
+  window.transisiKategoriPelangganV76 = function (showHome) {
+    if (showHome) openHomeSmooth();
+    else closeHomeSmooth();
+  };
+})();
+</script>
+
 </body>
 </html>
