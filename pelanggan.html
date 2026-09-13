@@ -467,11 +467,11 @@
   #promo-banner-section::before, #promo-banner-section::after { display: none !important; }
   @keyframes customerPromoBounce {
     0%, 37.5%, 100% { transform: translateY(0) scale(1); }
-    5% { transform: translateY(-9px) scale(1.04); }
+    5% { transform: translateY(-9px) scale(1.03); }
     10% { transform: translateY(0) scale(1); }
-    15% { transform: translateY(-9px) scale(1.04); }
+    15% { transform: translateY(-9px) scale(1.03); }
     20% { transform: translateY(0) scale(1); }
-    25% { transform: translateY(-9px) scale(1.04); }
+    25% { transform: translateY(-9px) scale(1.03); }
     30% { transform: translateY(0) scale(1); }
   }
 
@@ -852,7 +852,7 @@
   overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
 }
 #customer-home-header #promo-banner-section {
-  position: relative !important; right: auto !important; top: auto !important;
+  position: relative !important; right: auto !important; top: auto !important; transform: none !important;
   justify-self: end !important; align-self: center !important;
   width: 68px !important; min-width: 68px !important;
   height: 68px !important; min-height: 68px !important;
@@ -1016,17 +1016,17 @@
 
       <!-- Kategori katalog: ikon saja; judul muncul hanya setelah masuk mode Produk/kategori. -->
       <div class="category-chips no-print" id="category-container" aria-label="Kategori produk">
-        <button type="button" class="chip-btn active" data-category="Home" aria-label="Home" title="Home" onclick="pilihKategoriPelanggan('Home')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.8 12 3.8l8.5 7"/><path d="M5.8 10.2v9.8h12.4v-9.8"/><path d="M9.2 20v-5.8h5.6V20"/><path d="M7.1 8.2c1.4-.8 2.7-.8 4 0s2.7.8 4 0 2.7-.8 4 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Produk" aria-label="Produk" title="Produk" onclick="pilihKategoriPelanggan('Produk')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 8.4h15.6l-1.1 10.9a1.5 1.5 0 0 1-1.5 1.3H6.8a1.5 1.5 0 0 1-1.5-1.3L4.2 8.4Z"/><path d="M8 8.4c.2-2.8 1.6-4.4 4-4.4s3.8 1.6 4 4.4"/><path d="M8 12.2c1 .8 2 .8 3 0s2-.8 3 0 2 .8 3 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Titipan Warga" aria-label="Titipan Warga" title="Titipan Warga" onclick="pilihKategoriPelanggan('Titipan Warga')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.2 12 3.5l8 5.7"/><path d="M6.2 9v11h11.6V9"/><path d="M8.4 20v-5.4h7.2V20"/><path d="M4 20h16"/><path d="M9 11.2c1-.9 2.1-.9 3 0 1-.9 2.1-.9 3 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Sembako" aria-label="Sembako" title="Sembako" onclick="pilihKategoriPelanggan('Sembako')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 7.2h11.6l-.8 12H7l-.8-12Z"/><path d="M8.4 7.2c.2-2.2 1.4-3.5 3.6-3.5s3.4 1.3 3.6 3.5"/><path d="M8.1 11.2c1.3-.9 2.5-.9 3.8 0s2.5.9 3.8 0"/><path d="M9.2 15.2c.9-.6 1.8-.6 2.8 0s1.9.6 2.8 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Minuman" aria-label="Minuman" title="Minuman" onclick="pilihKategoriPelanggan('Minuman')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 4.2h9.6"/><path d="M8.1 4.5 9.3 19.8h5.4l1.2-15.3"/><path d="M9.1 10.2c1.1.8 2.2.8 3.2 0s2.1-.8 3.2 0"/><path d="M10 14.5c.8.5 1.6.5 2.4 0s1.6-.5 2.4 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Makanan" aria-label="Makanan" title="Makanan" onclick="pilihKategoriPelanggan('Makanan')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 13.2h15.6"/><path d="M6.1 13.2a5.9 5.9 0 0 1 11.8 0"/><path d="M7.2 17.1h9.6"/><path d="M9.2 17.1v3M14.8 17.1v3"/><path d="M8.5 10.4c.7-.5 1.4-.5 2.1 0s1.4.5 2.1 0 1.4-.5 2.1 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Snack" aria-label="Snack" title="Snack" onclick="pilihKategoriPelanggan('Snack')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10.1h12l-1 9.8H7l-1-9.8Z"/><path d="M8.1 10.1c.1-2 1.1-3.2 2.4-3.7-.1-1.5.5-2.6 1.5-3.1 1 .5 1.6 1.6 1.5 3.1 1.3.5 2.3 1.7 2.4 3.7"/><path d="M8.8 13.8c.9-.6 1.7-.6 2.6 0s1.7.6 2.6 0 1.7-.6 2.6 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Bumbu" aria-label="Bumbu" title="Bumbu" onclick="pilihKategoriPelanggan('Bumbu')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8.1h10v11.6H7z"/><path d="M8.6 8.1c.2-2.1 1.4-3.4 3.4-3.4s3.2 1.3 3.4 3.4"/><path d="M9.3 12c.8.6 1.6.6 2.4 0s1.6-.6 2.4 0"/><path d="M9.3 15.4c.8.5 1.6.5 2.4 0"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Perawatan" aria-label="Perawatan" title="Perawatan" onclick="pilihKategoriPelanggan('Perawatan')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3.5h6v2.8H9z"/><path d="M8.1 6.3h7.8l.9 14.2H7.2L8.1 6.3Z"/><path d="M10 11.3h4M10 15h4"/><path d="M12 8.7v.01"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Kebutuhan Rumah" aria-label="Kebutuhan Rumah" title="Kebutuhan Rumah" onclick="pilihKategoriPelanggan('Kebutuhan Rumah')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10.2h14l-1 10.2H6L5 10.2Z"/><path d="M8.2 10.2V7.5a3.8 3.8 0 0 1 7.6 0v2.7"/><path d="M8.8 14.2c1-.7 2-.7 3 0s2 .7 3 0"/><path d="M10 17.4h4"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Lainnya" aria-label="Lainnya" title="Lainnya" onclick="pilihKategoriPelanggan('Lainnya')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 7.2h13.6v13.1H5.2z"/><path d="M8.2 7.2V4.1h7.6v3.1"/><path d="M8.7 12.2c.8-.6 1.6-.6 2.4 0s1.6.6 2.4 0 1.6-.6 2.4 0"/><path d="M10 16h4"/></svg></button>
+        <button type="button" class="chip-btn active" data-category="Home" aria-label="Home" title="Home" onclick="pilihKategoriPelanggan('Home')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8"/><path d="M6 10v10h12V10"/><path d="M9 20v-6h6v6"/><path d="M8 8.5h.01"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Produk" aria-label="Produk" title="Produk" onclick="pilihKategoriPelanggan('Produk')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5h16l-1.2 11H5.2L4 8.5Z"/><path d="M8 8.5c.2-3 1.7-4.5 4-4.5s3.8 1.5 4 4.5"/><path d="M9 12.5h.01M15 12.5h.01"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Titipan Warga" aria-label="Titipan Warga" title="Titipan Warga" onclick="pilihKategoriPelanggan('Titipan Warga')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5 12 3l8 6.5"/><path d="M6 9v11h12V9"/><path d="M8.5 20v-5h7v5"/><path d="M4 20h16"/><path d="M9 11.5h6"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Sembako" aria-label="Sembako" title="Sembako" onclick="pilihKategoriPelanggan('Sembako')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14l-1 11H6l-1-11Z"/><path d="M8 8.5c.3-2.8 1.7-4.2 4-4.2s3.7 1.4 4 4.2"/><path d="M8.5 12.5c1.2.8 2.2.8 3.5 0s2.3-.8 3.5 0"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Minuman" aria-label="Minuman" title="Minuman" onclick="pilihKategoriPelanggan('Minuman')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10"/><path d="M8 4.5 9.2 20h5.6L16 4.5"/><path d="M9 10h6"/><path d="M10 14c1 .7 2 .7 3 0s2-.7 3 0"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Makanan" aria-label="Makanan" title="Makanan" onclick="pilihKategoriPelanggan('Makanan')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h16"/><path d="M6 13a6 6 0 0 1 12 0"/><path d="M7 17h10"/><path d="M9 17v3M15 17v3"/><path d="M8 10h.01M16 10h.01"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Snack" aria-label="Snack" title="Snack" onclick="pilihKategoriPelanggan('Snack')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10h12l-1 10H7L6 10Z"/><path d="M8 10c0-2 1-3 2-3 0-2 1-3 2-3s2 1 2 3c1 0 2 1 2 3"/><path d="M9 14h.01M12 14h.01M15 14h.01"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Bumbu" aria-label="Bumbu" title="Bumbu" onclick="pilihKategoriPelanggan('Bumbu')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8h10v12H7z"/><path d="M8.5 8c.3-2.1 1.5-3.3 3.5-3.3S15.2 5.9 15.5 8"/><path d="M9.5 12.5h5M9.5 16h3.5"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Perawatan" aria-label="Perawatan" title="Perawatan" onclick="pilihKategoriPelanggan('Perawatan')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v3H9z"/><path d="M8 6h8l1 15H7L8 6Z"/><path d="M10 11h4M10 15h4"/><path d="M12 8v.01"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Kebutuhan Rumah" aria-label="Kebutuhan Rumah" title="Kebutuhan Rumah" onclick="pilihKategoriPelanggan('Kebutuhan Rumah')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h14l-1 11H6L5 10Z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M9 14c1 .7 2 .7 3 0s2-.7 3 0"/></svg></button>
+        <button type="button" class="chip-btn" data-category="Lainnya" aria-label="Lainnya" title="Lainnya" onclick="pilihKategoriPelanggan('Lainnya')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14v14H5z"/><path d="M8 7V4h8v3"/><path d="M9 12h6M9 16h4"/><path d="M12 9.5v.01"/></svg></button>
       </div>
 
       <div class="pos-container" style="gap: 0;">
