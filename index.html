@@ -189,6 +189,22 @@
   background: #7c3aed !important; color: #ffffff !important;
 }
 </style>
+
+<style id="multi-category-admin-style">
+  .category-picker { width:100%; }
+  .category-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; min-height:0; }
+  .category-chip { display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border-radius:999px; background:var(--input-bg); color:var(--text-color); border:1px solid var(--input-border); font-size:.78rem; }
+  .category-chip button { border:0; background:transparent; color:inherit; cursor:pointer; font-weight:800; padding:0 2px; line-height:1; }
+  .category-picker-toggle { width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 10px; border-radius:8px; background:var(--input-bg); color:var(--text-color); border:1px solid var(--input-border); cursor:pointer; text-align:left; }
+  .category-picker-menu { position:absolute; z-index:120; left:0; right:0; top:100%; margin-top:4px; max-height:230px; overflow-y:auto; background:var(--card-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.18); padding:6px; }
+  .category-option { width:100%; display:flex; align-items:center; gap:8px; border:0; background:transparent; color:inherit; padding:9px 8px; border-radius:7px; cursor:pointer; text-align:left; }
+  .category-option:hover { background:rgba(127,127,127,.12); }
+  .category-option input { pointer-events:none; }
+  .category-add { margin-top:5px; border-top:1px solid var(--border-color); padding-top:6px; }
+  .category-add button { width:100%; border:0; background:transparent; color:var(--text-color); padding:9px 8px; text-align:left; cursor:pointer; border-radius:7px; font-weight:700; }
+  .category-add button:hover { background:rgba(127,127,127,.12); }
+</style>
+
 </head>
 <body data-theme="colorful-v2">
 
@@ -1135,8 +1151,14 @@ function adminPreviewCustomerHome() {
         </div>
 
         <label style="font-size: 0.85rem;" data-i18n="category_label">Kategori:</label>
-        <input type="text" id="db-category" placeholder="Cth: Sembako, Minuman" autocomplete="off">
-        <div style="font-size:0.72rem; color:var(--muted-text, #888); margin-top:-4px;">Bisa lebih dari satu kategori. Pisahkan dengan koma. Kategori baru akan tersimpan otomatis.</div>
+        <div id="db-category-picker" class="category-picker" style="position: relative;">
+          <input type="hidden" id="db-category" value="">
+          <div id="db-category-chips" class="category-chips" aria-live="polite"></div>
+          <button type="button" id="db-category-toggle" class="category-picker-toggle" onclick="toggleCategoryPicker(event)">
+            <span>Pilih kategori...</span><span aria-hidden="true">▼</span>
+          </button>
+          <div id="db-category-menu" class="category-picker-menu" style="display:none;"></div>
+        </div>
 
         <div style="display: flex; gap: 8px;">
           <div style="flex: 1;">
