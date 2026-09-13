@@ -382,24 +382,11 @@
       font-size:0 !important; display:flex !important; align-items:center !important; justify-content:center !important;
       position:relative; overflow:hidden;
     }
-    .category-chips .chip-btn::before {
-      font-size:1.45rem !important; line-height:1 !important; margin:0 !important;
-    }
-    .category-chips .chip-btn:nth-child(1)::before { content:'🏪'; }
-    .category-chips .chip-btn:nth-child(2)::before { content:'🏠'; }
-    .category-chips .chip-btn:nth-child(3)::before { content:'🥤'; }
-    .category-chips .chip-btn:nth-child(4)::before { content:'🍪'; }
-    .category-chips .chip-btn:nth-child(5)::before { content:'🧂'; }
-    .category-chips .chip-btn:nth-child(6)::before { content:'📦'; }
-    .category-chips .chip-btn:nth-child(7)::before { content:'🧰'; }
-    .category-chips .chip-btn:nth-child(1) { background:#fff7ed !important; }
-    .category-chips .chip-btn:nth-child(2) { background:#eff6ff !important; }
-    .category-chips .chip-btn:nth-child(3) { background:#ecfdf5 !important; }
-    .category-chips .chip-btn:nth-child(4) { background:#fdf2f8 !important; }
-    .category-chips .chip-btn:nth-child(5) { background:#fefce8 !important; }
-    .category-chips .chip-btn:nth-child(6) { background:#f5f3ff !important; }
-    .category-chips .chip-btn:nth-child(7) { background:#f0fdfa !important; }
+    .category-chips .chip-btn::before { content:none !important; }
+    .category-chips .chip-btn { font-size:1.45rem !important; line-height:1 !important; text-indent:0 !important; }
     .category-chips .chip-btn.active { box-shadow:inset 0 0 0 2px #2563eb, 0 5px 14px rgba(37,99,235,.16) !important; transform:translateY(-1px); }
+    .selected-category-heading { display:flex; align-items:center; gap:7px; padding:2px 7px 7px; font-size:.82rem; font-weight:900; color:var(--text-color); }
+    .selected-category-heading span:first-child { font-size:1.15rem; line-height:1; }
 
     .product-catalog-grid { gap:9px !important; }
     .product-catalog-grid .inv-card {
@@ -530,16 +517,19 @@
         </button>
       </div>
       <!-- Kategori: diletakkan setelah card Sedang Laris agar konten rekomendasi berada lebih dekat ke atas. -->
-      <div class="category-chips no-print" id="category-container">
-        <button class="chip-btn active" onclick="pilihKategoriPelanggan('Semua')">Semua</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Umum')">Umum</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('')">Minuman</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Snack')">Snack</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Bumbu')">Bumbu</button>
-        <button class="chip-btn" style="border-color: #d97706; color: #d97706;" onclick="pilihKategoriPelanggan('Titipan Warga')">📦 Titipan Warga</button>
-        <button class="chip-btn" onclick="pilihKategoriPelanggan('Lainnya')">Lainnya</button>
+      <div class="category-chips no-print" id="category-container" aria-label="Kategori produk">
+        <button class="chip-btn active" data-category="Semua" aria-label="Produk" title="Produk" onclick="pilihKategoriPelanggan('Semua')">🏠</button>
+        <button class="chip-btn" data-category="Titipan Warga" aria-label="Titipan Warga" title="Titipan Warga" onclick="pilihKategoriPelanggan('Titipan Warga')">🏘️</button>
+        <button class="chip-btn" data-category="Sembako" aria-label="Sembako" title="Sembako" onclick="pilihKategoriPelanggan('Sembako')">🍚</button>
+        <button class="chip-btn" data-category="Minuman" aria-label="Minuman" title="Minuman" onclick="pilihKategoriPelanggan('Minuman')">🥤</button>
+        <button class="chip-btn" data-category="Makanan" aria-label="Makanan" title="Makanan" onclick="pilihKategoriPelanggan('Makanan')">🍜</button>
+        <button class="chip-btn" data-category="Snack" aria-label="Snack" title="Snack" onclick="pilihKategoriPelanggan('Snack')">🍪</button>
+        <button class="chip-btn" data-category="Bumbu" aria-label="Bumbu" title="Bumbu" onclick="pilihKategoriPelanggan('Bumbu')">🧂</button>
+        <button class="chip-btn" data-category="Perawatan" aria-label="Perawatan" title="Perawatan" onclick="pilihKategoriPelanggan('Perawatan')">🧼</button>
+        <button class="chip-btn" data-category="Kebutuhan Rumah" aria-label="Kebutuhan Rumah" title="Kebutuhan Rumah" onclick="pilihKategoriPelanggan('Kebutuhan Rumah')">🧴</button>
+        <button class="chip-btn" data-category="Lainnya" aria-label="Lainnya" title="Lainnya" onclick="pilihKategoriPelanggan('Lainnya')">📦</button>
       </div>
-
+      <div id="selected-category-heading" class="selected-category-heading no-print" aria-live="polite" style="display:none;"><span id="selected-category-icon">🏠</span><span id="selected-category-name">Produk</span></div>
 
       <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 10px;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
@@ -1496,12 +1486,36 @@
       filterKatalogPelanggan("");
     }
 
+    const kategoriPelangganUI = {
+      'Semua': { ikon: '🏠', nama: 'Produk' },
+      'Titipan Warga': { ikon: '🏘️', nama: 'Titipan Warga' },
+      'Sembako': { ikon: '🍚', nama: 'Sembako' },
+      'Minuman': { ikon: '🥤', nama: 'Minuman' },
+      'Makanan': { ikon: '🍜', nama: 'Makanan' },
+      'Snack': { ikon: '🍪', nama: 'Snack' },
+      'Bumbu': { ikon: '🧂', nama: 'Bumbu' },
+      'Perawatan': { ikon: '🧼', nama: 'Perawatan' },
+      'Kebutuhan Rumah': { ikon: '🧴', nama: 'Kebutuhan Rumah' },
+      'Lainnya': { ikon: '📦', nama: 'Lainnya' }
+    };
+
     function pilihKategoriPelanggan(kategori) {
       activeKategoriPelanggan = kategori;
-      document.querySelectorAll('.chip-btn').forEach(btn => { if(btn.innerText.includes(kategori) && (kategori !== 'Semua' || btn.innerText === 'Semua')) btn.classList.add('active'); else btn.classList.remove('active'); });
+      const infoKategori = kategoriPelangganUI[kategori] || { ikon: '📦', nama: kategori };
+      document.querySelectorAll('#category-container .chip-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === kategori);
+      });
+      const heading = document.getElementById('selected-category-heading');
+      const headingIcon = document.getElementById('selected-category-icon');
+      const headingName = document.getElementById('selected-category-name');
+      if (heading && headingIcon && headingName) {
+        headingIcon.textContent = infoKategori.ikon;
+        headingName.textContent = infoKategori.nama;
+        heading.style.display = 'flex';
+      }
       currentPosPage = 1; perbaruiTampilanKategori(); refreshKatalogPelanggan();
     }
-    
+
     function perbaruiTampilanKategori() {
       const searchOpen = document.getElementById('sticky-search-container')?.style.display === 'block';
       let isSemua = activeKategoriPelanggan === 'Semua';
@@ -2036,16 +2050,10 @@
 
       let matchedProducts = [];
       for (let code in databaseProduk) {
-        let p = databaseProduk[code]; let pNamaLower = String(p.nama || '').toLowerCase();
-        let pKat = p.kategori ? p.kategori : "";
-        if (!pKat) {
-           if(pNamaLower.includes('beras') || pNamaLower.includes('gula') || pNamaLower.includes('minyak') || pNamaLower.includes('telur')) pKat = 'Umum';
-           else if (pNamaLower.includes('kopi') || pNamaLower.includes('es') || pNamaLower.includes('teh') || pNamaLower.includes('air') || pNamaLower.includes('susu')) pKat = 'Minuman';
-           else if (pNamaLower.includes('snack') || pNamaLower.includes('roti') || pNamaLower.includes('biskuit') || pNamaLower.includes('chiki')) pKat = 'Snack';
-           else if (pNamaLower.includes('bumbu') || pNamaLower.includes('garam') || pNamaLower.includes('kecap') || pNamaLower.includes('bawang') || pNamaLower.includes('masako')) pKat = 'Bumbu';
-           else if (pNamaLower.includes('titip') || pNamaLower.includes('kue')) pKat = 'Titipan Warga';
-           else pKat = 'Lainnya';
-        }
+        let p = databaseProduk[code];
+        let pNamaLower = String(p.nama || '').toLowerCase();
+        // Kategori pelanggan bersumber langsung dari field kategori di DB produk.
+        let pKat = String(p.kategori || '').trim();
         let searchKeyword = (document.getElementById("inventory-search-input")?.value || "").toLowerCase().trim();
         let matchSearch = !searchKeyword || pNamaLower.includes(searchKeyword);
         let matchCategory = (activeKategoriPelanggan === 'Semua') || (pKat.toLowerCase() === activeKategoriPelanggan.toLowerCase());
