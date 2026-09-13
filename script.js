@@ -1260,129 +1260,126 @@ function updateUnitLabel() {
   }
 }
 
-const DEFAULT_PRODUCT_CATEGORIES = [
-  "Titipan Warga", "Sembako", "Minuman", "Makanan", "Snack", "Bumbu", "Perawatan", "Kebutuhan Rumah", "Lainnya"
-];
+let selectedProductCategories = [];
 
 function normalizeProductCategories(value) {
-  if (Array.isArray(value)) return value.map(v => String(v || "").trim()).filter(Boolean);
-  if (typeof value === "string") {
-    return value.split(",").map(v => v.trim()).filter(Boolean);
-  }
+  if (Array.isArray(value)) return [...new Set(value.map(v => String(v || '').trim()).filter(Boolean))];
+  if (typeof value === 'string') return [...new Set(value.split(',').map(v => v.trim()).filter(Boolean))];
   return [];
 }
 
-function getSelectedProductCategories() {
-  const hidden = document.getElementById("db-category");
-  if (!hidden) return [];
-  try {
-    const parsed = JSON.parse(hidden.value || "[]");
-    if (Array.isArray(parsed)) return normalizeProductCategories(parsed);
-  } catch (_) {}
-  return normalizeProductCategories(hidden.value);
+const STANDARD_PRODUCT_CATEGORIES = [
+  "Titipan Warga",
+  "Sembako",
+  "Minuman",
+  "Makanan",
+  "Snack",
+  "Bumbu",
+  "Perawatan",
+  "Kebutuhan Rumah",
+  "Lainnya"
+];
+
+function getAllProductCategories() {
+  const set = new Set(STANDARD_PRODUCT_CATEGORIES);
+  Object.values(databaseProduk || {}).forEach(p => {
+    normalizeProductCategories(p && p.kategori).forEach(k => set.add(k));
+  });
+  return Array.from(set).sort((a,b) => {
+    const ai = STANDARD_PRODUCT_CATEGORIES.indexOf(a);
+    const bi = STANDARD_PRODUCT_CATEGORIES.indexOf(b);
+    if (ai >= 0 && bi >= 0) return ai - bi;
+    if (ai >= 0) return -1;
+    if (bi >= 0) return 1;
+    return a.localeCompare(b, 'id');
+  });
+}
+
+function syncSelectedProductCategories() {
+  document.getElementById('db-category').value = JSON.stringify(selectedProductCategories);
 }
 
 function setSelectedProductCategories(value) {
-  const hidden = document.getElementById("db-category");
-  if (!hidden) return;
-  const categories = [...new Set(normalizeProductCategories(value))];
-  hidden.value = JSON.stringify(categories);
+  selectedProductCategories = normalizeProductCategories(value);
+  syncSelectedProductCategories();
   renderProductCategoryPicker();
-}
-
-function getAvailableProductCategories() {
-  const set = new Set(DEFAULT_PRODUCT_CATEGORIES);
-  if (typeof databaseProduk === "object" && databaseProduk) {
-    Object.values(databaseProduk).forEach(p => normalizeProductCategories(p && p.kategori).forEach(k => set.add(k)));
-  }
-  getSelectedProductCategories().forEach(k => set.add(k));
-  return Array.from(set).sort((a, b) => a.localeCompare(b, 'id'));
 }
 
 function renderProductCategoryPicker() {
-  const chips = document.getElementById("db-category-chips");
-  const menu = document.getElementById("db-category-menu");
-  const toggle = document.getElementById("db-category-toggle");
-  if (!chips || !menu || !toggle) return;
-
-  const selected = getSelectedProductCategories();
-  chips.innerHTML = selected.map((kat, i) => `
-    <span class="category-chip">
-      <span>${escapeHtmlAdmin(kat)}</span>
-      <button type="button" aria-label="Hapus ${escapeHtmlAdmin(kat)}" onclick="removeProductCategory(${i}); event.stopPropagation();">×</button>
-    </span>
-  `).join("");
-
-  toggle.querySelector('span:first-child').textContent = selected.length ? "Tambah/pilih kategori..." : "Pilih kategori...";
-
-  const options = getAvailableProductCategories();
-  menu.innerHTML = options.map(kat => {
-    const checked = selected.includes(kat) ? " checked" : "";
-    const safeKat = escapeHtmlAdmin(kat);
-    return `<label class="category-option">
-      <input type="checkbox"${checked} onchange="toggleProductCategory(${JSON.stringify(kat)}, this.checked); event.stopPropagation();">
-      <span>${safeKat}</span>
-    </label>`;
-  }).join("") + `
-    <div class="category-add">
-      <button type="button" onclick="addNewProductCategory(event)">＋ Tambah kategori baru</button>
-    </div>`;
+  const chips = document.getElementById('db-category-chips');
+  const menu = document.getElementById('db-category-menu');
+  if (!chips || !menu) return;
+  chips.innerHTML = '';
+  if (!selectedProductCategories.length) {
+    chips.innerHTML = '<span style="color:var(--text-muted);font-size:.82rem;">Pilih kategori...</span>';
+  } else {
+    selectedProductCategories.forEach(cat => {
+      const chip = document.createElement('span');
+      chip.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;background:var(--primary-color,#2563eb);color:#fff;font-size:.76rem;';
+      chip.innerHTML = `${escapeHtml(cat)} <button type="button" style="border:0;background:transparent;color:inherit;cursor:pointer;font-weight:bold;padding:0;" aria-label="Hapus kategori">×</button>`;
+      chip.querySelector('button').onclick = (e) => { e.stopPropagation(); toggleProductCategory(cat); };
+      chips.appendChild(chip);
+    });
+  }
+  const cats = getAllProductCategories();
+  menu.innerHTML = '';
+  if (!cats.length) {
+    menu.innerHTML = '<div style="padding:8px;color:var(--text-muted);font-size:.8rem;">Belum ada kategori tersimpan.</div>';
+  } else {
+    cats.forEach(cat => {
+      const row = document.createElement('label');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;cursor:pointer;font-size:.82rem;';
+      const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=selectedProductCategories.includes(cat);
+      cb.onchange = () => toggleProductCategory(cat, cb.checked);
+      row.appendChild(cb);
+      const text = document.createElement('span'); text.textContent=cat; row.appendChild(text);
+      menu.appendChild(row);
+    });
+  }
+  const add = document.createElement('div');
+  add.style.cssText='display:flex;gap:6px;padding:8px 4px 4px;border-top:1px solid var(--border-color);margin-top:6px;';
+  add.innerHTML='<input id="db-new-category" type="text" placeholder="Kategori baru..." style="flex:1;min-width:0;padding:7px;border:1px solid var(--input-border);border-radius:7px;background:var(--input-bg);color:var(--text-color);"><button type="button" style="padding:7px 9px;border:0;border-radius:7px;cursor:pointer;">＋</button>';
+  add.querySelector('button').onclick=(e)=>{e.stopPropagation(); addNewProductCategory();};
+  add.querySelector('input').onclick=(e)=>e.stopPropagation();
+  menu.appendChild(add);
+  syncSelectedProductCategories();
 }
 
-function escapeHtmlAdmin(value) {
-  return String(value ?? "").replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
-}
-
-function toggleCategoryPicker(event) {
-  if (event) event.stopPropagation();
-  const menu = document.getElementById("db-category-menu");
+function toggleProductCategoryMenu() {
+  const menu=document.getElementById('db-category-menu');
   if (!menu) return;
-  const willShow = menu.style.display === "none" || !menu.style.display;
-  if (willShow) renderProductCategoryPicker();
-  menu.style.display = willShow ? "block" : "none";
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  if (menu.style.display === 'block') renderProductCategoryPicker();
 }
 
-function toggleProductCategory(category, checked) {
-  const selected = getSelectedProductCategories();
-  const idx = selected.indexOf(category);
-  if (checked && idx < 0) selected.push(category);
-  if (!checked && idx >= 0) selected.splice(idx, 1);
-  setSelectedProductCategories(selected);
-  const menu = document.getElementById("db-category-menu");
-  if (menu) menu.style.display = "block";
+function toggleProductCategory(cat, force) {
+  const exists=selectedProductCategories.includes(cat);
+  const shouldSelect = force === undefined ? !exists : force;
+  if (shouldSelect && !exists) selectedProductCategories.push(cat);
+  if (!shouldSelect && exists) selectedProductCategories=selectedProductCategories.filter(x=>x!==cat);
+  syncSelectedProductCategories();
   renderProductCategoryPicker();
 }
 
-function removeProductCategory(index) {
-  const selected = getSelectedProductCategories();
-  selected.splice(index, 1);
-  setSelectedProductCategories(selected);
-}
-
-function addNewProductCategory(event) {
-  if (event) event.stopPropagation();
-  const raw = prompt("Nama kategori baru:");
-  const category = String(raw || "").trim();
-  if (!category) return;
-  const selected = getSelectedProductCategories();
-  if (!selected.some(k => k.toLowerCase() === category.toLowerCase())) selected.push(category);
-  setSelectedProductCategories(selected);
-  const menu = document.getElementById("db-category-menu");
-  if (menu) menu.style.display = "block";
+function addNewProductCategory() {
+  const input=document.getElementById('db-new-category');
+  const cat=(input?.value||'').trim();
+  if(!cat) return;
+  if(!selectedProductCategories.includes(cat)) selectedProductCategories.push(cat);
+  syncSelectedProductCategories();
   renderProductCategoryPicker();
+  const newInput=document.getElementById('db-new-category');
+  if(newInput) newInput.focus();
 }
 
-function readProductCategoryForSave() {
-  const selected = getSelectedProductCategories();
-  if (selected.length === 0) return "Umum";
-  return selected.length === 1 ? selected[0] : selected;
+function getSelectedProductCategoriesForSave() {
+  const cats = normalizeProductCategories(selectedProductCategories);
+  return cats.length ? cats : ["Lainnya"];
 }
 
-document.addEventListener("click", function(e) {
-  const picker = document.getElementById("db-category-picker");
-  const menu = document.getElementById("db-category-menu");
-  if (picker && menu && !picker.contains(e.target)) menu.style.display = "none";
-});
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+}
 
 function openProductModal(codeToEdit = null, restockId = null) {
   const modal = document.getElementById("productModal");
@@ -1400,6 +1397,7 @@ function openProductModal(codeToEdit = null, restockId = null) {
 
       let sat = (rItem.satuan || "").toLowerCase();
       document.getElementById("db-code").value = rItem.code || "";
+      document.getElementById("db-barcode").value = rItem.barcode || "";
       document.getElementById("db-name").value = rItem.nama || "";
       setSelectedProductCategories(rItem.kategori || "");
       document.getElementById("db-unit").value = sat || "pcs";
@@ -1417,6 +1415,7 @@ function openProductModal(codeToEdit = null, restockId = null) {
 
     let sat = (p.satuan || "").toLowerCase();
     document.getElementById("db-code").value = codeToEdit;
+    document.getElementById("db-barcode").value = p.barcode || "";
     document.getElementById("db-name").value = p.nama;
     setSelectedProductCategories(p.kategori || "");
     document.getElementById("db-unit").value = sat || "pcs";
@@ -1435,7 +1434,8 @@ function openProductModal(codeToEdit = null, restockId = null) {
     submitBtn.innerText = "Tambahkan ke Belanja Stok";
     submitBtn.setAttribute("onclick", "tambahkanKeBelanjaStok()");
 
-    document.getElementById("db-code").value = "";
+    document.getElementById("db-code").value = "BRG-" + Date.now();
+    document.getElementById("db-barcode").value = "";
     document.getElementById("db-name").value = "";
     setSelectedProductCategories([]);
     document.getElementById("db-unit").value = "pcs";
@@ -1449,7 +1449,8 @@ function openProductModal(codeToEdit = null, restockId = null) {
     submitBtn.innerText = "Simpan ke Stok";
     submitBtn.setAttribute("onclick", "simpanBarangLangsung()");
 
-    document.getElementById("db-code").value = "";
+    document.getElementById("db-code").value = "BRG-" + Date.now();
+    document.getElementById("db-barcode").value = "";
     document.getElementById("db-name").value = "";
     setSelectedProductCategories([]);
     document.getElementById("db-unit").value = "pcs";
@@ -1465,9 +1466,6 @@ function openProductModal(codeToEdit = null, restockId = null) {
   document.getElementById("online-image-results").style.display = "none";
   document.getElementById("online-image-results").innerHTML = "";
   document.getElementById("autocomplete-suggestions").style.display = "none";
-  renderProductCategoryPicker();
-  const categoryMenu = document.getElementById("db-category-menu");
-  if (categoryMenu) categoryMenu.style.display = "none";
 
   modal.classList.add("show");
   history.pushState({tab: activeTab, modal: 'product'}, "", "");
@@ -1517,7 +1515,8 @@ function simpanBarangLangsung() {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = readProductCategoryForSave();
+  const barcode = document.getElementById("db-barcode").value.trim();
+  const category = getSelectedProductCategoriesForSave();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
@@ -1535,6 +1534,7 @@ function simpanBarangLangsung() {
   db.collection("produk").doc(code).set({
     nama: name,
     kategori: category,
+    barcode: barcode || "",
     satuan: unit,
     isiRtg: isiRtg,
     stok: finalStok,
@@ -1552,7 +1552,8 @@ function simpanBarangLangsung() {
 function simpanEditBarang(code) {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
-  const category = readProductCategoryForSave();
+  const barcode = document.getElementById("db-barcode").value.trim();
+  const category = getSelectedProductCategoriesForSave();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
@@ -1570,6 +1571,7 @@ function simpanEditBarang(code) {
   db.collection("produk").doc(code).update({
     nama: name,
     kategori: category,
+    barcode: barcode || "",
     satuan: unit,
     isiRtg: isiRtg,
     stok: finalStok,
@@ -1588,7 +1590,8 @@ function simpanEditBelanjaStok(restockId) {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = readProductCategoryForSave();
+  const barcode = document.getElementById("db-barcode").value.trim();
+  const category = getSelectedProductCategoriesForSave();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
@@ -1601,6 +1604,7 @@ function simpanEditBelanjaStok(restockId) {
     rItem.code = code;
     rItem.nama = name;
     rItem.kategori = category;
+    rItem.barcode = barcode || "";
     rItem.satuan = unit;
     rItem.isiRtg = isiRtg;
     rItem.qty = qtyBeli;
@@ -1643,6 +1647,7 @@ function autoFillDataBarang(namaInput) {
         let sat = (m.satuan || "").toLowerCase();
         document.getElementById("db-name").value = m.nama;
         document.getElementById("db-code").value = m.code;
+        document.getElementById("db-barcode").value = m.barcode || "";
         setSelectedProductCategories(m.kategori || "");
         document.getElementById("db-unit").value = sat || "pcs";
         document.getElementById("db-isi-rtg").value = m.isiRtg || 10;
@@ -1663,6 +1668,7 @@ function autoFillDataBarang(namaInput) {
     let p = databaseProduk[exactMatchCode];
     let sat = (p.satuan || "").toLowerCase();
     document.getElementById("db-code").value = exactMatchCode;
+    document.getElementById("db-barcode").value = p.barcode || "";
     setSelectedProductCategories(p.kategori || "");
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
@@ -1873,7 +1879,8 @@ function tambahkanKeBelanjaStok() {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = readProductCategoryForSave();
+  const barcode = document.getElementById("db-barcode").value.trim();
+  const category = getSelectedProductCategoriesForSave();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
@@ -1887,6 +1894,7 @@ function tambahkanKeBelanjaStok() {
     code: code,
     nama: name,
     kategori: category,
+    barcode: barcode || "",
     satuan: unit,
     isiRtg: isiRtg,
     qty: qtyBeli,
@@ -1948,6 +1956,7 @@ async function prosesBelanjaStok() {
       harga: item.harga,
       modalRtg: item.modalRtg,
       hargaRtg: item.hargaRtg,
+      barcode: item.barcode || "",
       foto: item.foto !== defaultPlaceholderImg ? item.foto : (produkLama ? produkLama.foto || "" : "")
     }, { merge: true });
   });
@@ -2373,11 +2382,14 @@ function toggleScannerDb() {
 
 function processBarcodeScanDb(barcode) {
   playBeep();
-  document.getElementById("db-code").value = barcode;
-  if (databaseProduk[barcode]) {
-    let p = databaseProduk[barcode];
+  const value = String(barcode || '').trim();
+  document.getElementById("db-barcode").value = value;
+  const foundEntry = Object.entries(databaseProduk || {}).find(([docId, p]) => String(p?.barcode || '').trim() === value || docId === value);
+  if (foundEntry) {
+    const [docId, p] = foundEntry;
     let sat = (p.satuan || "").toLowerCase();
-    document.getElementById("db-name").value = p.nama;
+    document.getElementById("db-code").value = docId;
+    document.getElementById("db-name").value = p.nama || "";
     setSelectedProductCategories(p.kategori || "");
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
@@ -2830,14 +2842,14 @@ function updateDropdowns(kategoriList) {
   if(filterSelect) {
     let currentVal = filterSelect.value;
     let html = `<option value="Semua">${currentLang === 'en' ? 'All Categories' : (currentLang === 'ar' ? 'جميع الفئات' : 'Semua Kategori')}</option>`;
-    [...new Set(kategoriList)].forEach(kat => { html += `<option value="${kat}" ${kat === currentVal ? "selected" : ""}>${kat}</option>`; });
+    kategoriList.forEach(kat => { html += `<option value="${kat}" ${kat === currentVal ? "selected" : ""}>${kat}</option>`; });
     if (filterSelect.innerHTML !== html) filterSelect.innerHTML = html;
   }
   const filterPosSelect = document.getElementById("filter-category-pos");
   if(filterPosSelect) {
     let currentPosVal = filterPosSelect.value;
     let htmlPos = `<option value="Semua">${currentLang === 'en' ? 'All Categories' : (currentLang === 'ar' ? 'جميع الفئات' : 'Semua Kategori')}</option>`;
-    [...new Set(kategoriList)].forEach(kat => { htmlPos += `<option value="${kat}" ${kat === currentPosVal ? "selected" : ""}>${kat}</option>`; });
+    kategoriList.forEach(kat => { htmlPos += `<option value="${kat}" ${kat === currentPosVal ? "selected" : ""}>${kat}</option>`; });
     if (filterPosSelect.innerHTML !== htmlPos) filterPosSelect.innerHTML = htmlPos;
   }
 }
@@ -2930,11 +2942,10 @@ function refreshData() {
   let filteredItemsPos = [];
   for (let code in databaseProduk) {
     let item = databaseProduk[code];
-    let katList = normalizeProductCategories(item.kategori);
-    if (katList.length === 0) katList = ["Umum"];
-    katList.forEach(kat => categories.add(kat));
+    let kat = item.kategori || "Umum";
+    categories.add(kat);
 
-    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || katList.includes(filterKatPos))) {
+    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || kat === filterKatPos)) {
       filteredItemsPos.push({ code, ...item });
     }
   }
@@ -2962,9 +2973,8 @@ function refreshData() {
     let filteredItems = [];
     for (let code in databaseProduk) {
       let item = databaseProduk[code];
-      let katList = normalizeProductCategories(item.kategori);
-      if (katList.length === 0) katList = ["Umum"];
-      if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || katList.includes(filterKat))) {
+      let kat = item.kategori || "Umum";
+      if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
         filteredItems.push({ code, ...item });
       }
     }
@@ -2990,7 +3000,7 @@ function refreshData() {
       } else {
         paginatedStokItems.forEach(item => {
           let code = item.code;
-          let kat = normalizeProductCategories(item.kategori).join(", ") || "Umum";
+          let kat = item.kategori || "Umum";
           let sat = (item.satuan || "pcs").toLowerCase();
           let stok = item.stok !== undefined ? item.stok : 0;
           let fotoSrc = item.foto || defaultPlaceholderImg;
@@ -3136,7 +3146,7 @@ function renderKatalogKasirPaginated(filteredItems) {
   } else {
     paginatedPosItems.forEach(p => {
       let code = p.code;
-      let kat = normalizeProductCategories(p.kategori).join(", ") || "Umum";
+      let kat = p.kategori || "Umum";
       let sat = (p.satuan || "").toLowerCase();
       let stok = p.stok !== undefined ? p.stok : 0;
       let fotoSrc = p.foto || defaultPlaceholderImg;
@@ -3874,10 +3884,6 @@ function bersihkanSemuaChatRumpiAdmin() {
   }
 }
 
-function escapeHtml(text) {
-  if (!text) return "";
-  return text.toString().replace(/&/g, "&amp;").replace(/&lt;/g, "&lt;").replace(/>/g, "&gt;");
-}
 // --- END FITUR CHAT RUMPI ---
 
 
