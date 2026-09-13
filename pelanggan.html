@@ -407,9 +407,7 @@
 
 
 /* Promo: same rhythm as AI FAB — 3 bounces, 3 seconds rest, repeat */
-@keyframes promoBounceThree {
-  0%, 62.5%, 100% { transform: translateY(0); }
-  4%  { transform: translateY(-9px); }
+4%  { transform: translateY(-9px); }
   8%  { transform: translateY(0); }
   12% { transform: translateY(-7px); }
   16% { transform: translateY(0); }
@@ -486,9 +484,7 @@
   }
   #promo-banner-section .promo-stage > div:not(:first-child) { display: none !important; }
   #promo-banner-section::before, #promo-banner-section::after { display: none !important; }
-  @keyframes promoBounceThree {
-    0%, 37.5%, 100% { transform: translateY(0) scale(1); }
-    5% { transform: translateY(-9px) scale(1.03); }
+  5% { transform: translateY(-9px) scale(1.03); }
     10% { transform: translateY(0) scale(1); }
     15% { transform: translateY(-9px) scale(1.03); }
     20% { transform: translateY(0) scale(1); }
@@ -3251,4 +3247,25 @@ body.theme-colorful-v2 .products-container {
     .inv-card [style*="color: #fde047"], .trending-card [style*="color: #fde047"], .reorder-card [style*="color: #fde047"] { color:#fff !important; }
     .recipe-card .recipe-btn-action { background:#111827 !important; color:#fff !important; border:none !important; }
     .btn-quick-cart-icon { background:#111827 !important; color:#fff !important; }
+
+/* PROMO V3 — exactly the same 3-bounce rhythm as Asisten AI */
+@keyframes promoBounceThree {
+  0%, 37.5%, 100% { transform: translateY(0) scale(1); }
+  5%  { transform: translateY(-9px) scale(1.03); }
+  10% { transform: translateY(0) scale(1); }
+  15% { transform: translateY(-9px) scale(1.03); }
+  20% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-9px) scale(1.03); }
+  30% { transform: translateY(0) scale(1); }
+}
+#promo-banner-section {
+  animation: promoBounceThree 4.8s ease-in-out infinite !important;
+  will-change: transform;
+}
+#promo-banner-section:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  #promo-banner-section { animation: none !important; }
+}
 </style>
