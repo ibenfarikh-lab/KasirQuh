@@ -1101,6 +1101,26 @@ function simpanPengaturanAkun() {
 }
 
 let databaseProduk = {};
+
+// Kategori produk mendukung satu atau banyak nilai.
+// Data lama (string) tetap dibaca, data baru dapat berupa array.
+function kategoriArray(value) {
+  if (Array.isArray(value)) return value.map(v => String(v).trim()).filter(Boolean);
+  if (value === undefined || value === null) return [];
+  return String(value).split(/[,\n;]+/).map(v => v.trim()).filter(Boolean);
+}
+function kategoriTeks(value) {
+  return kategoriArray(value).join(", ") || "Umum";
+}
+function kategoriMemuat(value, target) {
+  return kategoriArray(value).some(k => k === target);
+}
+function bacaInputKategori() {
+  const input = document.getElementById("db-category");
+  const list = kategoriArray(input ? input.value : "");
+  return list.length ? (list.length === 1 ? list[0] : list) : "Umum";
+}
+
 db.collection("produk").onSnapshot((snapshot) => {
   databaseProduk = {};
   snapshot.forEach((doc) => {
@@ -1277,7 +1297,7 @@ function openProductModal(codeToEdit = null, restockId = null) {
       let sat = (rItem.satuan || "").toLowerCase();
       document.getElementById("db-code").value = rItem.code || "";
       document.getElementById("db-name").value = rItem.nama || "";
-      document.getElementById("db-category").value = rItem.kategori || "";
+      document.getElementById("db-category").value = kategoriTeks(rItem.kategori);
       document.getElementById("db-unit").value = sat || "pcs";
       document.getElementById("db-isi-rtg").value = rItem.isiRtg || 10;
       document.getElementById("db-stock").value = rItem.qty !== undefined ? rItem.qty : 1;
@@ -1294,7 +1314,7 @@ function openProductModal(codeToEdit = null, restockId = null) {
     let sat = (p.satuan || "").toLowerCase();
     document.getElementById("db-code").value = codeToEdit;
     document.getElementById("db-name").value = p.nama;
-    document.getElementById("db-category").value = p.kategori || "";
+    document.getElementById("db-category").value = kategoriTeks(p.kategori);
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
     let stokTampil = p.stok !== undefined ? p.stok : 0;
@@ -1390,7 +1410,7 @@ function simpanBarangLangsung() {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = document.getElementById("db-category").value.trim() || "Umum";
+  const category = bacaInputKategori();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
@@ -1425,7 +1445,7 @@ function simpanBarangLangsung() {
 function simpanEditBarang(code) {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
-  const category = document.getElementById("db-category").value.trim() || "Umum";
+  const category = bacaInputKategori();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
@@ -1461,7 +1481,7 @@ function simpanEditBelanjaStok(restockId) {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = document.getElementById("db-category").value.trim() || "Umum";
+  const category = bacaInputKategori();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
@@ -1516,7 +1536,7 @@ function autoFillDataBarang(namaInput) {
         let sat = (m.satuan || "").toLowerCase();
         document.getElementById("db-name").value = m.nama;
         document.getElementById("db-code").value = m.code;
-        document.getElementById("db-category").value = m.kategori || "";
+        document.getElementById("db-category").value = kategoriTeks(m.kategori);
         document.getElementById("db-unit").value = sat || "pcs";
         document.getElementById("db-isi-rtg").value = m.isiRtg || 10;
         document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? m.modalRtg : m.modal) || 0).toLocaleString('id-ID');
@@ -1536,7 +1556,7 @@ function autoFillDataBarang(namaInput) {
     let p = databaseProduk[exactMatchCode];
     let sat = (p.satuan || "").toLowerCase();
     document.getElementById("db-code").value = exactMatchCode;
-    document.getElementById("db-category").value = p.kategori || "";
+    document.getElementById("db-category").value = kategoriTeks(p.kategori);
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
     document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? p.modalRtg : p.modal) || 0).toLocaleString('id-ID');
@@ -1746,7 +1766,7 @@ function tambahkanKeBelanjaStok() {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = document.getElementById("db-category").value.trim() || "Umum";
+  const category = bacaInputKategori();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
@@ -2251,7 +2271,7 @@ function processBarcodeScanDb(barcode) {
     let p = databaseProduk[barcode];
     let sat = (p.satuan || "").toLowerCase();
     document.getElementById("db-name").value = p.nama;
-    document.getElementById("db-category").value = p.kategori || "";
+    document.getElementById("db-category").value = kategoriTeks(p.kategori);
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
     document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? p.modalRtg : p.modal) || 0).toLocaleString('id-ID');
@@ -2803,10 +2823,10 @@ function refreshData() {
   let filteredItemsPos = [];
   for (let code in databaseProduk) {
     let item = databaseProduk[code];
-    let kat = item.kategori || "Umum";
-    categories.add(kat);
+    let kat = kategoriTeks(item.kategori);
+    kategoriArray(item.kategori || "Umum").forEach(k => categories.add(k));
 
-    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || kat === filterKatPos)) {
+    if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKatPos === "Semua" || kategoriMemuat(item.kategori || "Umum", filterKatPos))) {
       filteredItemsPos.push({ code, ...item });
     }
   }
@@ -2834,8 +2854,8 @@ function refreshData() {
     let filteredItems = [];
     for (let code in databaseProduk) {
       let item = databaseProduk[code];
-      let kat = item.kategori || "Umum";
-      if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kat === filterKat)) {
+      let kat = kategoriTeks(item.kategori);
+      if ((item.nama.toLowerCase().includes(searchKeyword) || code.toLowerCase().includes(searchKeyword)) && (filterKat === "Semua" || kategoriMemuat(item.kategori || "Umum", filterKat))) {
         filteredItems.push({ code, ...item });
       }
     }
@@ -2861,7 +2881,7 @@ function refreshData() {
       } else {
         paginatedStokItems.forEach(item => {
           let code = item.code;
-          let kat = item.kategori || "Umum";
+          let kat = kategoriTeks(item.kategori);
           let sat = (item.satuan || "pcs").toLowerCase();
           let stok = item.stok !== undefined ? item.stok : 0;
           let fotoSrc = item.foto || defaultPlaceholderImg;
@@ -3007,7 +3027,7 @@ function renderKatalogKasirPaginated(filteredItems) {
   } else {
     paginatedPosItems.forEach(p => {
       let code = p.code;
-      let kat = p.kategori || "Umum";
+      let kat = kategoriTeks(p.kategori);
       let sat = (p.satuan || "").toLowerCase();
       let stok = p.stok !== undefined ? p.stok : 0;
       let fotoSrc = p.foto || defaultPlaceholderImg;
