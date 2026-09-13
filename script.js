@@ -2343,23 +2343,34 @@ function toggleScannerPos() {
   }
 }
 
-function processBarcodeScanPos(barcode) {
+function processBarcodeScanPos(scannedValue) {
   if (isCooldown) return;
   isCooldown = true;
   playBeep();
-  let produk = databaseProduk[barcode];
-  if (!produk) {
+
+  const value = String(scannedValue || '').trim();
+  // Produk sekarang memakai ID Dokumen Firebase sebagai key.
+  // QR/Barcode disimpan di field `barcode`, jadi scanner harus mencari keduanya.
+  const found = Object.entries(databaseProduk || {}).find(([docId, p]) =>
+    String(docId).trim() === value || String(p?.barcode || '').trim() === value
+  );
+
+  if (!found) {
     showNotif("Barang tidak ditemukan!");
     setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
     return;
   }
+
+  const [docId, produk] = found;
   if ((produk.stok || 0) <= 0) {
     showNotif("Stok Habis!");
     setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
     return;
   }
+
   showNotif("Berhasil: " + produk.nama);
-  tambahItemKeCart(barcode, produk);
+  // Keranjang tetap menggunakan ID Dokumen sebagai key internal.
+  tambahItemKeCart(docId, produk);
   setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
 }
 

@@ -669,7 +669,7 @@
         <div style="font-weight:800;font-size:1rem;">📱 Beranda Pelanggan</div>
         <div style="font-size:.78rem;opacity:.72;margin-top:3px;">Kelola fitur yang tampil di halaman utama pelanggan.</div>
       </div>
-      <button type="button" onclick="adminPreviewCustomerHome()" style="border:1px solid rgba(255,255,255,.2);background:#fff;color:#111;border-radius:10px;padding:8px 11px;font-weight:700;cursor:pointer;">👁️ Preview</button>
+
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
@@ -885,10 +885,10 @@ function renderAdminPromoProductList(selectedCodes) {
   box.innerHTML=items.map(({code,p})=>{
     const checked=codes.includes(code);
     const stok=Number(p.stok||0);
-    return `<label style="display:flex;align-items:center;gap:8px;padding:7px;border-radius:8px;background:#222;border:1px solid #333;font-size:.78rem;">
-      <input type="checkbox" class="admin-promo-product" value="${code}" ${checked?'checked':''} ${stok<=0?'disabled':''}>
-      <span style="flex:1;">${String(p.nama).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}</span>
-      <span style="opacity:.65;">${stok>0?('stok '+stok):'habis'}</span>
+    return `<label class="admin-promo-product-row" style="display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;column-gap:8px;padding:8px 9px;border-radius:8px;background:#222;border:1px solid #333;font-size:.78rem;box-sizing:border-box;min-height:44px;">
+      <input type="checkbox" class="admin-promo-product" value="${code}" ${checked?'checked':''} ${stok<=0?'disabled':''} style="width:18px;height:18px;margin:0;justify-self:center;">
+      <span style="min-width:0;line-height:1.25;overflow-wrap:anywhere;text-align:left;">${String(p.nama).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}</span>
+      <span style="opacity:.65;white-space:nowrap;text-align:right;">${stok>0?('stok '+stok):'habis'}</span>
     </label>`;
   }).join('');
   box.querySelectorAll('.admin-promo-product').forEach(el=>el.addEventListener('change',()=>{
@@ -1088,9 +1088,6 @@ function scrollKePengaturanBerandaPelanggan() {
   window.setTimeout(() => {
     if (target.getAttribute('aria-hidden') === 'false') target.style.maxHeight = 'none';
   }, 600);
-}
-function adminPreviewCustomerHome() {
-  alert('Preview Beranda Pelanggan: kerangka sudah siap. Tampilan preview akan kita sambungkan pada tahap berikutnya.');
 }
 </script>
       </div>
