@@ -367,26 +367,40 @@
     }
     .customer-running-text.run-once { animation: customerMarquee 14s linear infinite; }
 
+    /* Kategori pelanggan: ikon saja, kecil, satu baris, tanpa pembungkus. */
     .category-chips {
-      display:flex !important; flex-wrap:nowrap !important; gap:10px !important;
+      display:flex !important; flex-wrap:nowrap !important; gap:12px !important;
       overflow-x:auto !important; overflow-y:hidden !important;
-      padding:3px 4px 9px !important; margin:0 !important;
+      padding:4px 6px 6px !important; margin:0 !important;
       scrollbar-width:none; -webkit-overflow-scrolling:touch;
+      align-items:center;
     }
     .category-chips::-webkit-scrollbar { display:none; }
     .category-chips .chip-btn {
-      flex:0 0 52px !important; width:52px !important; min-width:52px !important; height:52px !important;
-      min-height:52px !important; padding:0 !important; border:0 !important;
-      border-radius:18px !important; background:var(--card-bg) !important;
-      color:var(--text-color) !important; box-shadow:0 4px 12px rgba(15,23,42,.09) !important;
+      flex:0 0 28px !important; width:28px !important; min-width:28px !important;
+      height:28px !important; min-height:28px !important; padding:0 !important;
+      border:0 !important; border-radius:0 !important; background:transparent !important;
+      color:var(--text-color) !important; box-shadow:none !important;
       font-size:0 !important; display:flex !important; align-items:center !important; justify-content:center !important;
-      position:relative; overflow:hidden;
+      position:relative; overflow:visible; opacity:.78;
+      transition:transform .15s ease, opacity .15s ease;
     }
-    .category-chips .chip-btn::before { content:none !important; }
-    .category-chips .chip-btn { font-size:1.45rem !important; line-height:1 !important; text-indent:0 !important; }
-    .category-chips .chip-btn.active { box-shadow:inset 0 0 0 2px #2563eb, 0 5px 14px rgba(37,99,235,.16) !important; transform:translateY(-1px); }
-    .selected-category-heading { display:flex; align-items:center; gap:7px; padding:2px 7px 7px; font-size:.82rem; font-weight:900; color:var(--text-color); }
-    .selected-category-heading span:first-child { font-size:1.15rem; line-height:1; }
+    .category-chips .chip-btn::before {
+      font-size:1rem !important; line-height:1 !important; margin:0 !important;
+      filter:drop-shadow(0 1px 1px rgba(0,0,0,.12));
+    }
+    .category-chips .chip-btn:nth-child(1)::before { content:'🏠'; }
+    .category-chips .chip-btn:nth-child(2)::before { content:'🛍️'; }
+    .category-chips .chip-btn:nth-child(3)::before { content:'🏘️'; }
+    .category-chips .chip-btn:nth-child(4)::before { content:'🍚'; }
+    .category-chips .chip-btn:nth-child(5)::before { content:'🥤'; }
+    .category-chips .chip-btn:nth-child(6)::before { content:'🍜'; }
+    .category-chips .chip-btn:nth-child(7)::before { content:'🍪'; }
+    .category-chips .chip-btn:nth-child(8)::before { content:'🧂'; }
+    .category-chips .chip-btn:nth-child(9)::before { content:'🧼'; }
+    .category-chips .chip-btn:nth-child(10)::before { content:'🧴'; }
+    .category-chips .chip-btn:nth-child(11)::before { content:'📦'; }
+    .category-chips .chip-btn.active { opacity:1 !important; transform:scale(1.16); }
 
     .product-catalog-grid { gap:9px !important; }
     .product-catalog-grid .inv-card {
@@ -516,21 +530,6 @@
           </div>
         </button>
       </div>
-      <!-- Kategori: diletakkan setelah card Sedang Laris agar konten rekomendasi berada lebih dekat ke atas. -->
-      <div class="category-chips no-print" id="category-container" aria-label="Kategori produk">
-        <button class="chip-btn active" data-category="Semua" aria-label="Produk" title="Produk" onclick="pilihKategoriPelanggan('Semua')">🏠</button>
-        <button class="chip-btn" data-category="Titipan Warga" aria-label="Titipan Warga" title="Titipan Warga" onclick="pilihKategoriPelanggan('Titipan Warga')">🏘️</button>
-        <button class="chip-btn" data-category="Sembako" aria-label="Sembako" title="Sembako" onclick="pilihKategoriPelanggan('Sembako')">🍚</button>
-        <button class="chip-btn" data-category="Minuman" aria-label="Minuman" title="Minuman" onclick="pilihKategoriPelanggan('Minuman')">🥤</button>
-        <button class="chip-btn" data-category="Makanan" aria-label="Makanan" title="Makanan" onclick="pilihKategoriPelanggan('Makanan')">🍜</button>
-        <button class="chip-btn" data-category="Snack" aria-label="Snack" title="Snack" onclick="pilihKategoriPelanggan('Snack')">🍪</button>
-        <button class="chip-btn" data-category="Bumbu" aria-label="Bumbu" title="Bumbu" onclick="pilihKategoriPelanggan('Bumbu')">🧂</button>
-        <button class="chip-btn" data-category="Perawatan" aria-label="Perawatan" title="Perawatan" onclick="pilihKategoriPelanggan('Perawatan')">🧼</button>
-        <button class="chip-btn" data-category="Kebutuhan Rumah" aria-label="Kebutuhan Rumah" title="Kebutuhan Rumah" onclick="pilihKategoriPelanggan('Kebutuhan Rumah')">🧴</button>
-        <button class="chip-btn" data-category="Lainnya" aria-label="Lainnya" title="Lainnya" onclick="pilihKategoriPelanggan('Lainnya')">📦</button>
-      </div>
-      <div id="selected-category-heading" class="selected-category-heading no-print" aria-live="polite" style="display:none;"><span id="selected-category-icon">🏠</span><span id="selected-category-name">Produk</span></div>
-
       <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 10px;">
         <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
         <div id="reorder-container" class="auto-scroll-wrapper"></div>
@@ -550,10 +549,23 @@
         <div id="trending-container" class="auto-scroll-wrapper"></div>
       </div>
 
-
+      <!-- Navigasi Home/Kategori: hanya ikon, satu baris horizontal. -->
+      <div class="category-chips no-print" id="category-container">
+        <button class="chip-btn active" aria-label="Home" title="Home" onclick="pilihKategoriPelanggan('__HOME__')">Home</button>
+        <button class="chip-btn" aria-label="Produk" title="Produk" onclick="pilihKategoriPelanggan('Semua')">Produk</button>
+        <button class="chip-btn" aria-label="Titipan Warga" title="Titipan Warga" onclick="pilihKategoriPelanggan('Titipan Warga')">Titipan Warga</button>
+        <button class="chip-btn" aria-label="Sembako" title="Sembako" onclick="pilihKategoriPelanggan('Sembako')">Sembako</button>
+        <button class="chip-btn" aria-label="Minuman" title="Minuman" onclick="pilihKategoriPelanggan('Minuman')">Minuman</button>
+        <button class="chip-btn" aria-label="Makanan" title="Makanan" onclick="pilihKategoriPelanggan('Makanan')">Makanan</button>
+        <button class="chip-btn" aria-label="Snack" title="Snack" onclick="pilihKategoriPelanggan('Snack')">Snack</button>
+        <button class="chip-btn" aria-label="Bumbu" title="Bumbu" onclick="pilihKategoriPelanggan('Bumbu')">Bumbu</button>
+        <button class="chip-btn" aria-label="Perawatan" title="Perawatan" onclick="pilihKategoriPelanggan('Perawatan')">Perawatan</button>
+        <button class="chip-btn" aria-label="Kebutuhan Rumah" title="Kebutuhan Rumah" onclick="pilihKategoriPelanggan('Kebutuhan Rumah')">Kebutuhan Rumah</button>
+        <button class="chip-btn" aria-label="Lainnya" title="Lainnya" onclick="pilihKategoriPelanggan('Lainnya')">Lainnya</button>
+      </div>
 
       <div class="pos-container" style="gap: 0;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 0 0 2px 0; color: var(--text-color);">🛍️ Semua Produk</div>
+        <div id="catalog-category-title" style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin: 0 0 2px 0; color: var(--text-color);">🛍️ Produk</div>
         <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 0 6px 4px 6px; background: transparent; border: none; box-shadow: none;">
           <div id="pos-catalog-container"></div>
         </div>
@@ -1025,7 +1037,7 @@
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "TokoQuh", phone: "089" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24; let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
-    let activeKategoriPelanggan = 'Semua'; let toastTimeout;
+    let activeKategoriPelanggan = '__HOME__'; let toastTimeout;
     let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = true;
 
     let currentDetailCode = null; let currentDetailQty = 1; let currentDetailStep = 1;
@@ -1486,48 +1498,41 @@
       filterKatalogPelanggan("");
     }
 
-    const kategoriPelangganUI = {
-      'Semua': { ikon: '🏠', nama: 'Produk' },
-      'Titipan Warga': { ikon: '🏘️', nama: 'Titipan Warga' },
-      'Sembako': { ikon: '🍚', nama: 'Sembako' },
-      'Minuman': { ikon: '🥤', nama: 'Minuman' },
-      'Makanan': { ikon: '🍜', nama: 'Makanan' },
-      'Snack': { ikon: '🍪', nama: 'Snack' },
-      'Bumbu': { ikon: '🧂', nama: 'Bumbu' },
-      'Perawatan': { ikon: '🧼', nama: 'Perawatan' },
-      'Kebutuhan Rumah': { ikon: '🧴', nama: 'Kebutuhan Rumah' },
-      'Lainnya': { ikon: '📦', nama: 'Lainnya' }
-    };
-
     function pilihKategoriPelanggan(kategori) {
       activeKategoriPelanggan = kategori;
-      const infoKategori = kategoriPelangganUI[kategori] || { ikon: '📦', nama: kategori };
-      document.querySelectorAll('#category-container .chip-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.category === kategori);
+      document.querySelectorAll('#category-container .chip-btn').forEach((btn, index) => {
+        const shouldActive = (kategori === '__HOME__' && index === 0) || (kategori === 'Semua' && index === 1) ||
+          (kategori !== '__HOME__' && kategori !== 'Semua' && btn.getAttribute('title') === kategori);
+        btn.classList.toggle('active', shouldActive);
       });
-      const heading = document.getElementById('selected-category-heading');
-      const headingIcon = document.getElementById('selected-category-icon');
-      const headingName = document.getElementById('selected-category-name');
-      if (heading && headingIcon && headingName) {
-        headingIcon.textContent = infoKategori.ikon;
-        headingName.textContent = infoKategori.nama;
-        heading.style.display = 'flex';
-      }
-      currentPosPage = 1; perbaruiTampilanKategori(); refreshKatalogPelanggan();
+      currentPosPage = 1;
+      perbaruiTampilanKategori();
+      refreshKatalogPelanggan();
     }
-
+    
     function perbaruiTampilanKategori() {
       const searchOpen = document.getElementById('sticky-search-container')?.style.display === 'block';
-      let isSemua = activeKategoriPelanggan === 'Semua';
+      const isHome = activeKategoriPelanggan === '__HOME__';
+      const isProduk = activeKategoriPelanggan === 'Semua';
       if (searchOpen) {
         ['category-container','reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'].forEach(id => { const el=document.getElementById(id); if(el) el.style.display='none'; });
         return;
       }
-      const promoBanner = document.getElementById('promo-banner-section'); if(promoBanner && promoBanner.getAttribute('aria-hidden') === 'false' && isSemua) promoBanner.style.display = 'flex'; else if(promoBanner) promoBanner.style.display = 'none';
-      document.getElementById('recipe-section-wrapper').style.display = isSemua ? 'block' : 'none';
-      document.getElementById('trending-section-wrapper').style.display = isSemua ? 'block' : 'none';
+      const promoBanner = document.getElementById('promo-banner-section');
+      if(promoBanner) promoBanner.style.display = (promoBanner.getAttribute('aria-hidden') === 'false' && isHome) ? 'flex' : 'none';
+      const categoryContainer = document.getElementById('category-container');
+      if(categoryContainer) categoryContainer.style.display = 'flex';
+      const recipe = document.getElementById('recipe-section-wrapper');
+      if(recipe) recipe.style.display = isHome ? 'block' : 'none';
+      const trending = document.getElementById('trending-section-wrapper');
+      if(trending) trending.style.display = isHome ? 'block' : 'none';
       let reorderWrapper = document.getElementById('reorder-section-wrapper');
-      if (reorderWrapper) { reorderWrapper.style.display = (isSemua && document.getElementById('reorder-container').children.length > 0) ? 'block' : 'none'; }
+      if (reorderWrapper) { reorderWrapper.style.display = (isHome && document.getElementById('reorder-container').children.length > 0) ? 'block' : 'none'; }
+      const title = document.getElementById('catalog-category-title');
+      if(title) {
+        const labels = { '__HOME__': '🛍️ Produk', 'Semua': '🛍️ Produk', 'Titipan Warga': '🏘️ Titipan Warga', 'Sembako': '🍚 Sembako', 'Minuman': '🥤 Minuman', 'Makanan': '🍜 Makanan', 'Snack': '🍪 Snack', 'Bumbu': '🧂 Bumbu', 'Perawatan': '🧼 Perawatan', 'Kebutuhan Rumah': '🧴 Kebutuhan Rumah', 'Lainnya': '📦 Lainnya' };
+        title.textContent = labels[activeKategoriPelanggan] || '🛍️ Produk';
+      }
     }
 
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
@@ -1819,7 +1824,7 @@
       }
       const catContainer = document.getElementById('category-container'); if(catContainer) catContainer.style.display = d.cat;
 
-      if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && pb.getAttribute('aria-hidden') === 'false' && activeKategoriPelanggan === 'Semua') pb.style.display = 'flex'; }
+      if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && pb.getAttribute('aria-hidden') === 'false' && activeKategoriPelanggan === '__HOME__') pb.style.display = 'flex'; }
       else { 
         const promoBanner = document.getElementById('promo-banner-section'); if (promoBanner) promoBanner.style.display = 'none'; document.getElementById('recipe-section-wrapper').style.display = 'none'; document.getElementById('trending-section-wrapper').style.display = 'none';
         let reorderWrapper = document.getElementById('reorder-section-wrapper'); if (reorderWrapper) reorderWrapper.style.display = 'none';
@@ -2050,13 +2055,11 @@
 
       let matchedProducts = [];
       for (let code in databaseProduk) {
-        let p = databaseProduk[code];
-        let pNamaLower = String(p.nama || '').toLowerCase();
-        // Kategori pelanggan bersumber langsung dari field kategori di DB produk.
-        let pKat = String(p.kategori || '').trim();
+        let p = databaseProduk[code]; let pNamaLower = String(p.nama || '').toLowerCase();
+        const pKat = String(p.kategori || '').trim();
         let searchKeyword = (document.getElementById("inventory-search-input")?.value || "").toLowerCase().trim();
         let matchSearch = !searchKeyword || pNamaLower.includes(searchKeyword);
-        let matchCategory = (activeKategoriPelanggan === 'Semua') || (pKat.toLowerCase() === activeKategoriPelanggan.toLowerCase());
+        let matchCategory = (activeKategoriPelanggan === '__HOME__' || activeKategoriPelanggan === 'Semua') || (pKat.toLowerCase() === activeKategoriPelanggan.toLowerCase());
         if (matchCategory && matchSearch) matchedProducts.push({ code, ...p });
       }
       
@@ -2302,7 +2305,7 @@
         setupAutoScrollInteraction("reorder-container");
       }
 
-      if(renderedCount > 0 && activeKategoriPelanggan === 'Semua' && document.getElementById('belanja').classList.contains('active')) { wrapper.style.display = "block"; } else { wrapper.style.display = "none"; }
+      if(renderedCount > 0 && activeKategoriPelanggan === '__HOME__' && document.getElementById('belanja').classList.contains('active')) { wrapper.style.display = "block"; } else { wrapper.style.display = "none"; }
     }
 
     function muatRiwayatPesananOnlinePelanggan() { 
