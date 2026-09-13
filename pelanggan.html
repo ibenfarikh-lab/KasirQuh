@@ -609,28 +609,43 @@
   }
 
 </style>
-<style id="home-feature-transition-v74">
+<style id="home-feature-transition-v75">
 #reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper {
   overflow: hidden;
   transform-origin: top center;
   max-height: 3000px;
   opacity: 1;
   transform: translateY(0) scaleY(1);
-  transition: max-height .42s cubic-bezier(.22,1,.36,1), opacity .30s ease, transform .42s cubic-bezier(.22,1,.36,1), margin .42s cubic-bezier(.22,1,.36,1), padding .42s cubic-bezier(.22,1,.36,1);
+  transition:
+    max-height .72s cubic-bezier(.16,1,.3,1),
+    opacity .48s ease,
+    transform .72s cubic-bezier(.16,1,.3,1),
+    margin .72s cubic-bezier(.16,1,.3,1),
+    padding .72s cubic-bezier(.16,1,.3,1);
   will-change: max-height, opacity, transform, margin, padding;
 }
 .home-feature-closing {
   max-height: 0 !important;
   opacity: 0 !important;
-  transform: translateY(-28px) scaleY(.92);
+  transform: translateY(-42px) scaleY(.94);
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
   pointer-events: none;
 }
+/* Katalog ikut terasa tertarik naik saat 3 panel Home ditutup. */
+.home-catalog-transition {
+  transform: translateY(0);
+  transition: transform .72s cubic-bezier(.16,1,.3,1);
+  will-change: transform;
+}
+.home-catalog-transition.catalog-lifting {
+  transform: translateY(-18px);
+}
 @media (prefers-reduced-motion: reduce) {
-  #reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper { transition: none !important; }
+  #reorder-section-wrapper, #recipe-section-wrapper, #trending-section-wrapper,
+  .home-catalog-transition { transition: none !important; }
 }
 </style>
 <style id="customer-developer-footer-style-v73">.customer-developer-footer{text-align:center;margin:16px 0 14px;padding:8px 0 12px;font-size:.7rem;color:var(--text-muted);border-top:1px solid var(--border-color);}.customer-developer-footer a{color:inherit;text-decoration:none;}</style>
@@ -2147,43 +2162,57 @@
     }
 
 
+    let homeFeatureTransitionTimer = null;
     function setHomeFeatureTransition(showHome) {
       const ids = ['reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper'];
+      const catalog = document.querySelector('.home-catalog-transition');
+      if (homeFeatureTransitionTimer) clearTimeout(homeFeatureTransitionTimer);
+
       ids.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
 
-        // A section may be genuinely empty (e.g. reorder), so keep its normal display logic.
         if (!showHome) {
           if (getComputedStyle(el).display === 'none') {
             el.style.display = 'block';
-            el.style.maxHeight = el.scrollHeight + 'px';
-            void el.offsetHeight;
-          } else {
-            el.style.maxHeight = el.scrollHeight + 'px';
-            void el.offsetHeight;
           }
-          el.classList.add('home-feature-closing');
+          // Mulai dari tinggi aktual agar penutupan benar-benar terlihat.
+          el.style.maxHeight = el.scrollHeight + 'px';
+          el.classList.remove('home-feature-closing');
+          void el.offsetHeight;
+          requestAnimationFrame(() => {
+            el.classList.add('home-feature-closing');
+          });
           el.addEventListener('transitionend', function(ev) {
             if (ev.propertyName !== 'max-height' || !el.classList.contains('home-feature-closing')) return;
             el.style.display = 'none';
           }, {once:true});
         } else {
-          // Open from a truly closed state: display first, then animate max-height upward.
           el.style.display = 'block';
-          el.classList.add('home-feature-closing');
           el.style.maxHeight = '0px';
-          el.style.opacity = '0';
-          el.style.transform = 'translateY(-28px) scaleY(.92)';
+          el.classList.add('home-feature-closing');
           void el.offsetHeight;
           requestAnimationFrame(() => {
             el.classList.remove('home-feature-closing');
             el.style.maxHeight = el.scrollHeight + 'px';
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0) scaleY(1)';
           });
         }
       });
+
+      if (catalog) {
+        catalog.classList.remove('catalog-lifting');
+        void catalog.offsetHeight;
+        if (!showHome) {
+          // Saat panel-panel di atas mengempis, katalog ikut bergerak naik.
+          requestAnimationFrame(() => catalog.classList.add('catalog-lifting'));
+          homeFeatureTransitionTimer = setTimeout(() => catalog.classList.remove('catalog-lifting'), 760);
+        } else {
+          // Saat kembali ke Home, katalog turun sedikit lalu kembali ke posisi normal
+          // bersamaan dengan panel Home yang membuka.
+          catalog.classList.add('catalog-lifting');
+          requestAnimationFrame(() => requestAnimationFrame(() => catalog.classList.remove('catalog-lifting')));
+        }
+      }
     }
 
     function switchTabPelanggan(tabId) {
