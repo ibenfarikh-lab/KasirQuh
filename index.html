@@ -56,12 +56,12 @@
 [data-theme="colorful-v2"],
 [data-theme="colorful2"],
 [data-theme="colorful-v.2"] {
-  --admin-solid-blue: #2563eb;
-  --admin-solid-purple: #7c3aed;
-  --admin-solid-pink: #ec4899;
-  --admin-solid-orange: #f97316;
-  --admin-solid-green: #10b981;
-  --admin-solid-cyan: #06b6d4;
+  --admin-solid-blue: #163A5F;
+  --admin-solid-purple: #5A3A24;
+  --admin-solid-pink: #6B2525;
+  --admin-solid-orange: #7A421D;
+  --admin-solid-green: #1F5A3A;
+  --admin-solid-cyan: #14555A;
   background-image: none !important;
 }
 
@@ -111,23 +111,23 @@
 /* Solid palette by card position. */
 [data-theme="colorful-v2"] .card:nth-child(5n+1),
 [data-theme="colorful2"] .card:nth-child(5n+1),
-[data-theme="colorful-v.2"] .card:nth-child(5n+1) { background:#2563eb !important; }
+[data-theme="colorful-v.2"] .card:nth-child(5n+1) { background:#163A5F !important; }
 
 [data-theme="colorful-v2"] .card:nth-child(5n+2),
 [data-theme="colorful2"] .card:nth-child(5n+2),
-[data-theme="colorful-v.2"] .card:nth-child(5n+2) { background:#f97316 !important; }
+[data-theme="colorful-v.2"] .card:nth-child(5n+2) { background:#7A421D !important; }
 
 [data-theme="colorful-v2"] .card:nth-child(5n+3),
 [data-theme="colorful2"] .card:nth-child(5n+3),
-[data-theme="colorful-v.2"] .card:nth-child(5n+3) { background:#10b981 !important; }
+[data-theme="colorful-v.2"] .card:nth-child(5n+3) { background:#1F5A3A !important; }
 
 [data-theme="colorful-v2"] .card:nth-child(5n+4),
 [data-theme="colorful2"] .card:nth-child(5n+4),
-[data-theme="colorful-v.2"] .card:nth-child(5n+4) { background:#7c3aed !important; }
+[data-theme="colorful-v.2"] .card:nth-child(5n+4) { background:#5A3A24 !important; }
 
 [data-theme="colorful-v2"] .card:nth-child(5n+5),
 [data-theme="colorful2"] .card:nth-child(5n+5),
-[data-theme="colorful-v.2"] .card:nth-child(5n+5) { background:#ec4899 !important; }
+[data-theme="colorful-v.2"] .card:nth-child(5n+5) { background:#6B2525 !important; }
 
 /* Buttons and navigation are solid too. */
 [data-theme="colorful-v2"] button,
@@ -186,7 +186,53 @@
 [data-theme="colorful-v2"] .login-card button,
 [data-theme="colorful2"] .login-card button,
 [data-theme="colorful-v.2"] .login-card button {
-  background: #7c3aed !important; color: #ffffff !important;
+  background: #163A5F !important; color: #ffffff !important;
+}
+
+/* ============================================================
+   PRODUCT CATEGORY CHECKLIST — aligned for mobile
+   ============================================================ */
+[data-theme="colorful-v2"] #db-category-menu label,
+[data-theme="colorful2"] #db-category-menu label,
+[data-theme="colorful-v.2"] #db-category-menu label,
+#db-category-menu label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 7px 8px !important;
+  margin: 0 !important;
+  text-align: left !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+}
+#db-category-menu label input[type="checkbox"] {
+  flex: 0 0 auto !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#db-category-menu label span {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+/* V2 palette aliases: all colorful, but dark/solid/bold. */
+[data-theme="colorful-v2"],
+[data-theme="colorful2"],
+[data-theme="colorful-v.2"] {
+  --admin-solid-blue: #163A5F;
+  --admin-solid-purple: #5A3A24;
+  --admin-solid-pink: #6B2525;
+  --admin-solid-orange: #7A421D;
+  --admin-solid-green: #1F5A3A;
+  --admin-solid-cyan: #14555A;
 }
 </style>
 </head>
