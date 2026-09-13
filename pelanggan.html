@@ -406,6 +406,27 @@
     }
 
 
+/* Promo: same rhythm as AI FAB — 3 bounces, 3 seconds rest, repeat */
+@keyframes promoBounceThree {
+  0%, 62.5%, 100% { transform: translateY(0); }
+  4%  { transform: translateY(-9px); }
+  8%  { transform: translateY(0); }
+  12% { transform: translateY(-7px); }
+  16% { transform: translateY(0); }
+  20% { transform: translateY(-5px); }
+  24% { transform: translateY(0); }
+}
+
+/* Keep promo geometry exactly as-is; animation only */
+.customer-promo,
+.customerPromo,
+.promo-trigger,
+.promo-float,
+#customerPromo,
+#promoTrigger {
+  animation: promoBounceThree 7.8s ease-in-out infinite !important;
+  will-change: transform;
+}
 </style>
 
 <style id="customer-chat-subtabs-fix">
@@ -450,7 +471,7 @@
     background: #2563eb !important;
     box-shadow: 0 7px 18px rgba(37,99,235,.28) !important;
     overflow: visible !important;
-    animation: customerPromoBounce 4.8s ease-in-out infinite !important;
+    animation: promoBounceThree 4.8s ease-in-out infinite !important;
   }
   #promo-banner-section .promo-stage {
     padding: 0 !important;
@@ -465,7 +486,7 @@
   }
   #promo-banner-section .promo-stage > div:not(:first-child) { display: none !important; }
   #promo-banner-section::before, #promo-banner-section::after { display: none !important; }
-  @keyframes customerPromoBounce {
+  @keyframes promoBounceThree {
     0%, 37.5%, 100% { transform: translateY(0) scale(1); }
     5% { transform: translateY(-9px) scale(1.03); }
     10% { transform: translateY(0) scale(1); }
