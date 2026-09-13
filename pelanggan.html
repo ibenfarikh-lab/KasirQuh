@@ -670,80 +670,100 @@
 </style>
 
 
-<style id="kq-header-warunge-mimi">
-/* === KasirQuh Warunge Mimi: header refresh === */
-.kq-header-refresh {
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 10px 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-radius: 0 0 22px 22px;
+<style id="kq-warunge-mimi-header-refresh">
+/* Header refresh: only reorganizes existing header content + approved logo asset. */
+.customer-home-header {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 86px minmax(0,1fr) 54px !important;
+  align-items: center !important;
+  column-gap: 12px !important;
+  padding: 14px 14px 16px !important;
+  margin: 0 -8px 10px !important;
+  min-height: 116px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
-.kq-header-refresh .kq-logo {
-  width: 72px;
-  height: 72px;
-  flex: 0 0 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
+.customer-home-logo-wrap {
+  width: 86px !important;
+  height: 86px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
 }
-.kq-header-refresh .kq-logo svg {
-  width: 100%;
-  height: 100%;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.customer-home-logo {
+  width:86px !important;
+  height:86px !important;
+  object-fit:contain !important;
+  display:block !important;
+  background:transparent !important;
 }
-.kq-header-refresh .kq-info {
-  flex: 1;
-  min-width: 0;
+.customer-home-logo-dark { display:none !important; }
+[data-theme="dark"] .customer-home-logo-light { display:none !important; }
+[data-theme="dark"] .customer-home-logo-dark { display:block !important; }
+.customer-home-header .customer-home-title-row {
+  min-width:0 !important;
+  min-height:0 !important;
+  display:block !important;
 }
-.kq-header-refresh .kq-name {
-  margin: 0 0 3px;
-  font-weight: 800;
-  font-size: 1.02rem;
-  line-height: 1.15;
+.customer-home-header .customer-home-title {
+  margin:0 !important;
+  font-size:1.12rem !important;
+  line-height:1.15 !important;
+  letter-spacing:-.2px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
 }
-.kq-header-refresh .kq-greeting {
-  margin: 0 0 4px;
-  font-size: .82rem;
-  line-height: 1.25;
+.customer-home-header .customer-home-title::before { content:none !important; }
+.customer-home-header .customer-home-greeting {
+  margin:5px 0 0 !important;
+  font-size:.78rem !important;
+  line-height:1.2 !important;
 }
-.kq-header-refresh .kq-store-info {
-  margin: 0;
-  font-size: .76rem;
-  line-height: 1.25;
-  opacity: .86;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.customer-home-header #customer-home-info-line {
+  width:100% !important;
+  max-width:none !important;
+  margin:7px 0 0 !important;
+  padding:6px 8px !important;
+  box-sizing:border-box !important;
+  border-radius:12px !important;
+  min-width:0 !important;
 }
-.kq-header-refresh .kq-promo {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  background: transparent;
-  font-size: 1.2rem;
-  cursor: pointer;
+.customer-home-header .customer-running-window { min-width:0 !important; }
+.customer-home-header .customer-running-text { font-size:.64rem !important; }
+.customer-home-header #promo-banner-section {
+  position:static !important;
+  width:54px !important;
+  min-width:54px !important;
+  height:54px !important;
+  min-height:54px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border-radius:50% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
 }
-[data-theme="light"] .kq-header-refresh .kq-logo { color: #000; }
-[data-theme="dark"] .kq-header-refresh .kq-logo { color: #fff; }
-
-@media (max-width: 480px) {
-  .kq-header-refresh { padding: 9px 10px 12px; gap: 9px; }
-  .kq-header-refresh .kq-logo { width: 64px; height: 64px; flex-basis: 64px; }
-  .kq-header-refresh .kq-name { font-size: .96rem; }
+.customer-home-header #promo-banner-section .promo-stage {
+  padding:0 !important;
+  width:auto !important;
+}
+.customer-home-header #promo-banner-section .promo-stage > div:not(:first-child) { display:none !important; }
+.customer-home-header #promo-banner-section .promo-stage > div:first-child {
+  margin:0 !important;
+  font-size:1.9rem !important;
+}
+@media (max-width:480px){
+  .customer-home-header { grid-template-columns:72px minmax(0,1fr) 48px !important; column-gap:9px !important; padding:11px 10px 13px !important; min-height:96px !important; }
+  .customer-home-logo-wrap,.customer-home-logo { width:72px !important; height:72px !important; }
+  .customer-home-header .customer-home-title { font-size:1rem !important; }
+  .customer-home-header .customer-home-greeting { font-size:.73rem !important; }
+  .customer-home-header #customer-home-info-line { margin-top:5px !important; padding:5px 7px !important; font-size:.63rem !important; }
+  .customer-home-header #promo-banner-section { width:48px !important; min-width:48px !important; height:48px !important; min-height:48px !important; }
 }
 </style>
 
@@ -826,23 +846,16 @@
 
   <!-- 1. HALAMAN BELANJA -->
     <div id="belanja" class="tab-content active" style="display: block;">
-      <div class="kq-header-refresh">
-  <div class="kq-logo"><svg viewBox="0 0 100 100" aria-hidden="true">
-<path d="M18 42 50 18l32 24"/>
-<path d="M24 40v42h52V40"/>
-<path d="M35 82V57h30v25"/>
-<path d="M42 67h16"/>
-<path d="M31 49h38"/>
-</svg></div>
-  <div class="kq-info">
-    <div class="kq-name">Warunge Mimi</div>
-    <div class="kq-greeting" id="kq-greeting">Selamat datang</div>
-    <div class="kq-store-info" id="kq-store-info">Info Toko</div>
-  </div>
-  <button class="kq-promo" type="button" aria-label="Promo" title="Promo">🎁</button>
-</div>
-        <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
-        <div id="customer-home-info-line" class="customer-home-info-line"><span class="customer-info-label">📢  Info Toko:</span><span class="customer-running-window" aria-live="polite"><span id="customer-home-running-text" class="customer-running-text">&nbsp;</span></span></div>
+      <div class="customer-home-header no-print" id="customer-home-header">
+        <div class="customer-home-logo-wrap" aria-hidden="true">
+          <img class="customer-home-logo customer-home-logo-light" src="assets/logo-warunge-mimi-light.png" alt="">
+          <img class="customer-home-logo customer-home-logo-dark" src="assets/logo-warunge-mimi-dark.png" alt="">
+        </div>
+        <div class="customer-home-title-row">
+          <h1 class="customer-home-title"><span id="customer-home-store-name">Nama Toko</span></h1>
+          <p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
+          <div id="customer-home-info-line" class="customer-home-info-line"><span class="customer-info-label">📢  Info Toko:</span><span class="customer-running-window" aria-live="polite"><span id="customer-home-running-text" class="customer-running-text">&nbsp;</span></span></div>
+        </div>
         <button id="promo-banner-section" class="promo-banner no-print" aria-label="Lihat promo toko" onclick="bukaPromoTokoPelanggan()" style="display:none;">
           <div class="promo-stage">
             <div style="font-size:2rem;line-height:1;margin-bottom:10px;">🎁</div>
@@ -851,123 +864,7 @@
             <div id="promo-slide-content" style="display:none;"></div>
           </div>
         </button>
-      </div>
-      <div id="reorder-section-wrapper" class="no-print" style="display: none; margin-bottom: 10px;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
-        <div id="reorder-container" class="auto-scroll-wrapper"></div>
-      </div>
-
-      <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
-      <div id="recipe-section-wrapper" class="no-print" style="margin: 1px 0 2px 0;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🍜  ide Masak Warga Hari Ini</div>
-        <div class="horizontal-scroll-container" id="recipe-scroll-container">
-          <!-- Rendered via JavaScript -->
-        </div>
-      </div>
-
-      <!-- Barang Laris Hari Ini -->
-      <div id="trending-section-wrapper" class="no-print" style="margin: 1px 0 2px 0;">
-        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
-        <div id="trending-container" class="auto-scroll-wrapper"></div>
-      </div>
-
-
-
-      <!-- Kategori katalog: ikon saja; judul muncul hanya setelah masuk mode Produk/kategori. -->
-      <div class="category-chips no-print" id="category-container" aria-label="Kategori produk">
-        <button type="button" class="chip-btn active" data-category="Home" aria-label="Home" title="Home" onclick="pilihKategoriPelanggan('Home')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8"/><path d="M5.5 9.5V21h13V9.5"/><path d="M9 21v-6h6v6"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Produk" aria-label="Produk" title="Produk" onclick="pilihKategoriPelanggan('Produk')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1 12H5L4 8Z"/><path d="M8 8a4 4 0 0 1 8 0"/><path d="M9 12v.01M15 12v.01"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Titipan Warga" aria-label="Titipan Warga" title="Titipan Warga" onclick="pilihKategoriPelanggan('Titipan Warga')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M8 21v-6h8v6"/><path d="M3 21h18"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Sembako" aria-label="Sembako" title="Sembako" onclick="pilihKategoriPelanggan('Sembako')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l-1 12H5L4 8Z"/><path d="M7 8c0-2.2 2.2-4 5-4s5 1.8 5 4"/><path d="M8 12h8"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Minuman" aria-label="Minuman" title="Minuman" onclick="pilihKategoriPelanggan('Minuman')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10"/><path d="M8 4l1 16h6l1-16"/><path d="M9 9h6"/><path d="M10 13h4"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Makanan" aria-label="Makanan" title="Makanan" onclick="pilihKategoriPelanggan('Makanan')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h16"/><path d="M6 13a6 6 0 0 1 12 0"/><path d="M7 17h10"/><path d="M9 17v3M15 17v3"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Snack" aria-label="Snack" title="Snack" onclick="pilihKategoriPelanggan('Snack')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 10h12l-1 10H7L6 10Z"/><path d="M8 10c0-2 1-3 2-3 0-2 1-3 2-3s2 1 2 3c1 0 2 1 2 3"/><path d="M9 14h.01M12 14h.01M15 14h.01"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Bumbu" aria-label="Bumbu" title="Bumbu" onclick="pilihKategoriPelanggan('Bumbu')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9h10v10H7z"/><path d="M8 9c0-2 1.8-3 4-3s4 1 4 3"/><path d="M10 4h4"/><path d="M10 13h4M10 16h4"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Perawatan" aria-label="Perawatan" title="Perawatan" onclick="pilihKategoriPelanggan('Perawatan')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v3H9z"/><path d="M8 6h8l1 15H7L8 6Z"/><path d="M10 11h4M10 15h4"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Kebutuhan Rumah" aria-label="Kebutuhan Rumah" title="Kebutuhan Rumah" onclick="pilihKategoriPelanggan('Kebutuhan Rumah')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 10h14l-1 11H6L5 10Z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><path d="M9 14h6"/></svg></button>
-        <button type="button" class="chip-btn" data-category="Lainnya" aria-label="Lainnya" title="Lainnya" onclick="pilihKategoriPelanggan('Lainnya')"><svg class="category-line-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14v14H5z"/><path d="M8 7V4h8v3"/><path d="M9 12h6M9 16h4"/></svg></button>
-      </div>
-
-      <div class="pos-container" style="gap: 0;">
-        <div id="catalog-category-title" class="catalog-category-title" aria-live="polite"></div>
-        <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 0 6px 4px 6px; background: transparent; border: none; box-shadow: none;">
-          <div id="pos-catalog-container"></div>
-        </div>
-      </div>
-
-      <!-- MODAL KERANJANG -->
-      <div id="cartModal" class="modal-backdrop" onclick="if(event.target === this) closeCartModal()">
-        <div class="modal-content" style="max-width: 380px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 12px; background: var(--card-bg); display: flex; flex-direction: column; gap: 6px;">
-          <div class="modal-header no-print" style="margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="font-size: 1rem; margin: 0;">Keranjang Belanja</h3>
-            <button class="btn-close-modal" onclick="closeCartModal()" style="font-size: 1.1rem; background:none; border:none; cursor:pointer; color:var(--text-color);">&times;</button>
-          </div>
-          <div class="receipt-header" style="margin-bottom: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
-            <h3 id="receipt-shop-name" style="margin: 0; font-size: 0.9rem;">Nama Toko</h3>
-            <p id="receipt-shop-address" style="margin: 0; font-size: 0.7rem; color: var(--text-muted);">Alamat Toko</p>
-          </div>
-          <div class="cart-table-wrapper" style="max-height: 26vh; overflow-y: auto;">
-            <table class="cart-table" style="font-size: 0.78rem; width: 100%;">
-              <thead>
-                <tr>
-                  <th style="width: 42%;">Barang</th>
-                  <th style="width: 34%; text-align: center;">Atur Qty</th>
-                  <th style="width: 24%; text-align: right;">Total</th>
-                </tr>
-              </thead>
-              <tbody id="cart-body"></tbody>
-            </table>
-          </div>
-          
-          <div class="summary-box" style="padding: 2px 0; display: flex; flex-direction: column; gap: 4px;">
-            <div style="font-size: 0.85rem; font-weight: bold; display: flex; justify-content: space-between;"><span>Total:</span> <span style="color: #16a34a;">Rp <span id="grand-total">0</span></span></div>
-            
-            <div class="no-print" style="display: flex; flex-direction: column; gap: 4px;">
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <label style="font-size: 0.72rem; font-weight: 600; width: 35%;">Pembayaran:</label>
-                <select id="pay-method-cust" onchange="togglePayMethodCust()" style="flex: 1; font-size: 0.75rem; padding: 4px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
-                  <option value="COD">COD (Bayar di Tempat)</option>
-                  <option value="TF">Transfer Bank</option>
-                  <option value="WhatsApp">Pesan via WA</option>
-                </select>
-              </div>
-
-              <div id="wrapper-tf-proof" style="display: none; padding: 4px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: 4px;">
-                <label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 2px;">Bukti Transfer:</label>
-                <input type="file" id="cust-proof-file" accept="image/*" onchange="handleProofUpload(event)" style="font-size: 0.68rem; width: 100%;">
-                <input type="hidden" id="cust-proof-base64" value="">
-              </div>
-
-              <div style="padding: 6px; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--input-border); display: flex; flex-direction: column; gap: 4px;">
-                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.73rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
-                  <span>🌟 Simpan jadi Menu Resep</span>
-                  <input type="checkbox" id="cust-save-recipe-toggle" onchange="toggleSaveRecipeOptions(this.checked)" style="margin: 0;">
-                </label>
-                <div id="wrapper-save-recipe-fields" style="display: none; flex-direction: column; gap: 4px; margin-top: 2px;">
-                  <input type="text" id="cust-save-recipe-name" placeholder="Nama Menu (Cth: Sop Spesial Weekend)" style="width: 100%; font-size: 0.73rem; padding: 5px 6px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;">
-                  <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; cursor: pointer; color: var(--text-color); margin: 0;">
-                    <span>📢 Bagikan otomatis ke Chat Rumpi</span>
-                    <input type="checkbox" id="cust-share-rumpi-toggle" checked style="margin: 0;">
-                  </label>
-                </div>
-              </div>
-
-              <textarea id="cust-order-note" rows="1" placeholder="Catatan untuk toko (opsional)..." style="width: 100%; font-size: 0.75rem; padding: 5px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;"></textarea>
-            </div>
-          </div>
-
-          <div style="display: flex; gap: 4px;" class="no-print">
-            <button class="btn-success" onclick="prosesCheckoutPelanggan()" style="flex: 1; background: #16a34a; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;">
-              🛒 Belanja Sekarang
-            </button>
-            <button onclick="prosesSimpanMenuSaja()" style="flex: 1; background: #7c3aed; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;">
-              💾 Simpan Menu Saja
-            </button>
-          </div>
-          <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 0; padding: 4px; font-size: 0.72rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">🗑️ Kosongkan Keranjang</button>
-        </div>
-      </div>
-    </div>
+      </div>    </div>
 
     <!-- 2. HALAMAN DATA PELANGGAN -->
     <div id="data-pelanggan" class="tab-content" style="display: none;">
@@ -2949,21 +2846,6 @@
       });
     }, 850);
   };
-})();
-</script>
-
-
-<script id="kq-header-warunge-mimi-js">
-(function () {
-  function updateKQGreeting() {
-    const el = document.getElementById('kq-greeting');
-    if (!el) return;
-    const h = new Date().getHours();
-    const icon = h < 11 ? '☀️' : (h < 15 ? '☀️' : (h < 18 ? '🌤️' : '🌙'));
-    const text = h < 11 ? 'Selamat pagi' : (h < 15 ? 'Selamat siang' : (h < 18 ? 'Selamat sore' : 'Selamat malam'));
-    el.textContent = icon + ' ' + text;
-  }
-  updateKQGreeting();
 })();
 </script>
 
