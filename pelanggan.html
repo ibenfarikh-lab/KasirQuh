@@ -4162,21 +4162,20 @@ body[data-theme="modern"] main {
 </script>
 
 
-<!-- No. 1 Header Toko: full-width mobile wrapper -->
-<style id="kq-header-fullwidth-clean">
+<!-- =========================================================
+     NO. 1 — HEADER TOKO
+     Full viewport seperti Bottom Navbar.
+     HANYA mengubah wadah/posisi luar header.
+     Isi header tidak diubah.
+     ========================================================= -->
+<style id="kq-no1-header-viewport-final">
 @media (max-width: 699px) {
-  /* Make only the store header span the viewport, like the bottom navbar. */
   #customer-home-header {
     width: 100vw !important;
     max-width: 100vw !important;
     margin-left: calc(50% - 50vw) !important;
     margin-right: calc(50% - 50vw) !important;
     box-sizing: border-box !important;
-  }
-
-  /* Keep the header's contents safely away from the screen edges. */
-  #customer-home-header > * {
-    box-sizing: border-box;
   }
 }
 </style>
