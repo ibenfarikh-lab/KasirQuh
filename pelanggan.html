@@ -4657,3 +4657,27 @@ body.theme-colorful-v2 .products-container {
 }
 </style>
 
+
+<style id="kq-no3-card-inner-spacing-v5-final">
+/* FIX V5: rail/card outer edge tetap full-bleed, tetapi isi card punya ruang dalam.
+   Selector ini sengaja lebih spesifik daripada aturan rail yang mereset padding card. */
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card {
+  box-sizing: border-box !important;
+  padding: 12px !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 6px 0 !important;
+  box-sizing: border-box !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > div:last-child {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card .recipe-btn-action {
+  box-sizing: border-box !important;
+}
+</style>
