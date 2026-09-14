@@ -1616,6 +1616,132 @@ body[data-theme="modern"] #data-pelanggan #profile-coins {
 }
 </style>
 
+
+<style id="modern-responsive-grid-v8">
+/* ============================================================
+   MODERN RESPONSIVE GRID
+   - Card tidak lagi dikunci 125x125.
+   - 125px = ukuran minimum.
+   - Card mengikuti ruang layar secara proporsional.
+   - Grid otomatis berubah 2 / 3 / 4 / dst.
+   - Batas maksimum ±190px agar desktop tidak menjadi terlalu besar.
+   - HANYA Modern. Light/Dark tetap memakai aturan sebelumnya.
+   ============================================================ */
+
+body[data-theme="modern"] .product-catalog-grid {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(125px, min(190px, 1fr))
+  ) !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: start !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+body[data-theme="modern"] .product-catalog-grid .modern-product-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 190px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1 !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  overflow: hidden !important;
+  container-type: size !important;
+}
+
+/* Semua layer visual mengikuti ukuran card. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Foto: proporsional terhadap card, bukan lagi fixed 70x68px. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage .modern-product {
+  width: 56% !important;
+  height: 54% !important;
+  top: 17% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  object-fit: contain !important;
+}
+
+/* Glow tetap menjadi alas dan ikut membesar/mengecil bersama card. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage .modern-platform {
+  width: 94% !important;
+  height: 35% !important;
+  left: 50% !important;
+  bottom: 4% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Info tetap berada tepat di atas glow. */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  left: 5% !important;
+  right: 5% !important;
+  top: 68% !important;
+  bottom: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+/* Tipografi ikut skala card. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name {
+  font-size: clamp(.57rem, 7.3cqw, .80rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price {
+  margin-top: 1% !important;
+  font-size: clamp(.62rem, 8.0cqw, .88rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  margin-top: 1% !important;
+  font-size: clamp(.45rem, 5.8cqw, .68rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Badge ikut sedikit membesar tetapi tetap proporsional. */
+body[data-theme="modern"] .modern-product-card .modern-stock-badge {
+  left: 1% !important;
+  top: 1% !important;
+  padding: 2px 4px !important;
+  font-size: clamp(.46rem, 4.8cqw, .62rem) !important;
+}
+
+/* Tombol keranjang ikut skala card, tetapi tetap bulat. */
+body[data-theme="modern"] .modern-product-card .modern-cart-btn {
+  width: clamp(24px, 19cqw, 34px) !important;
+  height: clamp(24px, 19cqw, 34px) !important;
+  min-width: clamp(24px, 19cqw, 34px) !important;
+  min-height: clamp(24px, 19cqw, 34px) !important;
+  right: 1% !important;
+  bottom: 1% !important;
+  font-size: clamp(.68rem, 5.5cqw, .90rem) !important;
+}
+</style>
+
 </head>
 
 <script>
