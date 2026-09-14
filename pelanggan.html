@@ -923,46 +923,6 @@ body.fab-auth-hidden .fab-container {
 }
 </style>
 
-
-<style id="modern-carousel-full-bleed-v1">
-/* MODERN: carousel Stok Rumah & Sedang Laris full-bleed ke tepi viewport.
-   Judul tetap mengikuti wrapper utama; hanya area gesernya yang keluar ke tepi layar. */
-#reorder-section-wrapper > .auto-scroll-wrapper,
-#trending-section-wrapper > .auto-scroll-wrapper {
-  width: calc(100% + 16px) !important;
-  margin-left: -8px !important;
-  margin-right: -8px !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  box-sizing: border-box !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  clip-path: inset(0) !important;
-}
-
-#reorder-section-wrapper .auto-scroll-track,
-#trending-section-wrapper .auto-scroll-track {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  gap: 8px !important;
-  width: max-content !important;
-}
-
-/* Card pertama benar-benar mulai dari tepi viewport, bukan 10px di dalamnya. */
-#reorder-section-wrapper .auto-scroll-track > .reorder-card:first-child,
-#trending-section-wrapper .auto-scroll-track > .trending-card:first-child {
-  margin-left: 0 !important;
-}
-
-@media (max-width: 420px) {
-  #reorder-section-wrapper > .auto-scroll-wrapper,
-  #trending-section-wrapper > .auto-scroll-wrapper {
-    width: calc(100% + 16px) !important;
-    margin-left: -8px !important;
-    margin-right: -8px !important;
-  }
-}
-</style>
 </head>
 
 <script>
@@ -1278,7 +1238,7 @@ body.fab-auth-hidden .fab-container {
       <div class="card" style="padding: 12px; margin-bottom: 8px;">
         <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Tampilan & Tema</h3>
         <div class="form-vertical" style="display: flex; flex-direction: column; gap: 6px;">
-          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="auto">Auto (Sistem)</option></select>
+          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="modern">Modern</option><option value="auto">Auto (Sistem)</option></select>
           <label style="font-size: 0.75rem; margin-top: 4px;">Tampilan:</label><select id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="grid">Kotak</option><option value="list">Daftar</option></select>
         </div>
       </div>
@@ -3346,4 +3306,139 @@ body.theme-colorful-v2 .products-container {
     .inv-card [style*="color: #fde047"], .trending-card [style*="color: #fde047"], .reorder-card [style*="color: #fde047"] { color:#fff !important; }
     .recipe-card .recipe-btn-action { background:#111827 !important; color:#fff !important; border:none !important; }
     .btn-quick-cart-icon { background:#111827 !important; color:#fff !important; }
+</style>
+
+
+<style id="kq-modern-theme-final">
+/* =========================================================
+   KASIRQUH CUSTOMER — MODERN THEME
+   Modern adalah tema tersendiri: navy/blue, bukan Light putih.
+   ========================================================= */
+[data-theme="modern"] {
+  --bg-color:#07111f !important;
+  --card-bg:#0d1b2f !important;
+  --input-bg:#091629 !important;
+  --input-border:#294d7a !important;
+  --border-color:#29466b !important;
+  --text-color:#f8fbff !important;
+  --text-muted:#a9bdd7 !important;
+  background:#07111f !important;
+  color:#f8fbff !important;
+}
+
+html:has(body[data-theme="modern"]),
+body[data-theme="modern"] { background:#07111f !important; }
+
+body[data-theme="modern"] .main-content,
+body[data-theme="modern"] #belanja,
+body[data-theme="modern"] #data-pelanggan,
+body[data-theme="modern"] #live-chat,
+body[data-theme="modern"] #pengaturan {
+  background:#07111f !important;
+  color:#f8fbff !important;
+}
+
+/* Header tetap menjadi identitas biru KasirQuh, tetapi menyatu dengan Modern. */
+body[data-theme="modern"] .customer-home-header {
+  background:linear-gradient(145deg,#155eef 0%,#2563eb 55%,#173b86 100%) !important;
+  box-shadow:0 10px 28px rgba(37,99,235,.28) !important;
+}
+
+/* Kategori Modern: ikon bersih tanpa background. */
+body[data-theme="modern"] .category-chips .chip-btn,
+body[data-theme="modern"] .category-chips .chip-btn.active {
+  background:transparent !important;
+  box-shadow:none !important;
+  border:0 !important;
+  color:#fff !important;
+}
+body[data-theme="modern"] .category-chips .chip-btn .category-line-icon {
+  color:#fff !important;
+  --category-icon-color:#fff;
+}
+
+/* Section wrapper / card — bukan putih. */
+body[data-theme="modern"] .card,
+body[data-theme="modern"] .pos-container,
+body[data-theme="modern"] .product-detail-box,
+body[data-theme="modern"] .customer-chat-container,
+body[data-theme="modern"] .settings-card,
+body[data-theme="modern"] .profile-card {
+  background:#0d1b2f !important;
+  color:#f8fbff !important;
+  border-color:#29466b !important;
+}
+
+/* Produk tetap colorful, tetapi tidak memakai putih sebagai pembungkus. */
+body[data-theme="modern"] .inv-card {
+  color:#fff !important;
+  border:1px solid rgba(96,165,250,.48) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.28) !important;
+}
+
+body[data-theme="modern"] .recipe-card,
+body[data-theme="modern"] .reorder-card,
+body[data-theme="modern"] .trending-card {
+  border:1px solid rgba(96,165,250,.34) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.25) !important;
+}
+
+/* Form Data Pelanggan & Pengaturan */
+body[data-theme="modern"] input,
+body[data-theme="modern"] textarea,
+body[data-theme="modern"] select {
+  background:#091629 !important;
+  color:#f8fbff !important;
+  border-color:#294d7a !important;
+}
+body[data-theme="modern"] input::placeholder,
+body[data-theme="modern"] textarea::placeholder { color:#8299b5 !important; }
+
+/* Tombol utama */
+body[data-theme="modern"] button:not(.category-line-icon) {
+  color:#fff;
+}
+
+/* Bottom navbar full-width seperti Admin, tetapi tetap Modern. */
+body[data-theme="modern"] .permanent-bottom-bar {
+  left:0 !important; right:0 !important; width:100% !important;
+  background:rgba(7,17,31,.96) !important;
+  border-top:1px solid #29466b !important;
+  border-radius:20px 20px 0 0 !important;
+  box-shadow:0 -8px 24px rgba(0,0,0,.32) !important;
+  backdrop-filter:blur(12px);
+}
+body[data-theme="modern"] #bottom-bar-title { color:#fff !important; }
+body[data-theme="modern"] #pagination-box {
+  background:#102844 !important;
+  border-color:#38699d !important;
+}
+
+/* Floating menu/modal Modern */
+body[data-theme="modern"] .modal-content,
+body[data-theme="modern"] .modal-box,
+body[data-theme="modern"] #menuToggleModal .modal-content {
+  background:#07111f !important;
+  color:#fff !important;
+  border-color:#29466b !important;
+}
+body[data-theme="modern"] .popup-menu-btn {
+  color:#fff !important;
+  background:#0e263f !important;
+}
+body[data-theme="modern"] .popup-menu-btn.active-menu {
+  color:#fff !important;
+  background:#155eef !important;
+}
+
+/* Detail produk: hilangkan kesan card putih pada Modern. */
+body[data-theme="modern"] .product-detail-box > div,
+body[data-theme="modern"] .product-detail-box [style*="background: white"],
+body[data-theme="modern"] .product-detail-box [style*="background:#fff"] {
+  background-color:#0d1b2f !important;
+}
+
+@media (max-width:480px) {
+  body[data-theme="modern"] .main-content { padding-left:8px !important; padding-right:8px !important; }
+}
 </style>
