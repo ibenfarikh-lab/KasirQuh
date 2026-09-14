@@ -1872,6 +1872,93 @@ body[data-theme="modern"] main {
 }
 </style>
 
+
+<style id="kq-no3-no4-responsive-alignment">
+/* ============================================================
+   NO.3 IDE MASAK + NO.4 SEDANG LARIS
+   Patokan layout mengikuti Header, Stok Rumah dan inner padding
+   Bottom Bar. BUKAN bagian dari Bottom Navbar.
+   ============================================================ */
+#recipe-section-wrapper,
+#trending-section-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  overflow: hidden !important;
+}
+
+#recipe-section-wrapper > div:first-child,
+#trending-section-wrapper > div:first-child {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Main-content sudah memberi gutter 8px.
+   Tambahan 4px di sini = 12px, sama dengan inner padding bottom bar. */
+#recipe-scroll-container,
+#trending-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+  overscroll-behavior-x: contain;
+}
+
+#recipe-scroll-container {
+  display: flex !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch;
+}
+#recipe-scroll-container::-webkit-scrollbar { display:none !important; }
+
+#trending-container {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch;
+}
+#trending-container::-webkit-scrollbar { display:none !important; }
+
+/* Card tetap horizontal-scroll seperti desain sebelumnya,
+   tetapi tidak boleh memaksa section melebar mengikuti card. */
+#recipe-scroll-container .recipe-card,
+#trending-container .trending-card {
+  flex: 0 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Layar sangat kecil: gutter tetap konsisten, card boleh sedikit mengecil. */
+@media (max-width: 360px) {
+  #recipe-scroll-container .recipe-card {
+    min-width: 162px !important;
+    max-width: 162px !important;
+  }
+  #trending-container .trending-card {
+    min-width: 168px !important;
+    max-width: 168px !important;
+  }
+}
+
+/* Layar lebar: section tetap mengikuti viewport, tidak melebar sendiri. */
+@media (min-width: 700px) {
+  #recipe-section-wrapper,
+  #trending-section-wrapper {
+    width: 100% !important;
+  }
+}
+</style>
+
 </head>
 
 <script>
