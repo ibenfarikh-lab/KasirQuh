@@ -4681,3 +4681,28 @@ body.theme-colorful-v2 .products-container {
   box-sizing: border-box !important;
 }
 </style>
+
+<style id="fix-ide-masak-inner-gap-v7">
+/* IDE MASAK: kembalikan tinggi/original card, tetapi isi tetap punya jarak dari tepi */
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card {
+  box-sizing: border-box !important;
+  padding: 10px !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 5px 0 !important;
+  box-sizing: border-box !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > div {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > div:last-child {
+  margin: 0 !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card .recipe-btn-action {
+  box-sizing: border-box !important;
+}
+</style>
