@@ -980,6 +980,26 @@ body.fab-auth-hidden .fab-container {
     background: transparent !important;
   }
 </style>
+<style id="modern-png-transparent-fix-v2">
+/* FINAL: paksa area gambar produk Modern benar-benar transparan.
+   Menangkal aturan global .inv-card img yang memberi background putih/abu. */
+body[data-theme="modern"] .product-catalog-grid .inv-card > div.modern-product-stage > img.modern-product,
+body[data-theme="modern"] .product-catalog-grid .modern-product-card img.modern-product {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  mix-blend-mode: normal !important;
+}
+body[data-theme="modern"] .product-catalog-grid .modern-product-stage {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+</style>
 </head>
 
 <script>
