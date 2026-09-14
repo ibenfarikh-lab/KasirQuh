@@ -1502,7 +1502,9 @@ function handleImageUpload(event) {
       canvas.height = height;
       ctx.drawImage(img, 0, 0, width, height);
       
-      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      const compressedBase64 = file.type === 'image/png'
+  ? canvas.toDataURL('image/png')
+  : canvas.toDataURL('image/jpeg', 0.7);
       document.getElementById("db-selected-online-img").value = compressedBase64;
       showNotif("Foto berhasil dimuat!");
     };
