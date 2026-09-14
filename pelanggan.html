@@ -923,6 +923,101 @@ body.fab-auth-hidden .fab-container {
 }
 </style>
 
+
+<style id="katalog-piringan-fix2">
+/* Katalog grid: PNG transparan sebagai objek produk di atas piringan bawaan */
+.product-catalog-grid .inv-card {
+  background: var(--card-bg, #fff) !important;
+  color: var(--text-color, #111827) !important;
+  border: 1px solid rgba(148,163,184,.18) !important;
+  border-radius: 20px !important;
+  padding: 8px !important;
+  overflow: visible !important;
+  box-shadow: 0 5px 15px rgba(15,23,42,.08) !important;
+}
+.product-catalog-grid .product-stage {
+  position: relative;
+  height: 138px;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 0 0 7px;
+  overflow: visible;
+}
+.product-catalog-grid .product-plate {
+  position: absolute;
+  z-index: 1;
+  left: 10%;
+  right: 10%;
+  bottom: 5px;
+  height: 38px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, #ffffff 0 48%, #e5e7eb 49% 68%, #cbd5e1 69% 76%, #f8fafc 77% 100%);
+  box-shadow: 0 5px 8px rgba(15,23,42,.18);
+}
+.product-catalog-grid .product-transparent-img {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 92% !important;
+  height: 124px !important;
+  margin: 0 auto;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+.product-catalog-grid .product-info {
+  position: relative;
+  z-index: 3;
+  min-width: 0;
+  padding: 0 3px 2px;
+  text-align: left;
+}
+.product-catalog-grid .product-name {
+  color: var(--text-color, #111827) !important;
+  font-size: .78rem;
+  line-height: 1.15;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+.product-catalog-grid .product-stock {
+  color: var(--text-muted, #64748b) !important;
+  font-size: .65rem;
+  line-height: 1.15;
+  margin-bottom: 2px;
+}
+.product-catalog-grid .product-price {
+  color: #2563eb !important;
+  font-size: .82rem;
+  line-height: 1.15;
+  font-weight: 900;
+}
+.product-catalog-grid .product-stage .btn-quick-cart-icon {
+  z-index: 5 !important;
+  bottom: 8px !important;
+  right: 3px !important;
+}
+.product-catalog-grid .product-stage > div[style*="position:absolute"][style*="z-index: 5"] {
+  z-index: 6 !important;
+}
+.product-catalog-grid .inv-card > div[style*="z-index:10"] {
+  border-radius: 18px !important;
+}
+@media (max-width:420px) {
+  .product-catalog-grid .product-stage { height: 126px; }
+  .product-catalog-grid .product-transparent-img { height: 114px !important; width: 94% !important; }
+  .product-catalog-grid .product-plate { height: 34px; left: 8%; right: 8%; bottom: 4px; }
+}
+</style>
+
 </head>
 
 <script>
@@ -2841,18 +2936,18 @@ body.fab-auth-hidden .fab-container {
 
         if (catalogViewMode === 'grid') {
           container.innerHTML += `
-            <div class="inv-card piringan-product-card" onclick="openProductDetail('${code}')">
-              ${isHabis ? '<div class="piringan-habis-overlay"><span>HABIS</span></div>' : ''}
-              <div class="piringan-visual">
-                <div class="piringan-plate" aria-hidden="true"></div>
+            <div class="inv-card" onclick="openProductDetail('${code}')">
+              ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:8px; display:flex; align-items:center; justify-content:center;"><span style="background:#dc2626; color:#fff; font-weight:bold; padding:3px 8px; border-radius:6px; font-size:0.7rem; transform:rotate(-15deg);">HABIS</span></div>' : ''}
+              <div class="product-stage" aria-hidden="true">
+                <div class="product-plate"></div>
                 ${sisaStokBadge}
-                <img src="${fotoSrc}" class="piringan-product-img" alt="${p.nama}">
+                <img src="${fotoSrc}" class="product-transparent-img" alt="${p.nama || 'Produk'}">
                 <button class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
               </div>
-              <div class="piringan-product-info">
-                <div class="piringan-product-name">${p.nama}</div>
-                <div class="piringan-product-stock">Stok: ${p.stok || 0} ${satuan}</div>
-                <div class="piringan-product-price">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+              <div class="product-info">
+                <div class="product-name">${p.nama}</div>
+                <div class="product-stock">Stok: ${p.stok || 0} ${satuan}</div>
+                <div class="product-price">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
               </div>
             </div>`;
         } else {
@@ -3296,114 +3391,6 @@ body.theme-colorful-v2 .products-container {
     .promo-floating-nav button { width:32px; height:32px; border:0; border-radius:50%; background:#2563eb; color:#fff; font-size:1.35rem; line-height:1; cursor:pointer; }
     .promo-floating-nav button:disabled { opacity:.3; cursor:default; }
     .promo-floating-nav span { min-width:48px; text-align:center; font-size:.68rem; font-weight:900; color:var(--text-muted); }
-
-
-    /* === KATALOG PIRINGAN V1 — berbasis PNG transparan === */
-    .product-catalog-grid .piringan-product-card {
-      background: transparent !important;
-      border: 0 !important;
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      color: var(--text-color) !important;
-      padding: 0 3px 8px !important;
-      overflow: visible !important;
-      min-width: 0;
-      position: relative;
-    }
-    .piringan-visual {
-      height: 116px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 4px;
-    }
-    .piringan-plate {
-      position: absolute;
-      left: 8%;
-      right: 8%;
-      bottom: 4px;
-      height: 48px;
-      border-radius: 50%;
-      background:
-        radial-gradient(ellipse at center, rgba(255,255,255,.98) 0 31%, rgba(226,232,240,.98) 32% 52%, rgba(148,163,184,.55) 53% 57%, rgba(241,245,249,.98) 58% 75%, rgba(100,116,139,.28) 76% 80%, rgba(255,255,255,0) 81%);
-      filter: drop-shadow(0 5px 5px rgba(15,23,42,.18));
-      transform: perspective(90px) rotateX(12deg);
-    }
-    .piringan-product-img {
-      position: relative;
-      z-index: 2;
-      width: 88%;
-      height: 102px;
-      object-fit: contain !important;
-      object-position: center bottom;
-      border: 0 !important;
-      border-radius: 0 !important;
-      background: transparent !important;
-      filter: drop-shadow(0 4px 3px rgba(15,23,42,.16));
-    }
-    .piringan-product-card .btn-quick-cart-icon {
-      z-index: 6;
-      right: 2px !important;
-      bottom: 5px !important;
-      width: 30px !important;
-      height: 30px !important;
-    }
-    .piringan-product-card .inv-card,
-    .piringan-product-card [style*="background:#ef4444"] { z-index: 5; }
-    .piringan-product-card .piringan-visual > div[style*="background:#ef4444"] {
-      top: 3px !important; left: 2px !important; z-index: 7 !important;
-      border-radius: 8px !important;
-    }
-    .piringan-product-info {
-      text-align: center;
-      padding: 0 2px;
-      line-height: 1.15;
-    }
-    .piringan-product-name {
-      font-size: .76rem;
-      font-weight: 900;
-      color: var(--text-color);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 3px;
-    }
-    .piringan-product-stock {
-      font-size: .62rem;
-      color: var(--text-muted);
-      margin-bottom: 2px;
-    }
-    .piringan-product-price {
-      font-size: .78rem;
-      font-weight: 900;
-      color: #2563eb;
-    }
-    .piringan-habis-overlay {
-      position: absolute;
-      inset: 0 0 auto 0;
-      height: 116px;
-      z-index: 20;
-      border-radius: 18px;
-      background: rgba(15,23,42,.42);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-    .piringan-habis-overlay span {
-      background: #dc2626; color: #fff; font-weight: 900; padding: 5px 10px;
-      border-radius: 8px; font-size: .72rem; transform: rotate(-12deg);
-      box-shadow: 0 3px 8px rgba(0,0,0,.22);
-    }
-    @media (max-width:420px) {
-      .piringan-visual { height: 108px; }
-      .piringan-product-img { width: 92%; height: 94px; }
-      .piringan-plate { height: 44px; bottom: 3px; }
-      .piringan-habis-overlay { height: 108px; }
-      .piringan-product-name { font-size: .72rem; }
-      .piringan-product-price { font-size: .75rem; }
-    }
 
     /* Semua card pelanggan: colorful solid, tanpa gradient */
     .recipe-card, .reorder-card, .trending-card, .inv-card, .catalog-list-item { background-image:none !important; }
