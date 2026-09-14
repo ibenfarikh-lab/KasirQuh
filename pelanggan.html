@@ -1483,6 +1483,139 @@ body[data-theme="modern"] #pengaturan .card[style*="#fff5f5"] {
 }
 </style>
 
+
+<style id="modern-v7-final-surface-and-info">
+/* ============================================================
+   MODERN V7
+   - Nama/Harga/Stok masuk ke area bawah foto + tepat di atas glow.
+   - Seluruh floating product detail tidak lagi putih.
+   - Card Data Pelanggan + isi riwayat ikut surface Modern.
+   - Hanya Modern; Light/Dark tidak disentuh.
+   ============================================================ */
+
+/* 1) INFO PRODUK: overlay pada bagian bawah foto, sebelum glow */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  left: 6px !important;
+  right: 6px !important;
+  top: 62px !important;
+  bottom: auto !important;
+  z-index: 12 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+  background: transparent !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.98), 0 0 5px rgba(0,0,0,.7) !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name {
+  font-size: .57rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price {
+  margin-top: 1px !important;
+  font-size: .62rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  margin-top: 1px !important;
+  font-size: .45rem !important;
+  line-height: 1.05 !important;
+  color: #d7ecff !important;
+}
+
+/* 2) MODAL DETAIL PRODUK: hilangkan surface putih */
+body[data-theme="modern"] #productDetailModal .product-detail-box {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border: 1px solid #29456d !important;
+  box-shadow: 0 22px 60px rgba(0,0,0,.68), 0 0 24px rgba(37,99,235,.18) !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box > div:nth-child(2) {
+  background: #0f1b2d !important;
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #productDetailModal #detail-name,
+body[data-theme="modern"] #productDetailModal #detail-stock,
+body[data-theme="modern"] #productDetailModal #detail-desc {
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box > div:nth-child(2) > div[style*="background"] {
+  background: #081426 !important;
+  border-color: #29456d !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box input,
+body[data-theme="modern"] #productDetailModal .product-detail-box .qty-btn {
+  background: #13233b !important;
+  color: #f8fafc !important;
+  border-color: #365985 !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box .qty-btn {
+  box-shadow: none !important;
+}
+
+/* 3) DATA PELANGGAN: semua card dan box riwayat tidak putih */
+body[data-theme="modern"] #data-pelanggan .card {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border-color: #263852 !important;
+}
+
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div {
+  background: #0b172a !important;
+  color: #f8fafc !important;
+  border-color: #29456d !important;
+  box-shadow: 0 5px 14px rgba(0,0,0,.32) !important;
+}
+
+/* Box "Rincian Barang" yang dibuat inline oleh JS */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div div[style*="background: var(--input-bg)"] {
+  background: #13233b !important;
+  color: #e5eefb !important;
+  border-color: #29456d !important;
+}
+
+/* Teks yang sebelumnya mengambil warna hitam/abu dari inline style */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div span,
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div li,
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div strong {
+  color: #f8fafc !important;
+}
+
+/* Warna status dan total tetap menjadi aksen aslinya */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div span[style*="#16a34a"] {
+  color: #fff !important;
+}
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div > div:last-child {
+  color: #4ade80 !important;
+}
+
+/* Koin Warga tetap emas */
+body[data-theme="modern"] #data-pelanggan #profile-coins {
+  color: #fbbf24 !important;
+}
+</style>
+
 </head>
 
 <script>
