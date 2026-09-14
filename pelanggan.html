@@ -1252,6 +1252,43 @@ body[data-theme="modern"] .modern-product-card .modern-cart-btn {
 }
 </style>
 
+
+<style id="modern-card-info-text-v4">
+/* Modern: info produk tepat di bawah badge, pure text, left aligned. */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  top: 28px !important;
+  left: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  z-index: 6 !important;
+
+  /* Pure text — tanpa kotak/background rounded. */
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  text-align: left !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  text-align: left !important;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.85),
+    0 0 5px rgba(0,0,0,.45) !important;
+}
+</style>
+
 </head>
 
 <script>
