@@ -3925,7 +3925,40 @@ body[data-theme="modern"] main {
     // Pagination lama tidak lagi mengubah sumber data. Tahap berikutnya akan menggantinya dengan infinite scroll.
     function ubahHalamanPos(d) { return; }
 
-    function filterKatalogPelanggan(v) { currentPosPage = 1; refreshKatalogPelanggan(); }
+    function filterKatalogPelanggan(v) {
+      currentPosPage = 1;
+      // Saat filter/kategori berubah, mulai lagi dari 6 card pertama yang cocok.
+      catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
+      refreshKatalogPelanggan();
+    }
+
+    // TAHAP 2: infinite scroll katalog. Setiap mendekati ujung katalog,
+    // tambahkan 6 card berikutnya. Ini hanya mengatur card yang DITAMPILKAN;
+    // databaseProduk/dashboard tetap tidak dibatasi.
+    let catalogScrollLoading = false;
+    function handleCatalogInfiniteScroll() {
+      if (catalogScrollLoading) return;
+      const wrapper = document.getElementById('pos-card-wrapper');
+      if (!wrapper || wrapper.style.display === 'none') return;
+
+      const remaining = document.querySelectorAll('#pos-catalog-container > *').length;
+      const indicator = document.getElementById('pos-page-indicator');
+      if (!indicator) return;
+      const parts = indicator.textContent.match(/\/\s*(\d+)/);
+      const total = parts ? parseInt(parts[1], 10) : 0;
+      if (!total || catalogVisibleCount >= total) return;
+
+      const rect = wrapper.getBoundingClientRect();
+      const nearBottom = rect.bottom <= window.innerHeight + 350;
+      if (!nearBottom) return;
+
+      catalogScrollLoading = true;
+      catalogVisibleCount = Math.min(catalogVisibleCount + CATALOG_INITIAL_VISIBLE, total);
+      refreshKatalogPelanggan();
+      requestAnimationFrame(() => { catalogScrollLoading = false; });
+    }
+
+    window.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true });
 
     function renderCartPelanggan() {
       const tbody = document.getElementById("cart-body"); tbody.innerHTML = ""; let total = 0, totalQty = 0;
