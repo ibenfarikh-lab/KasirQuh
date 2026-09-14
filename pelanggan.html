@@ -3681,6 +3681,58 @@ body[data-theme="modern"] main {
       }
     }
 
+
+    // NO. 2 only: seamless auto-scroll for the "Stok Rumah Habis" carousel.
+    // Because the track contains an exact duplicate, reset by half the track
+    // width instead of jumping back to scrollLeft=0.
+    function setupSeamlessReorderScroll(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      let isInteracting = false;
+      let timeoutId = null;
+      let lastTime = performance.now();
+
+      const step = (now) => {
+        const dt = Math.min(now - lastTime, 50);
+        lastTime = now;
+
+        if (!isInteracting && container.scrollWidth > container.clientWidth) {
+          const track = container.querySelector(".auto-scroll-track");
+          const loopWidth = track ? track.scrollWidth / 2 : 0;
+
+          // Slow, frame-rate-independent movement.
+          container.scrollLeft += 0.026 * dt;
+
+          // Seamless loop: the second copy is identical to the first.
+          if (loopWidth > 0 && container.scrollLeft >= loopWidth) {
+            container.scrollLeft -= loopWidth;
+          }
+        }
+
+        requestAnimationFrame(step);
+      };
+
+      requestAnimationFrame(step);
+
+      const pause = () => {
+        isInteracting = true;
+        clearTimeout(timeoutId);
+      };
+
+      const resume = () => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => { isInteracting = false; }, 2200);
+      };
+
+      container.addEventListener("touchstart", pause, { passive: true });
+      container.addEventListener("touchend", resume, { passive: true });
+      container.addEventListener("touchcancel", resume, { passive: true });
+      container.addEventListener("mousedown", pause);
+      container.addEventListener("mouseup", resume);
+      container.addEventListener("mouseleave", resume);
+    }
+
     function setupAutoScrollInteraction(containerId) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -4056,7 +4108,7 @@ body[data-theme="modern"] main {
       
       if(renderedCount > 0) {
         container.innerHTML = `<div class="auto-scroll-track">${itemsHtml}${itemsHtml}</div>`;
-        setupAutoScrollInteraction("reorder-container");
+        setupSeamlessReorderScroll("reorder-container");
       }
 
       if(renderedCount > 0 && activeKategoriPelanggan === 'Home' && document.getElementById('belanja').classList.contains('active')) { wrapper.style.display = "block"; } else { wrapper.style.display = "none"; }
@@ -4181,6 +4233,59 @@ body[data-theme="modern"] main {
     margin-top: -15px !important;
 
     box-sizing: border-box !important;
+  }
+}
+</style>
+
+
+<!-- =========================================================
+     NO. 2 — STOK RUMAH HABIS? BELI LAGI YUK!
+     Full viewport wrapper + safe card gutter.
+     Tidak mengubah No. 1, 3, 4, 5, 6, atau 7.
+     ========================================================= -->
+<style id="kq-no2-reorder-fullwidth-final">
+@media (max-width: 699px) {
+  #reorder-section-wrapper {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  #reorder-section-wrapper > div:first-child {
+    box-sizing: border-box !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  #reorder-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    clip-path: none !important;
+    scrollbar-width: none !important;
+  }
+
+  #reorder-container::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  #reorder-container .auto-scroll-track {
+    box-sizing: border-box !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    padding-top: 4px !important;
+    padding-bottom: 6px !important;
+  }
+
+  #reorder-container .reorder-card {
+    flex-shrink: 0 !important;
   }
 }
 </style>
