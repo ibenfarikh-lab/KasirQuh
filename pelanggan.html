@@ -1289,6 +1289,27 @@ body[data-theme="modern"] .modern-product-card .modern-product-info .modern-prod
 }
 </style>
 
+
+<style id="modern-photo-platform-v5">
+/* Modern V5 — foto lebih besar dan turun mendekati platform glow.
+   Hanya tema Modern; ukuran card tetap 125x125px. */
+body[data-theme="modern"] .modern-product-stage .modern-product {
+  width: 70px !important;
+  height: 68px !important;
+  top: 22px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  object-fit: contain !important;
+  z-index: 3 !important;
+}
+
+/* Glow tetap besar dan menjadi alas visual paling bawah. */
+body[data-theme="modern"] .modern-product-stage .modern-platform {
+  bottom: 5px !important;
+  z-index: 1 !important;
+}
+</style>
+
 </head>
 
 <script>
