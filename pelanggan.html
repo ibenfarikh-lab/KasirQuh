@@ -3365,6 +3365,14 @@ body[data-theme="modern"] main {
             refreshKatalogPelanggan();
 
             showToast("Berhasil Masuk! Selamat Berbelanja 🛒");
+
+            // FIX LOGIN LAYOUT: setelah login berhasil, lakukan refresh halaman SATU KALI.
+            // Flag hanya dipakai untuk menandai refresh akibat login, sehingga tidak loop.
+            localStorage.setItem('kasirquh_refresh_after_login_once', '1');
+            setTimeout(() => {
+              window.location.reload();
+            }, 150);
+
             periksaCheckinHarian();
             tampilkanKoinDiProfil();
             renderRecipeCards();
