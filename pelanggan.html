@@ -1000,6 +1000,105 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-stage {
   background-image: none !important;
 }
 </style>
+
+<style id="modern-midnight-theme">
+  /* ============================================================
+     MODERN — MIDNIGHT NAVY
+     Identitas khusus Modern. Light/Dark tidak disentuh.
+     Semua surface utama SOLID, tanpa gradient.
+     ============================================================ */
+  body[data-theme="modern"] {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+  }
+
+  body[data-theme="modern"] .main-content,
+  body[data-theme="modern"] .tab-content,
+  body[data-theme="modern"] #belanja {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+  }
+
+  /* Header Modern: tetap biru KasirQuh, tetapi solid */
+  body[data-theme="modern"] .customer-home-header {
+    background: #2563eb !important;
+    background-image: none !important;
+    box-shadow: 0 10px 24px rgba(0,0,0,.28) !important;
+  }
+
+  /* Judul section menjadi terang agar tidak memakai karakter Light */
+  body[data-theme="modern"] #reorder-section-wrapper > div:first-child,
+  body[data-theme="modern"] #recipe-section-wrapper > div:first-child,
+  body[data-theme="modern"] #trending-section-wrapper > div:first-child,
+  body[data-theme="modern"] .pos-container > div:first-child {
+    color: #f8fafc !important;
+  }
+
+  /* Kategori: surface navy, tetap sederhana */
+  body[data-theme="modern"] .category-chips .chip-btn {
+    background: #111c2e !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #263852 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,.24) !important;
+  }
+  body[data-theme="modern"] .category-chips .chip-btn.active {
+    background: #172a46 !important;
+    color: #60a5fa !important;
+    box-shadow: inset 0 0 0 2px rgba(96,165,250,.35), 0 5px 15px rgba(0,0,0,.28) !important;
+  }
+
+  /* Shelf kartu fitur tetap berwarna; hanya ruang di belakangnya yang navy */
+  body[data-theme="modern"] #reorder-container,
+  body[data-theme="modern"] #recipe-scroll-container,
+  body[data-theme="modern"] #trending-container {
+    background: transparent !important;
+  }
+
+  /* Katalog: latar navy, card produk tetap memakai desain Modern */
+  body[data-theme="modern"] .product-catalog-grid {
+    background: transparent !important;
+  }
+
+  /* Search Modern */
+  body[data-theme="modern"] #sticky-search-container {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+  }
+  body[data-theme="modern"] #inventory-search-input {
+    background: #111c2e !important;
+    color: #f8fafc !important;
+    border-color: #263852 !important;
+  }
+  body[data-theme="modern"] #inventory-search-input::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  /* Bottom navigation Modern */
+  body[data-theme="modern"] .permanent-bottom-bar {
+    background: #0f172a !important;
+    background-image: none !important;
+    color: #f8fafc !important;
+    border-top: 1px solid #263852 !important;
+    box-shadow: 0 -8px 22px rgba(0,0,0,.30) !important;
+  }
+
+  /* Surface umum yang memakai variable Light dipisahkan dari Modern */
+  body[data-theme="modern"] .modal-content,
+  body[data-theme="modern"] .promo-floating-card,
+  body[data-theme="modern"] .popup-menu-btn.active-menu {
+    background: #111c2e !important;
+    color: #f8fafc !important;
+  }
+  body[data-theme="modern"] .popup-menu-btn {
+    color: #e2e8f0 !important;
+  }
+
+  /* Jangan biarkan selector global membuat halaman Modern kembali putih */
+  body[data-theme="modern"] .main-content > div:not(.customer-home-header):not(.category-chips):not(.permanent-bottom-bar) {
+    color: #f8fafc;
+  }
+</style>
+
 </head>
 
 <script>
