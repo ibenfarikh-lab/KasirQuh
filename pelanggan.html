@@ -1872,80 +1872,6 @@ body[data-theme="modern"] main {
 }
 </style>
 
-
-<style id="kq-no3-no4-layout-rail-final">
-/* ============================================================
-   NO.3 IDE MASAK + NO.4 SEDANG LARIS
-   Mengikuti RAIL horizontal kartu STOK RUMAH.
-   Bukan navbar. Tidak mengubah bottom navigation.
-   ============================================================ */
-#recipe-section-wrapper,
-#trending-section-wrapper {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-/* Judul section berada tepat pada garis kiri kartu Stok Rumah. */
-#recipe-section-wrapper > div:first-child,
-#trending-section-wrapper > div:first-child {
-  box-sizing: border-box !important;
-  padding-left: 14px !important;
-  padding-right: 14px !important;
-}
-
-/* No.3 — rail sama dengan kartu Stok Rumah:
-   main-content 15px + 14px = 29px pada HP.
-   Karena memakai padding relatif terhadap parent, otomatis ikut
-   menyesuaikan saat main-content berubah di tablet/layar lebar. */
-#recipe-scroll-container {
-  box-sizing: border-box !important;
-  width: 100% !important;
-  max-width: 100% !important;
-  padding-left: 14px !important;
-  padding-right: 14px !important;
-  padding-top: 2px !important;
-  padding-bottom: 4px !important;
-  gap: 8px !important;
-  overflow-x: auto !important;
-  overflow-y: hidden !important;
-  scrollbar-width: none !important;
-}
-#recipe-scroll-container::-webkit-scrollbar { display:none !important; }
-
-/* No.4 — auto-scroll memiliki 4px + track 10px pada Stok Rumah.
-   Pertahankan pola tersebut agar ujung card persis satu garis. */
-#trending-container {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  padding-left: 4px !important;
-  padding-right: 4px !important;
-  overflow-x: auto !important;
-  overflow-y: visible !important;
-  scrollbar-width: none !important;
-}
-#trending-container::-webkit-scrollbar { display:none !important; }
-#trending-container .auto-scroll-track {
-  box-sizing: border-box !important;
-  padding-left: 10px !important;
-  padding-right: 10px !important;
-  padding-top: 4px !important;
-  padding-bottom: 6px !important;
-  gap: 8px !important;
-}
-
-/* Jangan biarkan card No.3/No.4 mengubah lebar halaman. */
-#recipe-scroll-container > *,
-#trending-container > *,
-#trending-container .auto-scroll-track > * {
-  flex-shrink: 0 !important;
-  box-sizing: border-box !important;
-}
-</style>
-
 </head>
 
 <script>
@@ -4365,7 +4291,7 @@ body[data-theme="modern"] main {
 </style>
 
 </body>
-</html>
+\n<style id="kq-no3-no4-exact-rail-final">\n/* FINAL: No.3 & No.4 mengikuti RAIL GEOMETRY No.2 (Stok Rumah).\n   Header/Bottom Navbar tidak disentuh. */\n#recipe-section-wrapper, #trending-section-wrapper {\n  box-sizing: border-box !important;\n  overflow: visible !important;\n}\n#recipe-section-wrapper > div:first-child,\n#trending-section-wrapper > div:first-child {\n  box-sizing: border-box !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n}\n#recipe-scroll-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n  padding-top: 2px !important;\n  padding-bottom: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: hidden !important;\n  scrollbar-width: none !important;\n}\n#trending-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 4px !important;\n  padding-right: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: visible !important;\n  scrollbar-width: none !important;\n}\n#trending-container .auto-scroll-track {\n  box-sizing: border-box !important;\n  padding-left: 10px !important;\n  padding-right: 10px !important;\n  padding-top: 4px !important;\n  padding-bottom: 6px !important;\n}\n#recipe-scroll-container > *,\n#trending-container > *,\n#trending-container .auto-scroll-track > * {\n  flex-shrink: 0 !important;\n}\n@media (max-width: 699px) {\n  /* Samakan OUTER WRAPPER dengan No.2: full viewport.\n     Rail kartu tetap 14px dari viewport: No.2 = 4px + 10px. */\n  #recipe-section-wrapper, #trending-section-wrapper {\n    width: 100vw !important;\n    max-width: 100vw !important;\n    margin-left: calc(50% - 50vw) !important;\n    margin-right: calc(50% - 50vw) !important;\n    box-sizing: border-box !important;\n  }\n}\n</style>\n</html>
 
 <style>
 
@@ -4648,3 +4574,63 @@ body.theme-colorful-v2 .products-container {
       gap: 10px !important;
     }
 </style>
+<style id="kq-no3-no4-true-edge-final">
+/* FINAL EDGE: No.3 & No.4 mengikuti FULL-BLEED EDGE No.2 (Stok Rumah).
+   Tidak menyentuh Header, No.2, katalog, atau bottom navbar. */
+@media (max-width: 699px) {
+  #recipe-section-wrapper,
+  #trending-section-wrapper {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  #recipe-section-wrapper > div:first-child,
+  #trending-section-wrapper > div:first-child {
+    box-sizing: border-box !important;
+    padding-left: 26px !important;
+    padding-right: 26px !important;
+  }
+
+  #recipe-scroll-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  #recipe-scroll-container > * {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  #trending-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+
+  #trending-container .auto-scroll-track {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+</style>
+
