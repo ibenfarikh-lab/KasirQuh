@@ -1099,6 +1099,49 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-stage {
   }
 </style>
 
+
+<style id="modern-logo-category-final-v2">
+/* ============================================================
+   MODERN V2 — LOGO PUTIH + IKON KATEGORI PUTIH
+   Hanya berlaku untuk tema Modern.
+   Light dan Dark tetap memakai aturan masing-masing.
+   ============================================================ */
+
+/* Logo toko: SVG memakai currentColor, jadi Modern dipaksa putih. */
+body[data-theme="modern"] #customer-home-header .customer-home-logo-wrap,
+body[data-theme="modern"] #customer-home-header .customer-home-logo {
+  color: #ffffff !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Kategori Modern: tidak ada kotak/background di belakang ikon. */
+body[data-theme="modern"] .category-chips .chip-btn,
+body[data-theme="modern"] .category-chips .chip-btn.active {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+/* Ikon kategori Modern selalu putih. */
+body[data-theme="modern"] .category-chips .chip-btn .category-line-icon,
+body[data-theme="modern"] .category-chips .chip-btn.active .category-line-icon {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+  background: transparent !important;
+  filter: none !important;
+}
+
+/* Animasi kategori aktif tetap membesar, tanpa background. */
+body[data-theme="modern"] .category-chips .chip-btn.active {
+  transform: scale(1.35) !important;
+}
+</style>
+
 </head>
 
 <script>
