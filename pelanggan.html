@@ -963,6 +963,23 @@ body.fab-auth-hidden .fab-container {
 }
 </style>
 
+
+<style id="modern-png-transparent-fix">
+  /* PNG produk Modern: jangan beri latar/bingkai dari elemen gambar.
+     Background card tetap terlihat melalui area transparan PNG. */
+  body[data-theme="modern"] .product-catalog-grid .modern-product {
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    object-fit: contain !important;
+  }
+
+  body[data-theme="modern"] .product-catalog-grid .modern-product-stage {
+    background: transparent !important;
+  }
+</style>
 </head>
 
 <script>
