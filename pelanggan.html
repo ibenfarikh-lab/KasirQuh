@@ -4163,18 +4163,23 @@ body[data-theme="modern"] main {
 
 
 <!-- =========================================================
-     NO. 1 — HEADER TOKO
-     Full viewport seperti Bottom Navbar.
-     HANYA mengubah wadah/posisi luar header.
-     Isi header tidak diubah.
+     NO. 1 — HEADER TOKO / TOP EDGE FIX
+     Hanya mengatur wadah luar Header Toko.
+     Isi Header TIDAK diubah.
      ========================================================= -->
-<style id="kq-no1-header-viewport-final">
+<style id="kq-no1-header-full-edge-final">
 @media (max-width: 699px) {
   #customer-home-header {
     width: 100vw !important;
     max-width: 100vw !important;
+
+    /* Keluar dari padding kiri/kanan .main-content
+       dan naik melewati padding-top 15px agar benar-benar
+       menempel ke tepi atas area halaman. */
     margin-left: calc(50% - 50vw) !important;
     margin-right: calc(50% - 50vw) !important;
+    margin-top: -15px !important;
+
     box-sizing: border-box !important;
   }
 }
