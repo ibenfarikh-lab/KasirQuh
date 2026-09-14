@@ -1873,11 +1873,11 @@ body[data-theme="modern"] main {
 </style>
 
 
-<style id="kq-no3-no4-responsive-alignment">
+<style id="kq-no3-no4-layout-rail-final">
 /* ============================================================
    NO.3 IDE MASAK + NO.4 SEDANG LARIS
-   Patokan layout mengikuti Header, Stok Rumah dan inner padding
-   Bottom Bar. BUKAN bagian dari Bottom Navbar.
+   Mengikuti RAIL horizontal kartu STOK RUMAH.
+   Bukan navbar. Tidak mengubah bottom navigation.
    ============================================================ */
 #recipe-section-wrapper,
 #trending-section-wrapper {
@@ -1886,76 +1886,63 @@ body[data-theme="modern"] main {
   box-sizing: border-box !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
-  overflow: hidden !important;
 }
 
+/* Judul section berada tepat pada garis kiri kartu Stok Rumah. */
 #recipe-section-wrapper > div:first-child,
 #trending-section-wrapper > div:first-child {
   box-sizing: border-box !important;
-  width: 100% !important;
-  padding-left: 4px !important;
-  padding-right: 4px !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
 }
 
-/* Main-content sudah memberi gutter 8px.
-   Tambahan 4px di sini = 12px, sama dengan inner padding bottom bar. */
-#recipe-scroll-container,
-#trending-container {
+/* No.3 — rail sama dengan kartu Stok Rumah:
+   main-content 15px + 14px = 29px pada HP.
+   Karena memakai padding relatif terhadap parent, otomatis ikut
+   menyesuaikan saat main-content berubah di tablet/layar lebar. */
+#recipe-scroll-container {
+  box-sizing: border-box !important;
   width: 100% !important;
   max-width: 100% !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding-left: 4px !important;
-  padding-right: 4px !important;
-  overscroll-behavior-x: contain;
-}
-
-#recipe-scroll-container {
-  display: flex !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+  padding-top: 2px !important;
+  padding-bottom: 4px !important;
   gap: 8px !important;
   overflow-x: auto !important;
   overflow-y: hidden !important;
   scrollbar-width: none !important;
-  -webkit-overflow-scrolling: touch;
 }
 #recipe-scroll-container::-webkit-scrollbar { display:none !important; }
 
+/* No.4 — auto-scroll memiliki 4px + track 10px pada Stok Rumah.
+   Pertahankan pola tersebut agar ujung card persis satu garis. */
 #trending-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
   overflow-x: auto !important;
-  overflow-y: hidden !important;
+  overflow-y: visible !important;
   scrollbar-width: none !important;
-  -webkit-overflow-scrolling: touch;
 }
 #trending-container::-webkit-scrollbar { display:none !important; }
-
-/* Card tetap horizontal-scroll seperti desain sebelumnya,
-   tetapi tidak boleh memaksa section melebar mengikuti card. */
-#recipe-scroll-container .recipe-card,
-#trending-container .trending-card {
-  flex: 0 0 auto !important;
+#trending-container .auto-scroll-track {
   box-sizing: border-box !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  padding-top: 4px !important;
+  padding-bottom: 6px !important;
+  gap: 8px !important;
 }
 
-/* Layar sangat kecil: gutter tetap konsisten, card boleh sedikit mengecil. */
-@media (max-width: 360px) {
-  #recipe-scroll-container .recipe-card {
-    min-width: 162px !important;
-    max-width: 162px !important;
-  }
-  #trending-container .trending-card {
-    min-width: 168px !important;
-    max-width: 168px !important;
-  }
-}
-
-/* Layar lebar: section tetap mengikuti viewport, tidak melebar sendiri. */
-@media (min-width: 700px) {
-  #recipe-section-wrapper,
-  #trending-section-wrapper {
-    width: 100% !important;
-  }
+/* Jangan biarkan card No.3/No.4 mengubah lebar halaman. */
+#recipe-scroll-container > *,
+#trending-container > *,
+#trending-container .auto-scroll-track > * {
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
 }
 </style>
 
