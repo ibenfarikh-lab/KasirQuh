@@ -1742,6 +1742,62 @@ body[data-theme="modern"] .modern-product-card .modern-cart-btn {
 }
 </style>
 
+
+<style id="customer-admin-scale-baseline-v1">
+/* ============================================================
+   CUSTOMER RESPONSIVE BASELINE
+   Mengikuti SISTEM SKALA/LAYOUT panel Admin, bukan desain Admin.
+   Tidak memakai transform/zoom. Tidak mengubah warna/theme.
+   ============================================================ */
+
+/* File pelanggan sebelumnya memiliki inline body font-size: .85rem.
+   Admin menggunakan ukuran browser normal. Kembalikan baseline ke 1rem. */
+body {
+  font-size: 1rem !important;
+}
+
+/* Admin memakai main-content dengan padding 15px.
+   Pelanggan mengikuti ruang kerja yang sama, tetap aman untuk bottom bar. */
+.main-content {
+  padding: 15px 15px 90px !important;
+  box-sizing: border-box !important;
+}
+
+/* Katalog menggunakan seluruh ruang kontainer, seperti grid Admin.
+   Jumlah kolom ditentukan otomatis oleh ruang yang tersedia. */
+.product-catalog-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+  width: 100% !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* Jangan biarkan isi grid membuat halaman melebar horizontal. */
+.product-catalog-grid > * {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Tablet/desktop: manfaatkan lebar layar tanpa mengubah identitas visual. */
+@media (min-width: 700px) {
+  .main-content {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* Layar sangat lebar: beri ruang tepi sedikit lebih lega,
+   tetapi tidak mengunci max-width agar katalog tetap mengikuti layar. */
+@media (min-width: 1200px) {
+  .main-content {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+</style>
+
 </head>
 
 <script>
