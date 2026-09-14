@@ -434,6 +434,46 @@ body.fab-auth-hidden .fab-container {
   display: none !important;
 }
 
+
+
+    /* ============================================================
+       TEMA MODERN — KHUSUS CARD PRODUK KATALOG GRID
+       Tidak mengubah aturan Light / Dark yang sudah ada.
+       ============================================================ */
+    body[data-theme="modern"] .product-catalog-grid {
+      grid-template-columns: repeat(auto-fill, 125px) !important;
+      justify-content: center !important;
+      gap: 10px !important;
+    }
+    body[data-theme="modern"] .product-catalog-grid .modern-product-card {
+      width: 125px !important; height: 125px !important;
+      min-width: 125px !important; max-width: 125px !important;
+      min-height: 125px !important; max-height: 125px !important;
+      box-sizing: border-box !important; position: relative !important;
+      padding: 5px !important; overflow: hidden !important;
+      border-radius: 18px !important;
+      background: radial-gradient(circle at 50% 42%, #102d58 0%, #081a36 48%, #050b18 100%) !important;
+      border: 1px solid rgba(70,145,255,.48) !important;
+      box-shadow: 0 0 12px rgba(0,105,255,.18), inset 0 0 14px rgba(0,95,255,.08) !important;
+      color: #fff !important;
+    }
+    body[data-theme="modern"] .modern-product-stage { position: relative !important; height: 82px !important; width: 100% !important; display: block !important; overflow: visible !important; }
+    body[data-theme="modern"] .modern-product { position: absolute !important; z-index: 5 !important; top: 0 !important; left: 50% !important; transform: translateX(-50%) !important; width: 62% !important; height: 57px !important; object-fit: contain !important; filter: drop-shadow(0 7px 6px rgba(0,0,0,.48)) !important; }
+    body[data-theme="modern"] .modern-platform { position: absolute !important; z-index: 3 !important; left: 50% !important; bottom: 3px !important; width: 94% !important; height: 43px !important; transform: translateX(-50%) !important; }
+    body[data-theme="modern"] .modern-platform::before { content: "" !important; position: absolute !important; left: 8% !important; right: 8% !important; bottom: 1px !important; height: 15px !important; border-radius: 50% !important; background: rgba(35,125,255,.58) !important; filter: blur(8px) !important; }
+    body[data-theme="modern"] .modern-base { position: absolute !important; left: 3% !important; right: 3% !important; bottom: 5px !important; height: 22px !important; border-radius: 50% !important; background: radial-gradient(ellipse at 50% 32%, #dff7ff 0 9%, #8ecbff 20%, #438cff 38%, #1260df 53%, #0a286c 73%, #071536 100%) !important; box-shadow: 0 3px 7px rgba(0,0,0,.55), 0 0 9px rgba(45,135,255,.8), inset 0 2px 3px rgba(255,255,255,.9), inset 0 -5px 7px rgba(0,34,120,.8) !important; }
+    body[data-theme="modern"] .modern-base::after { content: "" !important; position: absolute !important; left: 2% !important; right: 2% !important; bottom: -3px !important; height: 10px !important; border-radius: 50% !important; background: linear-gradient(to bottom, #72b8ff, #1854bd 45%, #071a50) !important; z-index: -1 !important; }
+    body[data-theme="modern"] .modern-rim { position: absolute !important; left: 7% !important; right: 7% !important; bottom: 10px !important; height: 20px !important; border-radius: 50% !important; border: 3px solid rgba(205,241,255,.95) !important; background: radial-gradient(ellipse at 50% 45%, rgba(255,255,255,.95), rgba(85,168,255,.75) 35%, rgba(23,91,220,.9) 62%, rgba(4,27,85,.95) 100%) !important; box-shadow: 0 0 6px rgba(140,210,255,.9), inset 0 2px 3px rgba(255,255,255,.9), inset 0 -3px 5px rgba(0,45,160,.9) !important; }
+    body[data-theme="modern"] .modern-surface { position: absolute !important; left: 17% !important; right: 17% !important; bottom: 14px !important; height: 14px !important; border-radius: 50% !important; background: radial-gradient(ellipse at 50% 35%, #eafaff 0 7%, #9ddcff 20%, #4b9eff 43%, #1662dc 67%, #0a2b75 100%) !important; box-shadow: inset 0 1px 2px rgba(255,255,255,.95), inset 0 -2px 4px rgba(0,47,155,.9), 0 0 5px rgba(50,145,255,.8) !important; }
+    body[data-theme="modern"] .modern-highlight { position: absolute !important; left: 23% !important; right: 23% !important; bottom: 18px !important; height: 4px !important; border-radius: 50% !important; background: rgba(255,255,255,.68) !important; filter: blur(2px) !important; }
+    body[data-theme="modern"] .modern-product-info { position: relative !important; z-index: 12 !important; margin: -1px 3px 0 !important; text-align: center !important; line-height: 1.05 !important; }
+    body[data-theme="modern"] .modern-product-name { font-size: .61rem !important; font-weight: 800 !important; color: #fff !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+    body[data-theme="modern"] .modern-product-price { margin-top: 2px !important; font-size: .67rem !important; font-weight: 900 !important; color: #ffe100 !important; white-space: nowrap !important; }
+    body[data-theme="modern"] .modern-product-stock { margin-top: 1px !important; font-size: .48rem !important; color: #8fc9ff !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+    body[data-theme="modern"] .modern-cart-btn { position: absolute !important; z-index: 20 !important; right: 1px !important; bottom: 1px !important; width: 24px !important; height: 24px !important; min-width: 24px !important; min-height: 24px !important; padding: 0 !important; border-radius: 50% !important; background: #2563eb !important; color: #fff !important; border: 1px solid rgba(255,255,255,.55) !important; box-shadow: 0 3px 7px rgba(0,0,0,.35) !important; font-size: .68rem !important; }
+    body[data-theme="modern"] .modern-stock-badge { position: absolute !important; z-index: 15 !important; left: 1px !important; top: 1px !important; padding: 2px 4px !important; border-radius: 7px !important; background: #ef4444 !important; color: #fff !important; font-size: .46rem !important; font-weight: 900 !important; line-height: 1 !important; }
+    body[data-theme="modern"] .modern-product-soldout { position: absolute !important; inset: 0 !important; z-index: 50 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 18px !important; background: rgba(0,0,0,.58) !important; }
+    body[data-theme="modern"] .modern-product-soldout span { padding: 3px 7px !important; border-radius: 6px !important; background: #dc2626 !important; color: #fff !important; font-size: .62rem !important; font-weight: 900 !important; transform: rotate(-12deg) !important; }
 </style>
 
 <style id="customer-chat-subtabs-fix">
@@ -923,6 +963,841 @@ body.fab-auth-hidden .fab-container {
 }
 </style>
 
+
+<style id="modern-png-transparent-fix">
+  /* PNG produk Modern: jangan beri latar/bingkai dari elemen gambar.
+     Background card tetap terlihat melalui area transparan PNG. */
+  body[data-theme="modern"] .product-catalog-grid .modern-product {
+    background: transparent !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    object-fit: contain !important;
+  }
+
+  body[data-theme="modern"] .product-catalog-grid .modern-product-stage {
+    background: transparent !important;
+  }
+</style>
+<style id="modern-png-transparent-fix-v2">
+/* FINAL: paksa area gambar produk Modern benar-benar transparan.
+   Menangkal aturan global .inv-card img yang memberi background putih/abu. */
+body[data-theme="modern"] .product-catalog-grid .inv-card > div.modern-product-stage > img.modern-product,
+body[data-theme="modern"] .product-catalog-grid .modern-product-card img.modern-product {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  mix-blend-mode: normal !important;
+}
+body[data-theme="modern"] .product-catalog-grid .modern-product-stage {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+</style>
+
+<style id="modern-midnight-theme">
+  /* ============================================================
+     MODERN — MIDNIGHT NAVY
+     Identitas khusus Modern. Light/Dark tidak disentuh.
+     Semua surface utama SOLID, tanpa gradient.
+     ============================================================ */
+  body[data-theme="modern"] {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+  }
+
+  body[data-theme="modern"] .main-content,
+  body[data-theme="modern"] .tab-content,
+  body[data-theme="modern"] #belanja {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+  }
+
+  /* Header Modern: tetap biru KasirQuh, tetapi solid */
+  body[data-theme="modern"] .customer-home-header {
+    background: #2563eb !important;
+    background-image: none !important;
+    box-shadow: 0 10px 24px rgba(0,0,0,.28) !important;
+  }
+
+  /* Judul section menjadi terang agar tidak memakai karakter Light */
+  body[data-theme="modern"] #reorder-section-wrapper > div:first-child,
+  body[data-theme="modern"] #recipe-section-wrapper > div:first-child,
+  body[data-theme="modern"] #trending-section-wrapper > div:first-child,
+  body[data-theme="modern"] .pos-container > div:first-child {
+    color: #f8fafc !important;
+  }
+
+  /* Kategori: surface navy, tetap sederhana */
+  body[data-theme="modern"] .category-chips .chip-btn {
+    background: #111c2e !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #263852 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,.24) !important;
+  }
+  body[data-theme="modern"] .category-chips .chip-btn.active {
+    background: #172a46 !important;
+    color: #60a5fa !important;
+    box-shadow: inset 0 0 0 2px rgba(96,165,250,.35), 0 5px 15px rgba(0,0,0,.28) !important;
+  }
+
+  /* Shelf kartu fitur tetap berwarna; hanya ruang di belakangnya yang navy */
+  body[data-theme="modern"] #reorder-container,
+  body[data-theme="modern"] #recipe-scroll-container,
+  body[data-theme="modern"] #trending-container {
+    background: transparent !important;
+  }
+
+  /* Katalog: latar navy, card produk tetap memakai desain Modern */
+  body[data-theme="modern"] .product-catalog-grid {
+    background: transparent !important;
+  }
+
+  /* Search Modern */
+  body[data-theme="modern"] #sticky-search-container {
+    background: #0b1220 !important;
+    color: #f8fafc !important;
+  }
+  body[data-theme="modern"] #inventory-search-input {
+    background: #111c2e !important;
+    color: #f8fafc !important;
+    border-color: #263852 !important;
+  }
+  body[data-theme="modern"] #inventory-search-input::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  /* Bottom navigation Modern */
+  body[data-theme="modern"] .permanent-bottom-bar {
+    background: #0f172a !important;
+    background-image: none !important;
+    color: #f8fafc !important;
+    border-top: 1px solid #263852 !important;
+    box-shadow: 0 -8px 22px rgba(0,0,0,.30) !important;
+  }
+
+  /* Surface umum yang memakai variable Light dipisahkan dari Modern */
+  body[data-theme="modern"] .modal-content,
+  body[data-theme="modern"] .promo-floating-card,
+  body[data-theme="modern"] .popup-menu-btn.active-menu {
+    background: #111c2e !important;
+    color: #f8fafc !important;
+  }
+  body[data-theme="modern"] .popup-menu-btn {
+    color: #e2e8f0 !important;
+  }
+
+  /* Jangan biarkan selector global membuat halaman Modern kembali putih */
+  body[data-theme="modern"] .main-content > div:not(.customer-home-header):not(.category-chips):not(.permanent-bottom-bar) {
+    color: #f8fafc;
+  }
+</style>
+
+
+<style id="modern-logo-category-final-v2">
+/* ============================================================
+   MODERN V2 — LOGO PUTIH + IKON KATEGORI PUTIH
+   Hanya berlaku untuk tema Modern.
+   Light dan Dark tetap memakai aturan masing-masing.
+   ============================================================ */
+
+/* Logo toko: SVG memakai currentColor, jadi Modern dipaksa putih. */
+body[data-theme="modern"] #customer-home-header .customer-home-logo-wrap,
+body[data-theme="modern"] #customer-home-header .customer-home-logo {
+  color: #ffffff !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Kategori Modern: tidak ada kotak/background di belakang ikon. */
+body[data-theme="modern"] .category-chips .chip-btn,
+body[data-theme="modern"] .category-chips .chip-btn.active {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+/* Ikon kategori Modern selalu putih. */
+body[data-theme="modern"] .category-chips .chip-btn .category-line-icon,
+body[data-theme="modern"] .category-chips .chip-btn.active .category-line-icon {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+  background: transparent !important;
+  filter: none !important;
+}
+
+/* Animasi kategori aktif tetap membesar, tanpa background. */
+body[data-theme="modern"] .category-chips .chip-btn.active {
+  transform: scale(1.35) !important;
+}
+</style>
+
+
+<style id="modern-card-overlay-v3">
+/* ============================================================
+   MODERN PRODUCT CARD V3
+   Card tetap 125x125px.
+   Foto = layer utama
+   Badge + Nama/Harga/Stok = overlay di atas foto
+   Glow = alas paling bawah
+   Hanya Modern.
+   ============================================================ */
+
+body[data-theme="modern"] .modern-product-card {
+  position: relative !important;
+  width: 125px !important;
+  height: 125px !important;
+  min-width: 125px !important;
+  max-width: 125px !important;
+  min-height: 125px !important;
+  max-height: 125px !important;
+  overflow: hidden !important;
+}
+
+/* Area visual dibuat memenuhi card agar posisi layer stabil. */
+body[data-theme="modern"] .modern-product-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  z-index: 1 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+/* Glow/piringan menjadi alas paling bawah. */
+body[data-theme="modern"] .modern-product-stage .modern-platform {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 5px !important;
+  transform: translateX(-50%) !important;
+  z-index: 1 !important;
+}
+
+/* Foto produk berada di atas glow. */
+body[data-theme="modern"] .modern-product-stage .modern-product {
+  position: absolute !important;
+  left: 50% !important;
+  top: 13px !important;
+  width: 64px !important;
+  height: 54px !important;
+  object-fit: contain !important;
+  transform: translateX(-50%) !important;
+  z-index: 3 !important;
+  background: transparent !important;
+}
+
+/* Badge tetap paling atas. */
+body[data-theme="modern"] .modern-product-card .modern-badge {
+  position: absolute !important;
+  top: 5px !important;
+  left: 5px !important;
+  z-index: 7 !important;
+}
+
+/* Informasi produk menjadi overlay di atas foto. */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  left: 5px !important;
+  right: 5px !important;
+  bottom: 25px !important;
+  z-index: 6 !important;
+  padding: 4px 6px !important;
+  border-radius: 9px !important;
+  background: rgba(11,18,32,.68) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+  box-sizing: border-box !important;
+}
+
+/* Nama, harga, stok tetap rapat agar muat di card kecil. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name {
+  color: #fff !important;
+  font-size: .62rem !important;
+  line-height: 1.05 !important;
+  font-weight: 800 !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price {
+  color: #fff !important;
+  font-size: .58rem !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  color: rgba(255,255,255,.82) !important;
+  font-size: .49rem !important;
+  line-height: 1.05 !important;
+}
+
+/* Keranjang berada di atas semua layer visual. */
+body[data-theme="modern"] .modern-product-card .modern-cart-btn {
+  z-index: 8 !important;
+}
+</style>
+
+
+<style id="modern-card-info-text-v4">
+/* Modern: info produk tepat di bawah badge, pure text, left aligned. */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  top: 28px !important;
+  left: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  z-index: 6 !important;
+
+  /* Pure text — tanpa kotak/background rounded. */
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  text-align: left !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  text-align: left !important;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.85),
+    0 0 5px rgba(0,0,0,.45) !important;
+}
+</style>
+
+
+<style id="modern-photo-platform-v5">
+/* Modern V5 — foto lebih besar dan turun mendekati platform glow.
+   Hanya tema Modern; ukuran card tetap 125x125px. */
+body[data-theme="modern"] .modern-product-stage .modern-product {
+  width: 70px !important;
+  height: 68px !important;
+  top: 22px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  object-fit: contain !important;
+  z-index: 3 !important;
+}
+
+/* Glow tetap besar dan menjadi alas visual paling bawah. */
+body[data-theme="modern"] .modern-product-stage .modern-platform {
+  bottom: 5px !important;
+  z-index: 1 !important;
+}
+</style>
+
+
+<style id="modern-final-surfaces-v6">
+/* ============================================================
+   MODERN V6
+   1) Info produk berada di atas piringan glow; stock menjadi
+      baris terakhir tepat di bawah foto.
+   2) Floating promo/product card memakai identitas Modern.
+   3) Data Pelanggan + Pengaturan seluruh card memakai surface Modern.
+   Hanya Modern; Light/Dark tidak disentuh.
+   ============================================================ */
+
+/* ---- 1. INFO PRODUK: tepat di area antara foto dan glow ---- */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  left: 6px !important;
+  right: 6px !important;
+  top: 89px !important;
+  bottom: auto !important;
+  z-index: 12 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+/* Pure text + shadow. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock {
+  display: block !important;
+  text-align: left !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 5px rgba(0,0,0,.65) !important;
+}
+
+/* Sedikit lebih padat agar tiga baris tetap muat di card 125px. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name {
+  font-size: .57rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price {
+  margin-top: 1px !important;
+  font-size: .62rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock {
+  margin-top: 1px !important;
+  font-size: .45rem !important;
+  line-height: 1.05 !important;
+  color: #d7ecff !important;
+}
+
+/* ---- 2. FLOATING PROMO/PRODUCT CARD ---- */
+body[data-theme="modern"] .promo-floating-backdrop {
+  background: rgba(2,6,23,.76) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+body[data-theme="modern"] .promo-floating-card {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border: 1px solid #29456d !important;
+  box-shadow: 0 22px 60px rgba(0,0,0,.62), 0 0 24px rgba(37,99,235,.18) !important;
+}
+body[data-theme="modern"] .promo-floating-close {
+  background: #172a46 !important;
+  color: #fff !important;
+  border: 1px solid #365985 !important;
+}
+body[data-theme="modern"] .promo-floating-badge {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+body[data-theme="modern"] .promo-detail {
+  color: #f8fafc !important;
+}
+body[data-theme="modern"] .promo-detail img,
+body[data-theme="modern"] .promo-detail-placeholder {
+  background: #081426 !important;
+  border: 1px solid #29456d !important;
+}
+body[data-theme="modern"] .promo-detail-price {
+  color: #60a5fa !important;
+}
+body[data-theme="modern"] .promo-detail-price-label,
+body[data-theme="modern"] .promo-detail-stock {
+  color: #a9bdd6 !important;
+}
+body[data-theme="modern"] .promo-floating-nav button {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+body[data-theme="modern"] .promo-floating-nav span {
+  color: #cbd5e1 !important;
+}
+
+/* ---- 3. DATA PELANGGAN + PENGATURAN ---- */
+body[data-theme="modern"] #data-pelanggan,
+body[data-theme="modern"] #pengaturan {
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #data-pelanggan .card,
+body[data-theme="modern"] #pengaturan .card {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border: 1px solid #263852 !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.28) !important;
+  border-radius: 16px !important;
+}
+
+body[data-theme="modern"] #data-pelanggan .card h3,
+body[data-theme="modern"] #pengaturan .card h3,
+body[data-theme="modern"] #data-pelanggan .card strong,
+body[data-theme="modern"] #pengaturan .card strong,
+body[data-theme="modern"] #data-pelanggan label,
+body[data-theme="modern"] #pengaturan label {
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #data-pelanggan .card p,
+body[data-theme="modern"] #data-pelanggan .card [style*="color: var(--text-muted)"],
+body[data-theme="modern"] #pengaturan .card p,
+body[data-theme="modern"] #pengaturan .card [style*="color: var(--text-muted)"] {
+  color: #a9bdd6 !important;
+}
+
+/* Koin Warga: tetap emas sebagai aksen, tetapi wadahnya Modern. */
+body[data-theme="modern"] #data-pelanggan #profile-coins {
+  color: #fbbf24 !important;
+}
+body[data-theme="modern"] #data-pelanggan .card > div[style*="#fef3c7"] {
+  background: #1f2937 !important;
+  border-color: #8a6412 !important;
+}
+body[data-theme="modern"] #data-pelanggan .card > div[style*="#fef3c7"] div:first-child {
+  color: #fbbf24 !important;
+}
+
+/* Input/select/textarea di Pengaturan mengikuti surface Modern. */
+body[data-theme="modern"] #pengaturan input,
+body[data-theme="modern"] #pengaturan textarea,
+body[data-theme="modern"] #pengaturan select {
+  background: #081426 !important;
+  color: #f8fafc !important;
+  border-color: #29456d !important;
+}
+body[data-theme="modern"] #pengaturan input::placeholder,
+body[data-theme="modern"] #pengaturan textarea::placeholder {
+  color: #8ea5c0 !important;
+}
+
+/* Blok cache/error di Pengaturan tidak lagi menjadi putih. */
+body[data-theme="modern"] #pengaturan #card-install-pwa,
+body[data-theme="modern"] #pengaturan .card[style*="#fff5f5"] {
+  background: #111c2e !important;
+  border-color: #365985 !important;
+}
+</style>
+
+
+<style id="modern-v7-final-surface-and-info">
+/* ============================================================
+   MODERN V7
+   - Nama/Harga/Stok masuk ke area bawah foto + tepat di atas glow.
+   - Seluruh floating product detail tidak lagi putih.
+   - Card Data Pelanggan + isi riwayat ikut surface Modern.
+   - Hanya Modern; Light/Dark tidak disentuh.
+   ============================================================ */
+
+/* 1) INFO PRODUK: overlay pada bagian bawah foto, sebelum glow */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  left: 6px !important;
+  right: 6px !important;
+  top: 62px !important;
+  bottom: auto !important;
+  z-index: 12 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+  background: transparent !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.98), 0 0 5px rgba(0,0,0,.7) !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name {
+  font-size: .57rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price {
+  margin-top: 1px !important;
+  font-size: .62rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  margin-top: 1px !important;
+  font-size: .45rem !important;
+  line-height: 1.05 !important;
+  color: #d7ecff !important;
+}
+
+/* 2) MODAL DETAIL PRODUK: hilangkan surface putih */
+body[data-theme="modern"] #productDetailModal .product-detail-box {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border: 1px solid #29456d !important;
+  box-shadow: 0 22px 60px rgba(0,0,0,.68), 0 0 24px rgba(37,99,235,.18) !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box > div:nth-child(2) {
+  background: #0f1b2d !important;
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #productDetailModal #detail-name,
+body[data-theme="modern"] #productDetailModal #detail-stock,
+body[data-theme="modern"] #productDetailModal #detail-desc {
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box > div:nth-child(2) > div[style*="background"] {
+  background: #081426 !important;
+  border-color: #29456d !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box input,
+body[data-theme="modern"] #productDetailModal .product-detail-box .qty-btn {
+  background: #13233b !important;
+  color: #f8fafc !important;
+  border-color: #365985 !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box .qty-btn {
+  box-shadow: none !important;
+}
+
+/* 3) DATA PELANGGAN: semua card dan box riwayat tidak putih */
+body[data-theme="modern"] #data-pelanggan .card {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border-color: #263852 !important;
+}
+
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div {
+  background: #0b172a !important;
+  color: #f8fafc !important;
+  border-color: #29456d !important;
+  box-shadow: 0 5px 14px rgba(0,0,0,.32) !important;
+}
+
+/* Box "Rincian Barang" yang dibuat inline oleh JS */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div div[style*="background: var(--input-bg)"] {
+  background: #13233b !important;
+  color: #e5eefb !important;
+  border-color: #29456d !important;
+}
+
+/* Teks yang sebelumnya mengambil warna hitam/abu dari inline style */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div span,
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div li,
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div strong {
+  color: #f8fafc !important;
+}
+
+/* Warna status dan total tetap menjadi aksen aslinya */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div span[style*="#16a34a"] {
+  color: #fff !important;
+}
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div > div:last-child {
+  color: #4ade80 !important;
+}
+
+/* Koin Warga tetap emas */
+body[data-theme="modern"] #data-pelanggan #profile-coins {
+  color: #fbbf24 !important;
+}
+</style>
+
+
+<style id="modern-responsive-grid-v8">
+/* ============================================================
+   MODERN RESPONSIVE GRID
+   - Card tidak lagi dikunci 125x125.
+   - 125px = ukuran minimum.
+   - Card mengikuti ruang layar secara proporsional.
+   - Grid otomatis berubah 2 / 3 / 4 / dst.
+   - Batas maksimum ±190px agar desktop tidak menjadi terlalu besar.
+   - HANYA Modern. Light/Dark tetap memakai aturan sebelumnya.
+   ============================================================ */
+
+body[data-theme="modern"] .product-catalog-grid {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(125px, min(190px, 1fr))
+  ) !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: start !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+body[data-theme="modern"] .product-catalog-grid .modern-product-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 190px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1 !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  overflow: hidden !important;
+  container-type: size !important;
+}
+
+/* Semua layer visual mengikuti ukuran card. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Foto: proporsional terhadap card, bukan lagi fixed 70x68px. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage .modern-product {
+  width: 56% !important;
+  height: 54% !important;
+  top: 17% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  object-fit: contain !important;
+}
+
+/* Glow tetap menjadi alas dan ikut membesar/mengecil bersama card. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage .modern-platform {
+  width: 94% !important;
+  height: 35% !important;
+  left: 50% !important;
+  bottom: 4% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Info tetap berada tepat di atas glow. */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  left: 5% !important;
+  right: 5% !important;
+  top: 68% !important;
+  bottom: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+/* Tipografi ikut skala card. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name {
+  font-size: clamp(.57rem, 7.3cqw, .80rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price {
+  margin-top: 1% !important;
+  font-size: clamp(.62rem, 8.0cqw, .88rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  margin-top: 1% !important;
+  font-size: clamp(.45rem, 5.8cqw, .68rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Badge ikut sedikit membesar tetapi tetap proporsional. */
+body[data-theme="modern"] .modern-product-card .modern-stock-badge {
+  left: 1% !important;
+  top: 1% !important;
+  padding: 2px 4px !important;
+  font-size: clamp(.46rem, 4.8cqw, .62rem) !important;
+}
+
+/* Tombol keranjang ikut skala card, tetapi tetap bulat. */
+body[data-theme="modern"] .modern-product-card .modern-cart-btn {
+  width: clamp(24px, 19cqw, 34px) !important;
+  height: clamp(24px, 19cqw, 34px) !important;
+  min-width: clamp(24px, 19cqw, 34px) !important;
+  min-height: clamp(24px, 19cqw, 34px) !important;
+  right: 1% !important;
+  bottom: 1% !important;
+  font-size: clamp(.68rem, 5.5cqw, .90rem) !important;
+}
+</style>
+
+
+<style id="customer-admin-scale-baseline-v1">
+/* ============================================================
+   CUSTOMER RESPONSIVE BASELINE
+   Mengikuti SISTEM SKALA/LAYOUT panel Admin, bukan desain Admin.
+   Tidak memakai transform/zoom. Tidak mengubah warna/theme.
+   ============================================================ */
+
+/* File pelanggan sebelumnya memiliki inline body font-size: .85rem.
+   Admin menggunakan ukuran browser normal. Kembalikan baseline ke 1rem. */
+body {
+  font-size: 1rem !important;
+}
+
+/* Admin memakai main-content dengan padding 15px.
+   Pelanggan mengikuti ruang kerja yang sama, tetap aman untuk bottom bar. */
+.main-content {
+  padding: 15px 15px 90px !important;
+  box-sizing: border-box !important;
+}
+
+/* Katalog menggunakan seluruh ruang kontainer, seperti grid Admin.
+   Jumlah kolom ditentukan otomatis oleh ruang yang tersedia. */
+.product-catalog-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+  width: 100% !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* Jangan biarkan isi grid membuat halaman melebar horizontal. */
+.product-catalog-grid > * {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Tablet/desktop: manfaatkan lebar layar tanpa mengubah identitas visual. */
+@media (min-width: 700px) {
+  .main-content {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* Layar sangat lebar: beri ruang tepi sedikit lebih lega,
+   tetapi tidak mengunci max-width agar katalog tetap mengikuti layar. */
+@media (min-width: 1200px) {
+  .main-content {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+</style>
+
 </head>
 
 <script>
@@ -959,7 +1834,7 @@ body.fab-auth-hidden .fab-container {
 })();
 </script>
 
-<body data-theme="light" style="font-size: 0.85rem;">
+<body data-theme="modern" style="font-size: 0.85rem;">
 
   <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 15px; box-sizing: border-box;">
     <h1 id="welcomeStoreName" style="font-size: 2.2rem; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
@@ -1238,7 +2113,7 @@ body.fab-auth-hidden .fab-container {
       <div class="card" style="padding: 12px; margin-bottom: 8px;">
         <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Tampilan & Tema</h3>
         <div class="form-vertical" style="display: flex; flex-direction: column; gap: 6px;">
-          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="auto">Auto (Sistem)</option></select>
+          <label style="font-size: 0.75rem;">Tema:</label><select id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="modern">Modern</option></select>
           <label style="font-size: 0.75rem; margin-top: 4px;">Tampilan:</label><select id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="grid">Kotak</option><option value="list">Daftar</option></select>
         </div>
       </div>
@@ -1361,7 +2236,16 @@ body.fab-auth-hidden .fab-container {
     if (isStandalone && welcomeScreen) welcomeScreen.style.display = 'none';
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const cardInstall = document.getElementById('card-install-pwa'); if (cardInstall) cardInstall.style.display = 'block'; });
     async function triggerInstallPWA() { if (!deferredPrompt) return alert("Bisa install lewat menu Chrome."); deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') tutupWelcomeScreen(); deferredPrompt = null; document.getElementById('card-install-pwa').style.display = 'none'; }
-    function tutupWelcomeScreen() { if (welcomeScreen) { welcomeScreen.style.opacity = '0'; setTimeout(() => welcomeScreen.style.display = 'none', 500); } }
+    function tutupWelcomeScreen() {
+      // Tutup secara langsung dan ambil elemen terbaru agar tidak terpengaruh cache/urutan inisialisasi.
+      const screen = document.getElementById('welcomeScreen');
+      if (!screen) return;
+      screen.style.setProperty('opacity', '0', 'important');
+      screen.style.setProperty('pointer-events', 'none', 'important');
+      screen.style.setProperty('display', 'none', 'important');
+      document.body.classList.remove('fab-auth-hidden');
+      if (typeof updateFabAuthVisibility === 'function') updateFabAuthVisibility();
+    }
     function bukaLoginDariWelcome() { tutupWelcomeScreen(); if (!currentCustomerPhone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
 
     let isAiSoundOn = true; let aiRecognition = null; let isAiListening = false;
@@ -1710,7 +2594,7 @@ body.fab-auth-hidden .fab-container {
 
     window.onload = function() {
       muatIdeMasakAdminPelanggan();
-      applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'auto');
+      applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
@@ -2126,8 +3010,16 @@ body.fab-auth-hidden .fab-container {
     function playBeep() { playTone(1000, "sine"); } function playBeepDown() { playTone(600, "triangle"); }
     function playCustomerNotificationSound() { playTone(800, "sine"); setTimeout(() => playTone(1000, "sine"), 150); }
 
-    function applyThemePelanggan(theme) { document.body.setAttribute('data-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme); }
-    function gantiTemaPelanggan(theme) { localStorage.setItem('cust_theme_v13', theme); applyThemePelanggan(theme); }
+    function applyThemePelanggan(theme) { const safeTheme = ['light', 'dark', 'modern'].includes(theme) ? theme : 'light'; document.body.setAttribute('data-theme', safeTheme); }
+    function gantiTemaPelanggan(theme) {
+      const safeTheme = ['light', 'dark', 'modern'].includes(theme) ? theme : 'light';
+      const previousTheme = localStorage.getItem('cust_theme_v13') || 'modern';
+      localStorage.setItem('cust_theme_v13', safeTheme);
+      applyThemePelanggan(safeTheme);
+      if (previousTheme !== safeTheme) {
+        window.location.reload();
+      }
+    }
     function gantiViewModePelanggan(mode) { catalogViewMode = mode; localStorage.setItem('cust_view_v13', mode); refreshKatalogPelanggan(); }
     function toggleMenuModal() {
       const modal = document.getElementById('menuToggleModal');
@@ -2387,6 +3279,8 @@ body.fab-auth-hidden .fab-container {
             currentCustomerPhone = phone;
             currentCustomerName = docData.nama || 'Pelanggan';
             document.getElementById('customerLoginModal').style.display = 'none';
+            // Setelah login berhasil, tutup layar welcome secara langsung agar konten pelanggan terlihat.
+            tutupWelcomeScreen();
             muatDataPelangganRealtime();
             muatRiwayatPesananOnlinePelanggan();
             initCustomerChatListener();
@@ -2588,7 +3482,7 @@ body.fab-auth-hidden .fab-container {
         setHomeFeatureTransition(false);
       }
 
-      if (tabId === 'pengaturan') { document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'auto'; document.getElementById('setting-cust-view').value = catalogViewMode; if (currentCustomerPhone) { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => { if (!snap.empty) { let data = snap.docs[0].data(); document.getElementById('setting-cust-name').value = data.nama || ""; document.getElementById('setting-cust-phone').value = data.phone || ""; document.getElementById('setting-cust-address').value = data.alamat || ""; } }); } }
+      if (tabId === 'pengaturan') { document.getElementById('setting-cust-theme').value = localStorage.getItem('cust_theme_v13') || 'modern'; document.getElementById('setting-cust-view').value = catalogViewMode; if (currentCustomerPhone) { db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then(snap => { if (!snap.empty) { let data = snap.docs[0].data(); document.getElementById('setting-cust-name').value = data.nama || ""; document.getElementById('setting-cust-phone').value = data.phone || ""; document.getElementById('setting-cust-address').value = data.alamat || ""; } }); } }
     }
 
     async function muatBarangLarisHariIni() {
@@ -2840,18 +3734,42 @@ body.fab-auth-hidden .fab-container {
         let sisaStokBadge = (!isHabis && p.stok <= 5) ? `<div style="position:absolute; top:4px; left:4px; background:#ef4444; color:white; font-size:0.55rem; padding:2px 5px; border-radius:4px; font-weight:bold; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none; z-index: 5;">🔥 Sisa ${p.stok}</div>` : "";
 
         if (catalogViewMode === 'grid') {
-          container.innerHTML += `
-            <div class="inv-card" onclick="openProductDetail('${code}')">
-              ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:8px; display:flex; align-items:center; justify-content:center;"><span style="background:#dc2626; color:#fff; font-weight:bold; padding:3px 8px; border-radius:6px; font-size:0.7rem; transform:rotate(-15deg);">HABIS</span></div>' : ''}
-              <div style="text-align: center; margin-bottom: 4px; position: relative;">
-                ${sisaStokBadge}
-                <img src="${fotoSrc}" style="width: 100%; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
-                <button class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
-              </div>
-              <div style="font-weight: bold; font-size: 0.75rem; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-              <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Stok: ${p.stok || 0} ${satuan}</div>
-              <div style="font-size: 0.78rem; font-weight: bold; color: #fde047; margin-top: 2px;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
-            </div>`;
+          const activeCustomerTheme = document.body.getAttribute('data-theme');
+          if (activeCustomerTheme === 'modern') {
+            container.innerHTML += `
+              <div class="inv-card modern-product-card" onclick="openProductDetail('${code}')">
+                ${isHabis ? '<div class="modern-product-soldout"><span>HABIS</span></div>' : ''}
+                <div class="modern-product-stage">
+                  ${sisaStokBadge ? `<div class="modern-stock-badge">🔥 ${p.stok}</div>` : ''}
+                  <img class="modern-product" src="${fotoSrc}" alt="${p.nama}" loading="lazy">
+                  <div class="modern-platform" aria-hidden="true">
+                    <div class="modern-base"></div>
+                    <div class="modern-rim"></div>
+                    <div class="modern-surface"></div>
+                    <div class="modern-highlight"></div>
+                  </div>
+                  <button class="btn-quick-cart-icon modern-cart-btn" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
+                </div>
+                <div class="modern-product-info">
+                  <div class="modern-product-name">${p.nama}</div>
+                  <div class="modern-product-price">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+                  <div class="modern-product-stock">Stok: ${p.stok || 0} ${satuan}</div>
+                </div>
+              </div>`;
+          } else {
+            container.innerHTML += `
+              <div class="inv-card" onclick="openProductDetail('${code}')">
+                ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:8px; display:flex; align-items:center; justify-content:center;"><span style="background:#dc2626; color:#fff; font-weight:bold; padding:3px 8px; border-radius:6px; font-size:0.7rem; transform:rotate(-15deg);">HABIS</span></div>' : ''}
+                <div style="text-align: center; margin-bottom: 4px; position: relative;">
+                  ${sisaStokBadge}
+                  <img src="${fotoSrc}" style="width: 100%; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
+                  <button class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
+                </div>
+                <div style="font-weight: bold; font-size: 0.75rem; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
+                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Stok: ${p.stok || 0} ${satuan}</div>
+                <div style="font-size: 0.78rem; font-weight: bold; color: #fde047; margin-top: 2px;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+              </div>`;
+          }
         } else {
           container.innerHTML += `
             <div class="catalog-list-item" onclick="openProductDetail('${code}')">
@@ -3169,133 +4087,6 @@ body.fab-auth-hidden .fab-container {
 })();
 </script>
 
-
-
-<style id="modern-customer-navigation-scale">
-/* =========================================================
-   MODERN CUSTOMER — SKALA NAVIGASI DISELARASKAN DENGAN ADMIN
-   Bukan meniru desain Admin; hanya memakai skala/layout sebagai acuan.
-   ========================================================= */
-
-/* Navbar bawah */
-.permanent-bottom-bar {
-  min-height: 68px !important;
-  padding: 9px 12px !important;
-  gap: 10px !important;
-  box-sizing: border-box !important;
-}
-
-.permanent-bottom-bar #bottom-bar-title {
-  font-size: 1.05rem !important;
-  line-height: 1.2 !important;
-  font-weight: 700 !important;
-}
-
-.permanent-bottom-bar #pagination-box {
-  min-height: 44px !important;
-  padding: 4px 10px !important;
-  gap: 8px !important;
-  border-radius: 9px !important;
-  box-sizing: border-box !important;
-}
-
-.permanent-bottom-bar #pagination-box button {
-  min-width: 30px !important;
-  min-height: 34px !important;
-  font-size: 0.95rem !important;
-  padding: 4px 7px !important;
-}
-
-.permanent-bottom-bar #pos-page-indicator {
-  min-width: 36px !important;
-  text-align: center !important;
-  font-size: 0.9rem !important;
-}
-
-.permanent-bottom-bar > div:last-child button {
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: 10px !important;
-}
-
-.permanent-bottom-bar > div:last-child button svg {
-  width: 21px !important;
-  height: 21px !important;
-}
-
-/* Popup/toggle menu */
-#menuToggleModal {
-  padding: 0 12px 76px 0 !important;
-}
-
-#menuToggleModal > .modal-content {
-  width: min(240px, calc(100vw - 24px)) !important;
-  max-width: 240px !important;
-  padding: 8px !important;
-  border-radius: 16px !important;
-  box-sizing: border-box !important;
-}
-
-#menuToggleModal .popup-menu-btn {
-  min-height: 48px !important;
-  padding: 10px 12px !important;
-  gap: 10px !important;
-  border-radius: 10px !important;
-  font-size: 1rem !important;
-  line-height: 1.2 !important;
-  font-weight: 600 !important;
-}
-
-#menuToggleModal .popup-menu-btn svg {
-  width: 20px !important;
-  height: 20px !important;
-  flex: 0 0 20px !important;
-}
-
-#menuToggleModal .popup-menu-btn.active-menu {
-  font-weight: 700 !important;
-}
-
-@media (max-width: 420px) {
-  .permanent-bottom-bar {
-    min-height: 70px !important;
-    padding: 9px 10px !important;
-  }
-
-  .permanent-bottom-bar #bottom-bar-title {
-    font-size: 1.02rem !important;
-  }
-
-  .permanent-bottom-bar #pagination-box {
-    min-height: 44px !important;
-    padding: 4px 8px !important;
-  }
-
-  .permanent-bottom-bar #pagination-box button {
-    min-width: 28px !important;
-    font-size: 0.9rem !important;
-  }
-
-  .permanent-bottom-bar #pos-page-indicator {
-    font-size: 0.88rem !important;
-  }
-
-  #menuToggleModal {
-    padding-right: 8px !important;
-    padding-bottom: 78px !important;
-  }
-
-  #menuToggleModal > .modal-content {
-    width: min(240px, calc(100vw - 18px)) !important;
-  }
-
-  #menuToggleModal .popup-menu-btn {
-    min-height: 49px !important;
-    font-size: 1rem !important;
-  }
-}
-</style>
-
 </body>
 </html>
 
@@ -3433,4 +4224,218 @@ body.theme-colorful-v2 .products-container {
     .inv-card [style*="color: #fde047"], .trending-card [style*="color: #fde047"], .reorder-card [style*="color: #fde047"] { color:#fff !important; }
     .recipe-card .recipe-btn-action { background:#111827 !important; color:#fff !important; border:none !important; }
     .btn-quick-cart-icon { background:#111827 !important; color:#fff !important; }
+
+    /* ============================================================
+       LIGHT / DARK — CARD PRODUK COMPACT 125x125
+       Hanya ukuran & proporsi card grid. Warna/tema tetap mengikuti
+       aturan yang sudah ada. Tidak berlaku untuk Modern dan List.
+       ============================================================ */
+    body[data-theme="light"] .product-catalog-grid,
+    body[data-theme="dark"] .product-catalog-grid {
+      grid-template-columns: repeat(auto-fill, 125px) !important;
+      justify-content: center !important;
+      align-items: start !important;
+      gap: 10px !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card,
+    body[data-theme="dark"] .product-catalog-grid .inv-card {
+      width: 125px !important;
+      min-width: 125px !important;
+      max-width: 125px !important;
+      height: 125px !important;
+      min-height: 125px !important;
+      max-height: 125px !important;
+      box-sizing: border-box !important;
+      padding: 5px !important;
+      border-radius: 14px !important;
+      position: relative !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card > div:first-of-type,
+    body[data-theme="dark"] .product-catalog-grid .inv-card > div:first-of-type {
+      height: 62px !important;
+      min-height: 62px !important;
+      margin-bottom: 3px !important;
+      flex: 0 0 62px !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card > div:first-of-type img,
+    body[data-theme="dark"] .product-catalog-grid .inv-card > div:first-of-type img {
+      width: 100% !important;
+      height: 62px !important;
+      object-fit: cover !important;
+      border-radius: 10px !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card > div:first-of-type .btn-quick-cart-icon,
+    body[data-theme="dark"] .product-catalog-grid .inv-card > div:first-of-type .btn-quick-cart-icon {
+      width: 25px !important;
+      height: 25px !important;
+      min-width: 25px !important;
+      min-height: 25px !important;
+      right: 2px !important;
+      bottom: 2px !important;
+      font-size: .68rem !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card [style*="font-weight: bold"],
+    body[data-theme="dark"] .product-catalog-grid .inv-card [style*="font-weight: bold"] {
+      font-size: .66rem !important;
+      line-height: 1.05 !important;
+      margin-bottom: 2px !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card [style*="font-size: 0.65rem"],
+    body[data-theme="dark"] .product-catalog-grid .inv-card [style*="font-size: 0.65rem"] {
+      font-size: .54rem !important;
+      line-height: 1.05 !important;
+      margin-bottom: 1px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card [style*="color: #fde047"],
+    body[data-theme="dark"] .product-catalog-grid .inv-card [style*="color: #fde047"] {
+      font-size: .68rem !important;
+      line-height: 1.05 !important;
+      margin-top: 1px !important;
+    }
+
+    /* Modern tetap 125x125; aturan di atas sengaja tidak menyentuhnya. */
+
+    /* ============================================================
+       KATALOG PRODUCT SHELF — SEMUA TEMA
+       Ukuran card Grid dikunci 125x125 tanpa mengubah List.
+       ============================================================ */
+    .product-catalog-grid {
+      grid-template-columns: repeat(auto-fill, 125px) !important;
+      justify-content: space-evenly !important;
+      align-items: start !important;
+      width: 100% !important;
+      gap: 10px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Compact card Light/Dark: desain lama dipertahankan,
+       hanya proporsinya disesuaikan agar muat 125x125. */
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card {
+      width: 125px !important;
+      min-width: 125px !important;
+      max-width: 125px !important;
+      height: 125px !important;
+      min-height: 125px !important;
+      max-height: 125px !important;
+      box-sizing: border-box !important;
+      padding: 5px !important;
+      border-radius: 14px !important;
+      overflow: hidden !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div:first-of-type {
+      margin-bottom: 2px !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card img {
+      width: 100% !important;
+      height: 58px !important;
+      object-fit: cover !important;
+      border-radius: 6px !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div:not(:first-of-type) {
+      line-height: 1.05 !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card .btn-quick-cart-icon {
+      transform: scale(.82) !important;
+      transform-origin: bottom right !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div[style*="font-weight: bold"] {
+      font-size: .68rem !important;
+      margin-bottom: 1px !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div[style*="font-size: 0.65rem"] {
+      font-size: .57rem !important;
+      margin-bottom: 1px !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div[style*="font-size: 0.78rem"] {
+      font-size: .68rem !important;
+      margin-top: 1px !important;
+    }
+
+    /* Modern tetap 125x125; hanya distribusi shelf yang disamakan. */
+    body[data-theme="modern"] .product-catalog-grid {
+      grid-template-columns: repeat(auto-fill, 125px) !important;
+      justify-content: space-evenly !important;
+      gap: 10px !important;
+    }
+</style>
+
+<style id="modern-customer-navigation-scale-final">
+/* MODERN: skala navigasi mengikuti ukuran panel Admin, desain Modern tetap utuh. */
+body[data-theme="modern"] .permanent-bottom-bar {
+  min-height: 68px !important;
+  padding: 9px 12px !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+body[data-theme="modern"] .permanent-bottom-bar #bottom-bar-title {
+  font-size: 1.05rem !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+}
+body[data-theme="modern"] .permanent-bottom-bar #pagination-box {
+  min-height: 44px !important;
+  padding: 4px 10px !important;
+  gap: 8px !important;
+  border-radius: 9px !important;
+}
+body[data-theme="modern"] .permanent-bottom-bar #pagination-box button {
+  min-width: 30px !important;
+  min-height: 34px !important;
+  font-size: .95rem !important;
+}
+body[data-theme="modern"] .permanent-bottom-bar #pos-page-indicator {
+  min-width: 36px !important;
+  font-size: .9rem !important;
+  text-align: center !important;
+}
+body[data-theme="modern"] .permanent-bottom-bar > div:last-child button {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 10px !important;
+}
+body[data-theme="modern"] .permanent-bottom-bar > div:last-child button svg {
+  width: 21px !important;
+  height: 21px !important;
+}
+body[data-theme="modern"] #menuToggleModal {
+  padding: 0 12px 76px 0 !important;
+}
+body[data-theme="modern"] #menuToggleModal > .modal-content {
+  width: min(240px, calc(100vw - 24px)) !important;
+  max-width: 240px !important;
+  padding: 8px !important;
+  border-radius: 16px !important;
+}
+body[data-theme="modern"] #menuToggleModal .popup-menu-btn {
+  min-height: 48px !important;
+  padding: 10px 12px !important;
+  gap: 10px !important;
+  border-radius: 10px !important;
+  font-size: 1rem !important;
+  line-height: 1.2 !important;
+  font-weight: 600 !important;
+}
+body[data-theme="modern"] #menuToggleModal .popup-menu-btn svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+@media (max-width:420px) {
+  body[data-theme="modern"] .permanent-bottom-bar { min-height:70px !important; padding:9px 10px !important; }
+  body[data-theme="modern"] .permanent-bottom-bar #bottom-bar-title { font-size:1.02rem !important; }
+  body[data-theme="modern"] #menuToggleModal > .modal-content { width:min(240px,calc(100vw - 18px)) !important; }
+  body[data-theme="modern"] #menuToggleModal .popup-menu-btn { min-height:49px !important; font-size:1rem !important; }
+}
 </style>
