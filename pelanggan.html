@@ -1142,6 +1142,116 @@ body[data-theme="modern"] .category-chips .chip-btn.active {
 }
 </style>
 
+
+<style id="modern-card-overlay-v3">
+/* ============================================================
+   MODERN PRODUCT CARD V3
+   Card tetap 125x125px.
+   Foto = layer utama
+   Badge + Nama/Harga/Stok = overlay di atas foto
+   Glow = alas paling bawah
+   Hanya Modern.
+   ============================================================ */
+
+body[data-theme="modern"] .modern-product-card {
+  position: relative !important;
+  width: 125px !important;
+  height: 125px !important;
+  min-width: 125px !important;
+  max-width: 125px !important;
+  min-height: 125px !important;
+  max-height: 125px !important;
+  overflow: hidden !important;
+}
+
+/* Area visual dibuat memenuhi card agar posisi layer stabil. */
+body[data-theme="modern"] .modern-product-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  z-index: 1 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+/* Glow/piringan menjadi alas paling bawah. */
+body[data-theme="modern"] .modern-product-stage .modern-platform {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 5px !important;
+  transform: translateX(-50%) !important;
+  z-index: 1 !important;
+}
+
+/* Foto produk berada di atas glow. */
+body[data-theme="modern"] .modern-product-stage .modern-product {
+  position: absolute !important;
+  left: 50% !important;
+  top: 13px !important;
+  width: 64px !important;
+  height: 54px !important;
+  object-fit: contain !important;
+  transform: translateX(-50%) !important;
+  z-index: 3 !important;
+  background: transparent !important;
+}
+
+/* Badge tetap paling atas. */
+body[data-theme="modern"] .modern-product-card .modern-badge {
+  position: absolute !important;
+  top: 5px !important;
+  left: 5px !important;
+  z-index: 7 !important;
+}
+
+/* Informasi produk menjadi overlay di atas foto. */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  left: 5px !important;
+  right: 5px !important;
+  bottom: 25px !important;
+  z-index: 6 !important;
+  padding: 4px 6px !important;
+  border-radius: 9px !important;
+  background: rgba(11,18,32,.68) !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  backdrop-filter: blur(3px) !important;
+  -webkit-backdrop-filter: blur(3px) !important;
+  box-sizing: border-box !important;
+}
+
+/* Nama, harga, stok tetap rapat agar muat di card kecil. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name {
+  color: #fff !important;
+  font-size: .62rem !important;
+  line-height: 1.05 !important;
+  font-weight: 800 !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price {
+  color: #fff !important;
+  font-size: .58rem !important;
+  line-height: 1.05 !important;
+  font-weight: 900 !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  color: rgba(255,255,255,.82) !important;
+  font-size: .49rem !important;
+  line-height: 1.05 !important;
+}
+
+/* Keranjang berada di atas semua layer visual. */
+body[data-theme="modern"] .modern-product-card .modern-cart-btn {
+  z-index: 8 !important;
+}
+</style>
+
 </head>
 
 <script>
