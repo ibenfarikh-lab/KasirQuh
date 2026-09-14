@@ -2023,24 +2023,17 @@ body[data-theme="modern"] main {
         <div id="reorder-container" class="auto-scroll-wrapper"></div>
       </div>
 
-      <!-- NO. 3 IDE MASAK: dikendalikan dari navbar bottom -->
-      <div id="recipe-section-wrapper" class="no-print recipe-nav-source" style="display:none;">
-        <div id="recipe-scroll-container" class="horizontal-scroll-container"><!-- Rendered via JavaScript --></div>
-      </div>
-
-      <div id="ide-masak-drawer" class="no-print" aria-hidden="true">
-        <div class="ide-masak-drawer-head">
-          <div>
-            <div class="ide-masak-title">🍜 Ide Masak</div>
-            <div class="ide-masak-subtitle">Menu warga &amp; racikan pilihan untuk belanja hari ini</div>
-          </div>
-          <button type="button" class="ide-masak-close" onclick="toggleIdeMasakNav(false)" aria-label="Tutup Ide Masak">✕</button>
+      <!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
+      <div id="recipe-section-wrapper" class="no-print" style="margin: 1px 0 2px 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🍜  ide Masak Warga Hari Ini</div>
+        <div class="horizontal-scroll-container" id="recipe-scroll-container">
+          <!-- Rendered via JavaScript -->
         </div>
-        <div id="ide-masak-drawer-content" class="ide-masak-drawer-content"></div>
       </div>
 
       <!-- Barang Laris Hari Ini -->
-      <div id="trending-section-wrapper" class="no-print" style="display:none !important;">
+      <div id="trending-section-wrapper" class="no-print" style="margin: 1px 0 2px 0;">
+        <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
         <div id="trending-container" class="auto-scroll-wrapper"></div>
       </div>
 
@@ -2300,48 +2293,16 @@ body[data-theme="modern"] main {
   <div id="toastNotification" class="toast">Notifikasi</div>
 
   <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
-    <button id="bottom-ide-masak" class="bottom-nav-action" type="button" onclick="toggleIdeMasakNav()" title="Ide Masak" aria-label="Ide Masak">
-      <span class="bottom-nav-action-icon">🍜</span><span>Ide Masak</span>
-    </button>
-    <button id="bottom-trending" class="bottom-nav-action" type="button" onclick="toggleTrendingNav()" title="Sedang Laris" aria-label="Sedang Laris"><span class="bottom-nav-action-icon">🔥</span><span>Laris</span></button>
-    <div class="bottom-nav-page-wrap">
-      <span id="bottom-bar-title" style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">Belanja</span>
-      <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; padding: 2px 8px; gap: 6px;">
-        <button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">◄</button>
-        <span id="pos-page-indicator" style="font-size: 0.72rem; font-weight: bold; color: var(--text-color);">1/1</span>
-        <button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
-      </div>
+    <span id="bottom-bar-title" style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">Belanja</span>
+    <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; padding: 2px 8px; gap: 6px;">
+      <button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">◄</button>
+      <span id="pos-page-indicator" style="font-size: 0.72rem; font-weight: bold; color: var(--text-color);">1/1</span>
+      <button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
       <button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
     </div>
   </div>
-
-  <div id="trending-drawer" aria-hidden="true"><div class="trending-drawer-head"><div><div class="trending-drawer-title">🔥 Sedang Laris Hari Ini</div><div class="trending-drawer-subtitle">Produk yang paling banyak dibeli</div></div><button class="trending-drawer-close" type="button" onclick="toggleTrendingNav(false)" aria-label="Tutup">✕</button></div><div id="trending-drawer-content" class="trending-drawer-content"></div></div>
-
-
-     #trending-drawer{position:fixed;left:8px;right:8px;bottom:62px;z-index:99;background:var(--card-bg);border:1px solid var(--border-color);border-radius:18px 18px 12px 12px;box-shadow:0 14px 36px rgba(0,0,0,.28);padding:10px;transform:translateY(18px);opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease}
-     #trending-drawer.open{transform:translateY(0);opacity:1;pointer-events:auto}
-     .trending-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 3px 8px}.trending-drawer-title{font-weight:900;font-size:.9rem;color:var(--text-color)}.trending-drawer-subtitle{font-size:.62rem;color:var(--text-color);opacity:.68;margin-top:2px}.trending-drawer-close{width:30px;height:30px;border:0;border-radius:50%;background:var(--input-bg);color:var(--text-color);font-weight:900;cursor:pointer}.trending-drawer-content{overflow-x:auto;display:flex;gap:8px;padding:1px 1px 4px;scrollbar-width:none}.trending-drawer-content::-webkit-scrollbar{display:none}.trending-drawer-content .trending-card{min-width:180px;max-width:180px}#bottom-trending.active{background:var(--input-bg);box-shadow:inset 0 0 0 1px var(--input-border)}
-  <style id="ide-masak-bottom-nav-v1">
-    /* NO. 3: Ide Masak mengikuti pola navbar bottom, bukan lagi section/card di halaman. */
-    .recipe-nav-source { display:none !important; }
-    .bottom-nav-action, .bottom-nav-page-wrap { min-height:48px; }
-    .bottom-nav-action { border:0; background:transparent; color:var(--text-color); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:2px 10px; border-radius:10px; font-size:.66rem; font-weight:800; cursor:pointer; }
-    .bottom-nav-action-icon { font-size:1.22rem; line-height:1; }
-    .bottom-nav-action.active { background:var(--input-bg); box-shadow:inset 0 0 0 1px var(--input-border); }
-    .bottom-nav-page-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
-    #ide-masak-drawer { position:fixed; left:8px; right:8px; bottom:62px; z-index:99; background:var(--card-bg); border:1px solid var(--border-color); border-radius:18px 18px 12px 12px; box-shadow:0 14px 36px rgba(0,0,0,.28); padding:10px; transform:translateY(18px); opacity:0; pointer-events:none; transition:transform .2s ease,opacity .2s ease; }
-    #ide-masak-drawer.open { transform:translateY(0); opacity:1; pointer-events:auto; }
-    .ide-masak-drawer-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:2px 3px 8px; }
-    .ide-masak-title { font-weight:900; font-size:.9rem; color:var(--text-color); }
-    .ide-masak-subtitle { font-size:.62rem; color:var(--text-color); opacity:.68; margin-top:2px; }
-    .ide-masak-close { width:30px; height:30px; border:0; border-radius:50%; background:var(--input-bg); color:var(--text-color); font-weight:900; cursor:pointer; }
-    .ide-masak-drawer-content { overflow-x:auto; display:flex; gap:8px; padding:1px 1px 4px; scrollbar-width:none; }
-    .ide-masak-drawer-content::-webkit-scrollbar { display:none; }
-    .ide-masak-drawer-content .recipe-card { min-width:175px; max-width:175px; }
-    @media (max-width:420px) { #ide-masak-drawer { left:5px; right:5px; } .bottom-nav-action { padding-left:6px; padding-right:6px; } }
-  </style>
 
   <script>
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log(err)); }); }
@@ -3046,26 +3007,6 @@ body[data-theme="modern"] main {
           </div>
           <div style="font-size: 0.63rem; opacity: 0.8; font-style: italic; text-align: center; margin-top: auto;">Tersimpan otomatis di database akunmu</div>
         </div>`;
-      const drawer = document.getElementById('ide-masak-drawer-content');
-      if (drawer) drawer.innerHTML = container.innerHTML;
-    }
-
-    function toggleIdeMasakNav(force) {
-      const drawer = document.getElementById('ide-masak-drawer');
-      const btn = document.getElementById('bottom-ide-masak');
-      if (!drawer) return;
-      const open = typeof force === 'boolean' ? force : !drawer.classList.contains('open');
-      const trendingDrawer = document.getElementById('trending-drawer');
-      const trendingBtn = document.getElementById('bottom-trending');
-      if (open && trendingDrawer) { trendingDrawer.classList.remove('open'); trendingDrawer.setAttribute('aria-hidden','true'); if (trendingBtn) trendingBtn.classList.remove('active'); }
-      drawer.classList.toggle('open', open);
-      drawer.setAttribute('aria-hidden', open ? 'false' : 'true');
-      if (btn) btn.classList.toggle('active', open);
-      if (open) {
-        const source = document.getElementById('recipe-scroll-container');
-        const target = document.getElementById('ide-masak-drawer-content');
-        if (source && target) target.innerHTML = source.innerHTML;
-      }
     }
 
     function editSavedRecipe(index) {
@@ -3842,11 +3783,8 @@ body[data-theme="modern"] main {
       });
       container.innerHTML = `<div class="auto-scroll-track">${itemsHtml}${itemsHtml}</div>`;
       setupAutoScrollInteraction("trending-container");
-      const drawerContent = document.getElementById("trending-drawer-content"); if (drawerContent) drawerContent.innerHTML = itemsHtml;
       perbaruiTampilanKategori(); 
     }
-
-    function toggleTrendingNav(force) { const drawer=document.getElementById('trending-drawer'), btn=document.getElementById('bottom-trending'), ide=document.getElementById('ide-masak-drawer'), ideBtn=document.getElementById('bottom-ide-masak'); if(!drawer)return; const open=typeof force==='boolean'?force:!drawer.classList.contains('open'); if(open&&ide){ide.classList.remove('open');ide.setAttribute('aria-hidden','true');if(ideBtn)ideBtn.classList.remove('active');} drawer.classList.toggle('open',open);drawer.setAttribute('aria-hidden',open?'false':'true');if(btn)btn.classList.toggle('active',open); }
 
     function tambahKeKeranjangCepat(code) {
       let p = databaseProduk[code];
