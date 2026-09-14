@@ -2539,13 +2539,10 @@ body[data-theme="modern"] main {
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "TokoQuh", phone: "089" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24;
-    // TAHAP 1: katalog produk dimuat bertahap, 6 item per batch.
-    const CATALOG_BATCH_SIZE = 6;
-    let catalogProducts = [];
-    let catalogLastDoc = null;
-    let catalogLoading = false;
-    let catalogHasMore = true;
-    let catalogInitialized = false; let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
+    // TAHAP 1: jumlah card katalog yang ditampilkan saat awal. Ini TIDAK membatasi databaseProduk/dashboard.
+    const CATALOG_INITIAL_VISIBLE = 6;
+    let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
+    let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
     let activeKategoriPelanggan = 'Home'; let toastTimeout;
     let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = true;
 
@@ -3431,17 +3428,19 @@ body[data-theme="modern"] main {
 
     function initFirebaseListeners() {
       db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
-      // TAHAP 1: jangan ambil seluruh koleksi produk saat dashboard pertama dibuka.
-      // Katalog mengambil 6 dokumen pertama secara berurutan; batch berikutnya
-      // akan ditambahkan oleh mekanisme load katalog pada tahap berikutnya.
-      databaseProduk = {};
-      catalogProducts = [];
-      catalogLastDoc = null;
-      catalogLoading = false;
-      catalogHasMore = true;
-      catalogInitialized = false;
-      isProductsLoaded = false;
-      loadNextCatalogBatch(true);
+      db.collection("produk").onSnapshot((snapshot) => { 
+        databaseProduk = {}; 
+        snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
+        isProductsLoaded = true; 
+        muatBarangLarisHariIni(); 
+        perbaruiTampilanKategori(); 
+        refreshKatalogPelanggan(); 
+        if(window.__promoRenderHook) window.__promoRenderHook();
+        renderPromoTokoPelanggan();
+        if (lastFetchedOrders && lastFetchedOrders.length > 0) {
+          renderQuickReorder(lastFetchedOrders);
+        }
+      });
       db.collection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
         window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
@@ -3831,63 +3830,33 @@ body[data-theme="modern"] main {
       renderCartPelanggan();
     }
 
-    async function loadNextCatalogBatch(initial = false) {
-      if (catalogLoading || !catalogHasMore) return;
-      catalogLoading = true;
-      try {
-        let query = db.collection("produk").orderBy("nama").limit(CATALOG_BATCH_SIZE);
-        if (catalogLastDoc) query = query.startAfter(catalogLastDoc);
-        const snapshot = await query.get();
-        if (snapshot.empty) {
-          catalogHasMore = false;
-        } else {
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const product = { code: doc.id, ...data };
-            catalogProducts.push(product);
-            databaseProduk[doc.id] = data;
-          });
-          catalogLastDoc = snapshot.docs[snapshot.docs.length - 1];
-          if (snapshot.size < CATALOG_BATCH_SIZE) catalogHasMore = false;
-        }
-        isProductsLoaded = catalogProducts.length > 0;
-        catalogInitialized = true;
-        refreshKatalogPelanggan();
-      } catch (err) {
-        console.error("Gagal memuat batch katalog produk:", err);
-        catalogInitialized = true;
-        refreshKatalogPelanggan();
-      } finally {
-        catalogLoading = false;
-      }
-    }
-
     function refreshKatalogPelanggan() {
       const container = document.getElementById("pos-catalog-container"); const cardWrapper = document.getElementById("pos-card-wrapper");
       if (!container || !cardWrapper) return; container.className = catalogViewMode === 'list' ? "product-catalog-list" : "product-catalog-grid";
-      if (!catalogInitialized) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
+      if (!isProductsLoaded) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
 
-      let matchedProducts = catalogProducts.filter(p => {
-        let pNamaLower = String(p.nama || '').toLowerCase();
+      let matchedProducts = [];
+      for (let code in databaseProduk) {
+        let p = databaseProduk[code]; let pNamaLower = String(p.nama || '').toLowerCase();
         let pKat = p.kategori;
         let kategoriProduk = Array.isArray(pKat)
           ? pKat.flatMap(k => String(k || '').split(/[,;|]+/)).map(k => k.trim()).filter(Boolean)
           : String(pKat || '').split(/[,;|]+/).map(k => k.trim()).filter(Boolean);
-        let searchKeyword = (document.getElementById("inventory-search-input")?.value || "").toLowerCase().trim();
+      let searchKeyword = (document.getElementById("inventory-search-input")?.value || "").toLowerCase().trim();
         let matchSearch = !searchKeyword || pNamaLower.includes(searchKeyword);
         let matchCategory = (activeKategoriPelanggan === 'Home' || activeKategoriPelanggan === 'Produk') ||
           kategoriProduk.some(k => k.toLowerCase() === activeKategoriPelanggan.toLowerCase().trim());
-        return matchCategory && matchSearch;
-      });
-      matchedProducts.sort((a, b) => String(a.nama || '').localeCompare(String(b.nama || ''), 'id'));
+        if (matchCategory && matchSearch) matchedProducts.push({ code, ...p });
+      }
+      
+      matchedProducts.sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
+      // TAHAP 1: hanya card katalog yang dibatasi. databaseProduk tetap lengkap untuk seluruh dashboard.
+      let paginatedItems = matchedProducts.slice(0, catalogVisibleCount);
       container.innerHTML = "";
 
-      if (matchedProducts.length === 0) {
-        container.innerHTML = catalogProducts.length ? `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>` : `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Memuat produk...</div>`;
-        return;
-      }
+      if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; document.getElementById("pos-page-indicator").innerText = `1/1`; return; }
 
-      matchedProducts.forEach(p => {
+      paginatedItems.forEach(p => {
         let code = p.code; let isHabis = (p.stok || 0) <= 0;
         let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
         let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
@@ -3950,13 +3919,11 @@ body[data-theme="modern"] main {
               </div>
             </div>`;
         }
-      });
-      if (catalogLoading) {
-        container.insertAdjacentHTML('beforeend', '<div class="catalog-batch-loading" style="grid-column:1/-1;text-align:center;padding:10px;font-size:0.72rem;opacity:.7;">Memuat produk…</div>');
-      }
+      }); document.getElementById("pos-page-indicator").innerText = `${Math.min(catalogVisibleCount, matchedProducts.length)}/${matchedProducts.length}`;
     }
 
-    function ubahHalamanPos(d) { /* pagination akan dihapus pada Tahap 6 */ }
+    // Pagination lama tidak lagi mengubah sumber data. Tahap berikutnya akan menggantinya dengan infinite scroll.
+    function ubahHalamanPos(d) { return; }
 
     function filterKatalogPelanggan(v) { currentPosPage = 1; refreshKatalogPelanggan(); }
 
