@@ -2312,7 +2312,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
         </div>
       </div>
 
-      <div id="developer-options-panel" style="display: none;">
+      <div id="developer-options-panel" style="display: none; contain: layout style; contain-intrinsic-size: 1px 320px;">
       <div class="card" style="border: 1px solid var(--border-color); background: var(--card-bg); padding: 12px; margin-bottom: 8px;">
         <h3 style="color: var(--text-color); margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">🎞️ Animasi Navigasi</h3>
         <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Matikan jika perpindahan Dashboard/Pengaturan terasa berat atau tersendat. Animasi kecil tombol dan FAB tetap berjalan.</p>
@@ -4382,9 +4382,15 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       const btn = document.getElementById('Opsi Developer');
       if (!panel || !btn) return;
       const akanBuka = panel.style.display === 'none' || !panel.style.display;
-      panel.style.display = akanBuka ? 'block' : 'none';
+
+      // Update tombol lebih dulu agar tap terasa instan, lalu lakukan reflow berat
+      // setelah frame berikutnya. Containment mencegah perubahan panel merambat
+      // menghitung ulang seluruh halaman katalog.
       btn.setAttribute('aria-expanded', String(akanBuka));
       btn.innerHTML = akanBuka ? '🛠️ Tutup Opsi Developer' : '🛠️ Opsi Developer';
+      requestAnimationFrame(() => {
+        panel.style.display = akanBuka ? 'block' : 'none';
+      });
     }
 
     function animasiNavigasiDeveloperAktif() {
