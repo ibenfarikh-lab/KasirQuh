@@ -1961,6 +1961,27 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
   z-index: 20 !important;
 }
 </style>
+<style id="ai-chat-bottom-nav-clearance-v1">
+/* Chat AI harus selalu punya ruang aman di atas bottom navbar yang sudah diperbesar. */
+#aiChatModal {
+  padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+  box-sizing: border-box !important;
+}
+#aiChatModal > .modal-content {
+  height: min(65vh, calc(100dvh - 108px)) !important;
+  max-height: calc(100dvh - 108px) !important;
+}
+@media (max-width: 699px) {
+  #aiChatModal {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    padding-top: 10px !important;
+  }
+  #aiChatModal > .modal-content {
+    width: 100% !important;
+  }
+}
+</style>
 </head>
 
 <script>
