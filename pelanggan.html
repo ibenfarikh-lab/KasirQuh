@@ -330,11 +330,12 @@
 
     /* Tombol kembali ke atas katalog: selalu berada tepat di atas FAB Asisten. */
     #fab-back-to-top {
-      width: 44px; height: 44px; border-radius: 50%; border: none;
-      background: #111827; color: white; display: none; align-items: center; justify-content: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 22px;
-      flex: 0 0 44px; transition: opacity .2s ease, transform .2s ease;
-    }
+    width: 40px; height: 40px; border: none; background: transparent; color: inherit;
+    display: none; align-items: center; justify-content: center; padding: 0; margin: 0;
+    cursor: pointer; font-size: 28px; line-height: 1; flex: 0 0 40px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.28));
+    transition: opacity .2s ease, transform .2s ease;
+  }
     #fab-back-to-top.is-visible { display: flex; }
     #fab-back-to-top:active { transform: scale(.92); }
     body[data-theme="modern"] #fab-back-to-top { background: #1e293b; color: #f8fafc; }
@@ -2306,7 +2307,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
   </div>
 
   <div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
-    <button id="fab-back-to-top" onclick="kembaliKeAtasKatalog()" title="Kembali ke atas" aria-label="Kembali ke atas">↑</button>
+    <button id="fab-back-to-top" onclick="kembaliKeAtasKatalog()" title="Kembali ke atas" aria-label="Kembali ke atas">⬆️</button>
     <button id="fab-ai-btn" class="fab-main fab-ai-bounce" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;">😀</button>
     <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="20" height="20" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg>
@@ -4491,18 +4492,8 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
   function updateFabBackToTop() {
     const btn = document.getElementById('fab-back-to-top');
     if (!btn) return;
-
-    // Muncul setelah user benar-benar jauh dari atas (±2,2 layar).
-    // Setelah muncul, tetap terlihat selama perjalanan smooth-scroll
-    // dan baru hilang ketika sudah dekat bagian atas.
-    const showThreshold = Math.max(700, window.innerHeight * 2.2);
-    const hideThreshold = 180;
-
-    if (window.scrollY > showThreshold) {
-      btn.classList.add('is-visible');
-    } else if (window.scrollY < hideThreshold) {
-      btn.classList.remove('is-visible');
-    }
+    const visible = window.scrollY > Math.max(450, window.innerHeight * 1.25);
+    btn.classList.toggle('is-visible', visible);
   }
 
   function kembaliKeAtasKatalog() {
