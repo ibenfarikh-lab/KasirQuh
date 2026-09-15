@@ -1099,6 +1099,58 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-stage {
   }
 </style>
 
+<style id="modern-live-chat-dark-fix">
+/* MODERN — Live Chat: semua surface chat mengikuti midnight navy, bukan putih. */
+body[data-theme="modern"] #live-chat,
+body[data-theme="modern"] #live-chat .customer-chat-subtabs,
+body[data-theme="modern"] #live-chat .subtab-content-pane {
+  background: #0b1220 !important;
+  color: #f8fafc !important;
+}
+body[data-theme="modern"] #live-chat .customer-chat-subtabs {
+  border-bottom-color: #263852 !important;
+}
+body[data-theme="modern"] #live-chat .customer-chat-subtabs button {
+  background: #111c2e !important;
+  color: #94a3b8 !important;
+  border-color: #263852 !important;
+}
+body[data-theme="modern"] #live-chat .customer-chat-subtabs button[style*="color: rgb(37, 99, 235)"],
+body[data-theme="modern"] #live-chat .customer-chat-subtabs button.active {
+  background: #172a46 !important;
+  color: #60a5fa !important;
+}
+body[data-theme="modern"] #chat-rumpi-messages,
+body[data-theme="modern"] #customer-chat-messages {
+  background: #0f172a !important;
+  border-color: #263852 !important;
+  color: #f8fafc !important;
+}
+/* Bubble pesan lawan bicara: jangan lagi memakai var(--input-bg) yang pada Modern bisa putih. */
+body[data-theme="modern"] #chat-rumpi-messages > div:not(:only-child):not([style*="text-align: center"]),
+body[data-theme="modern"] #customer-chat-messages > div:not(:only-child):not([style*="text-align: center"]) {
+  background: #172033 !important;
+  color: #e5edf8 !important;
+  border-color: #30445f !important;
+}
+/* Pesan milik pelanggan tetap biru. */
+body[data-theme="modern"] #chat-rumpi-messages > div[style*="align-self: flex-end"],
+body[data-theme="modern"] #customer-chat-messages > div[style*="align-self: flex-end"] {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+body[data-theme="modern"] #chat-rumpi-input,
+body[data-theme="modern"] #customer-chat-input {
+  background: #111c2e !important;
+  color: #f8fafc !important;
+  border-color: #30445f !important;
+}
+body[data-theme="modern"] #chat-rumpi-input::placeholder,
+body[data-theme="modern"] #customer-chat-input::placeholder {
+  color: #94a3b8 !important;
+}
+</style>
 
 <style id="modern-logo-category-final-v2">
 /* ============================================================
