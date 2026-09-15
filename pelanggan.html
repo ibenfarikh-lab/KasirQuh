@@ -2294,7 +2294,7 @@ body[data-theme="modern"] main {
 
   <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
     <span id="bottom-bar-title" style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">Belanja</span>
-    <div id="pagination-box" style="display: flex; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; padding: 2px 8px; gap: 6px;">
+    <div id="pagination-box" style="display: none !important; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; padding: 2px 8px; gap: 6px;">
       <button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">◄</button>
       <span id="pos-page-indicator" style="font-size: 0.72rem; font-weight: bold; color: var(--text-color);">1/1</span>
       <button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">▶</button>
@@ -4376,6 +4376,27 @@ body[data-theme="modern"] main {
 }
 </style>
 
+
+<style id="fix-three-items-final-v1">
+/* 1) Pagination/page navigation is no longer needed with infinite scroll. */
+#pagination-box { display: none !important; }
+
+/* 2) Light theme uses the existing white logo artwork. */
+body[data-theme="light"] #customer-home-header .customer-home-logo,
+body[data-theme="light"] #customer-home-header .customer-home-logo-light {
+  color: #fff !important;
+}
+
+/* 3) Modern: make the current page name in the fixed bottom bar explicitly visible. */
+body[data-theme="modern"] .permanent-bottom-bar #bottom-bar-title {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #f8fafc !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.45) !important;
+  z-index: 5 !important;
+}
+</style>
 </html>
 
 <style>
