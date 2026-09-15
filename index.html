@@ -1805,6 +1805,14 @@
     let leaving = false;
     let slideTimer = null;
 
+    // Preload every slide before it is ever shown. This prevents a black flash
+    // when the image source changes during the transition.
+    const preloadedSlides = slides.map(function (src) {
+      const img = new Image();
+      img.src = src;
+      return img;
+    });
+
     // Position hotspots/glows against the actual rendered image, so object-fit:cover
     // and different screen aspect ratios cannot shift them away from the photo buttons.
     const customerBox = { x: 40 / 688, y: 1270 / 1536, w: 390 / 688, h: 100 / 1536 };
@@ -1855,18 +1863,26 @@
 
     function showNextSlide() {
       if (leaving) return;
-      current = (current + 1) % slides.length;
-      image.style.opacity = '0';
-      setTimeout(function () {
+      const next = (current + 1) % slides.length;
+      const nextImage = preloadedSlides[next];
+
+      function commitNextSlide() {
         if (leaving) return;
+        current = next;
+        // The next image is already loaded, so swap it without ever fading
+        // through the black background. The existing glow timing is preserved.
         image.src = slides[current];
         syncSlideButtonPositions();
-        image.onload = function () {
-          image.style.opacity = '1';
-        };
-        if (image.complete) image.style.opacity = '1';
-      }, 250);
-      setTimeout(pulseButtonGlows, 300);
+        pulseButtonGlows();
+      }
+
+      if (nextImage && nextImage.complete) {
+        commitNextSlide();
+      } else if (nextImage) {
+        nextImage.addEventListener('load', commitNextSlide, { once: true });
+      } else {
+        commitNextSlide();
+      }
     }
 
     pulseButtonGlows();
