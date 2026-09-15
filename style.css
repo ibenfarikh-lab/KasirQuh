@@ -1629,6 +1629,21 @@ body.theme-colorful-v2 [style*="#ec4899"] {
   background-image:none !important;
 }
 
+/* Visual 4 — invisible hotspots */
+[data-theme="colorful-v2"] .kv4-hotspot,
+[data-theme="colorful2"] .kv4-hotspot,
+[data-theme="colorful-v.2"] .kv4-hotspot,
+.kv4-hotspot {
+  background: transparent !important;
+  background-image: none !important;
+  color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
+
 /* Never allow a gradient image to survive in V2. */
 [data-theme="colorful-v2"] * { background-image:none !important; }
 
