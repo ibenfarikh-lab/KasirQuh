@@ -1876,17 +1876,25 @@ body[data-theme="modern"] main {
 <style id="fix-modern-stock-align-photo-v2">
 /* MODERN: teks produk dinaikkan agar baris stok sejajar dengan batas bawah foto */
 .product-catalog-grid .kq-platform-card .kq-product-info {
-  bottom: 350px !important;
+  bottom: 260px !important;
 }
 @media (max-width:520px) {
   .product-catalog-grid .kq-platform-card .kq-product-info {
-    bottom: 350px !important;
+    bottom: 260px !important;
   }
 }
 @media (max-width:360px) {
   .product-catalog-grid .kq-platform-card .kq-product-info {
-    bottom: 350px !important;
+    bottom: 260px !important;
   }
+}
+</style>
+
+<style id="modern-product-info-above-platform-v1">
+body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-product-info {
+  top: 55% !important;
+  bottom: auto !important;
+  z-index: 20 !important;
 }
 </style>
 </head>
@@ -3374,6 +3382,9 @@ body[data-theme="modern"] main {
             currentCustomerPhone = phone;
             currentCustomerName = docData.nama || 'Pelanggan';
             document.getElementById('customerLoginModal').style.display = 'none';
+            // Refresh HANYA setelah tombol Masuk pada form login berhasil.
+            // Tidak terkait dengan bottom navbar/menu.
+            setTimeout(() => { window.location.reload(); }, 150);
             // Setelah login berhasil, tutup layar welcome secara langsung agar konten pelanggan terlihat.
             tutupWelcomeScreen();
             muatDataPelangganRealtime();
@@ -4863,9 +4874,4 @@ body.theme-colorful-v2 .products-container {
 }
 </style>
 
-<style id="modern-product-info-raised-v1">
-/* MODERN: nama, harga, stok sedikit dinaikkan agar terasa berada di atas bidang bundar */
-body[data-theme="modern"] .modern-product-card .modern-product-info {
-  top: 63% !important;
-}
-</style>
+
