@@ -3589,6 +3589,17 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
         renderQuickReorder(lastFetchedOrders || []);
       });
 
+      // Listener pengaturan "Stok Rumah Habis" dari Admin > Beranda Pelanggan.
+      // Jumlah kartu mengikuti konfigurasi Firebase yang disimpan Admin.
+      db.collection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
+        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
+        window.__stokRumahConfig = { enabled: cfg.enabled !== false, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        renderQuickReorder(lastFetchedOrders || []);
+      }, (err) => {
+        console.warn("Listener pengaturan Stok Rumah gagal:", err);
+        renderQuickReorder(lastFetchedOrders || []);
+      });
+
       // Listener transaksi untuk "Sedang Laris".
       // Jika hari ini belum ada transaksi, tampilkan data dari tanggal transaksi
       // terakhir yang tersedia. Begitu ada transaksi baru, kartu otomatis dihitung ulang.
