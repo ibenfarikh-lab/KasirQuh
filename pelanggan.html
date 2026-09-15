@@ -4477,18 +4477,49 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
 
 
 <script id="kq-back-to-top-script">
-  // Tombol di navbar bawah: hanya mengembalikan posisi halaman ke paling atas.
-  // Tidak mengubah lazy rendering/infinite scroll atau jumlah produk yang sudah dirender.
+  // Tombol di navbar bawah: paksa kembali ke paling atas dari SEMUA kandidat
+  // scroll container. Tidak mengubah lazy rendering/infinite scroll.
   function kembaliKeAtasKatalog() {
-    const top = 0;
-    const behavior = 'smooth';
-    window.scrollTo({ top, left: 0, behavior });
-    document.documentElement.scrollTo({ top, left: 0, behavior });
-    document.body.scrollTo({ top, left: 0, behavior });
-    const scrollingEl = document.scrollingElement;
-    if (scrollingEl && scrollingEl !== document.documentElement && scrollingEl !== document.body) {
-      scrollingEl.scrollTo({ top, left: 0, behavior });
-    }
+    const targets = new Set();
+    const addTarget = (el) => { if (el) targets.add(el); };
+
+    addTarget(document.scrollingElement);
+    addTarget(document.documentElement);
+    addTarget(document.body);
+    addTarget(document.querySelector('.main-content'));
+    addTarget(document.querySelector('.tab-content.active'));
+    addTarget(document.getElementById('pos-card-wrapper'));
+    addTarget(document.getElementById('pos-catalog-container'));
+
+    // Tangkap container vertikal yang benar-benar sedang memiliki scroll.
+    // Ini membuat tombol tetap bekerja walaupun browser/PWA memindahkan
+    // scrolling dari window ke elemen tertentu.
+    document.querySelectorAll('*').forEach((el) => {
+      try {
+        if (el.scrollHeight > el.clientHeight + 2 && el.scrollTop > 0) addTarget(el);
+      } catch (e) {}
+    });
+
+    // Set langsung ke 0 terlebih dahulu agar klik berkali-kali tidak pernah
+    // tertahan oleh smooth-scroll yang masih berjalan.
+    targets.forEach((el) => {
+      try { el.scrollTop = 0; } catch (e) {}
+      try { el.scrollLeft = 0; } catch (e) {}
+      try { el.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (e) {}
+    });
+
+    try { window.scrollTo(0, 0); } catch (e) {}
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (e) {}
+
+    // Satu frame tambahan untuk browser Android/PWA yang masih menyelesaikan
+    // gesture scroll saat tombol ditekan.
+    requestAnimationFrame(() => {
+      targets.forEach((el) => {
+        try { el.scrollTop = 0; } catch (e) {}
+        try { el.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (e) {}
+      });
+      try { window.scrollTo(0, 0); } catch (e) {}
+    });
   }
 </script>
 </body>
