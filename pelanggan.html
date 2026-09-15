@@ -4491,8 +4491,18 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
   function updateFabBackToTop() {
     const btn = document.getElementById('fab-back-to-top');
     if (!btn) return;
-    const visible = window.scrollY > Math.max(450, window.innerHeight * 1.25);
-    btn.classList.toggle('is-visible', visible);
+
+    // Muncul setelah user benar-benar jauh dari atas (±2,2 layar).
+    // Setelah muncul, tetap terlihat selama perjalanan smooth-scroll
+    // dan baru hilang ketika sudah dekat bagian atas.
+    const showThreshold = Math.max(700, window.innerHeight * 2.2);
+    const hideThreshold = 180;
+
+    if (window.scrollY > showThreshold) {
+      btn.classList.add('is-visible');
+    } else if (window.scrollY < hideThreshold) {
+      btn.classList.remove('is-visible');
+    }
   }
 
   function kembaliKeAtasKatalog() {
