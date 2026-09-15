@@ -503,7 +503,10 @@ function gantiViewModeSetting(mode) {
 
 function toggleFloatingMenu() {
   const backdrop = document.getElementById("floating-menu-backdrop");
-  if (backdrop) backdrop.classList.toggle("show");
+  if (!backdrop) return;
+  const opening = !backdrop.classList.contains("show");
+  backdrop.classList.toggle("show", opening);
+  if (opening) history.pushState({tab: activeTab, floating: 'menu'}, "", "");
 }
 
 window.addEventListener('scroll', function() {
@@ -1175,33 +1178,47 @@ let isScannerDbOpen = false;
 const defaultPlaceholderImg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='45' height='45' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='2' ry='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg>";
 
 window.addEventListener('popstate', function(event) {
-  if (isScannerPosOpen) { toggleScannerPos(); history.pushState({tab: activeTab}, "", ""); return; }
-  if (isScannerDbOpen) { toggleScannerDb(); history.pushState({tab: activeTab}, "", ""); return; }
-  if (document.getElementById("cartModal").classList.contains("show")) { closeCartModal(); history.pushState({tab: activeTab}, "", ""); return; }
-  if (document.getElementById("productModal").classList.contains("show")) { closeProductModal(); history.pushState({tab: activeTab}, "", ""); return; }
-  if (document.getElementById("customerModal").classList.contains("show")) { closeCustomerModal(); history.pushState({tab: activeTab}, "", ""); return; }
-  if (document.getElementById("bookkeepingModal").classList.contains("show")) { closeBookkeepingModal(); history.pushState({tab: activeTab}, "", ""); return; }
-  if (document.getElementById("catatanModal") && document.getElementById("catatanModal").classList.contains("show")) { closeCatatanModal(); history.pushState({tab: activeTab}, "", ""); return; }
-  
-  const searchBar = document.getElementById("sticky-search-container");
-  if (searchBar && searchBar.classList.contains("show")) {
-    searchBar.classList.remove("show");
-    history.pushState({tab: activeTab}, "", "");
+  // Back menutup overlay/floating yang sedang terbuka. Setelah ditutup,
+  // jangan pushState lagi agar Back berikutnya langsung diserahkan ke
+  // Android/Chrome (keluar dari PWA), bukan mengulang history internal.
+  if (isScannerPosOpen) { toggleScannerPos(); return; }
+  if (isScannerDbOpen) { toggleScannerDb(); return; }
+
+  const closers = [
+    ['cartModal', closeCartModal],
+    ['productModal', closeProductModal],
+    ['customerModal', closeCustomerModal],
+    ['bookkeepingModal', closeBookkeepingModal],
+    ['catatanModal', closeCatatanModal],
+    ['proofModal', window.closeProofModal],
+    ['editOrderModal', window.closeEditOrderModal],
+    ['adminCustomerDetailModal', window.closeAdminCustomerDetailModal]
+  ];
+  for (const [id, closeFn] of closers) {
+    const el = document.getElementById(id);
+    if (el && el.classList.contains('show')) {
+      if (typeof closeFn === 'function') closeFn();
+      else el.classList.remove('show');
+      return;
+    }
+  }
+
+  const floatingMenu = document.getElementById('floating-menu-backdrop');
+  if (floatingMenu && floatingMenu.classList.contains('show')) {
+    floatingMenu.classList.remove('show');
     return;
   }
 
-  // Jika Back menuju history halaman sebelumnya, tampilkan halaman tersebut.
-  // Ini membuat Dashboard -> A -> B kembali menjadi B -> A -> Dashboard.
-  // pushHistory=false agar Back tidak membuat history baru.
-  if (event.state && event.state.tab) {
-    switchTab(event.state.tab, false);
+  const searchBar = document.getElementById('sticky-search-container');
+  if (searchBar && searchBar.classList.contains('show')) {
+    searchBar.classList.remove('show');
+    const input = document.getElementById('inventory-search-input');
+    if (input) input.value = '';
+    syncAndFilterGlobal('');
     return;
   }
 
-  // Back terakhir di panel admin tidak logout.
-  // Biarkan Android/browser menangani Back sehingga PWA bisa ditinggalkan
-  // seperti minimize, sementara sesi login tetap tersimpan.
-  return;
+  // Tidak ada overlay/floating UI: biarkan Android/Chrome menangani Back.
 });
 
 function openCartModal() {
@@ -2226,7 +2243,7 @@ function switchTab(tabId, pushHistory = true) {
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
 
-  if (pushHistory) history.pushState({tab: tabId}, "", "");
+  if (pushHistory) history.replaceState({tab: tabId}, "", "");
 
   const fabCart = document.getElementById('fab-cart-btn');
   const fabScan = document.getElementById('fab-scan-btn');
