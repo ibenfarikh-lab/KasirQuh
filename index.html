@@ -11,7 +11,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <!-- External Stylesheet dengan Cache Busting -->
-  <link rel="stylesheet" href="style.css?v=1.0.3">
+  <link rel="stylesheet" href="style.css?v=1.0.4">
 
   <style>
     .popup-menu-btn svg {
@@ -47,8 +47,196 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2563eb">
   <link rel="apple-touch-icon" href="icon-192.png">
+<style>
+
+/* ============================================================
+   ADMIN COLORFUL v.2 — SOLID ONLY
+   Colorful v.1 remains untouched.
+   ============================================================ */
+[data-theme="colorful-v2"],
+[data-theme="colorful2"],
+[data-theme="colorful-v.2"] {
+  --admin-solid-blue: #163A5F;
+  --admin-solid-purple: #5A3A24;
+  --admin-solid-pink: #6B2525;
+  --admin-solid-orange: #7A421D;
+  --admin-solid-green: #1F5A3A;
+  --admin-solid-cyan: #14555A;
+  background-image: none !important;
+}
+
+/* Kill gradients/images only while V2 is active. */
+[data-theme="colorful-v2"] *,
+[data-theme="colorful-v2"] *::before,
+[data-theme="colorful-v2"] *::after,
+[data-theme="colorful2"] *,
+[data-theme="colorful2"] *::before,
+[data-theme="colorful2"] *::after,
+[data-theme="colorful-v.2"] *,
+[data-theme="colorful-v.2"] *::before,
+[data-theme="colorful-v.2"] *::after {
+  background-image: none !important;
+}
+
+/* Main surfaces: solid colors. */
+[data-theme="colorful-v2"] body,
+[data-theme="colorful2"] body,
+[data-theme="colorful-v.2"] body {
+  background: #070b12 !important;
+}
+
+[data-theme="colorful-v2"] .card,
+[data-theme="colorful-v2"] .panel,
+[data-theme="colorful-v2"] .stat-card,
+[data-theme="colorful-v2"] .menu-card,
+[data-theme="colorful-v2"] .product-card,
+[data-theme="colorful-v2"] .table-card,
+[data-theme="colorful2"] .card,
+[data-theme="colorful2"] .panel,
+[data-theme="colorful2"] .stat-card,
+[data-theme="colorful2"] .menu-card,
+[data-theme="colorful2"] .product-card,
+[data-theme="colorful2"] .table-card,
+[data-theme="colorful-v.2"] .card,
+[data-theme="colorful-v.2"] .panel,
+[data-theme="colorful-v.2"] .stat-card,
+[data-theme="colorful-v.2"] .menu-card,
+[data-theme="colorful-v.2"] .product-card,
+[data-theme="colorful-v.2"] .table-card {
+  background: var(--admin-solid-blue) !important;
+  background-image: none !important;
+  color: #fff !important;
+}
+
+/* Solid palette by card position. */
+[data-theme="colorful-v2"] .card:nth-child(5n+1),
+[data-theme="colorful2"] .card:nth-child(5n+1),
+[data-theme="colorful-v.2"] .card:nth-child(5n+1) { background:#163A5F !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(5n+2),
+[data-theme="colorful2"] .card:nth-child(5n+2),
+[data-theme="colorful-v.2"] .card:nth-child(5n+2) { background:#7A421D !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(5n+3),
+[data-theme="colorful2"] .card:nth-child(5n+3),
+[data-theme="colorful-v.2"] .card:nth-child(5n+3) { background:#1F5A3A !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(5n+4),
+[data-theme="colorful2"] .card:nth-child(5n+4),
+[data-theme="colorful-v.2"] .card:nth-child(5n+4) { background:#5A3A24 !important; }
+
+[data-theme="colorful-v2"] .card:nth-child(5n+5),
+[data-theme="colorful2"] .card:nth-child(5n+5),
+[data-theme="colorful-v.2"] .card:nth-child(5n+5) { background:#6B2525 !important; }
+
+/* Buttons and navigation are solid too. */
+[data-theme="colorful-v2"] button,
+[data-theme="colorful-v2"] .btn,
+[data-theme="colorful-v2"] .button,
+[data-theme="colorful2"] button,
+[data-theme="colorful2"] .btn,
+[data-theme="colorful2"] .button,
+[data-theme="colorful-v.2"] button,
+[data-theme="colorful-v.2"] .btn,
+[data-theme="colorful-v.2"] .button {
+  background-image: none !important;
+  color: #fff !important;
+}
+
+/* Keep text readable on V2 colored surfaces. */
+[data-theme="colorful-v2"] .card *,
+[data-theme="colorful-v2"] .panel *,
+[data-theme="colorful-v2"] .stat-card *,
+[data-theme="colorful-v2"] .menu-card *,
+[data-theme="colorful2"] .card *,
+[data-theme="colorful2"] .panel *,
+[data-theme="colorful2"] .stat-card *,
+[data-theme="colorful2"] .menu-card *,
+[data-theme="colorful-v.2"] .card *,
+[data-theme="colorful-v.2"] .panel *,
+[data-theme="colorful-v.2"] .stat-card *,
+[data-theme="colorful-v.2"] .menu-card * {
+  color: #fff !important;
+}
+
+/* Login tetap memakai permukaan putih dengan teks gelap pada Colorful v.2.
+   Selector global tema tidak boleh membuat isi card putih ikut menjadi putih. */
+[data-theme="colorful-v2"] .login-card,
+[data-theme="colorful2"] .login-card,
+[data-theme="colorful-v.2"] .login-card {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  background-image: none !important;
+}
+[data-theme="colorful-v2"] .login-card h2,
+[data-theme="colorful2"] .login-card h2,
+[data-theme="colorful-v.2"] .login-card h2 { color: #0f172a !important; }
+[data-theme="colorful-v2"] .login-card p,
+[data-theme="colorful2"] .login-card p,
+[data-theme="colorful-v.2"] .login-card p { color: #64748b !important; }
+[data-theme="colorful-v2"] .login-card input,
+[data-theme="colorful2"] .login-card input,
+[data-theme="colorful-v.2"] .login-card input {
+  background: #172554 !important; color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+[data-theme="colorful-v2"] .login-card input::placeholder,
+[data-theme="colorful2"] .login-card input::placeholder,
+[data-theme="colorful-v.2"] .login-card input::placeholder { color: #cbd5e1 !important; }
+[data-theme="colorful-v2"] .login-card button,
+[data-theme="colorful2"] .login-card button,
+[data-theme="colorful-v.2"] .login-card button {
+  background: #163A5F !important; color: #ffffff !important;
+}
+
+/* ============================================================
+   PRODUCT CATEGORY CHECKLIST — aligned for mobile
+   ============================================================ */
+[data-theme="colorful-v2"] #db-category-menu label,
+[data-theme="colorful2"] #db-category-menu label,
+[data-theme="colorful-v.2"] #db-category-menu label,
+#db-category-menu label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 7px 8px !important;
+  margin: 0 !important;
+  text-align: left !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+}
+#db-category-menu label input[type="checkbox"] {
+  flex: 0 0 auto !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#db-category-menu label span {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+/* V2 palette aliases: all colorful, but dark/solid/bold. */
+[data-theme="colorful-v2"],
+[data-theme="colorful2"],
+[data-theme="colorful-v.2"] {
+  --admin-solid-blue: #163A5F;
+  --admin-solid-purple: #5A3A24;
+  --admin-solid-pink: #6B2525;
+  --admin-solid-orange: #7A421D;
+  --admin-solid-green: #1F5A3A;
+  --admin-solid-cyan: #14555A;
+}
+</style>
 </head>
-<body data-theme="light">
+<body data-theme="colorful-v2">
 
   <div id="loginModal" class="login-overlay" style="display: none;">
     <div class="login-card">
@@ -232,20 +420,27 @@
       </div>
 
       <!-- WRAPPER CHAT PRIBADI -->
-      <div id="wrapper-admin-chat-pribadi" style="display: flex; height: calc(100vh - 180px); gap: 10px;">
-        <div style="width: 35%; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
-          <div style="padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header);" data-i18n="chat_conversations">💬 Daftar Percakapan</div>
-          <div id="admin-chat-list" style="flex: 1; overflow-y: auto;">
-            <div style="padding: 15px; text-align: center; color: var(--text-muted); font-size: 0.85rem;" data-i18n="loading_chats">Memuat daftar chat...</div>
+      <div id="wrapper-admin-chat-pribadi" class="admin-private-chat-wide" style="display: flex; height: calc(100vh - 180px); gap: 10px; position: relative;">
+        <div id="admin-private-chat-drawer" class="admin-private-chat-drawer" style="display: none;">
+          <div class="admin-private-chat-drawer-head">
+            <span>💬 Daftar Pelanggan</span>
+            <button type="button" onclick="toggleAdminPrivateChatList(false)" aria-label="Tutup daftar pelanggan">✕</button>
+          </div>
+          <div id="admin-chat-list" class="admin-private-chat-list">
+            <div style="padding: 15px; text-align: center; color: #fff; font-size: 0.85rem;" data-i18n="loading_chats">Memuat daftar chat...</div>
           </div>
         </div>
-        <div style="flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
-          <div id="admin-chat-header" style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-            <span id="admin-chat-title" data-i18n="select_chat_prompt">Pilih pelanggan di samping untuk mulai chat</span>
+
+        <div class="admin-private-chat-main" style="flex: 1; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;">
+          <div id="admin-chat-header" class="admin-private-chat-header" style="padding: 8px 10px; border-bottom: 1px solid var(--border-color); font-weight: bold; background: var(--table-header); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+              <button type="button" class="admin-chat-people-toggle" onclick="toggleAdminPrivateChatList()" title="Daftar pelanggan" aria-label="Buka daftar pelanggan">👤</button>
+              <span id="admin-chat-title" data-i18n="select_chat_prompt">Pilih pelanggan untuk mulai chat</span>
+            </div>
             <button id="admin-chat-delete-btn" onclick="hapusSemuaChatPribadiAdmin()" title="Hapus seluruh chat dengan pelanggan ini" style="display: none; background: #dc2626; color: white; border: none; padding: 5px 9px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; flex-shrink: 0;">🗑️ Hapus Chat</button>
           </div>
           <div id="admin-chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: var(--bg-color);">
-            <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 0.85rem;" data-i18n="no_chat_selected">Belum ada ruang chat yang dipilih.</div>
+            <div style="text-align: center; color: #fff; margin-top: 20px; font-size: 0.85rem;" data-i18n="no_chat_selected">Belum ada ruang chat yang dipilih.</div>
           </div>
           <div style="padding: 10px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 8px;">
             <input type="text" id="admin-chat-input" placeholder="Ketik balasan..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color);" disabled data-i18n-placeholder="placeholder_reply">
@@ -307,6 +502,18 @@
       <div id="restock-grid-wrapper" class="inventory-grid" style="display: none;"></div>
     </div>
 
+
+    <!-- Fullscreen POS QR/Barcode Scanner -->
+    <div id="scannerModal" class="fab-scanner-modal" aria-hidden="true">
+      <div class="scanner-fullscreen-box">
+        <div id="reader-pos" class="scanner-wrapper"></div>
+        <div class="scanner-focus-frame"></div>
+        <div class="scanner-laser-line"></div>
+        <button type="button" class="btn-close-scanner-absolute" onclick="toggleScannerPos()" title="Tutup Scanner" aria-label="Tutup Scanner">&times;</button>
+        <div id="scan-status-pos" class="scan-status-floating"></div>
+      </div>
+    </div>
+
     <!-- Tombol-tombol FAB Melayang -->
     <div class="fab-container no-print">
       <button id="fab-scan-btn" class="fab-scanner" onclick="toggleScannerPos()" title="Buka/Tutup Scanner">
@@ -347,7 +554,7 @@
     <div id="laporan" class="tab-content">
       <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap;">
         <button id="sub-btn-pelanggan" class="sub-tab-btn active" onclick="switchSubDataTab('sub-pelanggan')" data-i18n="sub_customers">👥 Data Pelanggan</button>
-        <button id="sub-btn-persetujuan" class="sub-tab-btn" onclick="switchSubDataTab('sub-persetujuan')" data-i18n="sub_approvals">⏳ Persetujuan Pelanggan</button>
+        <button id="sub-btn-persetujuan" class="sub-tab-btn" onclick="switchSubDataTab('sub-persetujuan')" data-i18n="sub_approvals">⏳ Persetujuan Pelanggan <span id="pending-customer-badge" style="display:none; margin-left:4px; min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:#dc2626; color:#fff; font-size:0.68rem; font-weight:800; line-height:18px; text-align:center; vertical-align:middle;"></span></button>
         <button id="sub-btn-laporan" class="sub-tab-btn" onclick="switchSubDataTab('sub-laporan')" data-i18n="sub_transactions">📋 Data Transaksi</button>
       </div>
 
@@ -438,6 +645,129 @@
 
     <!-- 7. HALAMAN PENGATURAN -->
     <div id="pengaturan" class="tab-content">
+      <!-- SHORTCUT BERANDA PELANGGAN — selalu paling atas -->
+<!-- =========================================================
+     SHORTCUT: BERANDA PELANGGAN
+     Klik card ini untuk smooth-scroll ke seluruh pengaturan
+     Beranda Pelanggan di bawah.
+     ========================================================= -->
+<div id="shortcut-beranda-pelanggan"
+     class="admin-beranda-shortcut"
+     role="button"
+     tabindex="0"
+     aria-expanded="false"
+     onclick="scrollKePengaturanBerandaPelanggan()"
+     onkeydown="if(event.key==='Enter' || event.key===' '){event.preventDefault();scrollKePengaturanBerandaPelanggan();}"
+     style="margin-top:0;margin-bottom:10px;cursor:pointer;background:#111;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div style="width:46px;height:46px;min-width:46px;border-radius:12px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;font-size:1.45rem;">📱</div>
+    <div style="flex:1;">
+      <div style="font-weight:800;font-size:1.02rem;">Beranda Pelanggan</div>
+      <div style="font-size:.8rem;opacity:.72;margin-top:4px;">Kelola fitur yang tampil di halaman utama pelanggan.</div>
+    </div>
+    <div style="font-size:1.35rem;opacity:.9;">↓</div>
+  </div>
+</div>
+
+
+<!-- =========================================================
+     KERANGKA: BERANDA PELANGGAN
+     Tahap 1: UI kerangka saja. Belum mengubah logika/data.
+     ========================================================= -->
+<section id="admin-beranda-pelanggan" class="admin-beranda-pelanggan" aria-hidden="true" style="margin-top:0;margin-bottom:10px;scroll-margin-top:12px;max-height:0;overflow:hidden;opacity:0;transform:translateY(-8px);transition:max-height .55s ease,opacity .4s ease,transform .55s ease;">
+  <div style="background:#000;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;color:#fff;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-weight:800;font-size:1rem;">📱 Beranda Pelanggan</div>
+        <div style="font-size:.78rem;opacity:.72;margin-top:3px;">Kelola fitur yang tampil di halaman utama pelanggan.</div>
+      </div>
+
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;">
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🪙 Koin Warga</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pengaturan program koin.</div>
+        <button type="button" onclick="toggleAdminKoinWarga()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-koin-warga-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;"><span>Program aktif</span><input type="checkbox" id="admin-koin-enabled"></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;"><span>Bonus check-in harian</span><input type="number" id="admin-koin-daily" min="0" max="100000" step="1" style="width:90px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;"></label>
+          <button type="button" onclick="simpanPengaturanKoinWarga()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:700;cursor:pointer;">Simpan Koin</button>
+          <div id="admin-koin-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🔥 Promo Toko Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Pilih produk yang ingin dipromosikan.</div>
+        <button type="button" onclick="toggleAdminPromoToko()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-promo-toko-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Promo aktif</span><input type="checkbox" id="admin-promo-enabled">
+          </label>
+          <div style="font-size:.75rem;opacity:.7;margin-bottom:7px;">Pilih maksimal 5 barang dari katalog:</div>
+          <div id="admin-promo-product-list" style="max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:6px;"></div>
+          <button type="button" onclick="simpanPengaturanPromoToko()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#f59e0b;color:#111;font-weight:800;cursor:pointer;">Simpan Promo</button>
+          <div id="admin-promo-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">📢 Info Toko & Running Text</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Atur informasi toko dan teks berjalan di Beranda Pelanggan.</div>
+        <button type="button" onclick="toggleAdminHomeInfo()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-home-info-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <div style="font-size:.75rem;opacity:.75;margin-bottom:8px;">Baris tetap: <strong>Info Toko.... 📢</strong></div>
+          <label style="display:block;font-size:.8rem;margin-bottom:5px;">Teks Running</label>
+          <textarea id="admin-home-running-text" placeholder="Hari ini ada gratis ongkir sampai jam 12.00. Yuk gas buruan order... Bestie...!!!" style="width:100%;box-sizing:border-box;min-height:72px;padding:7px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;"></textarea>
+          <button type="button" onclick="simpanPengaturanHomeInfo()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Info</button>
+          <div id="admin-home-info-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🏠 Stok Rumah Habis</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan stok barang.</div>
+        <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
+          <span>Tampilkan</span>
+          <input type="checkbox" id="admin-home-stock-toggle" checked>
+        </label>
+      </div>
+
+<div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">🍳 Ide Masak Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Menu, foto, deskripsi, dan bahan terkait.</div>
+        <button type="button" onclick="toggleAdminIdeMasak()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-ide-masak-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-recipe-enabled">
+          </label>
+          <div style="font-size:.75rem;opacity:.7;margin-bottom:7px;">Maksimal 5 menu aktif. Bahan dipilih langsung dari katalog.</div>
+          <div id="admin-recipe-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <button type="button" onclick="tambahAdminIdeMasak()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">＋ Tambah Menu</button>
+          <button type="button" onclick="simpanPengaturanIdeMasak()" style="width:100%;margin-top:7px;border:0;border-radius:8px;padding:8px;background:#16a34a;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Ide Masak</button>
+          <div id="admin-recipe-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>      <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
+        <div style="font-weight:800;">📈 Sedang Laris Hari Ini</div>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan transaksi penjualan hari ini.</div>
+        <button type="button" onclick="toggleAdminSedangLaris()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-sedang-laris-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-trending-enabled">
+          </label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;">
+            <span>Jumlah produk</span><input type="number" id="admin-trending-limit" min="1" max="10" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
+          </label>
+          <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Urutan dihitung otomatis dari jumlah terjual hari ini.</div>
+          <button type="button" onclick="simpanPengaturanSedangLaris()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Laris</button>
+          <div id="admin-trending-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
       <div class="card">
         <h3 style="margin-top: 0; font-size: 1rem;" data-i18n="shop_identity">Identitas Toko</h3>
         <div class="form-vertical">
@@ -474,10 +804,12 @@
 
           <label style="font-size: 0.85rem; margin-top: 5px;" data-i18n="theme_label">Tema Tampilan:</label>
           <select id="setting-theme" onchange="gantiTema(this.value)">
-            <option value="light" data-i18n="theme_light">Terang (Light)</option>
-            <option value="dark" data-i18n="theme_dark">Gelap (Dark)</option>
-            <option value="auto" data-i18n="theme_auto">Sistem (Auto)</option>
-          </select>
+             <option value="light" data-i18n="theme_light">Light</option>
+             <option value="dark" data-i18n="theme_dark">Dark</option>
+             <option value="auto" data-i18n="theme_auto">Auto</option>
+             <option value="colorful" data-i18n="theme_colorful">Colorful v.1</option>
+             <option value="colorful-v2" data-i18n="theme_colorful_v2">Colorful v.2</option>
+           </select>
 
           <label style="font-size: 0.85rem; margin-top: 5px;" data-i18n="catalog_view_mode">Tampilan Katalog / Stok:</label>
           <select id="setting-view-mode" onchange="gantiViewModeSetting(this.value)">
@@ -532,7 +864,245 @@
       <div class="developer-info">
         Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)
       </div>
-    </div>
+    
+
+
+
+<script>
+function getPengaturanKoinWarga() {
+  return { enabled: localStorage.getItem('admin_koin_warga_enabled') !== 'false', daily: Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'), 10) || 10) };
+}
+function toggleAdminKoinWarga() {
+  const panel=document.getElementById('admin-koin-warga-panel'); if(!panel) return;
+  const open=panel.style.display !== 'none'; panel.style.display=open?'none':'block';
+  if(!open){ const c=getPengaturanKoinWarga(); document.getElementById('admin-koin-enabled').checked=c.enabled; document.getElementById('admin-koin-daily').value=c.daily; }
+}
+function simpanPengaturanKoinWarga() {
+  const enabled=document.getElementById('admin-koin-enabled').checked;
+  const daily=Math.max(0, parseInt(document.getElementById('admin-koin-daily').value,10) || 0);
+  localStorage.setItem('admin_koin_warga_enabled', String(enabled));
+  localStorage.setItem('admin_koin_warga_daily', String(daily));
+  const st=document.getElementById('admin-koin-status'); if(st) st.textContent='✓ Pengaturan Koin Warga tersimpan.';
+}
+function getPengaturanPromoTokoLocal() {
+  try { return JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{"enabled":true,"codes":[]}'); }
+  catch(e) { return {enabled:true,codes:[]}; }
+}
+function renderAdminPromoProductList(selectedCodes) {
+  const box=document.getElementById('admin-promo-product-list'); if(!box) return;
+  const codes=selectedCodes || [];
+  const items=Object.keys(databaseProduk || {}).map(code => ({code,p:databaseProduk[code]}))
+    .filter(x => x.p && x.p.nama).sort((a,b)=>String(a.p.nama).localeCompare(String(b.p.nama),'id'));
+  if(!items.length){ box.innerHTML='<div style="font-size:.75rem;opacity:.7;">Katalog belum dimuat.</div>'; return; }
+  box.innerHTML=items.map(({code,p})=>{
+    const checked=codes.includes(code);
+    const stok=Number(p.stok||0);
+    return `<label class="admin-promo-product-row" style="display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;column-gap:8px;padding:8px 9px;border-radius:8px;background:#222;border:1px solid #333;font-size:.78rem;box-sizing:border-box;min-height:44px;">
+      <input type="checkbox" class="admin-promo-product" value="${code}" ${checked?'checked':''} ${stok<=0?'disabled':''} style="width:18px;height:18px;margin:0;justify-self:center;">
+      <span style="min-width:0;line-height:1.25;overflow-wrap:anywhere;text-align:left;">${String(p.nama).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}</span>
+      <span style="opacity:.65;white-space:nowrap;text-align:right;">${stok>0?('stok '+stok):'habis'}</span>
+    </label>`;
+  }).join('');
+  box.querySelectorAll('.admin-promo-product').forEach(el=>el.addEventListener('change',()=>{
+    const checked=[...box.querySelectorAll('.admin-promo-product:checked')];
+    if(checked.length>5){ el.checked=false; alert('Maksimal 5 barang untuk Promo Toko Hari Ini.'); }
+  }));
+}
+function toggleAdminPromoToko() {
+  const panel=document.getElementById('admin-promo-toko-panel'); if(!panel) return;
+  const open=panel.style.display !== 'none'; panel.style.display=open?'none':'block';
+  if(!open){
+    const cfg=getPengaturanPromoTokoLocal();
+    document.getElementById('admin-promo-enabled').checked=cfg.enabled !== false;
+    renderAdminPromoProductList(cfg.codes || []);
+  }
+}
+async function simpanPengaturanPromoToko() {
+  const enabled=document.getElementById('admin-promo-enabled')?.checked !== false;
+  const codes=[...document.querySelectorAll('.admin-promo-product:checked')].map(el=>el.value).slice(0,5);
+  const cfg={enabled,codes,updatedAt:Date.now()};
+  localStorage.setItem('admin_promo_toko_v1',JSON.stringify(cfg));
+  try {
+    await db.collection('pengaturan').doc('beranda_pelanggan_promo').set(cfg,{merge:true});
+    const st=document.getElementById('admin-promo-status'); if(st) st.textContent='✓ Promo tersimpan dan siap tampil di pelanggan.';
+  } catch(err) {
+    const st=document.getElementById('admin-promo-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
+  }
+}
+function getAdminHomeInfoConfig() {
+  try { const c=JSON.parse(localStorage.getItem('admin_home_info_v1') || '{}'); return {runningText:c.runningText || ''}; }
+  catch(e) { return {runningText:''}; }
+}
+function toggleAdminHomeInfo() {
+  const panel=document.getElementById('admin-home-info-panel'); if(!panel) return;
+  const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
+  if(!open) { const c=getAdminHomeInfoConfig(); document.getElementById('admin-home-running-text').value=c.runningText; }
+}
+async function simpanPengaturanHomeInfo() {
+  const cfg={infoText:'Info Toko....', runningText:(document.getElementById('admin-home-running-text')?.value || '').trim(), updatedAt:Date.now()};
+  localStorage.setItem('admin_home_info_v1',JSON.stringify(cfg));
+  try { await db.collection('pengaturan').doc('beranda_pelanggan_home').set(cfg,{merge:true}); const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='✓ Info toko & running text tersimpan dan siap tampil di pelanggan.'; }
+  catch(err) { const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.'; }
+}
+function getAdminIdeMasakConfig() {
+  try {
+    const c = JSON.parse(localStorage.getItem('admin_ide_masak_v1') || '{}');
+    return { enabled: c.enabled !== false, recipes: Array.isArray(c.recipes) ? c.recipes : [] };
+  } catch(e) { return {enabled:true, recipes:[]}; }
+}
+function escapeAdminRecipe(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function renderAdminIdeMasakList(recipes) {
+  const box=document.getElementById('admin-recipe-list'); if(!box) return;
+  const list=Array.isArray(recipes)?recipes:[];
+  if(!list.length) {
+    box.innerHTML='<div style="font-size:.75rem;opacity:.7;padding:8px;border:1px dashed #444;border-radius:8px;">Belum ada menu. Tekan “Tambah Menu”.</div>';
+    return;
+  }
+  const products=Object.keys(databaseProduk||{}).map(code=>({code,p:databaseProduk[code]})).filter(x=>x.p&&x.p.nama)
+    .sort((a,b)=>String(a.p.nama).localeCompare(String(b.p.nama),'id'));
+  const options='<option value="">-- pilih bahan --</option>'+products.map(x=>`<option value="${escapeAdminRecipe(x.code)}">${escapeAdminRecipe(x.p.nama)}</option>`).join('');
+  box.innerHTML=list.map((r,i)=>{
+    const items=Array.isArray(r.items)?r.items:[];
+    return `<div class="admin-recipe-editor" data-index="${i}" style="padding:9px;border-radius:9px;background:#222;border:1px solid #3a3a3a;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px;">
+        <strong style="font-size:.8rem;">Menu ${i+1}</strong>
+        <button type="button" onclick="hapusAdminIdeMasak(${i})" style="border:0;border-radius:6px;background:#dc2626;color:#fff;padding:5px 8px;font-weight:700;">Hapus</button>
+      </div>
+      <input class="admin-recipe-name" value="${escapeAdminRecipe(r.nama)}" placeholder="Nama menu" style="width:100%;box-sizing:border-box;padding:7px;border-radius:7px;border:1px solid #555;margin-bottom:6px;background:#fff;color:#111;">
+      <input class="admin-recipe-photo" value="${escapeAdminRecipe(r.foto||'')}" placeholder="URL foto menu (opsional)" style="width:100%;box-sizing:border-box;padding:7px;border-radius:7px;border:1px solid #555;margin-bottom:6px;background:#fff;color:#111;">
+      <textarea class="admin-recipe-desc" placeholder="Deskripsi singkat" style="width:100%;box-sizing:border-box;min-height:55px;padding:7px;border-radius:7px;border:1px solid #555;margin-bottom:6px;background:#fff;color:#111;">${escapeAdminRecipe(r.desc||'')}</textarea>
+      <div style="font-size:.72rem;font-weight:700;margin-bottom:4px;">Bahan:</div>
+      <div class="admin-recipe-items" style="display:flex;flex-direction:column;gap:5px;">
+        ${items.map((it,j)=>`<div class="admin-recipe-item" style="display:flex;gap:5px;align-items:center;">
+          <select class="admin-recipe-product" style="flex:1;min-width:0;padding:6px;border-radius:6px;background:#fff;color:#111;border:1px solid #555;">${options.replace(`value="${escapeAdminRecipe(it.code)}"`,`value="${escapeAdminRecipe(it.code)}" selected`)}</select>
+          <input class="admin-recipe-qty" type="number" min="0.001" step="0.001" value="${Number(it.qty)||1}" style="width:58px;padding:6px;border-radius:6px;border:1px solid #555;background:#fff;color:#111;">
+          <button type="button" onclick="this.parentElement.remove()" style="border:0;border-radius:6px;background:#555;color:#fff;padding:6px 8px;">✕</button>
+        </div>`).join('')}
+      </div>
+      <button type="button" onclick="tambahBahanAdminIdeMasak(${i})" style="width:100%;margin-top:6px;border:1px solid #555;border-radius:7px;padding:6px;background:#333;color:#fff;font-weight:700;">＋ Tambah Bahan</button>
+    </div>`;
+  }).join('');
+}
+function toggleAdminIdeMasak() {
+  const panel=document.getElementById('admin-ide-masak-panel'); if(!panel) return;
+  const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
+  if(!open) {
+    const cfg=getAdminIdeMasakConfig();
+    document.getElementById('admin-recipe-enabled').checked=cfg.enabled;
+    renderAdminIdeMasakList(cfg.recipes);
+  }
+}
+function tambahAdminIdeMasak() {
+  const cfg=getAdminIdeMasakConfig();
+  if(cfg.recipes.length>=5) return alert('Maksimal 5 menu Ide Masak Hari Ini.');
+  cfg.recipes.push({id:'recipe_'+Date.now(),nama:'',desc:'',foto:'',items:[]});
+  renderAdminIdeMasakList(cfg.recipes);
+}
+function hapusAdminIdeMasak(index) {
+  const cfg=getAdminIdeMasakConfig();
+  cfg.recipes.splice(index,1);
+  renderAdminIdeMasakList(cfg.recipes);
+}
+function tambahBahanAdminIdeMasak(index) {
+  const box=document.querySelector(`.admin-recipe-editor[data-index="${index}"] .admin-recipe-items`);
+  if(!box) return;
+  const selects=document.querySelectorAll('#admin-recipe-list .admin-recipe-editor')[index].querySelectorAll('.admin-recipe-product');
+  const products=Object.keys(databaseProduk||{}).map(code=>({code,p:databaseProduk[code]})).filter(x=>x.p&&x.p.nama).sort((a,b)=>String(a.p.nama).localeCompare(String(b.p.nama),'id'));
+  const options='<option value="">-- pilih bahan --</option>'+products.map(x=>`<option value="${escapeAdminRecipe(x.code)}">${escapeAdminRecipe(x.p.nama)}</option>`).join('');
+  box.insertAdjacentHTML('beforeend',`<div class="admin-recipe-item" style="display:flex;gap:5px;align-items:center;">
+    <select class="admin-recipe-product" style="flex:1;min-width:0;padding:6px;border-radius:6px;background:#fff;color:#111;border:1px solid #555;">${options}</select>
+    <input class="admin-recipe-qty" type="number" min="0.001" step="0.001" value="1" style="width:58px;padding:6px;border-radius:6px;border:1px solid #555;background:#fff;color:#111;">
+    <button type="button" onclick="this.parentElement.remove()" style="border:0;border-radius:6px;background:#555;color:#fff;padding:6px 8px;">✕</button>
+  </div>`);
+}
+function collectAdminIdeMasak() {
+  return [...document.querySelectorAll('#admin-recipe-list .admin-recipe-editor')].map((el,i)=>({
+    id: el.dataset.index ? (getAdminIdeMasakConfig().recipes[Number(el.dataset.index)]?.id || ('recipe_'+Date.now()+i)) : ('recipe_'+Date.now()+i),
+    nama: el.querySelector('.admin-recipe-name')?.value.trim() || '',
+    foto: el.querySelector('.admin-recipe-photo')?.value.trim() || '',
+    desc: el.querySelector('.admin-recipe-desc')?.value.trim() || '',
+    items: [...el.querySelectorAll('.admin-recipe-item')].map(row=>({code:row.querySelector('.admin-recipe-product')?.value||'',qty:parseFloat(row.querySelector('.admin-recipe-qty')?.value)||1})).filter(x=>x.code)
+  }));
+}
+async function simpanPengaturanIdeMasak() {
+  const enabled=document.getElementById('admin-recipe-enabled')?.checked!==false;
+  const recipes=collectAdminIdeMasak().filter(r=>r.nama).slice(0,5);
+  const cfg={enabled,recipes,updatedAt:Date.now()};
+  localStorage.setItem('admin_ide_masak_v1',JSON.stringify(cfg));
+  try {
+    await db.collection('pengaturan').doc('beranda_pelanggan_resep').set(cfg,{merge:true});
+    const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='✓ Ide Masak tersimpan dan siap tampil di pelanggan.';
+  } catch(err) {
+    const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
+  }
+}
+function getAdminSedangLarisConfig() {
+  try {
+    const c=JSON.parse(localStorage.getItem('admin_sedang_laris_v1') || '{}');
+    return {enabled:c.enabled !== false, limit:Math.min(10,Math.max(1,parseInt(c.limit,10)||5))};
+  } catch(e) { return {enabled:true,limit:5}; }
+}
+function toggleAdminSedangLaris() {
+  const panel=document.getElementById('admin-sedang-laris-panel'); if(!panel) return;
+  const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
+  if(!open){ const c=getAdminSedangLarisConfig(); document.getElementById('admin-trending-enabled').checked=c.enabled; document.getElementById('admin-trending-limit').value=c.limit; }
+}
+async function simpanPengaturanSedangLaris() {
+  const enabled=document.getElementById('admin-trending-enabled')?.checked!==false;
+  const limit=Math.min(10,Math.max(1,parseInt(document.getElementById('admin-trending-limit')?.value,10)||5));
+  const cfg={enabled,limit,updatedAt:Date.now()};
+  localStorage.setItem('admin_sedang_laris_v1',JSON.stringify(cfg));
+  try {
+    await db.collection('pengaturan').doc('beranda_pelanggan_laris').set(cfg,{merge:true});
+    const st=document.getElementById('admin-trending-status'); if(st) st.textContent='✓ Pengaturan Sedang Laris tersimpan.';
+  } catch(err) {
+    const st=document.getElementById('admin-trending-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
+  }
+}
+function scrollKePengaturanBerandaPelanggan() {
+  const target = document.getElementById('admin-beranda-pelanggan');
+  const shortcut = document.getElementById('shortcut-beranda-pelanggan');
+  if (!target) return;
+
+  const isOpen = target.getAttribute('aria-hidden') === 'false';
+
+  if (isOpen) {
+    // Klik kedua: tutup kembali dengan animasi naik/fade.
+    // Gunakan tinggi aktual dulu agar transisi max-height tetap halus.
+    target.style.maxHeight = target.scrollHeight + 'px';
+    requestAnimationFrame(() => {
+      target.setAttribute('aria-hidden', 'true');
+      target.style.maxHeight = '0px';
+      target.style.opacity = '0';
+      target.style.transform = 'translateY(-8px)';
+    });
+    if (shortcut) shortcut.setAttribute('aria-expanded', 'false');
+    return;
+  }
+
+  // Klik pertama: buka konten tepat di bawah card Beranda Pelanggan.
+  target.setAttribute('aria-hidden', 'false');
+  target.style.maxHeight = '0px';
+  target.style.opacity = '0';
+  target.style.transform = 'translateY(-8px)';
+
+  requestAnimationFrame(() => {
+    target.style.maxHeight = target.scrollHeight + 'px';
+    target.style.opacity = '1';
+    target.style.transform = 'translateY(0)';
+  });
+
+  if (shortcut) shortcut.setAttribute('aria-expanded', 'true');
+
+  // Setelah transisi selesai, biarkan tinggi mengikuti isi agar aman bila panel berubah ukuran.
+  window.setTimeout(() => {
+    if (target.getAttribute('aria-hidden') === 'false') target.style.maxHeight = 'none';
+  }, 600);
+}
+</script>
+      </div>
 
   </div>
 
@@ -604,10 +1174,13 @@
       <input type="hidden" id="edit-restock-id">
       <input type="hidden" id="db-selected-online-img">
       <div class="form-vertical" style="display: flex; flex-direction: column; gap: 8px;">
-        <label style="font-size: 0.85rem;" data-i18n="product_code_label">Kode Barang / Barcode:</label>
+        <label style="font-size: 0.85rem;">ID Dokumen:</label>
+        <input type="text" id="db-code" readonly disabled style="width: 100%; opacity: 0.72; cursor: not-allowed;">
+
+        <label style="font-size: 0.85rem;">QR / Barcode Produk (Opsional):</label>
         <div style="display: flex; gap: 6px;">
-          <input type="text" id="db-code" placeholder="Kosongkan untuk generate otomatis" style="flex: 1;" data-i18n-placeholder="placeholder_code">
-          <button type="button" onclick="toggleScannerDb()" style="background: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer;" data-i18n="scan">📷 Scan</button>
+          <input type="text" id="db-barcode" placeholder="Kosongkan jika tidak ada" style="flex: 1;">
+          <button type="button" onclick="toggleScannerDb()" style="background: #2563eb; color: white; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer;">📷 Scan</button>
         </div>
         <div id="scanner-box-db" style="display: none; position: relative; margin-bottom: 6px;">
           <div id="reader-db" style="width: 100%;"></div>
@@ -620,7 +1193,13 @@
         </div>
 
         <label style="font-size: 0.85rem;" data-i18n="category_label">Kategori:</label>
-        <input type="text" id="db-category" placeholder="Cth: Sembako">
+        <input type="hidden" id="db-category">
+        <div id="db-category-picker" style="position: relative;">
+          <div id="db-category-chips" style="display:flex; flex-wrap:wrap; gap:6px; min-height:38px; padding:6px 8px; border:1px solid var(--input-border); border-radius:8px; background:var(--input-bg); cursor:pointer;" onclick="toggleProductCategoryMenu()">
+            <span style="color:var(--text-muted); font-size:.82rem;">Pilih kategori...</span>
+          </div>
+          <div id="db-category-menu" style="display:none; position:absolute; z-index:100; left:0; right:0; top:calc(100% + 4px); max-height:220px; overflow:auto; padding:6px; border:1px solid var(--border-color); border-radius:8px; background:var(--card-bg); box-shadow:0 8px 24px rgba(0,0,0,.18);"></div>
+        </div>
 
         <div style="display: flex; gap: 8px;">
           <div style="flex: 1;">
@@ -1232,11 +1811,11 @@
 
           chatListContainer.innerHTML += `
             <div onclick="bukaRuangChatAdmin('${phone}', '${name}')" style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; ${activeStyle}">
-              <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem;">
-                <span>👤 ${name}</span>
+              <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; color:#fff !important;">
+                <span style="color:#fff !important;">👤 ${name}</span>
                 ${unread > 0 ? `<span style="background: #ef4444; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem;">${unread}</span>` : ''}
               </div>
-              <div style="font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${phone}</div>
+              <div style="font-size: 0.78rem; color:#fff !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${phone}</div>
             </div>
           `;
         });
@@ -1246,8 +1825,18 @@
       });
     }
 
+    function toggleAdminPrivateChatList(forceState) {
+      const drawer = document.getElementById("admin-private-chat-drawer");
+      if (!drawer) return;
+      const open = typeof forceState === "boolean" ? forceState : drawer.style.display === "none";
+      drawer.style.display = open ? "flex" : "none";
+      const btn = document.querySelector(".admin-chat-people-toggle");
+      if (btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
     function bukaRuangChatAdmin(phone, name) {
       selectedChatPhone = phone;
+      toggleAdminPrivateChatList(false);
       const chatTitleEl = document.getElementById("admin-chat-title");
       if (chatTitleEl) chatTitleEl.innerText = `Chat dengan: ${name} (${phone})`;
       const deleteChatBtn = document.getElementById("admin-chat-delete-btn");
@@ -1668,271 +2257,172 @@
     }
   </script>
   <script src="script.js"></script>
+  <script>
+    // Notifikasi pelanggan baru: badge realtime pada tab Persetujuan Pelanggan.
+    (function initPendingCustomerNotification() {
+      let firstSnapshot = true;
+      let previousPendingCount = 0;
 
+      function updatePendingCustomerBadge(count) {
+        const badge = document.getElementById("pending-customer-badge");
+        if (!badge) return;
+        if (count > 0) {
+          badge.textContent = count > 99 ? "99+" : String(count);
+          badge.style.display = "inline-block";
+        } else {
+          badge.textContent = "";
+          badge.style.display = "none";
+        }
+      }
 
-<!-- KASIRQUH SLIDE 1-2-3 WELCOME PATCH -->
-<style id="kasirquh-slide123-patch">
-  #kasirquhVisual4Welcome {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    overflow: hidden;
-    background: #000;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity .72s ease, visibility .72s ease;
-  }
-  #kasirquhVisual4Welcome.kv4-leaving {
-    opacity: 0;
-    visibility: hidden;
-  }
-  #kasirquhVisual4Welcome .kv4-slide-image {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    user-select: none;
-    -webkit-user-drag: none;
-    opacity: 1;
-    transform: scale(1);
-    transition: opacity .55s ease, transform .82s cubic-bezier(.2,.75,.2,1), filter .72s ease;
-  }
-  #kasirquhVisual4Welcome.kv4-focus-customer .kv4-slide-image,
-  #kasirquhVisual4Welcome.kv4-focus-admin .kv4-slide-image {
-    transform: scale(1.12) translateY(-2%);
-    filter: brightness(.78) saturate(1.08) blur(.7px);
-  }
-  #kasirquhVisual4Welcome .kv4-dim {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(circle at 50% 65%, rgba(255,255,255,.04), rgba(0,0,0,.18) 70%, rgba(0,0,0,.28));
-    opacity: .28;
-    transition: opacity .7s ease;
-  }
-  #kasirquhVisual4Welcome.kv4-focus-customer .kv4-dim,
-  #kasirquhVisual4Welcome.kv4-focus-admin .kv4-dim { opacity: .72; }
-  #kasirquhVisual4Welcome .kv4-button-glow {
-    position: absolute;
-    z-index: 2;
-    pointer-events: none;
-    box-sizing: border-box;
-    border: 1.5px solid rgba(255,255,255,.86);
-    border-radius: 16px;
-    background: rgba(255,255,255,.012);
-    opacity: 0;
-    box-shadow: 0 0 4px rgba(255,255,255,.58), 0 0 11px rgba(255,255,255,.30), inset 0 0 6px rgba(255,255,255,.12);
-  }
-  #kv4CustomerGlow, #kv4AdminGlow {
-    left: 0; top: 0; width: 0; height: 0;
-  }
-  #kasirquhVisual4Welcome .kv4-button-glow.kv4-glow-active {
-    animation: kv4GlowReveal .88s ease-in-out forwards;
-  }
-  #kasirquhVisual4Welcome .kv4-button-glow.kv4-glow-pressed {
-    animation: kv4GlowPressed .34s ease-out forwards;
-  }
-  @keyframes kv4GlowReveal {
-    0% { opacity: 0; transform: scale(.985); filter: brightness(.96); }
-    20% { opacity: .78; transform: scale(1); filter: brightness(1.18); }
-    58% { opacity: .52; transform: scale(1.008); filter: brightness(1.08); }
-    100% { opacity: 0; transform: scale(1.018); filter: brightness(1); }
-  }
-  @keyframes kv4GlowPressed {
-    0% { opacity: .35; transform: scale(1); }
-    45% { opacity: 1; transform: scale(1.035); filter: brightness(1.55); box-shadow: 0 0 8px rgba(255,255,255,.95), 0 0 24px rgba(255,255,255,.7), inset 0 0 12px rgba(255,255,255,.28); }
-    100% { opacity: 0; transform: scale(1.055); }
-  }
-  @media (max-width: 480px) {
-    #kasirquhVisual4Welcome .kv4-button-glow { border-radius: 16px; border-width: 1.5px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    #kasirquhVisual4Welcome .kv4-button-glow { animation-duration: .2s !important; }
-  }
+      function startListener() {
+        if (typeof db === "undefined" || !db.collection) return;
 
-  #kasirquhVisual4Welcome .kv4-hotspot {
-    position: absolute;
-    z-index: 3;
-    padding: 0;
-    margin: 0;
-    border: 0;
-    outline: 0;
-    background: transparent !important;
-    background-image: none !important;
-    color: transparent !important;
-    box-shadow: none !important;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-  #kv4CustomerHotspot, #kv4AdminHotspot {
-    left: 0; top: 0; width: 0; height: 0;
-  }
-  @media (max-width: 480px) { }
-  @media (prefers-reduced-motion: reduce) {
-    #kasirquhVisual4Welcome,
-    #kasirquhVisual4Welcome .kv4-slide-image,
-    #kasirquhVisual4Welcome .kv4-dim { transition-duration: .2s; }
-  }
-</style>
+        db.collection("pelanggan").onSnapshot((snapshot) => {
+          let pendingCount = 0;
+          snapshot.forEach((doc) => {
+            const data = doc.data() || {};
+            if (String(data.status || "").toLowerCase() === "pending") pendingCount++;
+          });
 
-<div id="kasirquhVisual4Welcome" aria-label="Welcome screen">
-  <img id="kv4SlideImage" class="kv4-slide-image" src="./slide1.png" alt="" aria-hidden="true">
-  <div class="kv4-dim" aria-hidden="true"></div>
-  <div id="kv4CustomerGlow" class="kv4-button-glow kv4-glow-customer" aria-hidden="true"></div>
-  <div id="kv4AdminGlow" class="kv4-button-glow kv4-glow-admin" aria-hidden="true"></div>
-  <button id="kv4CustomerHotspot" class="kv4-hotspot" type="button" aria-label="Mulai Belanja"></button>
-  <button id="kv4AdminHotspot" class="kv4-hotspot" type="button" aria-label="Admin"></button>
-</div>
+          updatePendingCustomerBadge(pendingCount);
 
-<script id="kasirquh-slide123-script">
-(function () {
-  function initSlide123Welcome() {
-    const welcome = document.getElementById('kasirquhVisual4Welcome');
-    const image = document.getElementById('kv4SlideImage');
-    const customer = document.getElementById('kv4CustomerHotspot');
-    const admin = document.getElementById('kv4AdminHotspot');
-    const customerGlow = document.getElementById('kv4CustomerGlow');
-    const adminGlow = document.getElementById('kv4AdminGlow');
-    if (!welcome || !image || !customer || !admin) return;
+          if (!firstSnapshot && pendingCount > previousPendingCount) {
+            if (typeof playNotificationSound === "function") playNotificationSound();
+            if (typeof showNotif === "function") showNotif("🔔 Ada pelanggan baru menunggu persetujuan!");
+          }
 
-    const slides = ['./slide1.png', './slide2.png', './slide3.png'];
-    let current = 0;
-    let leaving = false;
-    let slideTimer = null;
-
-    // Preload every slide before it is ever shown. This prevents a black flash
-    // when the image source changes during the transition.
-    const preloadedSlides = slides.map(function (src) {
-      const img = new Image();
-      img.src = src;
-      return img;
-    });
-
-    // Position hotspots/glows against the actual rendered image, so object-fit:cover
-    // and different screen aspect ratios cannot shift them away from the photo buttons.
-    const customerBox = { x: 40 / 688, y: 1270 / 1536, w: 390 / 688, h: 100 / 1536 };
-    const adminBox = { x: 442 / 688, y: 1270 / 1536, w: 205 / 688, h: 100 / 1536 };
-
-    function syncSlideButtonPositions() {
-      const imgRect = image.getBoundingClientRect();
-      const parentRect = welcome.getBoundingClientRect();
-      const parentW = parentRect.width;
-      const parentH = parentRect.height;
-      const scale = Math.max(parentW / image.naturalWidth, parentH / image.naturalHeight);
-      const renderedW = image.naturalWidth * scale;
-      const renderedH = image.naturalHeight * scale;
-      const cropX = (renderedW - parentW) / 2;
-      const cropY = (renderedH - parentH) / 2;
-      function apply(box, hotspot, glow) {
-        if (!hotspot) return;
-        const left = box.x * image.naturalWidth * scale - cropX;
-        const top = box.y * image.naturalHeight * scale - cropY;
-        const width = box.w * image.naturalWidth * scale;
-        const height = box.h * image.naturalHeight * scale;
-        [hotspot, glow].forEach(function(el) {
-          if (!el) return;
-          el.style.left = left + 'px';
-          el.style.top = top + 'px';
-          el.style.width = width + 'px';
-          el.style.height = height + 'px';
+          previousPendingCount = pendingCount;
+          firstSnapshot = false;
+        }, (err) => {
+          console.warn("Gagal memantau persetujuan pelanggan:", err);
         });
       }
-      if (image.naturalWidth && image.naturalHeight) {
-        apply(customerBox, customer, customerGlow);
-        apply(adminBox, admin, adminGlow);
-      }
-    }
 
-    image.addEventListener('load', syncSlideButtonPositions);
-    window.addEventListener('resize', syncSlideButtonPositions);
-    requestAnimationFrame(syncSlideButtonPositions);
-
-    function pulseButtonGlows() {
-      [customerGlow, adminGlow].forEach(function (el) {
-        if (!el) return;
-        el.classList.remove('kv4-glow-active', 'kv4-glow-pressed');
-        void el.offsetWidth;
-        el.classList.add('kv4-glow-active');
-      });
-    }
-
-    function showNextSlide() {
-      if (leaving) return;
-      const next = (current + 1) % slides.length;
-      const nextImage = preloadedSlides[next];
-
-      function commitNextSlide() {
-        if (leaving) return;
-        current = next;
-        // The next image is already loaded, so swap it without ever fading
-        // through the black background. The existing glow timing is preserved.
-        image.src = slides[current];
-        syncSlideButtonPositions();
-        pulseButtonGlows();
-      }
-
-      if (nextImage && nextImage.complete) {
-        commitNextSlide();
-      } else if (nextImage) {
-        nextImage.addEventListener('load', commitNextSlide, { once: true });
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", startListener);
       } else {
-        commitNextSlide();
+        startListener();
       }
-    }
+    })();
+  </script>
 
-    pulseButtonGlows();
-    slideTimer = setInterval(showNextSlide, 4500);
 
-    function leave(mode, destination) {
-      if (leaving) return;
-      leaving = true;
-      if (slideTimer) clearInterval(slideTimer);
-      welcome.classList.add(mode);
-      setTimeout(function () {
-        if (destination) {
-          window.location.href = destination;
-          return;
-        }
-        welcome.classList.add('kv4-leaving');
-        setTimeout(function () { welcome.remove(); }, 760);
-      }, 430);
-    }
-
-    customer.addEventListener('click', function () {
-      if (customerGlow) { customerGlow.classList.remove('kv4-glow-active'); void customerGlow.offsetWidth; customerGlow.classList.add('kv4-glow-pressed'); }
-      leave('kv4-focus-customer', './pelanggan.html');
-    });
-
-    admin.addEventListener('click', function () {
-      if (adminGlow) { adminGlow.classList.remove('kv4-glow-active'); void adminGlow.offsetWidth; adminGlow.classList.add('kv4-glow-pressed'); }
-      welcome.classList.add('kv4-focus-admin');
-      leaving = true;
-      if (slideTimer) clearInterval(slideTimer);
-      setTimeout(function () {
-        welcome.classList.add('kv4-leaving');
-        setTimeout(function () {
-          welcome.remove();
-          const login = document.getElementById('loginModal');
-          if (login && localStorage.getItem('isLoggedIn') !== 'true') {
-            login.style.display = 'flex';
-          }
-        }, 500);
-      }, 430);
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSlide123Welcome);
-  } else {
-    initSlide123Welcome();
-  }
-})();
-</script>
 
 </body>
 </html>
+
+<style>
+
+/* ADMIN: kotak pembungkus halaman utama & daftar barang = BLACK
+   berlaku Colorful v.1 dan Colorful v.2 */
+[data-theme="colorful"] .main-page,
+[data-theme="colorful-v2"] .main-page,
+[data-theme="colorful"] .catalog-section,
+[data-theme="colorful-v2"] .catalog-section,
+[data-theme="colorful"] .available-products,
+[data-theme="colorful-v2"] .available-products,
+[data-theme="colorful"] .products-container,
+[data-theme="colorful-v2"] .products-container,
+body.theme-colorful .main-page,
+body.theme-colorful-v2 .main-page,
+body.theme-colorful .catalog-section,
+body.theme-colorful-v2 .catalog-section,
+body.theme-colorful .available-products,
+body.theme-colorful-v2 .available-products,
+body.theme-colorful .products-container,
+body.theme-colorful-v2 .products-container {
+  background: #000 !important;
+  background-image: none !important;
+}
+
+</style>
+
+<style>
+
+/* === KASIRQUH: FIX BOX PEMBUNGKUS HITAM === */
+:root {
+  --admin-mainbox-colorful-bg: #000 !important;
+  --admin-mainbox-colorful-v2-bg: #000 !important;
+}
+
+/* Main product/catalog wrappers in both colorful themes */
+body.theme-colorful .product-list-container,
+body.theme-colorful .products-container,
+body.theme-colorful .catalog-container,
+body.theme-colorful .available-products,
+body.theme-colorful .barang-tersedia,
+body.theme-colorful .daftar-barang,
+body.theme-colorful .product-section,
+body.theme-colorful-v2 .product-list-container,
+body.theme-colorful-v2 .products-container,
+body.theme-colorful-v2 .catalog-container,
+body.theme-colorful-v2 .available-products,
+body.theme-colorful-v2 .barang-tersedia,
+body.theme-colorful-v2 .daftar-barang,
+body.theme-colorful-v2 .product-section,
+[data-theme="colorful"] .product-list-container,
+[data-theme="colorful"] .products-container,
+[data-theme="colorful"] .catalog-container,
+[data-theme="colorful"] .available-products,
+[data-theme="colorful"] .barang-tersedia,
+[data-theme="colorful"] .daftar-barang,
+[data-theme="colorful"] .product-section,
+[data-theme="colorful-v1"] .product-list-container,
+[data-theme="colorful-v1"] .products-container,
+[data-theme="colorful-v1"] .catalog-container,
+[data-theme="colorful-v1"] .available-products,
+[data-theme="colorful-v1"] .barang-tersedia,
+[data-theme="colorful-v1"] .daftar-barang,
+[data-theme="colorful-v1"] .product-section,
+[data-theme="colorful-v2"] .product-list-container,
+[data-theme="colorful-v2"] .products-container,
+[data-theme="colorful-v2"] .catalog-container,
+[data-theme="colorful-v2"] .available-products,
+[data-theme="colorful-v2"] .barang-tersedia,
+[data-theme="colorful-v2"] .daftar-barang,
+[data-theme="colorful-v2"] .product-section,
+[data-theme="colorful2"] .product-list-container,
+[data-theme="colorful2"] .products-container,
+[data-theme="colorful2"] .catalog-container,
+[data-theme="colorful2"] .available-products,
+[data-theme="colorful2"] .barang-tersedia,
+[data-theme="colorful2"] .daftar-barang,
+[data-theme="colorful2"] .product-section {
+  background: #000 !important;
+  background-image: none !important;
+}
+
+/* Common large wrapper/card around "Daftar Barang Tersedia" */
+body.theme-colorful .section-card,
+body.theme-colorful-v2 .section-card,
+[data-theme="colorful"] .section-card,
+[data-theme="colorful-v1"] .section-card,
+[data-theme="colorful-v2"] .section-card,
+[data-theme="colorful2"] .section-card {
+  background: #000 !important;
+  background-image: none !important;
+}
+
+/* Colorful v2: no gradients on the main wrapper */
+body.theme-colorful-v2 *,
+[data-theme="colorful-v2"] *,
+[data-theme="colorful2"] * {
+  /* only neutralize backgrounds on wrappers; product cards keep their own colors */
+}
+
+/* Quantity controls: deliberately contrast with product-card colors */
+[data-theme="colorful"] .quantity-btn,
+[data-theme="colorful-v1"] .quantity-btn,
+[data-theme="colorful-v2"] .quantity-btn,
+[data-theme="colorful2"] .quantity-btn,
+[data-theme="colorful"] .qty-btn,
+[data-theme="colorful-v1"] .qty-btn,
+[data-theme="colorful-v2"] .qty-btn,
+[data-theme="colorful2"] .qty-btn {
+  background-image: none !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.45) !important;
+}
+
+</style>
