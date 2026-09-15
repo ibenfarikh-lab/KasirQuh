@@ -2807,13 +2807,13 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
-      const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
+      const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = cachedStoreName; if (document.getElementById('receipt-shop-name')) document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
       initChatRumpiListener();
       renderRecipeCards();
       if (currentCustomerPhone) {
         document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); periksaCheckinHarian(); tampilkanKoinDiProfil();
-      } else { if (isStandalone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
+      } else { const login = document.getElementById('customerLoginModal'); if (login) { login.style.display = 'flex'; gantiFormAuth('login'); } }
       initFirebaseListeners();
       initPromoTokoPelanggan();
       initCustomerHomeInfoListener();
