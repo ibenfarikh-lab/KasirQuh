@@ -2020,13 +2020,6 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
 
 <body data-theme="modern" style="font-size: 0.85rem;">
 
-  <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 15px; box-sizing: border-box;">
-    <h1 id="welcomeStoreName" style="font-size: 2.2rem; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
-    <p style="font-size: 0.95rem; opacity: 0.9; margin: 0 0 20px 0;">Selamat Datang di Toko Kami</p>
-    <button id="welcomeInstallBtn" onclick="triggerInstallPWA()" style="background: white; color: #2563eb; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">📲 Install Aplikasi KasirQuh</button>
-    <button onclick="bukaLoginDariWelcome()" style="position: absolute; bottom: 15px; left: 15px; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.6); padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">Masuk / Daftar</button>
-  </div>
-
   <div id="customerLoginModal" class="login-overlay" style="display: none;">
     <div class="login-card" style="max-height: 90vh; overflow-y: auto; padding: 16px;">
       <h2 style="margin-top: 0; margin-bottom: 4px; font-size: 1.3rem;">KasirQuh</h2>
@@ -2049,6 +2042,13 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
           <button type="submit" style="margin-top: 6px; border-radius: 6px; padding: 10px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;">Kirim Pendaftaran</button>
         </form>
         <p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Sudah punya akun? <a href="javascript:void(0)" onclick="gantiFormAuth('login')" style="color: #2563eb; font-weight: bold;">Masuk di sini</a></p>
+      </div>
+
+      <!-- CARD INSTALL PWA DI BAWAH LOGIN/DAFTAR -->
+      <div id="card-install-pwa-login" style="display:none; margin-top:10px; padding:12px; border-radius:14px; background:var(--card-bg); border:1px solid #2563eb; box-shadow:0 4px 14px rgba(0,0,0,.12);">
+        <div style="font-size:0.9rem; font-weight:800; color:#2563eb; margin-bottom:4px;">📲 Install KasirQuh</div>
+        <div style="font-size:0.72rem; color:var(--text-muted); line-height:1.4; margin-bottom:9px;">Pasang KasirQuh di layar utama HP agar lebih mudah dibuka kapan saja.</div>
+        <button type="button" onclick="triggerInstallPWA()" style="width:100%; padding:9px; border:none; border-radius:10px; background:#2563eb; color:white; font-weight:800; font-size:0.8rem; cursor:pointer;">📲 INSTALL APLIKASI</button>
       </div>
     </div>
   </div>
@@ -2439,10 +2439,10 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
 
   <script>
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log(err)); }); }
-    let deferredPrompt; const welcomeScreen = document.getElementById('welcomeScreen'); const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (isStandalone && welcomeScreen) welcomeScreen.style.display = 'none';
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const cardInstall = document.getElementById('card-install-pwa'); if (cardInstall) cardInstall.style.display = 'block'; });
-    async function triggerInstallPWA() { if (!deferredPrompt) return alert("Bisa install lewat menu Chrome."); deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') tutupWelcomeScreen(); deferredPrompt = null; document.getElementById('card-install-pwa').style.display = 'none'; }
+    let deferredPrompt; const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    if (isStandalone) { const cardInstallLogin = document.getElementById('card-install-pwa-login'); if (cardInstallLogin) cardInstallLogin.style.display = 'none'; }
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const cardInstallLogin = document.getElementById('card-install-pwa-login'); if (cardInstallLogin) cardInstallLogin.style.display = 'block'; });
+    async function triggerInstallPWA() { if (!deferredPrompt) return alert("Bisa install lewat menu Chrome."); deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; deferredPrompt = null; const cardInstallLogin = document.getElementById('card-install-pwa-login'); if (cardInstallLogin) cardInstallLogin.style.display = 'none'; }
     function tutupWelcomeScreen() {
       // Tutup secara langsung dan ambil elemen terbaru agar tidak terpengaruh cache/urutan inisialisasi.
       const screen = document.getElementById('welcomeScreen');
@@ -2453,7 +2453,6 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       document.body.classList.remove('fab-auth-hidden');
       if (typeof updateFabAuthVisibility === 'function') updateFabAuthVisibility();
     }
-    function bukaLoginDariWelcome() { tutupWelcomeScreen(); if (!currentCustomerPhone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
 
     let isAiSoundOn = true; let aiRecognition = null; let isAiListening = false;
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -4741,21 +4740,6 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     };
   })();
 </script>
-
-<script id="kasirquh-visual4-customer-entry">
-(function(){
-  if(!/[?&]openLogin=1(?:&|$)/.test(location.search))return;
-  function openLogin(){
-    const welcome=document.getElementById('welcomeScreen');
-    const login=document.getElementById('customerLoginModal');
-    if(welcome){welcome.style.setProperty('opacity','0','important');welcome.style.setProperty('pointer-events','none','important');welcome.style.setProperty('display','none','important');}
-    if(login){login.style.display='flex';if(typeof gantiFormAuth==='function')gantiFormAuth('login');setTimeout(()=>document.getElementById('cust-login-phone')?.focus(),80);}
-    try{history.replaceState({},document.title,location.pathname);}catch(e){}
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',openLogin,{once:true});else openLogin();
-})();
-</script>
-
 </body>
 \n<style id="kq-no3-no4-exact-rail-final">\n/* FINAL: No.3 & No.4 mengikuti RAIL GEOMETRY No.2 (Stok Rumah).\n   Header/Bottom Navbar tidak disentuh. */\n#recipe-section-wrapper, #trending-section-wrapper {\n  box-sizing: border-box !important;\n  overflow: visible !important;\n}\n#recipe-section-wrapper > div:first-child,\n#trending-section-wrapper > div:first-child {\n  box-sizing: border-box !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n}\n#recipe-scroll-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n  padding-top: 2px !important;\n  padding-bottom: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: hidden !important;\n  scrollbar-width: none !important;\n}\n#trending-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 4px !important;\n  padding-right: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: visible !important;\n  scrollbar-width: none !important;\n}\n#trending-container .auto-scroll-track {\n  box-sizing: border-box !important;\n  padding-left: 10px !important;\n  padding-right: 10px !important;\n  padding-top: 4px !important;\n  padding-bottom: 6px !important;\n}\n#recipe-scroll-container > *,\n#trending-container > *,\n#trending-container .auto-scroll-track > * {\n  flex-shrink: 0 !important;\n}\n@media (max-width: 699px) {\n  /* Samakan OUTER WRAPPER dengan No.2: full viewport.\n     Rail kartu tetap 14px dari viewport: No.2 = 4px + 10px. */\n  #recipe-section-wrapper, #trending-section-wrapper {\n    width: 100vw !important;\n    max-width: 100vw !important;\n    margin-left: calc(50% - 50vw) !important;\n    margin-right: calc(50% - 50vw) !important;\n    box-sizing: border-box !important;\n  }\n}\n</style>\n
 
