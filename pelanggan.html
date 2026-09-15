@@ -3579,19 +3579,9 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       });
       db.collection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
-        window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
         isTrendingConfigLoaded = true;
         muatBarangLarisHariIni();
-      });
-      // Listener pengaturan "Stok Rumah Habis" dari Admin > Beranda Pelanggan.
-      // Jumlah kartu mengikuti konfigurasi Firebase yang disimpan Admin.
-      db.collection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
-        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
-        window.__stokRumahConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
-        renderQuickReorder(lastFetchedOrders || []);
-      }, (err) => {
-        console.warn("Listener pengaturan Stok Rumah gagal:", err);
-        renderQuickReorder(lastFetchedOrders || []);
       });
 
       // Listener transaksi untuk "Sedang Laris".
@@ -3734,7 +3724,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       const cfg = window.__sedangLarisConfig || {enabled:true, limit:5};
       if (cfg.enabled === false) { renderTrending([]); return; }
 
-      const limit = Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5));
+      const limit = Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5));
       const token = ++trendingLoadToken;
 
       try {
@@ -4325,9 +4315,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       let renderedCount = 0; let itemsHtml = ""; 
       recentCodes.forEach(code => { 
         let p = databaseProduk[code]; 
-        const stokRumahCfg = window.__stokRumahConfig || {enabled:true, limit:5};
-        const stokRumahLimit = Math.min(20, Math.max(1, parseInt(stokRumahCfg.limit,10) || 5));
-        if(stokRumahCfg.enabled !== false && p && (p.stok || 0) > 0 && renderedCount < stokRumahLimit) { 
+        if(p && (p.stok || 0) > 0 && renderedCount < 5) { 
           let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>"; 
           let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs"); 
           let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); 
@@ -4753,6 +4741,21 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     };
   })();
 </script>
+
+<script id="kasirquh-visual4-customer-entry">
+(function(){
+  if(!/[?&]openLogin=1(?:&|$)/.test(location.search))return;
+  function openLogin(){
+    const welcome=document.getElementById('welcomeScreen');
+    const login=document.getElementById('customerLoginModal');
+    if(welcome){welcome.style.setProperty('opacity','0','important');welcome.style.setProperty('pointer-events','none','important');welcome.style.setProperty('display','none','important');}
+    if(login){login.style.display='flex';if(typeof gantiFormAuth==='function')gantiFormAuth('login');setTimeout(()=>document.getElementById('cust-login-phone')?.focus(),80);}
+    try{history.replaceState({},document.title,location.pathname);}catch(e){}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',openLogin,{once:true});else openLogin();
+})();
+</script>
+
 </body>
 \n<style id="kq-no3-no4-exact-rail-final">\n/* FINAL: No.3 & No.4 mengikuti RAIL GEOMETRY No.2 (Stok Rumah).\n   Header/Bottom Navbar tidak disentuh. */\n#recipe-section-wrapper, #trending-section-wrapper {\n  box-sizing: border-box !important;\n  overflow: visible !important;\n}\n#recipe-section-wrapper > div:first-child,\n#trending-section-wrapper > div:first-child {\n  box-sizing: border-box !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n}\n#recipe-scroll-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n  padding-top: 2px !important;\n  padding-bottom: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: hidden !important;\n  scrollbar-width: none !important;\n}\n#trending-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 4px !important;\n  padding-right: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: visible !important;\n  scrollbar-width: none !important;\n}\n#trending-container .auto-scroll-track {\n  box-sizing: border-box !important;\n  padding-left: 10px !important;\n  padding-right: 10px !important;\n  padding-top: 4px !important;\n  padding-bottom: 6px !important;\n}\n#recipe-scroll-container > *,\n#trending-container > *,\n#trending-container .auto-scroll-track > * {\n  flex-shrink: 0 !important;\n}\n@media (max-width: 699px) {\n  /* Samakan OUTER WRAPPER dengan No.2: full viewport.\n     Rail kartu tetap 14px dari viewport: No.2 = 4px + 10px. */\n  #recipe-section-wrapper, #trending-section-wrapper {\n    width: 100vw !important;\n    max-width: 100vw !important;\n    margin-left: calc(50% - 50vw) !important;\n    margin-right: calc(50% - 50vw) !important;\n    box-sizing: border-box !important;\n  }\n}\n</style>\n
 
