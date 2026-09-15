@@ -727,11 +727,19 @@
 
       <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
         <div style="font-weight:800;">🏠 Stok Rumah Habis</div>
-        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan stok barang.</div>
-        <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
-          <span>Tampilkan</span>
-          <input type="checkbox" id="admin-home-stock-toggle" checked>
-        </label>
+        <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Tampilkan produk yang pernah dibeli dan stoknya masih tersedia.</div>
+        <button type="button" onclick="toggleAdminStokRumah()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-stok-rumah-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-home-stock-toggle">
+          </label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;">
+            <span>Jumlah produk</span><input type="number" id="admin-stock-rumah-limit" min="1" max="10" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
+          </label>
+          <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Urutan mengikuti produk dari riwayat pembelian pelanggan, dengan stok yang masih tersedia.</div>
+          <button type="button" onclick="simpanPengaturanStokRumah()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Stok Rumah</button>
+          <div id="admin-stock-rumah-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
       </div>
 
 <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
@@ -943,6 +951,29 @@ async function simpanPengaturanHomeInfo() {
   localStorage.setItem('admin_home_info_v1',JSON.stringify(cfg));
   try { await db.collection('pengaturan').doc('beranda_pelanggan_home').set(cfg,{merge:true}); const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='✓ Info toko & running text tersimpan dan siap tampil di pelanggan.'; }
   catch(err) { const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.'; }
+}
+function getAdminStokRumahConfig() {
+  try {
+    const c=JSON.parse(localStorage.getItem('admin_stok_rumah_v1') || '{}');
+    return {enabled:c.enabled !== false, limit:Math.min(10,Math.max(1,parseInt(c.limit,10)||5))};
+  } catch(e) { return {enabled:true,limit:5}; }
+}
+function toggleAdminStokRumah() {
+  const panel=document.getElementById('admin-stok-rumah-panel'); if(!panel) return;
+  const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
+  if(!open){ const c=getAdminStokRumahConfig(); document.getElementById('admin-home-stock-toggle').checked=c.enabled; document.getElementById('admin-stock-rumah-limit').value=c.limit; }
+}
+async function simpanPengaturanStokRumah() {
+  const enabled=document.getElementById('admin-home-stock-toggle')?.checked!==false;
+  const limit=Math.min(10,Math.max(1,parseInt(document.getElementById('admin-stock-rumah-limit')?.value,10)||5));
+  const cfg={enabled,limit,updatedAt:Date.now()};
+  localStorage.setItem('admin_stok_rumah_v1',JSON.stringify(cfg));
+  try {
+    await db.collection('pengaturan').doc('beranda_pelanggan_stok_rumah').set(cfg,{merge:true});
+    const st=document.getElementById('admin-stock-rumah-status'); if(st) st.textContent='✓ Stok Rumah tersimpan dan siap tampil di pelanggan.';
+  } catch(err) {
+    const st=document.getElementById('admin-stock-rumah-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
+  }
 }
 function getAdminIdeMasakConfig() {
   try {
