@@ -2290,6 +2290,11 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
         </div>
       </div>
 
+      <div class="card" style="border: 1px solid #f59e0b; background-color: #fffbeb; padding: 12px; margin-bottom: 8px;">
+        <h3 style="color: #b45309; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembersih Data Situs</h3>
+        <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Menghapus cookie yang bisa diakses aplikasi, penyimpanan lokal, database situs, cache, dan pendaftaran service worker untuk situs ini. Anda mungkin perlu masuk kembali.</p>
+        <button onclick="hapusDataSitusPelanggan()" style="background: #b45309; color: white; padding: 8px; font-weight: bold; border-radius: 6px; width: 100%; border: none; cursor: pointer; font-size: 0.8rem;">🧹 Hapus Cookie & Data Situs</button>
+      </div>
       <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5; padding: 12px; margin-bottom: 8px;">
         <h3 style="color: #dc2626; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembaruan Sistem & Cache</h3>
         <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Gunakan tombol ini jika aplikasi tersangkut versi lama.</p>
@@ -4311,6 +4316,42 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
+    async function hapusDataSitusPelanggan() {
+      const ok = confirm("Hapus cookie & seluruh data situs aplikasi ini?\n\nYang akan dibersihkan: cookie yang dapat diakses JavaScript, localStorage, sessionStorage, IndexedDB, Cache Storage, dan service worker. Anda mungkin perlu masuk kembali.\n\nLanjutkan?");
+      if (!ok) return;
+      try {
+        // Cookie yang dapat diakses JavaScript pada domain/path ini. Cookie HttpOnly tidak dapat dihapus oleh halaman web.
+        const cookies = document.cookie ? document.cookie.split(";") : [];
+        cookies.forEach(cookie => {
+          const eq = cookie.indexOf("=");
+          const name = (eq >= 0 ? cookie.slice(0, eq) : cookie).trim();
+          if (!name) return;
+          document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; path=/";
+          document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; path=" + location.pathname;
+        });
+        try { localStorage.clear(); } catch (_) {}
+        try { sessionStorage.clear(); } catch (_) {}
+        if (window.indexedDB) {
+          if (indexedDB.databases) {
+            const dbs = await indexedDB.databases();
+            await Promise.all((dbs || []).map(db => db.name ? new Promise(resolve => { const req = indexedDB.deleteDatabase(db.name); req.onsuccess = req.onerror = req.onblocked = () => resolve(); }) : Promise.resolve()));
+          }
+        }
+        if (window.caches) {
+          const names = await caches.keys();
+          await Promise.all(names.map(name => caches.delete(name)));
+        }
+        if (navigator.serviceWorker) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map(r => r.unregister()));
+        }
+      } catch (err) {
+        console.warn("Pembersihan data situs tidak sepenuhnya berhasil:", err);
+      } finally {
+        // Beri browser sedikit waktu menyelesaikan penghapusan sebelum memuat ulang.
+        setTimeout(() => window.location.reload(), 350);
+      }
+    }
   </script>
 
 <script id="smooth-transisi-home-kategori-js-final">
