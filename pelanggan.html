@@ -2281,6 +2281,14 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       </div>
 
       <div id="developer-options-panel" style="display: none;">
+      <div class="card" style="border: 1px solid var(--border-color); background: var(--card-bg); padding: 12px; margin-bottom: 8px;">
+        <h3 style="color: var(--text-color); margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">🎞️ Animasi Navigasi</h3>
+        <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Matikan jika perpindahan Dashboard/Pengaturan terasa berat atau tersendat. Animasi kecil tombol dan FAB tetap berjalan.</p>
+        <label style="display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer; font-size:0.78rem;">
+          <span id="developer-animation-status">Animasi navigasi: ON</span>
+          <input id="developer-animation-toggle" type="checkbox" checked onchange="toggleAnimasiNavigasiDeveloper(this.checked)" style="width:20px; height:20px; accent-color:#2563eb; cursor:pointer;">
+        </label>
+      </div>
       <div class="card" style="border: 1px solid #f59e0b; background-color: #fffbeb; padding: 12px; margin-bottom: 8px;">
         <h3 style="color: #b45309; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembersih Data Situs</h3>
         <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Menghapus cookie yang bisa diakses aplikasi, penyimpanan lokal, database situs, cache, dan pendaftaran service worker untuk situs ini. Anda mungkin perlu masuk kembali.</p>
@@ -3232,8 +3240,8 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
 
     function pilihKategoriPelanggan(kategori) {
       const wasHome = activeKategoriPelanggan === 'Home';
-      if (wasHome && kategori !== 'Home' && window.smoothHomeToCategory) window.smoothHomeToCategory();
-      if (!wasHome && kategori === 'Home' && window.smoothCategoryToHome) window.smoothCategoryToHome();
+      if (wasHome && kategori !== 'Home' && animasiNavigasiDeveloperAktif() && window.smoothHomeToCategory) window.smoothHomeToCategory();
+      if (!wasHome && kategori === 'Home' && animasiNavigasiDeveloperAktif() && window.smoothCategoryToHome) window.smoothCategoryToHome();
       if (!appNavRestoring) appPushState({ category:kategori, search:false, modal:null });
       if (wasHome && kategori !== 'Home') setHomeFeatureTransition(false);
       activeKategoriPelanggan = kategori;
@@ -3564,6 +3572,23 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       const catalog = document.querySelector('.home-catalog-transition');
       if (homeFeatureTransitionTimer) clearTimeout(homeFeatureTransitionTimer);
 
+      if (!animasiNavigasiDeveloperAktif()) {
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.classList.remove('home-feature-closing');
+          el.style.maxHeight = '';
+          el.style.opacity = '';
+          el.style.transform = '';
+          el.style.display = showHome ? 'block' : 'none';
+        });
+        if (catalog) {
+          catalog.classList.remove('catalog-lifting');
+          catalog.classList.add('home-catalog-transition');
+        }
+        return;
+      }
+
       ids.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -3625,7 +3650,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       document.querySelectorAll('.tab-content').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
       const activeEl = document.getElementById(tabId); if (activeEl) { activeEl.classList.add('active'); activeEl.style.display = tabId === 'live-chat' ? 'flex' : 'block'; }
       if (tabId === 'live-chat') { unreadRumpiCust = 0; document.getElementById("badge-rumpi-subtab").style.display = "none"; document.getElementById("badge-livechat-cust").style.display = "none"; }
-      if (tabId === 'belanja' && activeKategoriPelanggan === 'Home') setTimeout(() => setHomeFeatureTransition(true), 20);
+      if (tabId === 'belanja' && activeKategoriPelanggan === 'Home') { if (animasiNavigasiDeveloperAktif()) setTimeout(() => setHomeFeatureTransition(true), 20); else setHomeFeatureTransition(true); }
       document.querySelectorAll('.popup-menu-btn').forEach(btn => btn.classList.remove('active-menu'));
       const activeBtnMap = { 'belanja': 'pop-btn-belanja', 'data-pelanggan': 'pop-btn-datapelanggan', 'live-chat': 'pop-btn-livechat', 'pengaturan': 'pop-btn-pengaturan' };
       if (activeBtnMap[tabId]) { document.getElementById(activeBtnMap[tabId])?.classList.add('active-menu'); }
@@ -4323,6 +4348,24 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       btn.setAttribute('aria-expanded', String(akanBuka));
       btn.innerHTML = akanBuka ? '🛠️ Tutup Opsi Developer' : '🛠️ Opsi Developer';
     }
+
+    function animasiNavigasiDeveloperAktif() {
+      return localStorage.getItem('cust_dev_nav_animation_v1') !== 'off';
+    }
+
+    function syncAnimasiNavigasiDeveloper() {
+      const toggle = document.getElementById('developer-animation-toggle');
+      const status = document.getElementById('developer-animation-status');
+      const aktif = animasiNavigasiDeveloperAktif();
+      if (toggle) toggle.checked = aktif;
+      if (status) status.textContent = aktif ? 'Animasi navigasi: ON' : 'Animasi navigasi: OFF';
+    }
+
+    function toggleAnimasiNavigasiDeveloper(aktif) {
+      localStorage.setItem('cust_dev_nav_animation_v1', aktif ? 'on' : 'off');
+      syncAnimasiNavigasiDeveloper();
+    }
+    syncAnimasiNavigasiDeveloper();
 
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
     async function hapusDataSitusPelanggan() {
