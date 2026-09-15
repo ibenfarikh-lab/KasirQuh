@@ -4477,8 +4477,8 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
 
 
 <script id="kq-back-to-top-script">
-  // Tombol di navbar bawah: paksa kembali ke paling atas dari SEMUA kandidat
-  // scroll container. Tidak mengubah lazy rendering/infinite scroll.
+  // Tombol navbar bawah: kembali ke atas dengan gerakan SMOOTH.
+  // Tidak mengubah lazy rendering / infinite scroll.
   function kembaliKeAtasKatalog() {
     const targets = new Set();
     const addTarget = (el) => { if (el) targets.add(el); };
@@ -4491,35 +4491,23 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     addTarget(document.getElementById('pos-card-wrapper'));
     addTarget(document.getElementById('pos-catalog-container'));
 
-    // Tangkap container vertikal yang benar-benar sedang memiliki scroll.
-    // Ini membuat tombol tetap bekerja walaupun browser/PWA memindahkan
-    // scrolling dari window ke elemen tertentu.
+    // Cari container yang benar-benar sedang bergulir.
     document.querySelectorAll('*').forEach((el) => {
       try {
         if (el.scrollHeight > el.clientHeight + 2 && el.scrollTop > 0) addTarget(el);
       } catch (e) {}
     });
 
-    // Set langsung ke 0 terlebih dahulu agar klik berkali-kali tidak pernah
-    // tertahan oleh smooth-scroll yang masih berjalan.
+    // Gunakan native smooth scrolling, bukan loncat langsung ke 0.
     targets.forEach((el) => {
-      try { el.scrollTop = 0; } catch (e) {}
-      try { el.scrollLeft = 0; } catch (e) {}
-      try { el.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (e) {}
+      try { el.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); } catch (e) {
+        try { el.scrollTop = 0; } catch (e2) {}
+      }
     });
 
-    try { window.scrollTo(0, 0); } catch (e) {}
-    try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (e) {}
-
-    // Satu frame tambahan untuk browser Android/PWA yang masih menyelesaikan
-    // gesture scroll saat tombol ditekan.
-    requestAnimationFrame(() => {
-      targets.forEach((el) => {
-        try { el.scrollTop = 0; } catch (e) {}
-        try { el.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch (e) {}
-      });
-      try { window.scrollTo(0, 0); } catch (e) {}
-    });
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); } catch (e) {
+      try { window.scrollTo(0, 0); } catch (e2) {}
+    }
   }
 </script>
 </body>
