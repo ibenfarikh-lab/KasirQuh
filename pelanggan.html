@@ -2280,6 +2280,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
         </div>
       </div>
 
+      <div id="developer-options-panel" style="display: none;">
       <div class="card" style="border: 1px solid #f59e0b; background-color: #fffbeb; padding: 12px; margin-bottom: 8px;">
         <h3 style="color: #b45309; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembersih Data Situs</h3>
         <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Menghapus cookie yang bisa diakses aplikasi, penyimpanan lokal, database situs, cache, dan pendaftaran service worker untuk situs ini. Anda mungkin perlu masuk kembali.</p>
@@ -2289,6 +2290,10 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
         <h3 style="color: #dc2626; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembaruan Sistem & Cache</h3>
         <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Gunakan tombol ini jika aplikasi tersangkut versi lama.</p>
         <button onclick="bersihkanCacheTotal()" style="background: #dc2626; color: white; padding: 8px; font-weight: bold; border-radius: 6px; width: 100%; border: none; cursor: pointer; font-size: 0.8rem;">🧹 Bersihkan Cache & Muat Ulang</button>
+      </div>
+      </div>
+      <div class="card" style="padding: 10px; margin-bottom: 8px; border: 1px dashed var(--border-color); background: var(--card-bg);">
+        <button id="Opsi Developer" type="button" onclick="toggleOpsiDeveloper()" aria-expanded="false" style="width: 100%; background: transparent; color: var(--text-muted); border: none; padding: 6px; font-size: 0.72rem; cursor: pointer;">🛠️ Opsi Developer</button>
       </div>
       <div class="card" style="padding: 12px;"><h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Sesi Aplikasi</h3><button class="btn-logout" onclick="logoutPelanggan()" style="background: #dc2626; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 0.8rem;">🚪 Keluar / Ganti Akun</button></div>
       <div class="customer-developer-footer" aria-label="Developer">Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)</div>
@@ -4309,6 +4314,16 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     function simpanProfilPelanggan() { const nama = document.getElementById("setting-cust-name").value.trim(); const alamat = document.getElementById("setting-cust-address").value.trim(); if (!nama) return alert("Nama wajib diisi!"); db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => { if (!snap.empty) { db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!")).catch(err => alert("Gagal memperbarui: " + err.message)); } }).catch(err => alert("Terjadi kesalahan: " + err.message)); }
     async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
+    function toggleOpsiDeveloper() {
+      const panel = document.getElementById('developer-options-panel');
+      const btn = document.getElementById('Opsi Developer');
+      if (!panel || !btn) return;
+      const akanBuka = panel.style.display === 'none' || !panel.style.display;
+      panel.style.display = akanBuka ? 'block' : 'none';
+      btn.setAttribute('aria-expanded', String(akanBuka));
+      btn.innerHTML = akanBuka ? '🛠️ Tutup Opsi Developer' : '🛠️ Opsi Developer';
+    }
+
     function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
     async function hapusDataSitusPelanggan() {
       const ok = confirm("Hapus cookie & seluruh data situs aplikasi ini?\n\nYang akan dibersihkan: cookie yang dapat diakses JavaScript, localStorage, sessionStorage, IndexedDB, Cache Storage, dan service worker. Anda mungkin perlu masuk kembali.\n\nLanjutkan?");
@@ -4484,7 +4499,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
   #scroll-helper-fab {
     position: fixed !important;
     right: 10px !important;
-    bottom: 228px !important;
+    bottom: 300px !important;
     width: 44px !important;
     height: 44px !important;
     padding: 0 !important;
@@ -4500,7 +4515,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    z-index: 320 !important;
+    z-index: 1001 !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
@@ -4532,7 +4547,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     pointer-events: none !important;
   }
   @media (max-width: 480px) {
-    #scroll-helper-fab { right: 10px !important; bottom: 228px !important; width: 42px !important; height: 42px !important; }
+    #scroll-helper-fab { right: 10px !important; bottom: 300px !important; width: 42px !important; height: 42px !important; }
     #scroll-helper-fab svg { width: 19px !important; height: 19px !important; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -4547,6 +4562,19 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
   (function () {
     const fab = document.getElementById('scroll-helper-fab');
     if (!fab) return;
+
+    // Selalu posisikan helper DI ATAS seluruh stack FAB (Asisten/Pencarian/Keranjang).
+    // Tidak bergantung pada tebakan jarak, jadi tidak bisa ketiban FAB pencarian.
+    function positionAboveFabStack() {
+      const stack = document.querySelector('.fab-container');
+      if (!stack) return;
+      try {
+        const r = stack.getBoundingClientRect();
+        const gap = 12;
+        const bottom = Math.max(90, window.innerHeight - r.top + gap);
+        fab.style.setProperty('bottom', bottom + 'px', 'important');
+      } catch (e) {}
+    }
 
     let ticking = false;
     const threshold = () => Math.max(650, window.innerHeight * 2.05);
@@ -4585,7 +4613,8 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     }
 
     window.addEventListener('scroll', scheduleUpdate, { passive: true, capture: true });
-    window.addEventListener('resize', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', () => { positionAboveFabStack(); scheduleUpdate(); }, { passive: true });
+    positionAboveFabStack();
     document.addEventListener('scroll', scheduleUpdate, { passive: true, capture: true });
     scheduleUpdate();
 
