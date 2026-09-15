@@ -331,7 +331,7 @@
     /* Tombol kembali ke atas katalog: selalu berada tepat di atas FAB Asisten. */
     #fab-back-to-top {
     width: 40px; height: 40px; border: none; background: transparent; color: inherit;
-    display: none; align-items: center; justify-content: center; padding: 0; margin: 0;
+    display: flex; align-items: center; justify-content: center; padding: 0; margin: 0;
     cursor: pointer; font-size: 28px; line-height: 1; flex: 0 0 40px;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.28));
     transition: opacity .2s ease, transform .2s ease;
@@ -4492,7 +4492,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
   function updateFabBackToTop() {
     const btn = document.getElementById('fab-back-to-top');
     if (!btn) return;
-    const visible = window.scrollY > Math.max(450, window.innerHeight * 1.25);
+    const visible = window.scrollY > Math.max(450, window.innerHeight * 1.75);
     btn.classList.toggle('is-visible', visible);
   }
 
