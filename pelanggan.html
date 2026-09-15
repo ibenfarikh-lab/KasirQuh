@@ -2057,7 +2057,7 @@ body[data-theme="modern"] main {
       <div class="pos-container" style="gap: 0;">
         <div id="catalog-category-title" class="catalog-category-title" aria-live="polite"></div>
         <div id="pos-card-wrapper" class="card no-print" style="margin-bottom: 0; display: none; padding: 0 6px 4px 6px; background: transparent; border: none; box-shadow: none;">
-          <div id="pos-catalog-container"></div>
+          <div id="pos-catalog-container"></div><div id="catalog-load-sentinel" aria-hidden="true" style="height:1px;width:100%;"></div>
         </div>
       </div>
 
@@ -3365,14 +3365,6 @@ body[data-theme="modern"] main {
             refreshKatalogPelanggan();
 
             showToast("Berhasil Masuk! Selamat Berbelanja 🛒");
-
-            // FIX LOGIN LAYOUT: setelah login berhasil, lakukan refresh halaman SATU KALI.
-            // Flag hanya dipakai untuk menandai refresh akibat login, sehingga tidak loop.
-            localStorage.setItem('kasirquh_refresh_after_login_once', '1');
-            setTimeout(() => {
-              window.location.reload();
-            }, 150);
-
             periksaCheckinHarian();
             tampilkanKoinDiProfil();
             renderRecipeCards();
@@ -3862,7 +3854,11 @@ body[data-theme="modern"] main {
       let paginatedItems = matchedProducts.slice(0, catalogVisibleCount);
       container.innerHTML = "";
 
-      if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; document.getElementById("pos-page-indicator").innerText = `1/1`; return; }
+      const loadSentinel = document.getElementById('catalog-load-sentinel');
+      cardWrapper.dataset.catalogTotal = String(matchedProducts.length);
+      if (loadSentinel) loadSentinel.style.display = (catalogVisibleCount < matchedProducts.length) ? 'block' : 'none';
+
+      if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; document.getElementById("pos-page-indicator").innerText = `1/1`; if (loadSentinel) loadSentinel.style.display='none'; return; }
 
       paginatedItems.forEach(p => {
         let code = p.code; let isHabis = (p.stok || 0) <= 0;
@@ -3940,35 +3936,19 @@ body[data-theme="modern"] main {
       refreshKatalogPelanggan();
     }
 
-    // TAHAP 2: infinite scroll katalog. Setiap mendekati ujung katalog,
-    // tambahkan 6 card berikutnya. Ini hanya mengatur card yang DITAMPILKAN;
-    // databaseProduk/dashboard tetap tidak dibatasi.
+    // TAHAP 2: lazy rendering + infinite scroll.
+    // DatabaseProduk tetap penuh. Sentinel dipakai agar tidak bergantung
+    // pada window.scroll atau jenis container scroll yang dipakai halaman.
     let catalogScrollLoading = false;
-    function handleCatalogInfiniteScroll() {
+    let catalogLoadObserver = null;
+
+    function loadNextCatalogBatch() {
       if (catalogScrollLoading) return;
       const wrapper = document.getElementById('pos-card-wrapper');
       if (!wrapper || wrapper.style.display === 'none') return;
 
-      const remaining = document.querySelectorAll('#pos-catalog-container > *').length;
-      const indicator = document.getElementById('pos-page-indicator');
-      if (!indicator) return;
-      const parts = indicator.textContent.match(/\/\s*(\d+)/);
-      const total = parts ? parseInt(parts[1], 10) : 0;
+      const total = parseInt(wrapper.dataset.catalogTotal || '0', 10);
       if (!total || catalogVisibleCount >= total) return;
-
-      // Gunakan tinggi dokumen sebagai patokan utama. Katalog berada di alur
-      // halaman dashboard, jadi scroll browser/body adalah scroll yang harus
-      // memicu pemuatan batch berikutnya. Jangan bergantung pada posisi
-      // bounding rect wrapper karena header/section lain dapat memengaruhi
-      // perhitungannya.
-      const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
-      const viewportBottom = scrollTop + window.innerHeight;
-      const documentHeight = Math.max(
-        document.documentElement.scrollHeight,
-        document.body.scrollHeight
-      );
-      const nearBottom = viewportBottom >= documentHeight - 450;
-      if (!nearBottom) return;
 
       catalogScrollLoading = true;
       catalogVisibleCount = Math.min(catalogVisibleCount + CATALOG_INITIAL_VISIBLE, total);
@@ -3976,7 +3956,32 @@ body[data-theme="modern"] main {
       requestAnimationFrame(() => { catalogScrollLoading = false; });
     }
 
+    function setupCatalogInfiniteScroll() {
+      const sentinel = document.getElementById('catalog-load-sentinel');
+      if (!sentinel || !('IntersectionObserver' in window)) return;
+      if (catalogLoadObserver) catalogLoadObserver.disconnect();
+
+      catalogLoadObserver = new IntersectionObserver((entries) => {
+        if (entries.some(entry => entry.isIntersecting)) loadNextCatalogBatch();
+      }, { root: null, rootMargin: '500px 0px 500px 0px', threshold: 0 });
+      catalogLoadObserver.observe(sentinel);
+    }
+
+    // Fallback tambahan untuk browser/scroll container yang tidak memicu
+    // observer secara konsisten. Capture=true menangkap scroll dari elemen anak.
+    function handleCatalogInfiniteScroll() {
+      if (catalogScrollLoading) return;
+      const sentinel = document.getElementById('catalog-load-sentinel');
+      if (!sentinel || sentinel.style.display === 'none') return;
+      const rect = sentinel.getBoundingClientRect();
+      if (rect.top <= window.innerHeight + 500) loadNextCatalogBatch();
+    }
+
     window.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true });
+    document.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true, capture: true });
+    window.addEventListener('resize', handleCatalogInfiniteScroll, { passive: true });
+    window.addEventListener('load', setupCatalogInfiniteScroll, { once: true });
+    setTimeout(setupCatalogInfiniteScroll, 0);
 
     function renderCartPelanggan() {
       const tbody = document.getElementById("cart-body"); tbody.innerHTML = ""; let total = 0, totalQty = 0;
