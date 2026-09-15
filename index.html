@@ -45,7 +45,7 @@
 
   <!-- PWA Configuration -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#06132d">
   <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 
@@ -2308,6 +2308,80 @@ function scrollKePengaturanBerandaPelanggan() {
   </script>
 
 
+
+<!-- KASIRQUH FUTURISTIC PWA OPENING -->
+<style>
+#kasirquhPwaOpening{
+  position:fixed; inset:0; z-index:2147483647;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; background:#06132d;
+  opacity:1; visibility:visible;
+  transition:opacity .65s ease, visibility .65s ease;
+}
+#kasirquhPwaOpening.hide{opacity:0;visibility:hidden;pointer-events:none}
+#kasirquhPwaOpening .kpo-grid{
+  position:absolute; inset:-20%; opacity:.22;
+  background-image:linear-gradient(rgba(80,170,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(80,170,255,.12) 1px,transparent 1px);
+  background-size:42px 42px; transform:perspective(500px) rotateX(58deg) scale(1.35);
+  transform-origin:center bottom; animation:kpoGrid 5s linear infinite;
+}
+#kasirquhPwaOpening .kpo-glow{
+  position:absolute; width:78vmax; height:78vmax; border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,.38) 0%,rgba(14,165,233,.17) 28%,rgba(37,99,235,.06) 48%,transparent 70%);
+  filter:blur(10px); animation:kpoPulse 2.2s ease-in-out infinite;
+}
+#kasirquhPwaOpening .kpo-orbit{
+  position:absolute; width:230px; height:230px; border-radius:50%;
+  border:1px solid rgba(125,211,252,.22); box-shadow:0 0 35px rgba(37,99,235,.2),inset 0 0 35px rgba(14,165,233,.12);
+  animation:kpoOrbit 3.8s linear infinite;
+}
+#kasirquhPwaOpening .kpo-orbit:before,
+#kasirquhPwaOpening .kpo-orbit:after{
+  content:""; position:absolute; inset:17px; border-radius:50%; border:1px solid rgba(96,165,250,.13);
+}
+#kasirquhPwaOpening .kpo-orbit:after{inset:-17px;border-color:rgba(56,189,248,.10)}
+#kasirquhPwaOpening .kpo-logo{
+  position:relative; width:min(34vw,180px); height:min(34vw,180px); object-fit:contain;
+  filter:drop-shadow(0 0 10px rgba(59,130,246,.75)) drop-shadow(0 0 30px rgba(14,165,233,.48));
+  animation:kpoLogo 1.35s cubic-bezier(.2,.8,.2,1) both;
+}
+#kasirquhPwaOpening .kpo-shine{
+  position:absolute; width:230%; height:28%; left:-65%; top:36%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);
+  transform:rotate(-18deg); filter:blur(5px); animation:kpoShine 1.35s .35s ease-out both;
+}
+#kasirquhPwaOpening .kpo-text{
+  position:absolute; bottom:11%; left:0; right:0; text-align:center;
+  color:rgba(219,234,254,.92); font:700 12px/1.2 system-ui,sans-serif; letter-spacing:4px;
+  text-transform:uppercase; opacity:0; animation:kpoText .7s .55s ease-out forwards;
+}
+@keyframes kpoLogo{0%{transform:scale(.52);opacity:0}65%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes kpoPulse{0%,100%{transform:scale(.92);opacity:.72}50%{transform:scale(1.08);opacity:1}}
+@keyframes kpoOrbit{to{transform:rotate(360deg)}}
+@keyframes kpoShine{0%{transform:translateX(-70%) rotate(-18deg);opacity:0}25%{opacity:1}100%{transform:translateX(70%) rotate(-18deg);opacity:0}}
+@keyframes kpoGrid{to{background-position:0 42px,42px 0}}
+@keyframes kpoText{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#kasirquhPwaOpening *{animation:none!important}}
+</style>
+<div id="kasirquhPwaOpening" aria-hidden="true">
+  <div class="kpo-grid"></div>
+  <div class="kpo-glow"></div>
+  <div class="kpo-orbit"></div>
+  <div style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:min(34vw,180px);height:min(34vw,180px);border-radius:28%;">
+    <img class="kpo-logo" src="icon-512.png" alt="KasirQuh">
+    <div class="kpo-shine"></div>
+  </div>
+  <div class="kpo-text">KasirQuh</div>
+</div>
+<script>
+(function(){
+  const o=document.getElementById('kasirquhPwaOpening');
+  if(!o)return;
+  const close=()=>o.classList.add('hide');
+  window.addEventListener('load',()=>setTimeout(close,1050),{once:true});
+  setTimeout(close,1800);
+})();
+</script>
 
 <!-- KASIRQUH SLIDE 1-2-3 WELCOME PATCH -->
 <style id="kasirquh-slide123-patch">
