@@ -65,9 +65,11 @@ const translations = {
     save_account: "Simpan Akun",
     pref_appearance: "Preferensi Tampilan & Bahasa",
     theme_label: "Tema Tampilan:",
-    theme_light: "Terang (Light)",
-    theme_dark: "Gelap (Dark)",
-    theme_auto: "Sistem (Auto)",
+    theme_light: "Light",
+    theme_dark: "Dark",
+    theme_colorful: "Colorful v.1",
+    theme_colorful_v2: "Colorful v.2",
+    theme_auto: "Auto",
     catalog_view_mode: "Tampilan Katalog / Stok:",
     view_grid: "Kotak (Grid)",
     view_list: "Daftar (List)",
@@ -210,6 +212,8 @@ const translations = {
     theme_label: "Theme:",
     theme_light: "Light",
     theme_dark: "Dark",
+    theme_colorful: "Colorful v.1",
+    theme_colorful_v2: "Colorful v.2",
     theme_auto: "Auto (System)",
     catalog_view_mode: "Catalog / Stock View:",
     view_grid: "Grid",
@@ -353,6 +357,8 @@ const translations = {
     theme_label: "المظهر:",
     theme_light: "فاتح",
     theme_dark: "داكن",
+    theme_colorful: "ملون",
+    theme_colorful_v2: "ملون v.2 (ألوان صلبة)",
     theme_auto: "تلقائي (النظام)",
     catalog_view_mode: "عرض الكتالوج / المخزون:",
     view_grid: "شبكة",
@@ -431,7 +437,10 @@ const translations = {
 };
 
 let currentLang = localStorage.getItem('setting_lang_v13') || 'id';
-let currentTheme = localStorage.getItem('setting_theme_v13') || 'light';
+// Jika belum ada preferensi tema tersimpan (device baru / cache dibersihkan),
+// gunakan Colorful v.2 sebagai tema awal. Setelah admin memilih manual,
+// pilihan tersebut disimpan di localStorage seperti biasa.
+let currentTheme = localStorage.getItem('setting_theme_v13') || 'colorful-v2';
 
 function applyTranslations() {
   const lang = currentLang;
@@ -1181,10 +1190,17 @@ window.addEventListener('popstate', function(event) {
     return;
   }
 
+  // Jika Back menuju history halaman sebelumnya, tampilkan halaman tersebut.
+  // Ini membuat Dashboard -> A -> B kembali menjadi B -> A -> Dashboard.
+  // pushHistory=false agar Back tidak membuat history baru.
+  if (event.state && event.state.tab) {
+    switchTab(event.state.tab, false);
+    return;
+  }
+
   // Back terakhir di panel admin tidak logout.
-  // Biarkan Android/browser menangani Back sehingga aplikasi ditinggalkan
+  // Biarkan Android/browser menangani Back sehingga PWA bisa ditinggalkan
   // seperti minimize, sementara sesi login tetap tersimpan.
-  // Jangan hapus localStorage 'isLoggedIn'.
   return;
 });
 
@@ -1248,6 +1264,127 @@ function updateUnitLabel() {
   }
 }
 
+let selectedProductCategories = [];
+
+function normalizeProductCategories(value) {
+  if (Array.isArray(value)) return [...new Set(value.map(v => String(v || '').trim()).filter(Boolean))];
+  if (typeof value === 'string') return [...new Set(value.split(',').map(v => v.trim()).filter(Boolean))];
+  return [];
+}
+
+const STANDARD_PRODUCT_CATEGORIES = [
+  "Titipan Warga",
+  "Sembako",
+  "Minuman",
+  "Makanan",
+  "Snack",
+  "Bumbu",
+  "Perawatan",
+  "Kebutuhan Rumah",
+  "Lainnya"
+];
+
+function getAllProductCategories() {
+  const set = new Set(STANDARD_PRODUCT_CATEGORIES);
+  Object.values(databaseProduk || {}).forEach(p => {
+    normalizeProductCategories(p && p.kategori).forEach(k => set.add(k));
+  });
+  return Array.from(set).sort((a,b) => {
+    const ai = STANDARD_PRODUCT_CATEGORIES.indexOf(a);
+    const bi = STANDARD_PRODUCT_CATEGORIES.indexOf(b);
+    if (ai >= 0 && bi >= 0) return ai - bi;
+    if (ai >= 0) return -1;
+    if (bi >= 0) return 1;
+    return a.localeCompare(b, 'id');
+  });
+}
+
+function syncSelectedProductCategories() {
+  document.getElementById('db-category').value = JSON.stringify(selectedProductCategories);
+}
+
+function setSelectedProductCategories(value) {
+  selectedProductCategories = normalizeProductCategories(value);
+  syncSelectedProductCategories();
+  renderProductCategoryPicker();
+}
+
+function renderProductCategoryPicker() {
+  const chips = document.getElementById('db-category-chips');
+  const menu = document.getElementById('db-category-menu');
+  if (!chips || !menu) return;
+  chips.innerHTML = '';
+  if (!selectedProductCategories.length) {
+    chips.innerHTML = '<span style="color:var(--text-muted);font-size:.82rem;">Pilih kategori...</span>';
+  } else {
+    selectedProductCategories.forEach(cat => {
+      const chip = document.createElement('span');
+      chip.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;background:var(--primary-color,#2563eb);color:#fff;font-size:.76rem;';
+      chip.innerHTML = `${escapeHtml(cat)} <button type="button" style="border:0;background:transparent;color:inherit;cursor:pointer;font-weight:bold;padding:0;" aria-label="Hapus kategori">×</button>`;
+      chip.querySelector('button').onclick = (e) => { e.stopPropagation(); toggleProductCategory(cat); };
+      chips.appendChild(chip);
+    });
+  }
+  const cats = getAllProductCategories();
+  menu.innerHTML = '';
+  if (!cats.length) {
+    menu.innerHTML = '<div style="padding:8px;color:var(--text-muted);font-size:.8rem;">Belum ada kategori tersimpan.</div>';
+  } else {
+    cats.forEach(cat => {
+      const row = document.createElement('label');
+      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;cursor:pointer;font-size:.82rem;';
+      const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=selectedProductCategories.includes(cat);
+      cb.onchange = () => toggleProductCategory(cat, cb.checked);
+      row.appendChild(cb);
+      const text = document.createElement('span'); text.textContent=cat; row.appendChild(text);
+      menu.appendChild(row);
+    });
+  }
+  const add = document.createElement('div');
+  add.style.cssText='display:flex;gap:6px;padding:8px 4px 4px;border-top:1px solid var(--border-color);margin-top:6px;';
+  add.innerHTML='<input id="db-new-category" type="text" placeholder="Kategori baru..." style="flex:1;min-width:0;padding:7px;border:1px solid var(--input-border);border-radius:7px;background:var(--input-bg);color:var(--text-color);"><button type="button" style="padding:7px 9px;border:0;border-radius:7px;cursor:pointer;">＋</button>';
+  add.querySelector('button').onclick=(e)=>{e.stopPropagation(); addNewProductCategory();};
+  add.querySelector('input').onclick=(e)=>e.stopPropagation();
+  menu.appendChild(add);
+  syncSelectedProductCategories();
+}
+
+function toggleProductCategoryMenu() {
+  const menu=document.getElementById('db-category-menu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  if (menu.style.display === 'block') renderProductCategoryPicker();
+}
+
+function toggleProductCategory(cat, force) {
+  const exists=selectedProductCategories.includes(cat);
+  const shouldSelect = force === undefined ? !exists : force;
+  if (shouldSelect && !exists) selectedProductCategories.push(cat);
+  if (!shouldSelect && exists) selectedProductCategories=selectedProductCategories.filter(x=>x!==cat);
+  syncSelectedProductCategories();
+  renderProductCategoryPicker();
+}
+
+function addNewProductCategory() {
+  const input=document.getElementById('db-new-category');
+  const cat=(input?.value||'').trim();
+  if(!cat) return;
+  if(!selectedProductCategories.includes(cat)) selectedProductCategories.push(cat);
+  syncSelectedProductCategories();
+  renderProductCategoryPicker();
+  const newInput=document.getElementById('db-new-category');
+  if(newInput) newInput.focus();
+}
+
+function getSelectedProductCategoriesForSave() {
+  const cats = normalizeProductCategories(selectedProductCategories);
+  return cats.length ? cats : ["Lainnya"];
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+}
+
 function openProductModal(codeToEdit = null, restockId = null) {
   const modal = document.getElementById("productModal");
   const title = document.getElementById("modal-title");
@@ -1264,8 +1401,9 @@ function openProductModal(codeToEdit = null, restockId = null) {
 
       let sat = (rItem.satuan || "").toLowerCase();
       document.getElementById("db-code").value = rItem.code || "";
+      document.getElementById("db-barcode").value = rItem.barcode || "";
       document.getElementById("db-name").value = rItem.nama || "";
-      document.getElementById("db-category").value = rItem.kategori || "";
+      setSelectedProductCategories(rItem.kategori || "");
       document.getElementById("db-unit").value = sat || "pcs";
       document.getElementById("db-isi-rtg").value = rItem.isiRtg || 10;
       document.getElementById("db-stock").value = rItem.qty !== undefined ? rItem.qty : 1;
@@ -1281,8 +1419,9 @@ function openProductModal(codeToEdit = null, restockId = null) {
 
     let sat = (p.satuan || "").toLowerCase();
     document.getElementById("db-code").value = codeToEdit;
+    document.getElementById("db-barcode").value = p.barcode || "";
     document.getElementById("db-name").value = p.nama;
-    document.getElementById("db-category").value = p.kategori || "";
+    setSelectedProductCategories(p.kategori || "");
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
     let stokTampil = p.stok !== undefined ? p.stok : 0;
@@ -1299,9 +1438,10 @@ function openProductModal(codeToEdit = null, restockId = null) {
     submitBtn.innerText = "Tambahkan ke Belanja Stok";
     submitBtn.setAttribute("onclick", "tambahkanKeBelanjaStok()");
 
-    document.getElementById("db-code").value = "";
+    document.getElementById("db-code").value = "BRG-" + Date.now();
+    document.getElementById("db-barcode").value = "";
     document.getElementById("db-name").value = "";
-    document.getElementById("db-category").value = "";
+    setSelectedProductCategories([]);
     document.getElementById("db-unit").value = "pcs";
     document.getElementById("db-isi-rtg").value = 10;
     document.getElementById("db-stock").value = "";
@@ -1313,9 +1453,10 @@ function openProductModal(codeToEdit = null, restockId = null) {
     submitBtn.innerText = "Simpan ke Stok";
     submitBtn.setAttribute("onclick", "simpanBarangLangsung()");
 
-    document.getElementById("db-code").value = "";
+    document.getElementById("db-code").value = "BRG-" + Date.now();
+    document.getElementById("db-barcode").value = "";
     document.getElementById("db-name").value = "";
-    document.getElementById("db-category").value = "";
+    setSelectedProductCategories([]);
     document.getElementById("db-unit").value = "pcs";
     document.getElementById("db-isi-rtg").value = 10;
     document.getElementById("db-stock").value = "";
@@ -1378,7 +1519,8 @@ function simpanBarangLangsung() {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = document.getElementById("db-category").value.trim() || "Umum";
+  const barcode = document.getElementById("db-barcode").value.trim();
+  const category = getSelectedProductCategoriesForSave();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
@@ -1396,6 +1538,7 @@ function simpanBarangLangsung() {
   db.collection("produk").doc(code).set({
     nama: name,
     kategori: category,
+    barcode: barcode || "",
     satuan: unit,
     isiRtg: isiRtg,
     stok: finalStok,
@@ -1413,7 +1556,8 @@ function simpanBarangLangsung() {
 function simpanEditBarang(code) {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
-  const category = document.getElementById("db-category").value.trim() || "Umum";
+  const barcode = document.getElementById("db-barcode").value.trim();
+  const category = getSelectedProductCategoriesForSave();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   let stokVal = parseFloat(document.getElementById("db-stock").value) || 0;
@@ -1431,6 +1575,7 @@ function simpanEditBarang(code) {
   db.collection("produk").doc(code).update({
     nama: name,
     kategori: category,
+    barcode: barcode || "",
     satuan: unit,
     isiRtg: isiRtg,
     stok: finalStok,
@@ -1449,7 +1594,8 @@ function simpanEditBelanjaStok(restockId) {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = document.getElementById("db-category").value.trim() || "Umum";
+  const barcode = document.getElementById("db-barcode").value.trim();
+  const category = getSelectedProductCategoriesForSave();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
@@ -1462,6 +1608,7 @@ function simpanEditBelanjaStok(restockId) {
     rItem.code = code;
     rItem.nama = name;
     rItem.kategori = category;
+    rItem.barcode = barcode || "";
     rItem.satuan = unit;
     rItem.isiRtg = isiRtg;
     rItem.qty = qtyBeli;
@@ -1504,7 +1651,8 @@ function autoFillDataBarang(namaInput) {
         let sat = (m.satuan || "").toLowerCase();
         document.getElementById("db-name").value = m.nama;
         document.getElementById("db-code").value = m.code;
-        document.getElementById("db-category").value = m.kategori || "";
+        document.getElementById("db-barcode").value = m.barcode || "";
+        setSelectedProductCategories(m.kategori || "");
         document.getElementById("db-unit").value = sat || "pcs";
         document.getElementById("db-isi-rtg").value = m.isiRtg || 10;
         document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? m.modalRtg : m.modal) || 0).toLocaleString('id-ID');
@@ -1524,7 +1672,8 @@ function autoFillDataBarang(namaInput) {
     let p = databaseProduk[exactMatchCode];
     let sat = (p.satuan || "").toLowerCase();
     document.getElementById("db-code").value = exactMatchCode;
-    document.getElementById("db-category").value = p.kategori || "";
+    document.getElementById("db-barcode").value = p.barcode || "";
+    setSelectedProductCategories(p.kategori || "");
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
     document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? p.modalRtg : p.modal) || 0).toLocaleString('id-ID');
@@ -1734,7 +1883,8 @@ function tambahkanKeBelanjaStok() {
   const name = document.getElementById("db-name").value.trim();
   if (!name) return alert("Isi nama barang terlebih dahulu!");
   let code = document.getElementById("db-code").value.trim() || ("BRG-" + Date.now());
-  const category = document.getElementById("db-category").value.trim() || "Umum";
+  const barcode = document.getElementById("db-barcode").value.trim();
+  const category = getSelectedProductCategoriesForSave();
   const unit = (document.getElementById("db-unit").value || "pcs").toLowerCase();
   const isiRtg = (unit === 'kg') ? 10 : (parseInt(document.getElementById("db-isi-rtg").value) || 10);
   const qtyBeli = parseFloat(document.getElementById("db-stock").value) || 1;
@@ -1748,6 +1898,7 @@ function tambahkanKeBelanjaStok() {
     code: code,
     nama: name,
     kategori: category,
+    barcode: barcode || "",
     satuan: unit,
     isiRtg: isiRtg,
     qty: qtyBeli,
@@ -1809,6 +1960,7 @@ async function prosesBelanjaStok() {
       harga: item.harga,
       modalRtg: item.modalRtg,
       hargaRtg: item.hargaRtg,
+      barcode: item.barcode || "",
       foto: item.foto !== defaultPlaceholderImg ? item.foto : (produkLama ? produkLama.foto || "" : "")
     }, { merge: true });
   });
@@ -2042,6 +2194,8 @@ function updatePermanentBarTitle() {
   } else if (activeTab === 'catatan') {
     titleEl.innerText = labelNamaTabCatatan[activeSubCatatanTab] || "Catatan";
     if (catatanPag) catatanPag.classList.add("show"); 
+  } else if (activeTab === 'live-chat-admin') {
+    titleEl.innerText = (currentLang === 'en') ? "Live Chat" : ((currentLang === 'ar') ? "الدردشة المباشرة" : "Live Chat");
   } else if (activeTab === 'pengaturan') {
     titleEl.innerText = (currentLang === 'en') ? "System Settings" : ((currentLang === 'ar') ? "إعدادات النظام" : "Pengaturan Sistem");
   } else if (activeTab === 'kalkulator') {
@@ -2058,6 +2212,7 @@ function updatePermanentBarTitle() {
     'belanja-stok': 'pop-btn-belanjastok',
     'laporan': 'pop-btn-laporan',
     'catatan': 'pop-btn-catatan',
+    'live-chat-admin': 'pop-btn-livechat',
     'pengaturan': 'pop-btn-pengaturan'
   };
   if (activeBtnMap[activeTab]) {
@@ -2173,8 +2328,14 @@ function playBeep() {
 
 function toggleScannerPos() {
   const modal = document.getElementById("scannerModal");
+  if (!modal) {
+    console.error("scannerModal tidak ditemukan");
+    showNotif("Scanner belum tersedia pada halaman ini.");
+    return;
+  }
   if (!isScannerPosOpen) {
     modal.classList.add("show");
+    modal.setAttribute("aria-hidden", "false");
     isScannerPosOpen = true;
     history.pushState({tab: activeTab, scanner: true}, "", "");
     if (!html5QrCodePos) html5QrCodePos = new Html5Qrcode("reader-pos");
@@ -2187,28 +2348,40 @@ function toggleScannerPos() {
   } else {
     if (scannerTimeoutTimer) { clearTimeout(scannerTimeoutTimer); scannerTimeoutTimer = null; }
     modal.classList.remove("show");
+    modal.setAttribute("aria-hidden", "true");
     isScannerPosOpen = false;
     if (html5QrCodePos && html5QrCodePos.isScanning) html5QrCodePos.stop().catch(err => {});
   }
 }
 
-function processBarcodeScanPos(barcode) {
+function processBarcodeScanPos(scannedValue) {
   if (isCooldown) return;
   isCooldown = true;
   playBeep();
-  let produk = databaseProduk[barcode];
-  if (!produk) {
+
+  const value = String(scannedValue || '').trim();
+  // Produk sekarang memakai ID Dokumen Firebase sebagai key.
+  // QR/Barcode disimpan di field `barcode`, jadi scanner harus mencari keduanya.
+  const found = Object.entries(databaseProduk || {}).find(([docId, p]) =>
+    String(docId).trim() === value || String(p?.barcode || '').trim() === value
+  );
+
+  if (!found) {
     showNotif("Barang tidak ditemukan!");
     setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
     return;
   }
+
+  const [docId, produk] = found;
   if ((produk.stok || 0) <= 0) {
     showNotif("Stok Habis!");
     setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
     return;
   }
+
   showNotif("Berhasil: " + produk.nama);
-  tambahItemKeCart(barcode, produk);
+  // Keranjang tetap menggunakan ID Dokumen sebagai key internal.
+  tambahItemKeCart(docId, produk);
   setTimeout(() => { isCooldown = false; }, scanCooldownDuration);
 }
 
@@ -2231,12 +2404,15 @@ function toggleScannerDb() {
 
 function processBarcodeScanDb(barcode) {
   playBeep();
-  document.getElementById("db-code").value = barcode;
-  if (databaseProduk[barcode]) {
-    let p = databaseProduk[barcode];
+  const value = String(barcode || '').trim();
+  document.getElementById("db-barcode").value = value;
+  const foundEntry = Object.entries(databaseProduk || {}).find(([docId, p]) => String(p?.barcode || '').trim() === value || docId === value);
+  if (foundEntry) {
+    const [docId, p] = foundEntry;
     let sat = (p.satuan || "").toLowerCase();
-    document.getElementById("db-name").value = p.nama;
-    document.getElementById("db-category").value = p.kategori || "";
+    document.getElementById("db-code").value = docId;
+    document.getElementById("db-name").value = p.nama || "";
+    setSelectedProductCategories(p.kategori || "");
     document.getElementById("db-unit").value = sat || "pcs";
     document.getElementById("db-isi-rtg").value = p.isiRtg || 10;
     document.getElementById("db-cost").value = (((sat === 'rtg' || sat === 'kg') ? p.modalRtg : p.modal) || 0).toLocaleString('id-ID');
@@ -2911,7 +3087,9 @@ function refreshData() {
     if (custContainer) {
       custContainer.innerHTML = "";
       let grandTotalAllCustomersFinancial = 0;
-      databasePelanggan.forEach(c => {
+      
+      // FILTER AGAR PELANGGAN PENDING TIDAK MUNCUL DI DAFTAR UTAMA
+      databasePelanggan.filter(c => String(c.status || "").toLowerCase() !== "pending").forEach(c => {
         let catatanHtml = "";
         let custTotalNominal = 0;
         if (c.catatan && c.catatan.length > 0) {
@@ -2929,6 +3107,34 @@ function refreshData() {
       const custTotalFin = document.getElementById("customer-total-financial");
       if (custTotalFin) custTotalFin.innerText = grandTotalAllCustomersFinancial.toLocaleString('id-ID');
     }
+
+    // KODE TAMBAHAN UNTUK MENAMPILKAN PELANGGAN PENDING
+    const pendingContainer = document.getElementById("pending-customer-list-wrapper");
+    if (pendingContainer) {
+      pendingContainer.innerHTML = "";
+      
+      let pendingCustomers = databasePelanggan.filter(c => String(c.status || "").toLowerCase() === "pending");
+      
+      if (pendingCustomers.length === 0) {
+        pendingContainer.innerHTML = `<div class="empty-state" style="text-align: center; padding: 20px; color: var(--text-muted);">Tidak ada pelanggan yang menunggu persetujuan.</div>`;
+      } else {
+        pendingCustomers.forEach(c => {
+          pendingContainer.innerHTML += `
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;">
+              <div>
+                <div style="font-weight: bold; font-size: 0.9rem;">👤 ${c.nama}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">📞 ${c.phone || '-'} | 📍 ${c.alamat || '-'}</div>
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <button onclick="setujuiAkunPelanggan('${c.id}')" style="background: #16a34a; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">✅ Setuju</button>
+                <button onclick="hapusPelanggan('${c.id}')" style="background: #dc2626; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.75rem;">❌ Tolak</button>
+              </div>
+            </div>
+          `;
+        });
+      }
+    }
+    
     return;
   }
 }
@@ -3700,10 +3906,6 @@ function bersihkanSemuaChatRumpiAdmin() {
   }
 }
 
-function escapeHtml(text) {
-  if (!text) return "";
-  return text.toString().replace(/&/g, "&amp;").replace(/&lt;/g, "&lt;").replace(/>/g, "&gt;");
-}
 // --- END FITUR CHAT RUMPI ---
 
 
