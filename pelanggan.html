@@ -2285,7 +2285,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
         <h3 style="color: var(--text-color); margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">🎞️ Animasi Navigasi</h3>
         <p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Matikan jika perpindahan Dashboard/Pengaturan terasa berat atau tersendat. Animasi kecil tombol dan FAB tetap berjalan.</p>
         <label style="display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer; font-size:0.78rem;">
-          <span id="developer-animation-status">Animasi navigasi: ON</span>
+          <span id="developer-animation-status">Animasi navigasi & scroll: ON</span>
           <input id="developer-animation-toggle" type="checkbox" checked onchange="toggleAnimasiNavigasiDeveloper(this.checked)" style="width:20px; height:20px; accent-color:#2563eb; cursor:pointer;">
         </label>
       </div>
@@ -3822,6 +3822,11 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
         const dt = Math.min(now - lastTime, 50);
         lastTime = now;
 
+        if (!animasiNavigasiDeveloperAktif()) {
+          requestAnimationFrame(step);
+          return;
+        }
+
         if (!isInteracting && container.scrollWidth > container.clientWidth) {
           const track = container.querySelector(".auto-scroll-track");
           const loopWidth = track ? track.scrollWidth / 2 : 0;
@@ -3867,6 +3872,7 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       let timeoutId = null;
 
       const scrollInterval = setInterval(() => {
+        if (!animasiNavigasiDeveloperAktif()) return;
         if (!isInteracting) {
           container.scrollLeft += scrollSpeed;
           if (container.scrollLeft >= (container.scrollWidth - container.clientWidth - 2)) {
@@ -4358,7 +4364,8 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       const status = document.getElementById('developer-animation-status');
       const aktif = animasiNavigasiDeveloperAktif();
       if (toggle) toggle.checked = aktif;
-      if (status) status.textContent = aktif ? 'Animasi navigasi: ON' : 'Animasi navigasi: OFF';
+      if (status) status.textContent = aktif ? 'Animasi navigasi & scroll: ON' : 'Animasi navigasi & scroll: OFF';
+      document.documentElement.classList.toggle('dev-no-nav-animation', !aktif);
     }
 
     function toggleAnimasiNavigasiDeveloper(aktif) {
@@ -4852,6 +4859,19 @@ body.theme-colorful-v2 .products-container {
     .promo-floating-badge { display:inline-flex; align-items:center; padding:5px 9px; border-radius:999px; background:#ef4444; color:#fff; font-size:.62rem; font-weight:900; margin-bottom:8px; }
     .promo-toko-slider { width:100%; overflow:hidden; touch-action:pan-y; }
     .promo-toko-track { display:flex; transition:transform .28s ease; will-change:transform; }
+    html.dev-no-nav-animation .promo-toko-track { transition: none !important; }
+html.dev-no-nav-animation .fab-ai-bounce,
+html.dev-no-nav-animation #promo-banner-section,
+html.dev-no-nav-animation .customer-promo,
+html.dev-no-nav-animation .customerPromo,
+html.dev-no-nav-animation .promo-trigger,
+html.dev-no-nav-animation .promo-float,
+html.dev-no-nav-animation #customerPromo,
+html.dev-no-nav-animation #promoTrigger {
+  animation: none !important;
+  will-change: auto !important;
+}
+
     .promo-detail { flex:0 0 100%; min-width:100%; box-sizing:border-box; text-align:center; padding:4px 4px 8px; }
     .promo-detail img, .promo-detail-placeholder { width:100%; height:190px; object-fit:cover; border-radius:18px; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-size:3rem; }
     .promo-detail-name { margin:10px 4px 3px; font-size:1.05rem; font-weight:900; }
