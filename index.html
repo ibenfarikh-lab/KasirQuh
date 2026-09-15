@@ -734,9 +734,9 @@
             <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-stock-enabled">
           </label>
           <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;">
-            <span>Jumlah produk</span><input type="number" id="admin-stock-limit" min="1" max="10" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
+            <span>Jumlah produk</span><input type="number" id="admin-stock-limit" min="1" max="20" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
           </label>
-          <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Maksimal 10 produk. Urutan mengikuti riwayat pembelian pelanggan.</div>
+          <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Maksimal 20 produk. Urutan mengikuti riwayat pembelian pelanggan.</div>
           <button type="button" onclick="simpanPengaturanStokRumah()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Stok Rumah</button>
           <div id="admin-stock-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
         </div>
@@ -765,7 +765,7 @@
             <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-trending-enabled">
           </label>
           <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;">
-            <span>Jumlah produk</span><input type="number" id="admin-trending-limit" min="1" max="10" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
+            <span>Jumlah produk</span><input type="number" id="admin-trending-limit" min="1" max="20" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
           </label>
           <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Urutan dihitung otomatis dari jumlah terjual hari ini.</div>
           <button type="button" onclick="simpanPengaturanSedangLaris()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Laris</button>
@@ -1049,7 +1049,7 @@ async function simpanPengaturanIdeMasak() {
 function getAdminSedangLarisConfig() {
   try {
     const c=JSON.parse(localStorage.getItem('admin_sedang_laris_v1') || '{}');
-    return {enabled:c.enabled !== false, limit:Math.min(10,Math.max(1,parseInt(c.limit,10)||5))};
+    return {enabled:c.enabled !== false, limit:Math.min(20,Math.max(1,parseInt(c.limit,10)||5))};
   } catch(e) { return {enabled:true,limit:5}; }
 }
 function toggleAdminSedangLaris() {
@@ -1059,7 +1059,7 @@ function toggleAdminSedangLaris() {
 }
 async function simpanPengaturanSedangLaris() {
   const enabled=document.getElementById('admin-trending-enabled')?.checked!==false;
-  const limit=Math.min(10,Math.max(1,parseInt(document.getElementById('admin-trending-limit')?.value,10)||5));
+  const limit=Math.min(20,Math.max(1,parseInt(document.getElementById('admin-trending-limit')?.value,10)||5));
   const cfg={enabled,limit,updatedAt:Date.now()};
   localStorage.setItem('admin_sedang_laris_v1',JSON.stringify(cfg));
   try {
@@ -1072,7 +1072,7 @@ async function simpanPengaturanSedangLaris() {
 function getAdminStokRumahConfig() {
   try {
     const c=JSON.parse(localStorage.getItem('admin_stok_rumah_v1') || '{}');
-    return {enabled:c.enabled !== false, limit:Math.min(10,Math.max(1,parseInt(c.limit,10)||5))};
+    return {enabled:c.enabled !== false, limit:Math.min(20,Math.max(1,parseInt(c.limit,10)||5))};
   } catch(e) { return {enabled:true,limit:5}; }
 }
 function toggleAdminStokRumah() {
@@ -1082,7 +1082,7 @@ function toggleAdminStokRumah() {
 }
 async function simpanPengaturanStokRumah() {
   const enabled=document.getElementById('admin-stock-enabled')?.checked!==false;
-  const limit=Math.min(10,Math.max(1,parseInt(document.getElementById('admin-stock-limit')?.value,10)||5));
+  const limit=Math.min(20,Math.max(1,parseInt(document.getElementById('admin-stock-limit')?.value,10)||5));
   const cfg={enabled,limit,updatedAt:Date.now()};
   localStorage.setItem('admin_stok_rumah_v1',JSON.stringify(cfg));
   try {
