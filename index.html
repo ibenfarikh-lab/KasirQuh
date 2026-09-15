@@ -728,10 +728,18 @@
       <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
         <div style="font-weight:800;">🏠 Stok Rumah Habis</div>
         <div style="font-size:.75rem;opacity:.7;margin:4px 0 10px;">Otomatis berdasarkan stok barang.</div>
-        <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;">
-          <span>Tampilkan</span>
-          <input type="checkbox" id="admin-home-stock-toggle" checked>
-        </label>
+        <button type="button" onclick="toggleAdminStokRumahHabis()" style="width:100%;border:0;border-radius:9px;padding:8px;background:#fff;color:#111;font-weight:700;cursor:pointer;">Kelola →</button>
+        <div id="admin-stok-rumah-panel" style="display:none;margin-top:10px;padding:10px;border-radius:10px;background:#181818;border:1px solid rgba(255,255,255,.1);">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;margin-bottom:9px;">
+            <span>Tampilkan di pelanggan</span><input type="checkbox" id="admin-home-stock-toggle">
+          </label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:.8rem;gap:10px;">
+            <span>Jumlah produk</span><input type="number" id="admin-stok-rumah-limit" min="1" max="10" step="1" style="width:80px;padding:6px;border-radius:7px;border:1px solid #555;background:#fff;color:#111;">
+          </label>
+          <div style="font-size:.7rem;opacity:.65;margin-top:7px;">Produk dipilih otomatis dari barang yang stoknya habis.</div>
+          <button type="button" onclick="simpanPengaturanStokRumahHabis()" style="width:100%;margin-top:9px;border:0;border-radius:8px;padding:8px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;">💾 Simpan Stok</button>
+          <div id="admin-stok-rumah-status" style="font-size:.7rem;opacity:.7;margin-top:6px;"></div>
+        </div>
       </div>
 
 <div class="admin-home-feature" style="background:#111;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;">
@@ -1036,6 +1044,35 @@ async function simpanPengaturanIdeMasak() {
     const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='✓ Ide Masak tersimpan dan siap tampil di pelanggan.';
   } catch(err) {
     const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
+  }
+}
+function getAdminStokRumahHabisConfig() {
+  try {
+    const c = JSON.parse(localStorage.getItem('admin_stok_rumah_habis_v1') || '{}');
+    return { enabled: c.enabled !== false, limit: Math.min(10, Math.max(1, parseInt(c.limit,10) || 5)) };
+  } catch(e) { return {enabled:true, limit:5}; }
+}
+function toggleAdminStokRumahHabis() {
+  const panel=document.getElementById('admin-stok-rumah-panel'); if(!panel) return;
+  const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
+  if(!open){
+    const c=getAdminStokRumahHabisConfig();
+    const enabled=document.getElementById('admin-home-stock-toggle');
+    const limit=document.getElementById('admin-stok-rumah-limit');
+    if(enabled) enabled.checked=c.enabled;
+    if(limit) limit.value=c.limit;
+  }
+}
+async function simpanPengaturanStokRumahHabis() {
+  const enabled=document.getElementById('admin-home-stock-toggle')?.checked!==false;
+  const limit=Math.min(10,Math.max(1,parseInt(document.getElementById('admin-stok-rumah-limit')?.value,10)||5));
+  const cfg={enabled,limit,updatedAt:Date.now()};
+  localStorage.setItem('admin_stok_rumah_habis_v1',JSON.stringify(cfg));
+  try {
+    await db.collection('pengaturan').doc('beranda_pelanggan_stok_rumah').set(cfg,{merge:true});
+    const st=document.getElementById('admin-stok-rumah-status'); if(st) st.textContent='✓ Pengaturan Stok Rumah Habis tersimpan.';
+  } catch(err) {
+    const st=document.getElementById('admin-stok-rumah-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
   }
 }
 function getAdminSedangLarisConfig() {
@@ -2056,6 +2093,7 @@ function scrollKePengaturanBerandaPelanggan() {
       editingOrderItemsTemp = trx.items ? JSON.parse(JSON.stringify(trx.items)) : [];
       renderEditOrderItemsModal();
       document.getElementById("editOrderModal").classList.add("show");
+      history.pushState({tab: activeTab, modal: 'editOrder'}, "", "");
     }
 
     function closeEditOrderModal() {
@@ -2132,6 +2170,7 @@ function scrollKePengaturanBerandaPelanggan() {
     function bukaBuktiTransfer(base64Img) {
       document.getElementById("proof-img-preview").src = base64Img;
       document.getElementById("proofModal").classList.add("show");
+      history.pushState({tab: activeTab, modal: 'proof'}, "", "");
     }
     function closeProofModal() { document.getElementById("proofModal").classList.remove("show"); }
     function ubahStatusPesananAdmin(id, status) {
@@ -2250,6 +2289,7 @@ function scrollKePengaturanBerandaPelanggan() {
 
       modalBody.innerHTML = htmlInfo + htmlTrx + htmlNotes;
       document.getElementById("adminCustomerDetailModal").classList.add("show");
+      history.pushState({tab: activeTab, modal: 'adminCustomerDetail'}, "", "");
     }
 
     function closeAdminCustomerDetailModal() {
