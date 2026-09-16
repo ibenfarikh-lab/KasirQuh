@@ -5906,3 +5906,59 @@ body[data-theme="modern"] #fab-cart-btn:focus-visible {
   box-shadow: 0 0 0 2px rgba(22,119,210,.28), 0 0 12px rgba(37,99,235,.35), 0 4px 12px rgba(0,0,0,.45) !important;
 }
 </style>
+
+<style id="modern-cart-final-white-strip-v5">
+/* MODERN CART — final cleanup for any inherited white strips/surfaces. */
+body[data-theme="modern"] #cartModal .cart-table-wrapper,
+body[data-theme="modern"] #cartModal .cart-table,
+body[data-theme="modern"] #cartModal .cart-table thead,
+body[data-theme="modern"] #cartModal .cart-table tbody,
+body[data-theme="modern"] #cartModal .cart-table tr,
+body[data-theme="modern"] #cartModal .cart-table th,
+body[data-theme="modern"] #cartModal .cart-table td {
+  background-color: #0b1728 !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+body[data-theme="modern"] #cartModal .cart-table thead th {
+  background: #0b1728 !important;
+  color: #8fb3df !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(70,145,255,.18) !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody tr {
+  background: #111f34 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td {
+  background: #111f34 !important;
+  border-top: 1px solid rgba(70,145,255,.12) !important;
+  border-bottom: 1px solid rgba(70,145,255,.12) !important;
+}
+/* Remove native scrollbar surfaces from the cart area. */
+body[data-theme="modern"] #cartModal .cart-table-wrapper::-webkit-scrollbar {
+  width: 5px !important;
+  height: 0 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table-wrapper::-webkit-scrollbar-track {
+  background: #081321 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table-wrapper::-webkit-scrollbar-thumb {
+  background: #294564 !important;
+  border-radius: 10px !important;
+}
+/* Any direct child surface inside the summary must stay Modern. */
+body[data-theme="modern"] #cartModal .summary-box,
+body[data-theme="modern"] #cartModal .summary-box > div,
+body[data-theme="modern"] #cartModal .summary-box > .no-print,
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div {
+  background-color: #0b1629 !important;
+  background-image: none !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div {
+  background-color: #0e1b2e !important;
+  background-image: none !important;
+  border-color: #294564 !important;
+}
+</style>
