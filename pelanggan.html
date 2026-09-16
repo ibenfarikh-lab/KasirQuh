@@ -2933,7 +2933,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
       const currentUrl = getPelangganVercelUrl();
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
       document.getElementById('qr-code-img').src = qrApiUrl;
-      const storeName = pengaturanToko.nama || "KasirQuh";
+      const storeName = pengaturanToko.nama || "Nama Toko";
       document.getElementById('qr-store-name').innerText = storeName;
       document.getElementById('qr-store-subtitle').innerText = "Belanja Harian Makin Praktis - " + storeName + " -";
       document.getElementById('qrCodeModal').classList.add('show');
@@ -2946,7 +2946,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
 
     function bagikanAplikasiViaWA() {
       const currentUrl = getPelangganVercelUrl();
-      const storeName = pengaturanToko.nama || "KasirQuh";
+      const storeName = pengaturanToko.nama || "Nama Toko";
       const pesan = `Halo! Yuk belanja kebutuhan harian makin praktis di *${storeName}* pakai aplikasi KasirQuh.\n\nKlik tautan Vercel berikut untuk mulai belanja & daftar:\n${currentUrl}\n\nTinggal Pilih Barang • Beres! 🛒✨`;
       window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
     }
@@ -2966,7 +2966,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 26px sans-serif';
       ctx.textAlign = 'center';
-      const storeName = pengaturanToko.nama || "KasirQuh";
+      const storeName = pengaturanToko.nama || "Nama Toko";
       ctx.fillText(storeName, 200, 65);
 
       ctx.font = '13px sans-serif';
@@ -3025,7 +3025,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     function bagikanProdukViaWA() {
       if(!currentDetailCode) return;
       let p = databaseProduk[currentDetailCode]; if(!p) return;
-      let storeName = pengaturanToko.nama || "KasirQuh";
+      let storeName = pengaturanToko.nama || "Nama Toko";
       let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
       let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
       let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
@@ -3120,7 +3120,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     const firebaseConfig = { apiKey: "AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g", authDomain: "kasirquh.firebaseapp.com", projectId: "kasirquh", storageBucket: "kasirquh.firebasestorage.app", messagingSenderId: "87320899036", appId: "1:87320899036:web:592c6768ea4aca6bdbb319", measurementId: "G-2BL7RJN9Z5" };
     firebase.initializeApp(firebaseConfig); const db = firebase.firestore();
 
-    let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "TokoQuh", phone: "089" };
+    let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "", phone: "" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24;
     // TAHAP 1: jumlah card katalog yang ditampilkan saat awal. Ini TIDAK membatasi databaseProduk/dashboard.
@@ -3801,7 +3801,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
 
     async function putarSuaraSambutanAI() {
       if (!isAiSoundOn) return;
-      const namaToko = (pengaturanToko && pengaturanToko.nama) ? pengaturanToko.nama : "KasirQuh";
+      const namaToko = (pengaturanToko && pengaturanToko.nama) ? pengaturanToko.nama : "Nama Toko";
       const teksSambutan = `HALOOOO BESTIE! WELCOME... di ${namaToko}! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari ${namaToko} siap baturi belanja makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget!`;
       try {
         if (window._aiWelcomeAudio) {
@@ -4036,7 +4036,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     }
 
     function initFirebaseListeners() {
-      db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
+      db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "Nama Toko"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
       db.collection("produk").onSnapshot((snapshot) => { 
         databaseProduk = {}; 
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
@@ -4933,7 +4933,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     }
 
     function simpanProfilPelanggan() { const nama = document.getElementById("setting-cust-name").value.trim(); const alamat = document.getElementById("setting-cust-address").value.trim(); if (!nama) return alert("Nama wajib diisi!"); db.collection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => { if (!snap.empty) { db.collection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!")).catch(err => alert("Gagal memperbarui: " + err.message)); } }).catch(err => alert("Terjadi kesalahan: " + err.message)); }
-    async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
+    async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'Nama Toko' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function toggleOpsiDeveloper() {
       const panel = document.getElementById('developer-options-panel');

@@ -258,7 +258,7 @@
   <div id="loginModal" class="login-overlay" style="display: none;">
     <div class="login-card">
       <h2 data-i18n="app_title">KasirQuh</h2>
-      <p id="login-sub-title">TokoQuh</p>
+      <p id="login-sub-title">Memuat nama toko...</p>
       <form onsubmit="prosesLogin(event)" class="form-vertical">
         <input type="text" id="login-username" placeholder="Username" required data-i18n-placeholder="placeholder_username">
         <input type="password" id="login-password" placeholder="Password" required data-i18n-placeholder="placeholder_password">
@@ -1678,7 +1678,7 @@ function scrollKePengaturanBerandaPelanggan() {
         daftarProdukText = 'Tidak ada produk yang dilampirkan (obrolan santai).';
       }
 
-      let namaTokoVal = 'KasirQuh';
+      let namaTokoVal = '';
       try {
         if (typeof pengaturanToko !== 'undefined' && pengaturanToko.nama) {
           namaTokoVal = pengaturanToko.nama;

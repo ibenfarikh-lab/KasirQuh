@@ -567,7 +567,7 @@ db.collection("pengaturan").doc("auth").onSnapshot((doc) => {
   refreshData();
 });
 
-let pengaturanToko = { nama: "TokoQuh", alamat: "Jl. Merdeka", phone: "089" };
+let pengaturanToko = { nama: "", alamat: "", phone: "" };
 db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
   if (doc.exists) {
     pengaturanToko = doc.data();
@@ -2894,7 +2894,7 @@ function updateDropdowns(kategoriList) {
 }
 
 function simpanPengaturanToko() {
-  const nama = document.getElementById("setting-shop-name").value.trim() || "TokoQuh";
+  const nama = document.getElementById("setting-shop-name").value.trim() || "";
   const alamat = document.getElementById("setting-shop-address").value.trim() || "-";
   const phone = document.getElementById("setting-shop-phone").value.trim() || "-";
 
@@ -2962,7 +2962,7 @@ function refreshData() {
   if (langSelect) langSelect.value = currentLang;
 
   const loginSub = document.getElementById("login-sub-title");
-  if (loginSub) loginSub.innerText = pengaturanToko.nama || "TokoQuh";
+  if (loginSub) loginSub.innerText = pengaturanToko.nama || "Memuat nama toko...";
   const rcptName = document.getElementById("receipt-shop-name");
   if (rcptName) rcptName.innerText = pengaturanToko.nama;
   const rcptAddr = document.getElementById("receipt-shop-address");
