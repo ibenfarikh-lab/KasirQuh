@@ -2708,6 +2708,35 @@ function scrollKePengaturanBerandaPelanggan() {
 
 
 
+
+<!-- AUTH/WELCOME SAFETY PATCH -->
+<script id="kq-auth-welcome-safety">
+(function () {
+  function releaseWelcome() {
+    var welcome = document.getElementById('kasirquhVisual4Welcome');
+    if (!welcome) return;
+    welcome.classList.add('kv4-leaving');
+    welcome.style.pointerEvents = 'none';
+    setTimeout(function () { if (welcome && welcome.parentNode) welcome.remove(); }, 760);
+  }
+  function checkAuthAndRelease() {
+    try {
+      if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) releaseWelcome();
+    } catch (e) {}
+  }
+  window.addEventListener('load', function () {
+    checkAuthAndRelease();
+    setTimeout(checkAuthAndRelease, 1200);
+  }, { once: true });
+  var slide = document.getElementById('kv4SlideImage');
+  if (slide) slide.addEventListener('error', function () {
+    checkAuthAndRelease();
+    setTimeout(function () {
+      try { if (!firebase.auth().currentUser) releaseWelcome(); } catch (e) { releaseWelcome(); }
+    }, 700);
+  }, { once: true });
+})();
+</script>
 </body>
 </html>
 
