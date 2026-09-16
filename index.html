@@ -2575,6 +2575,20 @@ function scrollKePengaturanBerandaPelanggan() {
 <script id="kasirquh-slide123-script">
 (function () {
   function initSlide123Welcome() {
+    // Firebase Auth may already be signed in before this welcome markup is initialized.
+    // In that case the welcome screen must never be recreated after script.js removed it.
+    try {
+      if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        const existingWelcome = document.getElementById('kasirquhVisual4Welcome');
+        if (existingWelcome) existingWelcome.remove();
+        const login = document.getElementById('loginModal');
+        if (login) login.style.display = 'none';
+        return;
+      }
+    } catch (e) {
+      console.warn('Welcome/Auth sync:', e);
+    }
+
     const welcome = document.getElementById('kasirquhVisual4Welcome');
     const image = document.getElementById('kv4SlideImage');
     const customer = document.getElementById('kv4CustomerHotspot');
