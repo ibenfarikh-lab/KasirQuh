@@ -5034,6 +5034,191 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     };
   })();
 </script>
+<style id="modern-cart-modal-fix-v2">
+/* ============================================================
+   MODERN — KERANJANG BELANJA
+   Khusus tema Modern. Tidak mengubah Light / Dark.
+   ============================================================ */
+body[data-theme="modern"] #cartModal {
+  background: rgba(2, 7, 18, .78) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  padding: 12px !important;
+}
+
+body[data-theme="modern"] #cartModal > .modal-content {
+  width: min(95%, 400px) !important;
+  max-width: 400px !important;
+  max-height: 88vh !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  border-radius: 22px !important;
+  background: #0b1629 !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(70,145,255,.48) !important;
+  box-shadow: 0 0 24px rgba(37,99,235,.24), 0 18px 45px rgba(0,0,0,.58), inset 0 0 22px rgba(0,95,255,.07) !important;
+}
+
+body[data-theme="modern"] #cartModal .modal-header {
+  flex-shrink: 0 !important;
+  padding: 12px 14px !important;
+  background: #101f36 !important;
+  border-bottom: 1px solid rgba(70,145,255,.25) !important;
+}
+body[data-theme="modern"] #cartModal .modal-header h3 {
+  color: #fff !important;
+  font-size: .98rem !important;
+  font-weight: 900 !important;
+}
+body[data-theme="modern"] #cartModal .btn-close-modal {
+  color: #cbd5e1 !important;
+  transition: .15s ease !important;
+}
+body[data-theme="modern"] #cartModal .btn-close-modal:active {
+  transform: scale(.9) !important;
+  color: #fff !important;
+}
+
+body[data-theme="modern"] #cartModal .receipt-header {
+  margin: 0 !important;
+  padding: 9px 14px 7px !important;
+  background: #0d1a2d !important;
+  border-bottom: 1px solid rgba(70,145,255,.20) !important;
+}
+body[data-theme="modern"] #cartModal #receipt-shop-name {
+  color: #fff !important;
+  font-weight: 900 !important;
+}
+body[data-theme="modern"] #cartModal #receipt-shop-address {
+  color: #8fb3df !important;
+}
+
+body[data-theme="modern"] #cartModal .cart-table-wrapper {
+  max-height: 30vh !important;
+  background: #081321 !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+}
+body[data-theme="modern"] #cartModal .cart-table {
+  color: #f8fafc !important;
+  border-collapse: separate !important;
+  border-spacing: 0 5px !important;
+}
+body[data-theme="modern"] #cartModal .cart-table thead th {
+  color: #8fb3df !important;
+  background: #0b1728 !important;
+  border: none !important;
+  padding: 6px 4px !important;
+  font-size: .66rem !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody tr {
+  background: #111f34 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td {
+  color: #f8fafc !important;
+  border-top: 1px solid rgba(70,145,255,.13) !important;
+  border-bottom: 1px solid rgba(70,145,255,.13) !important;
+  padding: 6px 4px !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:first-child {
+  border-left: 1px solid rgba(70,145,255,.13) !important;
+  border-radius: 9px 0 0 9px !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:last-child {
+  border-right: 1px solid rgba(70,145,255,.13) !important;
+  border-radius: 0 9px 9px 0 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td span,
+body[data-theme="modern"] #cartModal .cart-table tbody td[style*="color:var(--text-color)"] {
+  color: #f8fafc !important;
+}
+
+/* Tombol +/- tetap kontras, tetapi masuk palet Modern. */
+body[data-theme="modern"] #cartModal .cart-table button[onclick*="-1"] {
+  background: #b91c1c !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  box-shadow: 0 0 7px rgba(239,68,68,.18) !important;
+}
+body[data-theme="modern"] #cartModal .cart-table button[onclick*="1"] {
+  background: #1677d2 !important;
+  color: #fff !important;
+  border: 1px solid rgba(143,201,255,.35) !important;
+  box-shadow: 0 0 7px rgba(37,99,235,.20) !important;
+}
+
+body[data-theme="modern"] #cartModal .summary-box {
+  padding: 9px 14px 5px !important;
+  background: #0b1629 !important;
+  border-top: 1px solid rgba(70,145,255,.18) !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > div:first-child {
+  color: #fff !important;
+  font-size: .88rem !important;
+}
+body[data-theme="modern"] #cartModal #grand-total {
+  color: #ffe100 !important;
+  text-shadow: 0 0 7px rgba(255,225,0,.16) !important;
+}
+body[data-theme="modern"] #cartModal select,
+body[data-theme="modern"] #cartModal input,
+body[data-theme="modern"] #cartModal textarea {
+  background: #101f36 !important;
+  color: #f8fafc !important;
+  border-color: #294564 !important;
+}
+body[data-theme="modern"] #cartModal select option {
+  background: #101f36 !important;
+  color: #f8fafc !important;
+}
+body[data-theme="modern"] #cartModal label {
+  color: #dbeafe !important;
+}
+body[data-theme="modern"] #cartModal #wrapper-tf-proof,
+body[data-theme="modern"] #cartModal #wrapper-save-recipe-fields,
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div {
+  background: #0e1b2e !important;
+  border-color: #294564 !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div label,
+body[data-theme="modern"] #cartModal #wrapper-save-recipe-fields label {
+  color: #dbeafe !important;
+}
+
+body[data-theme="modern"] #cartModal .btn-success {
+  background: #1677d2 !important;
+  color: #fff !important;
+  border: 1px solid rgba(143,201,255,.35) !important;
+  box-shadow: 0 0 10px rgba(37,99,235,.20) !important;
+}
+body[data-theme="modern"] #cartModal .btn-clear-cart {
+  background: #9f1239 !important;
+  color: #fff !important;
+  border: 1px solid rgba(251,113,133,.25) !important;
+}
+body[data-theme="modern"] #cartModal button[onclick="prosesSimpanMenuSaja()"] {
+  background: #4f46a5 !important;
+  color: #fff !important;
+  border: 1px solid rgba(167,139,250,.30) !important;
+}
+body[data-theme="modern"] #cartModal .btn-success:active,
+body[data-theme="modern"] #cartModal .btn-clear-cart:active,
+body[data-theme="modern"] #cartModal button[onclick="prosesSimpanMenuSaja()"]:active {
+  transform: scale(.98) !important;
+}
+
+@media (max-width: 420px) {
+  body[data-theme="modern"] #cartModal > .modal-content {
+    width: 96% !important;
+    max-height: 89vh !important;
+    border-radius: 20px !important;
+  }
+  body[data-theme="modern"] #cartModal .cart-table-wrapper { max-height: 28vh !important; }
+}
+</style>
+
 </body>
 \n<style id="kq-no3-no4-exact-rail-final">\n/* FINAL: No.3 & No.4 mengikuti RAIL GEOMETRY No.2 (Stok Rumah).\n   Header/Bottom Navbar tidak disentuh. */\n#recipe-section-wrapper, #trending-section-wrapper {\n  box-sizing: border-box !important;\n  overflow: visible !important;\n}\n#recipe-section-wrapper > div:first-child,\n#trending-section-wrapper > div:first-child {\n  box-sizing: border-box !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n}\n#recipe-scroll-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n  padding-top: 2px !important;\n  padding-bottom: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: hidden !important;\n  scrollbar-width: none !important;\n}\n#trending-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 4px !important;\n  padding-right: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: visible !important;\n  scrollbar-width: none !important;\n}\n#trending-container .auto-scroll-track {\n  box-sizing: border-box !important;\n  padding-left: 10px !important;\n  padding-right: 10px !important;\n  padding-top: 4px !important;\n  padding-bottom: 6px !important;\n}\n#recipe-scroll-container > *,\n#trending-container > *,\n#trending-container .auto-scroll-track > * {\n  flex-shrink: 0 !important;\n}\n@media (max-width: 699px) {\n  /* Samakan OUTER WRAPPER dengan No.2: full viewport.\n     Rail kartu tetap 14px dari viewport: No.2 = 4px + 10px. */\n  #recipe-section-wrapper, #trending-section-wrapper {\n    width: 100vw !important;\n    max-width: 100vw !important;\n    margin-left: calc(50% - 50vw) !important;\n    margin-right: calc(50% - 50vw) !important;\n    box-sizing: border-box !important;\n  }\n}\n</style>\n
 
@@ -5542,3 +5727,80 @@ html.dev-no-nav-animation #promoTrigger {
 </style>
 
 
+
+
+<style id="desktop-portrait-viewport-v1">
+/* ============================================================
+   DESKTOP PORTRAIT VIEWPORT V1
+   Desktop saja: aplikasi pelanggan dibatasi seperti layar HP
+   dan dipusatkan. Tampilan mobile tidak disentuh.
+   Tema Modern tetap memakai visual/glow yang sudah ada.
+   ============================================================ */
+@media (min-width: 768px) {
+  html {
+    background: #0b0f16 !important;
+  }
+
+  body {
+    width: min(430px, 100vw) !important;
+    max-width: 430px !important;
+    min-width: 430px !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 0 55px rgba(0,0,0,.45) !important;
+  }
+
+  /* Elemen fixed yang merupakan bagian dari UI utama ikut berada
+     di dalam lebar portrait, bukan melebar mengikuti monitor. */
+  body > .bottom-nav,
+  body > .permanent-bottom-bar,
+  .fab-container {
+    width: min(430px, 100vw) !important;
+    max-width: 430px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+  }
+
+  .bottom-nav,
+  .permanent-bottom-bar {
+    width: min(430px, 100vw) !important;
+    max-width: 430px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Modal/login tetap proporsional seperti viewport HP. */
+  .modal-backdrop,
+  .login-overlay,
+  .fab-scanner-modal {
+    width: min(430px, 100vw) !important;
+    max-width: 430px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* FAB kanan tetap berada di sudut kanan layar portrait. */
+  #scroll-helper-fab {
+    left: auto !important;
+    right: max(10px, calc((100vw - 430px) / 2 + 10px)) !important;
+    transform: none !important;
+  }
+
+  /* Toast tetap berada di tengah viewport portrait. */
+  .toast {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    max-width: calc(430px - 32px) !important;
+    box-sizing: border-box !important;
+  }
+}
+</style>
