@@ -875,11 +875,27 @@
         </div>
       </div>
 
-      <!-- KARTU TOMBOL PENGHAPUS CACHE DARURAT -->
-      <div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5;">
-        <h3 style="color: #dc2626; margin-top: 0; font-size: 1rem;" data-i18n="system_cache_title">Pembaruan Sistem & Cache</h3>
-        <p style="color: var(--text-muted); font-size: 0.80rem; margin-bottom: 10px;" data-i18n="system_cache_desc">Gunakan tombol ini jika aplikasi tersangkut versi lama atau tidak sinkron.</p>
-        <button onclick="bersihkanCacheTotal()" style="background: #dc2626; color: white; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer;" data-i18n="clear_cache_btn">🧹 Bersihkan Cache & Muat Ulang</button>
+      <!-- OPSI DEVELOPER -->
+      <div class="card" style="border: 1px solid #7c3aed; background: var(--card-bg);">
+        <h3 style="color: #7c3aed; margin-top: 0; font-size: 1rem;">🛠️ Opsi Developer</h3>
+        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
+          <h4 style="margin: 0 0 5px; font-size: 0.92rem;">🔄 Pembaruan Aplikasi</h4>
+          <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0 0 9px;">Perbarui cache aplikasi dan muat versi terbaru tanpa menghapus login, pengaturan lokal, atau data Firestore.</p>
+          <button onclick="perbaruiAplikasi()" style="background: #2563eb; color: white; padding: 9px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer;">🔄 Perbarui Aplikasi</button>
+          <div id="update-app-status" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 6px; text-align: center;"></div>
+        </div>
+
+        <div style="border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; background: var(--card-bg);">
+          <h4 style="margin: 0 0 5px; font-size: 0.92rem;">🧩 Advance Script</h4>
+          <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0 0 8px;">Script sementara untuk migrasi, maintenance, atau perbaikan data. Script tersimpan untuk toko aktif dan dapat dihapus setelah selesai.</p>
+          <textarea id="advance-script-input" rows="8" spellcheck="false" placeholder="// Masukkan JavaScript sementara di sini..." style="width:100%; box-sizing:border-box; resize:vertical; font-family:monospace; font-size:0.75rem; padding:8px; border:1px solid var(--input-border); border-radius:7px; background:var(--input-bg); color:var(--text-color);"></textarea>
+          <div style="display:flex; gap:6px; margin-top:7px;">
+            <button onclick="simpanAdvanceScript()" style="flex:1; background:#16a34a; color:white; padding:8px; font-weight:bold; border-radius:7px; border:none; cursor:pointer;">💾 Simpan</button>
+            <button onclick="jalankanAdvanceScript()" style="flex:1; background:#7c3aed; color:white; padding:8px; font-weight:bold; border-radius:7px; border:none; cursor:pointer;">▶️ Jalankan</button>
+            <button onclick="hapusAdvanceScript()" style="flex:1; background:#dc2626; color:white; padding:8px; font-weight:bold; border-radius:7px; border:none; cursor:pointer;">🗑️ Hapus</button>
+          </div>
+          <div id="advance-script-status" style="font-size:0.72rem; color:var(--text-muted); margin-top:7px; text-align:center;">Belum ada script tersimpan.</div>
+        </div>
       </div>
 
       <div class="card">

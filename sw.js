@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kasirquh-v4';
+const CACHE_NAME = 'kasirquh-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -12,6 +12,11 @@ const urlsToCache = [
   '/slide3.png',
   '/welcome-visual-4.png'
 ];
+
+
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
+});
 
 self.addEventListener('install', event => {
   self.skipWaiting();

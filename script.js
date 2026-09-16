@@ -84,9 +84,6 @@ const translations = {
     ringtone_default: "Default (Beep Digital)",
     ringtone_custom: "Pilih File dari Memori HP (.mp3/.wav)",
     ringtone_help: "Pilih file audio dari penyimpanan HP Anda.",
-    system_cache_title: "Pembaruan Sistem & Cache",
-    system_cache_desc: "Gunakan tombol ini jika aplikasi tersangkut versi lama atau tidak sinkron.",
-    clear_cache_btn: "🧹 Bersihkan Cache & Muat Ulang",
     app_session: "Sesi Aplikasi",
     logout_btn: "🚪 Keluar / Logout",
     proof_transfer: "Bukti Transfer",
@@ -595,6 +592,7 @@ function handleAuthState(user) {
       // Profil toko sudah valid. Jangan jalankan migrasi global otomatis.
       // Data operasional harus tetap berada di toko/{tokoId}.
       refreshData();
+      muatAdvanceScriptAdmin();
     })
     .catch((err) => {
       console.error("Profil Auth/role gagal dibaca:", err);
@@ -3304,25 +3302,114 @@ function showNotif(msg) {
   setTimeout(() => { notif.style.display = "none"; }, 1500);
 }
 
-function bersihkanCacheTotal() {
-  if (confirm("Bersihkan seluruh cache aplikasi dan muat ulang ke versi terbaru?")) {
+async function perbaruiAplikasi() {
+  const status = document.getElementById('update-app-status');
+  const setStatus = (text) => { if (status) status.textContent = text; };
+  if (!confirm('Perbarui aplikasi sekarang?\n\nCache aplikasi akan disegarkan dan halaman dimuat ulang. Login, pengaturan lokal, dan data Firestore tidak dihapus.')) return;
+
+  try {
+    setStatus('Menyiapkan pembaruan...');
+
+    // Hapus hanya Cache Storage milik aplikasi. localStorage/sessionStorage/IndexedDB tidak disentuh.
     if ('caches' in window) {
-      caches.keys().then((names) => {
-        names.forEach((name) => {
-          caches.delete(name);
-        });
-      });
+      const names = await caches.keys();
+      await Promise.all(names.map(name => caches.delete(name)));
     }
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        for(let registration of registrations) {
-          registration.unregister();
-        }
-      });
+
+    // Minta Service Worker terbaru segera aktif, tetapi jangan menghapus data situs.
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map(async registration => {
+        try { await registration.update(); } catch (_) {}
+        if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }));
     }
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 500);
+
+    setStatus('Pembaruan selesai. Memuat ulang...');
+    setTimeout(() => window.location.reload(), 350);
+  } catch (err) {
+    console.warn('Pembaruan aplikasi tidak sepenuhnya berhasil:', err);
+    setStatus('Pembaruan sebagian gagal. Memuat ulang...');
+    setTimeout(() => window.location.reload(), 500);
+  }
+}
+
+async function muatAdvanceScriptAdmin() {
+  const input = document.getElementById('advance-script-input');
+  const status = document.getElementById('advance-script-status');
+  if (!input || !status || !currentAdminProfile?.tokoId) return;
+  try {
+    const doc = await storeCollection('pengaturan').doc('developer').get();
+    const data = doc.exists ? (doc.data() || {}) : {};
+    input.value = typeof data.advanceScript === 'string' ? data.advanceScript : '';
+    status.textContent = input.value.trim() ? 'Script tersimpan untuk toko aktif.' : 'Belum ada script tersimpan.';
+  } catch (err) {
+    console.warn('Gagal memuat Advance Script:', err);
+    status.textContent = 'Gagal membaca script developer.';
+  }
+}
+
+async function simpanAdvanceScript() {
+  const input = document.getElementById('advance-script-input');
+  const status = document.getElementById('advance-script-status');
+  if (!input || !status) return;
+  if (!currentAdminProfile?.tokoId) return alert('Profil toko belum siap. Silakan tunggu sebentar lalu coba lagi.');
+  const code = input.value;
+  if (!code.trim()) return alert('Kolom Advance Script masih kosong.');
+  if (code.length > 50000) return alert('Script terlalu panjang. Maksimal 50.000 karakter.');
+  if (!confirm('Simpan Advance Script untuk toko aktif?\n\nScript ini dapat dijalankan dari panel developer. Pastikan kodenya benar.')) return;
+  try {
+    await storeCollection('pengaturan').doc('developer').set({
+      advanceScript: code,
+      advanceScriptUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      advanceScriptUpdatedBy: currentAdminProfile.uid || ''
+    }, { merge: true });
+    status.textContent = 'Script tersimpan. Siap dijalankan.';
+  } catch (err) {
+    console.error('Gagal menyimpan Advance Script:', err);
+    alert('Gagal menyimpan Advance Script: ' + err.message);
+  }
+}
+
+async function jalankanAdvanceScript() {
+  const input = document.getElementById('advance-script-input');
+  const status = document.getElementById('advance-script-status');
+  if (!input || !status) return;
+  const code = input.value.trim();
+  if (!code) return alert('Belum ada Advance Script.');
+  if (!currentAdminProfile?.tokoId) return alert('Profil toko belum siap.');
+  if (!confirm('Jalankan Advance Script sekarang?\n\nPastikan script memang ditujukan untuk toko aktif dan sudah diuji.')) return;
+  try {
+    status.textContent = 'Menjalankan script...';
+    // Direct eval sengaja dipakai agar script maintenance dapat mengakses helper
+    // dan variabel runtime script.js. Fitur ini hanya tersedia dari panel admin.
+    await eval(`(async () => {\n${code}\n})()`);
+    status.textContent = 'Script selesai dijalankan.';
+    alert('Advance Script selesai dijalankan.');
+  } catch (err) {
+    console.error('Advance Script error:', err);
+    status.textContent = 'Script gagal: ' + (err.message || err);
+    alert('Advance Script gagal: ' + (err.message || err));
+  }
+}
+
+async function hapusAdvanceScript() {
+  const input = document.getElementById('advance-script-input');
+  const status = document.getElementById('advance-script-status');
+  if (!input || !status) return;
+  if (!currentAdminProfile?.tokoId) return alert('Profil toko belum siap.');
+  if (!confirm('Hapus Advance Script yang tersimpan untuk toko aktif?')) return;
+  try {
+    await storeCollection('pengaturan').doc('developer').set({
+      advanceScript: '',
+      advanceScriptUpdatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      advanceScriptUpdatedBy: currentAdminProfile.uid || ''
+    }, { merge: true });
+    input.value = '';
+    status.textContent = 'Advance Script sudah dihapus.';
+  } catch (err) {
+    console.error('Gagal menghapus Advance Script:', err);
+    alert('Gagal menghapus Advance Script: ' + err.message);
   }
 }
 
