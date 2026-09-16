@@ -592,21 +592,16 @@ function handleAuthState(user) {
       }
 
       ACTIVE_TOKO_ID = currentAdminProfile.tokoId;
-      migrateGlobalDataToV13().finally(() => refreshData());
+      // Profil toko sudah valid. Jangan jalankan migrasi global otomatis.
+      // Data operasional harus tetap berada di toko/{tokoId}.
+      refreshData();
     })
     .catch((err) => {
       console.error("Profil Auth/role gagal dibaca:", err);
-      // Tetap pertahankan sesi Firebase dan dashboard yang sudah terbuka.
-      // Jangan memaksa user kembali ke halaman login; ini mencegah loop login.
-      currentAdminProfile = {
-        uid: user.uid,
-        email: user.email || "",
-        role: "",
-        tokoId: ACTIVE_TOKO_ID
-      };
-      ACTIVE_TOKO_ID = "toko_v13";
-      refreshData();
-      alert("Login Firebase berhasil, tetapi profil admin belum terbaca. Detail: " + err.message);
+      // Jangan pernah mengarahkan akun yang profilnya gagal dibaca ke toko_v13.
+      // Itu berisiko membuat akun salah tenant membaca/menulis data toko lain.
+      currentAdminProfile = null;
+      alert("Login Firebase berhasil, tetapi profil admin belum terbaca. Data toko tidak diaktifkan. Detail: " + err.message);
     });
 }
 
@@ -615,58 +610,11 @@ if (typeof auth !== "undefined") auth.onAuthStateChanged(handleAuthState);
 // ===== MIGRASI DATA GLOBAL -> TOKO V13 (AMAN, TIDAK MENGHAPUS DATA LAMA) =====
 let v13MigrationRunning = false;
 async function migrateGlobalDataToV13() {
-  if (v13MigrationRunning) return;
-  v13MigrationRunning = true;
-  const markerRef = db.collection("pengaturan").doc("migrasi_toko_v13");
-  try {
-    const markerSnap = await markerRef.get();
-    if (markerSnap.exists && markerSnap.data()?.status === "completed") return;
-
-    const collections = ["produk", "pelanggan", "transaksi", "catatan", "db_chat_rumpi", "chats"];
-    const migrated = {};
-    for (const name of collections) {
-      const source = db.collection(name);
-      const target = storeCollection(name);
-      const snap = await source.get();
-      let count = 0;
-      let batch = db.batch();
-      let batchCount = 0;
-      const commitBatch = async () => {
-        if (batchCount > 0) await batch.commit();
-        batch = db.batch(); batchCount = 0;
-      };
-      for (const docSnap of snap.docs) {
-        batch.set(target.doc(docSnap.id), docSnap.data(), { merge: true });
-        batchCount++; count++;
-        if (batchCount >= 450) await commitBatch();
-        // chats memiliki subcollection messages; salin juga tanpa menghapus sumber.
-        if (name === "chats") {
-          const msgSnap = await source.doc(docSnap.id).collection("messages").get();
-          let msgBatch = db.batch(); let msgCount = 0;
-          for (const msg of msgSnap.docs) {
-            msgBatch.set(target.doc(docSnap.id).collection("messages").doc(msg.id), msg.data(), { merge: true });
-            msgCount++;
-            if (msgCount >= 450) { await msgBatch.commit(); msgBatch = db.batch(); msgCount = 0; }
-          }
-          if (msgCount) await msgBatch.commit();
-        }
-      }
-      await commitBatch();
-      migrated[name] = count;
-    }
-    await markerRef.set({
-      status: "completed",
-      tokoId: ACTIVE_TOKO_ID,
-      migrated,
-      completedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    console.log("Migrasi data V13 selesai:", migrated);
-  } catch (err) {
-    console.error("Migrasi V13 gagal:", err);
-    // Jangan tandai selesai. Pada login berikutnya dapat dilanjutkan/diulang dengan aman.
-  } finally {
-    v13MigrationRunning = false;
-  }
+  // DISABLED: migrasi global -> V13 tidak boleh berjalan otomatis.
+  // Fungsi lama sengaja dipertahankan sebagai placeholder agar referensi lama
+  // tidak error, tetapi tidak melakukan read/write ke koleksi global.
+  console.warn("Migrasi global -> V13 dinonaktifkan.");
+  return;
 }
 
 
