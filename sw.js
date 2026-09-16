@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kasirquh-v3';
+const CACHE_NAME = 'kasirquh-v4';
 const urlsToCache = [
   '/',
   '/index.html',
