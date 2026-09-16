@@ -2392,8 +2392,26 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
   height:100% !important;
   z-index:10 !important;
   border-radius:16px !important;
-  background:rgba(2,8,20,.70) !important;
+  background:rgba(2,8,20,.34) !important;
   pointer-events:none !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-soldout-overlay span {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:4px 10px !important;
+  border-radius:8px !important;
+  background:#dc2626 !important;
+  color:#fff !important;
+  font-size:.66rem !important;
+  font-weight:900 !important;
+  letter-spacing:.2px !important;
+  line-height:1 !important;
+  transform:rotate(-10deg) !important;
+  box-shadow:0 4px 10px rgba(0,0,0,.35),0 0 9px rgba(220,38,38,.28) !important;
 }
 @media (max-width:420px) {
   body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-photo-wrap {
@@ -4566,7 +4584,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
         } else {
           container.innerHTML += `
             <div class="catalog-list-item" onclick="openProductDetail('${code}')">
-              ${isHabis ? '<div class="modern-list-soldout-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:6px;"></div>' : ''}
+              ${isHabis ? '<div class="modern-list-soldout-overlay" aria-label="Stok habis"><span>HABIS</span></div>' : ''}
               <div class="modern-list-photo-wrap" style="position: relative; flex-shrink: 0;">
                 ${sisaStokBadge}
                 <img src="${fotoSrc}" class="modern-list-photo" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
