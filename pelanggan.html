@@ -5219,6 +5219,80 @@ body[data-theme="modern"] #cartModal button[onclick="prosesSimpanMenuSaja()"]:ac
 }
 </style>
 
+
+<style id="modern-cart-white-surface-final-v4">
+/* MODERN — bersihkan seluruh sisa surface putih di modal Keranjang.
+   Tidak memengaruhi Light/Dark. */
+body[data-theme="modern"] #cartModal .cart-table,
+body[data-theme="modern"] #cartModal .cart-table thead,
+body[data-theme="modern"] #cartModal .cart-table tbody,
+body[data-theme="modern"] #cartModal .cart-table tr,
+body[data-theme="modern"] #cartModal .cart-table th,
+body[data-theme="modern"] #cartModal .cart-table td {
+  border-color: transparent !important;
+}
+body[data-theme="modern"] #cartModal .cart-table thead th {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+body[data-theme="modern"] #cartModal .cart-table-wrapper {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+body[data-theme="modern"] #cartModal .summary-box {
+  border: 0 !important;
+  border-top: 1px solid rgba(70,145,255,.18) !important;
+  border-radius: 0 !important;
+}
+/* Kotak Simpan jadi Menu Resep: navy Modern, bukan putih dari var(--input-bg). */
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div[style*="background"] {
+  background: #0e1b2e !important;
+  color: #dbeafe !important;
+  border: 1px solid #294564 !important;
+  box-shadow: none !important;
+}
+/* Checkbox mengikuti Modern, termasuk saat dicentang/fokus. */
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  margin: 0 !important;
+  border-radius: 5px !important;
+  border: 1px solid #416487 !important;
+  background: #101f36 !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.15) !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle:checked,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle:checked {
+  background: #1677d2 !important;
+  border-color: #8fc9ff !important;
+}
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle:checked::after,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle:checked::after {
+  content: "✓" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle:focus,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(37,99,235,.22) !important;
+}
+</style>
 </body>
 \n<style id="kq-no3-no4-exact-rail-final">\n/* FINAL: No.3 & No.4 mengikuti RAIL GEOMETRY No.2 (Stok Rumah).\n   Header/Bottom Navbar tidak disentuh. */\n#recipe-section-wrapper, #trending-section-wrapper {\n  box-sizing: border-box !important;\n  overflow: visible !important;\n}\n#recipe-section-wrapper > div:first-child,\n#trending-section-wrapper > div:first-child {\n  box-sizing: border-box !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n}\n#recipe-scroll-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n  padding-top: 2px !important;\n  padding-bottom: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: hidden !important;\n  scrollbar-width: none !important;\n}\n#trending-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 4px !important;\n  padding-right: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: visible !important;\n  scrollbar-width: none !important;\n}\n#trending-container .auto-scroll-track {\n  box-sizing: border-box !important;\n  padding-left: 10px !important;\n  padding-right: 10px !important;\n  padding-top: 4px !important;\n  padding-bottom: 6px !important;\n}\n#recipe-scroll-container > *,\n#trending-container > *,\n#trending-container .auto-scroll-track > * {\n  flex-shrink: 0 !important;\n}\n@media (max-width: 699px) {\n  /* Samakan OUTER WRAPPER dengan No.2: full viewport.\n     Rail kartu tetap 14px dari viewport: No.2 = 4px + 10px. */\n  #recipe-section-wrapper, #trending-section-wrapper {\n    width: 100vw !important;\n    max-width: 100vw !important;\n    margin-left: calc(50% - 50vw) !important;\n    margin-right: calc(50% - 50vw) !important;\n    box-sizing: border-box !important;\n  }\n}\n</style>\n
 
