@@ -1452,6 +1452,16 @@ function scrollKePengaturanBerandaPelanggan() {
     const db = firebase.firestore();
     // Firebase Authentication: initialize once and expose the same auth instance to script.js
     const auth = firebase.auth();
+    // ===== V13 STORE DATA ROUTER =====
+    // Semua data operasional toko sekarang berada di: toko/{tokoId}/{koleksi}.
+    // tokoId bersifat stabil dan TIDAK mengikuti nama toko.
+    const ACTIVE_TOKO_ID = "toko_v13";
+    const V13_STORE_COLLECTIONS = new Set(["produk", "pelanggan", "transaksi", "catatan", "db_chat_rumpi", "chats"]);
+    function storeCollection(name) {
+      if (!V13_STORE_COLLECTIONS.has(name)) return db.collection(name);
+      return db.collection("toko").doc(ACTIVE_TOKO_ID).collection(name);
+    }
+
 
     let onlineOrdersDataCache = [];
     let activeOnlineTab = 'berlangsung';
@@ -1795,7 +1805,7 @@ function scrollKePengaturanBerandaPelanggan() {
 
     function initOnlineOrdersListener() {
       let isInitialLoad = true;
-      db.collection("transaksi").onSnapshot((snapshot) => {
+      storeCollection("transaksi").onSnapshot((snapshot) => {
         if (!isInitialLoad) {
           snapshot.docChanges().forEach((change) => {
             if (change.type === "added") {
@@ -1829,7 +1839,7 @@ function scrollKePengaturanBerandaPelanggan() {
     // --- FITUR LIVE CHAT ADMIN ---
     function initAdminChatListener() {
       let isInitialChatLoad = true;
-      db.collection("chats").onSnapshot((snapshot) => {
+      storeCollection("chats").onSnapshot((snapshot) => {
         if (!isInitialChatLoad) {
           snapshot.docChanges().forEach((change) => {
             let data = change.doc.data();
@@ -1901,12 +1911,12 @@ function scrollKePengaturanBerandaPelanggan() {
       document.getElementById("admin-chat-input").removeAttribute("disabled");
       document.getElementById("admin-chat-send-btn").removeAttribute("disabled");
 
-      db.collection("chats").doc(phone).update({ unreadAdmin: 0 }).catch(() => {});
+      storeCollection("chats").doc(phone).update({ unreadAdmin: 0 }).catch(() => {});
       adminChatPrevUnread[phone] = 0;
 
       if (chatUnsubscribe) chatUnsubscribe();
 
-      chatUnsubscribe = db.collection("chats").doc(phone).collection("messages")
+      chatUnsubscribe = storeCollection("chats").doc(phone).collection("messages")
         .orderBy("waktuTimestamp", "asc")
         .onSnapshot((snapshot) => {
           let msgContainer = document.getElementById("admin-chat-messages");
@@ -1938,13 +1948,13 @@ function scrollKePengaturanBerandaPelanggan() {
 
       let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
 
-      db.collection("chats").doc(selectedChatPhone).collection("messages").add({
+      storeCollection("chats").doc(selectedChatPhone).collection("messages").add({
         pengirim: "admin",
         pesan: pesan,
         waktu: nowStr,
         waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        db.collection("chats").doc(selectedChatPhone).set({
+        storeCollection("chats").doc(selectedChatPhone).set({
           lastMessage: "Admin: " + pesan,
           lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
           unreadCustomer: firebase.firestore.FieldValue.increment(1)
@@ -1958,13 +1968,13 @@ function scrollKePengaturanBerandaPelanggan() {
       if (!confirm("Hapus seluruh riwayat Chat Pribadi dengan pelanggan ini? Tindakan ini tidak dapat dibatalkan!")) return;
 
       try {
-        const messagesRef = db.collection("chats").doc(selectedChatPhone).collection("messages");
+        const messagesRef = storeCollection("chats").doc(selectedChatPhone).collection("messages");
         const snapshot = await messagesRef.get();
         let batch = db.batch();
         snapshot.forEach(doc => batch.delete(doc.ref));
         await batch.commit();
 
-        await db.collection("chats").doc(selectedChatPhone).set({
+        await storeCollection("chats").doc(selectedChatPhone).set({
           lastMessage: "",
           lastTimestamp: firebase.firestore.FieldValue.delete(),
           unreadAdmin: 0,
@@ -1987,7 +1997,7 @@ function scrollKePengaturanBerandaPelanggan() {
 
       let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID');
 
-      db.collection("db_chat_rumpi").add({
+      storeCollection("db_chat_rumpi").add({
         senderPhone: "Admin",
         senderName: "Admin Toko",
         pesan: pesan,
@@ -2175,7 +2185,7 @@ function scrollKePengaturanBerandaPelanggan() {
       let newQty = editingOrderItemsTemp.reduce((acc, i) => acc + i.qty, 0);
 
       try {
-        await db.collection("transaksi").doc(id).update({
+        await storeCollection("transaksi").doc(id).update({
           items: editingOrderItemsTemp,
           total: newTotal,
           qty: newQty
@@ -2194,10 +2204,10 @@ function scrollKePengaturanBerandaPelanggan() {
     }
     function closeProofModal() { document.getElementById("proofModal").classList.remove("show"); }
     function ubahStatusPesananAdmin(id, status) {
-      db.collection("transaksi").doc(id).update({ statusPesanan: status }).then(() => alert("Status diperbarui menjadi: " + status));
+      storeCollection("transaksi").doc(id).update({ statusPesanan: status }).then(() => alert("Status diperbarui menjadi: " + status));
     }
     function hapusPesananAdmin(id) {
-      if (confirm("Hapus riwayat pesanan online ini?")) db.collection("transaksi").doc(id).delete();
+      if (confirm("Hapus riwayat pesanan online ini?")) storeCollection("transaksi").doc(id).delete();
     }
 
     function initCustomerCardClickObserver() {
@@ -2231,9 +2241,9 @@ function scrollKePengaturanBerandaPelanggan() {
     }
 
     function bukaDetailPelangganAdminByPhone(phone) {
-      db.collection("pelanggan").where("phone", "==", phone).get().then(snap => {
+      storeCollection("pelanggan").where("phone", "==", phone).get().then(snap => {
         if (snap.empty) {
-          db.collection("pelanggan").get().then(allSnap => {
+          storeCollection("pelanggan").get().then(allSnap => {
             let found = null;
             allSnap.forEach(d => {
               let p = d.data().phone || "";
@@ -2338,7 +2348,7 @@ function scrollKePengaturanBerandaPelanggan() {
       function startListener() {
         if (typeof db === "undefined" || !db.collection) return;
 
-        db.collection("pelanggan").onSnapshot((snapshot) => {
+        storeCollection("pelanggan").onSnapshot((snapshot) => {
           let pendingCount = 0;
           snapshot.forEach((doc) => {
             const data = doc.data() || {};
