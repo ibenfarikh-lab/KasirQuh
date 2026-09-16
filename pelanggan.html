@@ -2282,29 +2282,29 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
 body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-photo-wrap [class*="stok-badge"] {
   z-index:8 !important;
 }
-body[data-theme="modern"] .product-catalog-list .catalog-list-item > div:nth-of-type(2) {
+body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-info {
   min-width:0 !important;
   flex:1 1 auto !important;
   padding-right:2px !important;
 }
-body[data-theme="modern"] .product-catalog-list .catalog-list-item > div:nth-of-type(2) > div:first-child {
+body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-info > div:first-child {
   color:#ffffff !important;
   font-size:.82rem !important;
   font-weight:850 !important;
   line-height:1.15 !important;
 }
-body[data-theme="modern"] .product-catalog-list .catalog-list-item > div:nth-of-type(2) > div:nth-child(2) {
+body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-info > div:nth-child(2) {
   margin-top:4px !important;
   color:#8fbfff !important;
   font-size:.66rem !important;
   line-height:1.1 !important;
 }
-body[data-theme="modern"] .product-catalog-list .catalog-list-item > div:last-child {
+body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-actions {
   flex:0 0 auto !important;
   min-width:78px !important;
   gap:5px !important;
 }
-body[data-theme="modern"] .product-catalog-list .catalog-list-item > div:last-child > div:first-child {
+body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-actions > div:first-child {
   color:#ffd84a !important;
   font-size:.79rem !important;
   font-weight:900 !important;
@@ -2350,7 +2350,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > div[style*=
     width:50px !important;
     height:50px !important;
   }
-  body[data-theme="modern"] .product-catalog-list .catalog-list-item > div:last-child { min-width:74px !important; }
+  body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-actions { min-width:74px !important; }
 }
 </style>
 
@@ -2387,38 +2387,56 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
 }
 body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-soldout-overlay {
   position:absolute !important;
-  inset:0 !important;
-  width:100% !important;
-  height:100% !important;
+  inset:auto !important;
+  left:68px !important;
+  top:50% !important;
+  width:auto !important;
+  height:auto !important;
   z-index:10 !important;
-  border-radius:16px !important;
-  background:rgba(2,8,20,.34) !important;
+  border-radius:0 !important;
+  background:transparent !important;
   pointer-events:none !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
+  display:block !important;
+  transform:translateY(-50%) !important;
 }
 body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-soldout-overlay span {
   display:inline-flex !important;
   align-items:center !important;
   justify-content:center !important;
-  padding:4px 10px !important;
-  border-radius:8px !important;
+  padding:4px 9px !important;
+  border-radius:999px !important;
   background:#dc2626 !important;
   color:#fff !important;
-  font-size:.66rem !important;
+  font-size:.62rem !important;
   font-weight:900 !important;
   letter-spacing:.2px !important;
   line-height:1 !important;
-  transform:rotate(-10deg) !important;
+  transform:rotate(-8deg) !important;
   box-shadow:0 4px 10px rgba(0,0,0,.35),0 0 9px rgba(220,38,38,.28) !important;
+  white-space:nowrap !important;
 }
 @media (max-width:420px) {
+  body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-soldout-overlay { left:63px !important; }
   body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-photo-wrap {
     flex-basis:54px !important; width:54px !important; min-width:54px !important; height:54px !important; border-radius:12px !important;
   }
   body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-photo-wrap .modern-list-photo {
     width:50px !important; height:50px !important; max-width:50px !important; max-height:50px !important;
+  }
+}
+</style>
+<style id="modern-list-soldout-final-fix">
+/* Final fix: sold-out badge must never become a flex child that resizes the photo area. */
+body[data-theme="modern"] .product-catalog-list .catalog-list-item { position:relative !important; }
+body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-soldout-overlay {
+  flex:none !important; width:max-content !important; max-width:max-content !important;
+}
+body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-photo-wrap {
+  flex:0 0 58px !important; width:58px !important; min-width:58px !important;
+}
+@media (max-width:420px) {
+  body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-list-photo-wrap {
+    flex:0 0 54px !important; width:54px !important; min-width:54px !important;
   }
 }
 </style>
@@ -4589,11 +4607,11 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
                 ${sisaStokBadge}
                 <img src="${fotoSrc}" class="modern-list-photo" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
               </div>
-              <div style="min-width: 0; flex: 1;">
+              <div class="modern-list-info" style="min-width: 0; flex: 1;">
                 <div style="font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
                 <div style="font-size: 0.68rem; color: rgba(255,255,255,0.8);">Stok: ${p.stok || 0} ${satuan}</div>
               </div>
-              <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+              <div class="modern-list-actions" style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
                 <div style="font-size: 0.8rem; font-weight: bold; color: #fde047;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
                 <button class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position: static; width: 24px; height: 24px; font-size: 0.7rem;">🛒</button>
               </div>
