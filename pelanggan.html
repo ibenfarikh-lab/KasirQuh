@@ -3617,7 +3617,16 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       currentDetailStep = isKg ? 0.25 : 1;
       currentDetailQty = currentDetailStep;
       
-      document.getElementById('detail-img').src = fotoSrc;
+      const detailModal = document.getElementById("productDetailModal");
+      const modernCardDetail = document.body.getAttribute('data-theme') === 'modern' && catalogViewMode === 'card';
+      detailModal.classList.toggle('modern-card-detail-mode', modernCardDetail);
+      const detailImg = document.getElementById('detail-img');
+      detailImg.src = fotoSrc;
+      if (modernCardDetail) {
+        detailImg.onload = function(){
+          if (typeof makeModernProductTransparent === 'function') makeModernProductTransparent(this);
+        };
+      }
       document.getElementById('detail-category').innerText = p.kategori || "UMUM";
       document.getElementById('detail-name').innerText = p.nama;
       document.getElementById('detail-price').innerText = `Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}`;
@@ -3631,12 +3640,14 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
       } else {
         btnAdd.style.background = "#2563eb"; btnAdd.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Masukkan`; btnAdd.disabled = false;
       }
-      document.getElementById("productDetailModal").classList.add("show");
+      detailModal.classList.add("show");
     }
     
     function closeProductDetail(skipHistory = false) {
       if (!skipHistory && !appNavRestoring && history.state?.__kasirquhState?.modal === 'productDetailModal') { history.back(); return; }
-      document.getElementById('productDetailModal').classList.remove('show');
+      const detailModal = document.getElementById('productDetailModal');
+      detailModal.classList.remove('show');
+      detailModal.classList.remove('modern-card-detail-mode');
     }
 
     function ubahQtyDetail(dir) {
