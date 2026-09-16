@@ -592,7 +592,7 @@ function handleAuthState(user) {
       }
 
       ACTIVE_TOKO_ID = currentAdminProfile.tokoId;
-      migrateGlobalDataToV13().finally(() => refreshData());
+      migrateGlobalDataToV13().finally(() => migrateGlobalPengaturanToV13().finally(() => refreshData()));
     })
     .catch((err) => {
       console.error("Profil Auth/role gagal dibaca:", err);
@@ -666,6 +666,63 @@ async function migrateGlobalDataToV13() {
     // Jangan tandai selesai. Pada login berikutnya dapat dilanjutkan/diulang dengan aman.
   } finally {
     v13MigrationRunning = false;
+  }
+}
+
+// ===== MIGRASI PENGATURAN GLOBAL -> TOKO V13 (SATU KALI, TANPA MENGHAPUS SUMBER) =====
+let v13PengaturanMigrationRunning = false;
+async function migrateGlobalPengaturanToV13() {
+  if (v13PengaturanMigrationRunning) return;
+  v13PengaturanMigrationRunning = true;
+  const markerRef = db.collection("pengaturan").doc("migrasi_pengaturan_toko_v13");
+  try {
+    const markerSnap = await markerRef.get();
+    if (markerSnap.exists && markerSnap.data()?.status === "completed") return;
+
+    if (!currentAdminProfile || !currentAdminProfile.tokoId) {
+      throw new Error("tokoId admin belum tersedia untuk migrasi pengaturan.");
+    }
+
+    const target = storeCollection("pengaturan");
+    const snap = await db.collection("pengaturan").get();
+    let batch = db.batch();
+    let batchCount = 0;
+    let count = 0;
+    const skipped = [];
+
+    const commitBatch = async () => {
+      if (batchCount > 0) await batch.commit();
+      batch = db.batch();
+      batchCount = 0;
+    };
+
+    for (const docSnap of snap.docs) {
+      // Marker migrasi tetap berada di koleksi global agar tidak ikut tersalin.
+      if (docSnap.id === "migrasi_toko_v13" || docSnap.id === "migrasi_pengaturan_toko_v13") {
+        skipped.push(docSnap.id);
+        continue;
+      }
+      batch.set(target.doc(docSnap.id), docSnap.data(), { merge: true });
+      batchCount++;
+      count++;
+      if (batchCount >= 450) await commitBatch();
+    }
+    await commitBatch();
+
+    await markerRef.set({
+      status: "completed",
+      tokoId: currentAdminProfile.tokoId,
+      migratedCount: count,
+      skipped,
+      completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    console.log("Migrasi pengaturan V13 selesai:", { migratedCount: count, tokoId: currentAdminProfile.tokoId });
+  } catch (err) {
+    console.error("Migrasi pengaturan V13 gagal:", err);
+    // Tidak menandai completed jika gagal; dapat dicoba lagi pada login berikutnya.
+  } finally {
+    v13PengaturanMigrationRunning = false;
   }
 }
 
