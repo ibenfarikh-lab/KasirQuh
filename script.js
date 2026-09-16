@@ -548,6 +548,15 @@ function parseRupiahToNumber(stringVal) {
 let userAuth = { user: "", pass: "", updatedAt: 0 };
 let currentAdminProfile = null;
 
+// ===== SUMBER DATA TOKO BERDASARKAN tokoId =====
+// Untuk V13, data operasional berada di toko/{tokoId}/{koleksi}.
+// Fallback toko_v13 menjaga listener awal tetap aman sebelum profil Auth selesai dibaca.
+let ACTIVE_TOKO_ID = "toko_v13";
+function storeCollection(name) {
+  const tokoId = (currentAdminProfile && currentAdminProfile.tokoId) || ACTIVE_TOKO_ID;
+  return db.collection("toko").doc(tokoId).collection(name);
+}
+
 function handleAuthState(user) {
   const loginModal = document.getElementById("loginModal");
   if (user) {
@@ -569,6 +578,7 @@ function handleAuthState(user) {
           role: profile.role || "",
           tokoId: profile.tokoId || ""
         };
+        ACTIVE_TOKO_ID = currentAdminProfile.tokoId || ACTIVE_TOKO_ID;
 
         if (currentAdminProfile.role !== "admin") {
           currentAdminProfile = null;
@@ -769,7 +779,7 @@ function setupCatatanListener(tabKey) {
     catatanListeners[tabKey] = null;
   }
 
-  catatanListeners[tabKey] = db.collection("catatan").doc(docId).onSnapshot(async (docSnap) => {
+  catatanListeners[tabKey] = storeCollection("catatan").doc(docId).onSnapshot(async (docSnap) => {
     if (docSnap.exists) {
       databaseCatatanDinamis[tabKey] = docSnap.data();
       renderHalamanSubCatatan(tabKey);
@@ -779,7 +789,7 @@ function setupCatatanListener(tabKey) {
       let prevDateStr = currDate.getFullYear() + '-' + String(currDate.getMonth() + 1).padStart(2, '0') + '-' + String(currDate.getDate()).padStart(2, '0');
       let prevDocId = `${tabKey}_${prevDateStr}`;
       
-      let prevDocSnap = await db.collection("catatan").doc(prevDocId).get();
+      let prevDocSnap = await storeCollection("catatan").doc(prevDocId).get();
       let targetItems = [];
 
       if (prevDocSnap.exists && prevDocSnap.data().items) {
@@ -803,7 +813,7 @@ function setupCatatanListener(tabKey) {
         modalAwal: "0",
         items: targetItems
       };
-      await db.collection("catatan").doc(docId).set(targetData);
+      await storeCollection("catatan").doc(docId).set(targetData);
     }
   }, err => {
     console.error("Gagal memuat catatan: ", err);
@@ -926,7 +936,7 @@ function hapusTabCatatanDinamis(tabKey) {
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
-      db.collection("catatan").doc(`${tabKey}_${selectedCatatanDate}`).delete().catch(e => {});
+      storeCollection("catatan").doc(`${tabKey}_${selectedCatatanDate}`).delete().catch(e => {});
       activeSubCatatanTab = daftarNamaTabCatatan[0];
       renderSubTabsCatatanUI();
       showNotif("Tab catatan dihapus!");
@@ -941,7 +951,7 @@ function simpanModalAwalDinamis(tabKey) {
   databaseCatatanDinamis[tabKey].tabKey = tabKey;
   databaseCatatanDinamis[tabKey].tanggal = selectedCatatanDate;
 
-  db.collection("catatan").doc(`${tabKey}_${selectedCatatanDate}`).set(databaseCatatanDinamis[tabKey], { merge: true })
+  storeCollection("catatan").doc(`${tabKey}_${selectedCatatanDate}`).set(databaseCatatanDinamis[tabKey], { merge: true })
     .catch(err => console.error("Gagal simpan modal: ", err));
 }
 
@@ -1102,7 +1112,7 @@ function simpanCatatanCard() {
   }
 
   dataObj.items = targetList;
-  db.collection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
+  storeCollection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
     .then(() => {
       databaseCatatanDinamis[targetTabKey] = dataObj;
       closeCatatanModal();
@@ -1118,7 +1128,7 @@ function hapusCatatanCardDinamis(targetTabKey, id) {
     if (!dataObj) return;
     dataObj.items = (dataObj.items || []).filter(c => c.id !== id);
 
-    db.collection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
+    storeCollection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
       .then(() => {
         renderHalamanSubCatatan(targetTabKey);
         showNotif("Catatan dihapus!");
@@ -1140,7 +1150,7 @@ function pindahCatatanUrutanDinamis(targetTabKey, index, direction) {
   targetList[targetIndex] = temp;
 
   dataObj.items = targetList;
-  db.collection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
+  storeCollection("catatan").doc(`${targetTabKey}_${selectedCatatanDate}`).set(dataObj)
     .then(() => {
       renderHalamanSubCatatan(targetTabKey);
       showNotif("Urutan diperbarui!");
@@ -1207,7 +1217,7 @@ function simpanPengaturanAkun() {
 }
 
 let databaseProduk = {};
-db.collection("produk").onSnapshot((snapshot) => {
+storeCollection("produk").onSnapshot((snapshot) => {
   databaseProduk = {};
   snapshot.forEach((doc) => {
     databaseProduk[doc.id] = doc.data();
@@ -1216,7 +1226,7 @@ db.collection("produk").onSnapshot((snapshot) => {
 });
 
 let databasePelanggan = [];
-db.collection("pelanggan").onSnapshot((snapshot) => {
+storeCollection("pelanggan").onSnapshot((snapshot) => {
   databasePelanggan = [];
   snapshot.forEach((doc) => {
     let data = doc.data();
@@ -1242,7 +1252,7 @@ function simpanRestockKeCloud() {
 }
 
 let riwayatTransaksi = [];
-db.collection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapshot) => {
+storeCollection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapshot) => {
   riwayatTransaksi = [];
   snapshot.forEach((doc) => {
     let tData = doc.data();
@@ -1251,7 +1261,7 @@ db.collection("transaksi").orderBy("waktuTimestamp", "desc").onSnapshot((snapsho
   });
   refreshData();
 }, (error) => {
-  db.collection("transaksi").get().then((snapshot) => {
+  storeCollection("transaksi").get().then((snapshot) => {
     riwayatTransaksi = [];
     snapshot.forEach((doc) => {
       let tData = doc.data();
@@ -1655,7 +1665,7 @@ function simpanBarangLangsung() {
   const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
   const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
 
-  db.collection("produk").doc(code).set({
+  storeCollection("produk").doc(code).set({
     nama: name,
     kategori: category,
     barcode: barcode || "",
@@ -1692,7 +1702,7 @@ function simpanEditBarang(code) {
   const selectedOnlineImg = document.getElementById("db-selected-online-img").value;
   const existingFoto = databaseProduk[code] ? databaseProduk[code].foto : "";
 
-  db.collection("produk").doc(code).update({
+  storeCollection("produk").doc(code).update({
     nama: name,
     kategori: category,
     barcode: barcode || "",
@@ -1961,7 +1971,7 @@ function simpanCatatanPembukuan() {
     } else {
       cust.catatan.push({ id: "NOTE-" + Date.now(), waktu: waktuOtomatis, jenis: jenis, nominal: nominal, keterangan: keterangan || "-" });
     }
-    db.collection("pelanggan").doc(custId).update({ catatan: cust.catatan })
+    storeCollection("pelanggan").doc(custId).update({ catatan: cust.catatan })
       .then(() => { closeBookkeepingModal(); showNotif("Catatan disimpan!"); })
       .catch(err => alert("Gagal menyimpan: " + err.message));
   }
@@ -1972,7 +1982,7 @@ function hapusCatatanPembukuan(custId, noteId) {
     let cust = databasePelanggan.find(c => c.id === custId);
     if (cust && cust.catatan) {
       cust.catatan = cust.catatan.filter(n => n.id !== noteId);
-      db.collection("pelanggan").doc(custId).update({ catatan: cust.catatan })
+      storeCollection("pelanggan").doc(custId).update({ catatan: cust.catatan })
         .then(() => showNotif("Catatan dihapus!"))
         .catch(err => alert("Gagal menghapus: " + err.message));
     }
@@ -2069,7 +2079,7 @@ async function prosesBelanjaStok() {
     let qtyPenambahan = (sat === 'rtg') ? (item.qty * item.isiRtg) : item.qty;
     let stokBaru = parseFloat((stokLama + qtyPenambahan).toFixed(3));
 
-    let docRef = db.collection("produk").doc(code);
+    let docRef = storeCollection("produk").doc(code);
     batch.set(docRef, {
       nama: item.nama,
       kategori: item.kategori,
@@ -2729,7 +2739,7 @@ function prosesSimpanTransaksi() {
     if (databaseProduk[item.barcode]) {
       let sisaStok = (databaseProduk[item.barcode].stok || 0) - item.qty;
       let newStok = Math.max(0, parseFloat(sisaStok.toFixed(3)));
-      db.collection("produk").doc(item.barcode).update({ stok: newStok });
+      storeCollection("produk").doc(item.barcode).update({ stok: newStok });
     }
   });
   const totalModal = cart.reduce((acc, item) => acc + item.submodal, 0);
@@ -2743,7 +2753,7 @@ function prosesSimpanTransaksi() {
     metode: document.getElementById("pay-method").value,
     qty: cart.reduce((acc, item) => acc + item.qty, 0)
   };
-  db.collection("transaksi").add(transaksi).catch(err => console.error("Gagal simpan transaksi ke cloud: ", err));
+  storeCollection("transaksi").add(transaksi).catch(err => console.error("Gagal simpan transaksi ke cloud: ", err));
 }
 
 function selesaiTransaksi() {
@@ -2793,7 +2803,7 @@ function bagikanStrukWhatsApp() {
 
 function hapusBarang(code) {
   if(confirm("Hapus barang ini?")) {
-    db.collection("produk").doc(code).delete()
+    storeCollection("produk").doc(code).delete()
       .then(() => showNotif("Barang dihapus!"))
       .catch(err => alert("Gagal menghapus: " + err.message));
   }
@@ -2835,7 +2845,7 @@ async function importStokExcel(event) {
         if (nama) {
           if (!code) code = "BRG-" + Date.now() + "-" + i;
           let stokTersimpan = (sat === 'rtg') ? (stok * 10) : stok;
-          let docRef = db.collection("produk").doc(code);
+          let docRef = storeCollection("produk").doc(code);
           batch.set(docRef, { nama, kategori: kat, satuan: sat, isiRtg: 10, stok: stokTersimpan, modal, harga, modalRtg: modal, hargaRtg: harga, foto: "" });
           count++;
         }
@@ -2877,7 +2887,7 @@ function importPelangganExcel(event) {
         let phone = cols[2].replace(/"/g, '') || "-";
         let alamat = cols[3].replace(/"/g, '') || "-";
         if (nama) {
-          let docRef = db.collection("pelanggan").doc(custId);
+          let docRef = storeCollection("pelanggan").doc(custId);
           batch.set(docRef, { nama, phone, alamat, password: "123456", catatan: [] });
           count++;
         }
@@ -2914,7 +2924,7 @@ function importLaporanExcel(event) {
       if (!row) continue;
       let cols = row.split(",");
       if (cols.length >= 6) {
-        let newTrxRef = db.collection("transaksi").doc();
+        let newTrxRef = storeCollection("transaksi").doc();
         batch.set(newTrxRef, {
           waktu: cols[0].replace(/"/g, ''),
           waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -2956,13 +2966,13 @@ function simpanPelanggan() {
     password: password ? password : existingPassword
   };
 
-  db.collection("pelanggan").doc(custId).set(dataPelanggan, { merge: true })
+  storeCollection("pelanggan").doc(custId).set(dataPelanggan, { merge: true })
     .then(() => { closeCustomerModal(); showNotif("Pelanggan tersimpan!"); })
     .catch(err => alert("Gagal: " + err.message));
 }
 
 function setujuiAkunPelanggan(docId) {
-  db.collection("pelanggan").doc(docId).update({
+  storeCollection("pelanggan").doc(docId).update({
     status: "aktif"
   }).then(() => {
     alert("Akun pelanggan berhasil disetujui! Pelanggan sekarang dapat masuk.");
@@ -2973,7 +2983,7 @@ function setujuiAkunPelanggan(docId) {
 
 function hapusPelanggan(id) {
   if (confirm("Hapus pelanggan ini?")) {
-    db.collection("pelanggan").doc(id).delete()
+    storeCollection("pelanggan").doc(id).delete()
       .then(() => showNotif("Pelanggan dihapus!"))
       .catch(err => alert("Gagal: " + err.message));
   }
@@ -3026,7 +3036,7 @@ function simpanPengaturanScan() {
 
 async function resetRiwayat() {
   if (confirm("Kosongkan SELURUH riwayat transaksi di Cloud?")) {
-    let snapshot = await db.collection("transaksi").get();
+    let snapshot = await storeCollection("transaksi").get();
     let batch = db.batch();
     snapshot.forEach(doc => {
       batch.delete(doc.ref);
@@ -3039,7 +3049,7 @@ async function resetRiwayat() {
 
 function resetDatabaseBarang() {
   if (confirm("Hapus SELURUH database barang?")) {
-    for (let code in databaseProduk) { db.collection("produk").doc(code).delete(); }
+    for (let code in databaseProduk) { storeCollection("produk").doc(code).delete(); }
     alert("Database barang dikosongkan.");
     refreshData();
   }
@@ -3897,7 +3907,7 @@ function initAdminRumpiNotificationListener() {
     adminRumpiBadgeListener();
   }
 
-  adminRumpiBadgeListener = db.collection("db_chat_rumpi")
+  adminRumpiBadgeListener = storeCollection("db_chat_rumpi")
     .orderBy("waktuTimestamp", "asc")
     .onSnapshot((snapshot) => {
       if (!isInitialLoadRumpiAdmin) {
@@ -3972,7 +3982,7 @@ function switchAdminChatSubTab(sub) {
 function initAdminChatRumpiListener() {
   if (adminChatRumpiUnsubscribe) adminChatRumpiUnsubscribe();
 
-  adminChatRumpiUnsubscribe = db.collection("db_chat_rumpi")
+  adminChatRumpiUnsubscribe = storeCollection("db_chat_rumpi")
     .orderBy("waktuTimestamp", "asc")
     .onSnapshot((snapshot) => {
       let msgContainer = document.getElementById("admin-chat-rumpi-messages");
@@ -4006,13 +4016,13 @@ function initAdminChatRumpiListener() {
 
 function hapusPesanRumpiAdmin(docId) {
   if (confirm("Hapus pesan ini dari Chat Rumpi?")) {
-    db.collection("db_chat_rumpi").doc(docId).delete().catch(err => alert("Gagal menghapus pesan: " + err.message));
+    storeCollection("db_chat_rumpi").doc(docId).delete().catch(err => alert("Gagal menghapus pesan: " + err.message));
   }
 }
 
 function bersihkanSemuaChatRumpiAdmin() {
   if (confirm("Hapus seluruh riwayat pesan di Chat Rumpi? Tindakan ini tidak dapat dibatalkan!")) {
-    db.collection("db_chat_rumpi").get().then(snapshot => {
+    storeCollection("db_chat_rumpi").get().then(snapshot => {
       let batch = db.batch();
       snapshot.forEach(doc => {
         batch.delete(doc.ref);
