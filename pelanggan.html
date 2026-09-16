@@ -671,6 +671,21 @@ body:not([data-theme="modern"]) .product-catalog-card .generic-card-view {
 .generic-card-price { margin: 3px 4px 0 !important; font-size: 1.05rem !important; font-weight:900 !important; color:#2563eb !important; }
 .generic-card-stock { margin: 3px 4px 0 !important; font-size: .8rem !important; color: var(--text-muted) !important; }
 
+/* VIEW CARD — Light/Dark mengikuti warna colorful List & Grid.
+   Modern sengaja TIDAK disentuh karena punya visual khusus sendiri. */
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-view {
+  background-image: none !important;
+  color: #fff !important;
+}
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-view:nth-child(5n+1) { background: #2563eb !important; }
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-view:nth-child(5n+2) { background: #f97316 !important; }
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-view:nth-child(5n+3) { background: #10b981 !important; }
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-view:nth-child(5n+4) { background: #8b5cf6 !important; }
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-view:nth-child(5n+5) { background: #ec4899 !important; }
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-name { color: #fff !important; }
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-price { color: #fde047 !important; }
+body:not([data-theme="modern"]) .product-catalog-card .generic-card-stock { color: rgba(255,255,255,.85) !important; }
+
 @media (max-width: 420px) {
   body[data-theme="modern"] .product-catalog-card .modern-product-card-view { min-height: 355px !important; }
   body[data-theme="modern"] .modern-card-stage { height: 255px !important; }
