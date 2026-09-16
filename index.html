@@ -949,7 +949,7 @@ async function simpanPengaturanPromoToko() {
   const cfg={enabled,codes,updatedAt:Date.now()};
   localStorage.setItem('admin_promo_toko_v1',JSON.stringify(cfg));
   try {
-    await db.collection('pengaturan').doc('beranda_pelanggan_promo').set(cfg,{merge:true});
+    await storeCollection("pengaturan").doc('beranda_pelanggan_promo').set(cfg,{merge:true});
     const st=document.getElementById('admin-promo-status'); if(st) st.textContent='✓ Promo tersimpan dan siap tampil di pelanggan.';
   } catch(err) {
     const st=document.getElementById('admin-promo-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
@@ -967,7 +967,7 @@ function toggleAdminHomeInfo() {
 async function simpanPengaturanHomeInfo() {
   const cfg={infoText:'Info Toko....', runningText:(document.getElementById('admin-home-running-text')?.value || '').trim(), updatedAt:Date.now()};
   localStorage.setItem('admin_home_info_v1',JSON.stringify(cfg));
-  try { await db.collection('pengaturan').doc('beranda_pelanggan_home').set(cfg,{merge:true}); const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='✓ Info toko & running text tersimpan dan siap tampil di pelanggan.'; }
+  try { await storeCollection("pengaturan").doc('beranda_pelanggan_home').set(cfg,{merge:true}); const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='✓ Info toko & running text tersimpan dan siap tampil di pelanggan.'; }
   catch(err) { const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.'; }
 }
 function getAdminIdeMasakConfig() {
@@ -1058,7 +1058,7 @@ async function simpanPengaturanIdeMasak() {
   const cfg={enabled,recipes,updatedAt:Date.now()};
   localStorage.setItem('admin_ide_masak_v1',JSON.stringify(cfg));
   try {
-    await db.collection('pengaturan').doc('beranda_pelanggan_resep').set(cfg,{merge:true});
+    await storeCollection("pengaturan").doc('beranda_pelanggan_resep').set(cfg,{merge:true});
     const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='✓ Ide Masak tersimpan dan siap tampil di pelanggan.';
   } catch(err) {
     const st=document.getElementById('admin-recipe-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
@@ -1087,7 +1087,7 @@ async function simpanPengaturanStokRumahHabis() {
   const cfg={enabled,limit,updatedAt:Date.now()};
   localStorage.setItem('admin_stok_rumah_habis_v1',JSON.stringify(cfg));
   try {
-    await db.collection('pengaturan').doc('beranda_pelanggan_stok_rumah').set(cfg,{merge:true});
+    await storeCollection("pengaturan").doc('beranda_pelanggan_stok_rumah').set(cfg,{merge:true});
     const st=document.getElementById('admin-stok-rumah-status'); if(st) st.textContent='✓ Pengaturan Stok Rumah Habis tersimpan.';
   } catch(err) {
     const st=document.getElementById('admin-stok-rumah-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
@@ -1110,7 +1110,7 @@ async function simpanPengaturanSedangLaris() {
   const cfg={enabled,limit,updatedAt:Date.now()};
   localStorage.setItem('admin_sedang_laris_v1',JSON.stringify(cfg));
   try {
-    await db.collection('pengaturan').doc('beranda_pelanggan_laris').set(cfg,{merge:true});
+    await storeCollection("pengaturan").doc('beranda_pelanggan_laris').set(cfg,{merge:true});
     const st=document.getElementById('admin-trending-status'); if(st) st.textContent='✓ Pengaturan Sedang Laris tersimpan.';
   } catch(err) {
     const st=document.getElementById('admin-trending-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';

@@ -592,7 +592,7 @@ function handleAuthState(user) {
       }
 
       ACTIVE_TOKO_ID = currentAdminProfile.tokoId;
-      migrateGlobalDataToV13().finally(() => migrateGlobalPengaturanToV13().finally(() => refreshData()));
+      migrateGlobalDataToV13().finally(() => refreshData());
     })
     .catch((err) => {
       console.error("Profil Auth/role gagal dibaca:", err);
@@ -669,81 +669,24 @@ async function migrateGlobalDataToV13() {
   }
 }
 
-// ===== MIGRASI PENGATURAN GLOBAL -> TOKO V13 (SATU KALI, TANPA MENGHAPUS SUMBER) =====
-let v13PengaturanMigrationRunning = false;
-async function migrateGlobalPengaturanToV13() {
-  if (v13PengaturanMigrationRunning) return;
-  v13PengaturanMigrationRunning = true;
-  const markerRef = db.collection("pengaturan").doc("migrasi_pengaturan_toko_v13");
-  try {
-    const markerSnap = await markerRef.get();
-    if (markerSnap.exists && markerSnap.data()?.status === "completed") return;
-
-    if (!currentAdminProfile || !currentAdminProfile.tokoId) {
-      throw new Error("tokoId admin belum tersedia untuk migrasi pengaturan.");
-    }
-
-    const target = storeCollection("pengaturan");
-    const snap = await db.collection("pengaturan").get();
-    let batch = db.batch();
-    let batchCount = 0;
-    let count = 0;
-    const skipped = [];
-
-    const commitBatch = async () => {
-      if (batchCount > 0) await batch.commit();
-      batch = db.batch();
-      batchCount = 0;
-    };
-
-    for (const docSnap of snap.docs) {
-      // Marker migrasi tetap berada di koleksi global agar tidak ikut tersalin.
-      if (docSnap.id === "migrasi_toko_v13" || docSnap.id === "migrasi_pengaturan_toko_v13") {
-        skipped.push(docSnap.id);
-        continue;
-      }
-      batch.set(target.doc(docSnap.id), docSnap.data(), { merge: true });
-      batchCount++;
-      count++;
-      if (batchCount >= 450) await commitBatch();
-    }
-    await commitBatch();
-
-    await markerRef.set({
-      status: "completed",
-      tokoId: currentAdminProfile.tokoId,
-      migratedCount: count,
-      skipped,
-      completedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    console.log("Migrasi pengaturan V13 selesai:", { migratedCount: count, tokoId: currentAdminProfile.tokoId });
-  } catch (err) {
-    console.error("Migrasi pengaturan V13 gagal:", err);
-    // Tidak menandai completed jika gagal; dapat dicoba lagi pada login berikutnya.
-  } finally {
-    v13PengaturanMigrationRunning = false;
-  }
-}
-
 
 let pengaturanToko = { nama: "", alamat: "", phone: "" };
-db.collection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
+storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
   if (doc.exists) {
     pengaturanToko = doc.data();
   } else {
-    db.collection("pengaturan").doc("toko_v13").set(pengaturanToko);
+    storeCollection("pengaturan").doc("toko_v13").set(pengaturanToko);
   }
   refreshData();
 });
 
 let scanCooldownDuration = 1500;
-db.collection("pengaturan").doc("sistem_v13").onSnapshot((doc) => {
+storeCollection("pengaturan").doc("sistem_v13").onSnapshot((doc) => {
   if (doc.exists) {
     let data = doc.data();
     if (data.cooldown) scanCooldownDuration = data.cooldown;
   } else {
-    db.collection("pengaturan").doc("sistem_v13").set({ cooldown: 1500 });
+    storeCollection("pengaturan").doc("sistem_v13").set({ cooldown: 1500 });
   }
   refreshData();
 });
@@ -814,13 +757,13 @@ function updateDateDisplayUI() {
   }
 }
 
-db.collection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
+storeCollection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
   if (doc.exists) {
     let data = doc.data();
     if (data.list && data.list.length > 0) daftarNamaTabCatatan = data.list;
     if (data.labels) labelNamaTabCatatan = data.labels;
   } else {
-    db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+    storeCollection("pengaturan").doc("daftar_tab_catatan_v13").set({
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     });
@@ -960,7 +903,7 @@ function tambahTabCatatanBaru() {
   daftarNamaTabCatatan.push(newKey);
   labelNamaTabCatatan[newKey] = newLabel;
 
-  db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+  storeCollection("pengaturan").doc("daftar_tab_catatan_v13").set({
     list: daftarNamaTabCatatan,
     labels: labelNamaTabCatatan
   }).then(() => {
@@ -974,7 +917,7 @@ function ubahNamaTabDinamis(tabKey) {
   let labelBaru = prompt(`Masukkan nama baru untuk "${labelLama}":`, labelLama);
   if (labelBaru !== null && labelBaru.trim() !== "") {
     labelNamaTabCatatan[tabKey] = labelBaru.trim();
-    db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+    storeCollection("pengaturan").doc("daftar_tab_catatan_v13").set({
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
@@ -992,7 +935,7 @@ function hapusTabCatatanDinamis(tabKey) {
     daftarNamaTabCatatan = daftarNamaTabCatatan.filter(k => k !== tabKey);
     delete labelNamaTabCatatan[tabKey];
 
-    db.collection("pengaturan").doc("daftar_tab_catatan_v13").set({
+    storeCollection("pengaturan").doc("daftar_tab_catatan_v13").set({
       list: daftarNamaTabCatatan,
       labels: labelNamaTabCatatan
     }).then(() => {
@@ -1297,17 +1240,17 @@ storeCollection("pelanggan").onSnapshot((snapshot) => {
 });
 
 let restockListItems = [];
-db.collection("pengaturan").doc("restock_v13").onSnapshot((doc) => {
+storeCollection("pengaturan").doc("restock_v13").onSnapshot((doc) => {
   if (doc.exists) {
     restockListItems = doc.data().items || [];
   } else {
-    db.collection("pengaturan").doc("restock_v13").set({ items: [] });
+    storeCollection("pengaturan").doc("restock_v13").set({ items: [] });
   }
   refreshData();
 });
 
 function simpanRestockKeCloud() {
-  db.collection("pengaturan").doc("restock_v13").set({ items: restockListItems })
+  storeCollection("pengaturan").doc("restock_v13").set({ items: restockListItems })
     .catch(err => console.error("Gagal simpan restock ke cloud: ", err));
 }
 
@@ -3071,7 +3014,7 @@ function simpanPengaturanToko() {
   const alamat = document.getElementById("setting-shop-address").value.trim() || "-";
   const phone = document.getElementById("setting-shop-phone").value.trim() || "-";
 
-  db.collection("pengaturan").doc("toko_v13").set({
+  storeCollection("pengaturan").doc("toko_v13").set({
     nama: nama,
     alamat: alamat,
     phone: phone
@@ -3085,7 +3028,7 @@ function simpanPengaturanToko() {
 function simpanPengaturanScan() {
   scanCooldownDuration = parseInt(document.getElementById("setting-cooldown").value) || 1500;
 
-  db.collection("pengaturan").doc("sistem_v13").set({
+  storeCollection("pengaturan").doc("sistem_v13").set({
     cooldown: scanCooldownDuration
   }, { merge: true }).then(() => {
     alert("Jeda scan berhasil diperbarui secara online!");
