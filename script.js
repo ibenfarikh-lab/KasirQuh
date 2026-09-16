@@ -559,52 +559,55 @@ function storeCollection(name) {
 
 function handleAuthState(user) {
   const loginModal = document.getElementById("loginModal");
-  if (user) {
-    if (loginModal) loginModal.style.display = "none";
-    const welcome = document.getElementById("kasirquhVisual4Welcome");
-    if (welcome) welcome.remove();
-
-    // Jangan membuat/menimpa role secara otomatis.
-    // Role dan toko adalah sumber otorisasi yang disimpan di Firestore.
-    db.collection("pengguna").doc(user.uid).get()
-      .then((doc) => {
-        if (!doc.exists) {
-          throw new Error("Profil pengguna belum ditemukan di Firestore.");
-        }
-        const profile = doc.data() || {};
-        currentAdminProfile = {
-          uid: user.uid,
-          email: user.email || profile.email || "",
-          role: profile.role || "",
-          tokoId: profile.tokoId || ""
-        };
-        ACTIVE_TOKO_ID = currentAdminProfile.tokoId || ACTIVE_TOKO_ID;
-
-        if (currentAdminProfile.role !== "admin") {
-          currentAdminProfile = null;
-          if (loginModal) loginModal.style.display = "flex";
-          alert("Akun berhasil login, tetapi belum memiliki role admin.");
-          return;
-        }
-
-        if (!currentAdminProfile.tokoId) {
-          if (loginModal) loginModal.style.display = "flex";
-          alert("Akun admin belum memiliki tokoId.");
-          return;
-        }
-
-        migrateGlobalDataToV13().finally(() => refreshData());
-      })
-      .catch((err) => {
-        console.error("Gagal membaca profil pengguna:", err);
-        currentAdminProfile = null;
-        if (loginModal) loginModal.style.display = "flex";
-        alert("Login Firebase berhasil, tetapi profil admin belum siap di Firestore.");
-      });
-  } else {
+  if (!user) {
     currentAdminProfile = null;
     if (loginModal) loginModal.style.display = "flex";
+    return;
   }
+
+  // Firebase Auth sudah menjadi sumber kebenaran sesi.
+  // Jangan mengembalikan user ke login hanya karena identitas toko/nama toko kosong.
+  if (loginModal) loginModal.style.display = "none";
+  const welcome = document.getElementById("kasirquhVisual4Welcome");
+  if (welcome) welcome.remove();
+
+  db.collection("pengguna").doc(user.uid).get()
+    .then((doc) => {
+      if (!doc.exists) {
+        throw new Error("Profil pengguna belum ditemukan di Firestore (pengguna/UID).");
+      }
+      const profile = doc.data() || {};
+      currentAdminProfile = {
+        uid: user.uid,
+        email: user.email || profile.email || "",
+        role: profile.role || "",
+        tokoId: profile.tokoId || ""
+      };
+
+      if (currentAdminProfile.role !== "admin") {
+        throw new Error("Akun Firebase ini belum memiliki role admin.");
+      }
+      if (!currentAdminProfile.tokoId) {
+        throw new Error("Akun admin belum memiliki tokoId.");
+      }
+
+      ACTIVE_TOKO_ID = currentAdminProfile.tokoId;
+      migrateGlobalDataToV13().finally(() => refreshData());
+    })
+    .catch((err) => {
+      console.error("Profil Auth/role gagal dibaca:", err);
+      // Tetap pertahankan sesi Firebase dan dashboard yang sudah terbuka.
+      // Jangan memaksa user kembali ke halaman login; ini mencegah loop login.
+      currentAdminProfile = {
+        uid: user.uid,
+        email: user.email || "",
+        role: "",
+        tokoId: ACTIVE_TOKO_ID
+      };
+      ACTIVE_TOKO_ID = "toko_v13";
+      refreshData();
+      alert("Login Firebase berhasil, tetapi profil admin belum terbaca. Detail: " + err.message);
+    });
 }
 
 if (typeof auth !== "undefined") auth.onAuthStateChanged(handleAuthState);
