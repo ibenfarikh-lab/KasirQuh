@@ -4092,3 +4092,22 @@ setTheme(currentTheme);
 setLanguage(currentLang);
 cekStatusLogin();
 updatePermanentBarTitle();
+
+// Toggle Opsi Developer pada panel admin.
+function toggleAdminDeveloperOptions() {
+  const panel = document.getElementById('admin-developer-panel');
+  const btn = document.getElementById('admin-developer-toggle');
+  const card = document.getElementById('developer-options-card');
+  if (!panel || !btn) return;
+
+  const akanBuka = panel.hidden;
+  panel.hidden = !akanBuka;
+  btn.setAttribute('aria-expanded', String(akanBuka));
+  btn.textContent = akanBuka ? '🛠️ Tutup Opsi Developer' : '🛠️ Opsi Developer';
+
+  if (akanBuka) {
+    requestAnimationFrame(() => {
+      (card || panel).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+}

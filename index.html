@@ -876,18 +876,21 @@
       </div>
 
       <!-- OPSI DEVELOPER -->
-      <div class="card" style="border: 1px solid #7c3aed; background: var(--card-bg);">
-        <h3 style="color: #7c3aed; margin-top: 0; font-size: 1rem;">🛠️ Opsi Developer</h3>
-        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 10px;">
-          <h4 style="margin: 0 0 5px; font-size: 0.92rem;">🔄 Pembaruan Aplikasi</h4>
+      <div class="card" id="developer-options-card" style="border: 1px dashed #7c3aed; background: var(--card-bg); padding: 10px; margin-bottom: 8px; scroll-margin-top: 18px;">
+        <button id="admin-developer-toggle" type="button" onclick="toggleAdminDeveloperOptions()" aria-expanded="false" aria-controls="admin-developer-panel" style="width: 100%; background: transparent; color: var(--text-muted); border: none; padding: 6px; font-size: 0.78rem; cursor: pointer; text-align: left; font-weight: 700;">🛠️ Opsi Developer</button>
+      </div>
+
+      <div id="admin-developer-panel" hidden style="scroll-margin-top: 18px;">
+        <div class="card" style="border: 1px solid #7c3aed; background: var(--card-bg); padding: 12px; margin-bottom: 8px;">
+          <h3 style="color: #7c3aed; margin-top: 0; font-size: 1rem;">🔄 Pembaruan Aplikasi</h3>
           <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0 0 9px;">Perbarui cache aplikasi dan muat versi terbaru tanpa menghapus login, pengaturan lokal, atau data Firestore.</p>
           <button onclick="perbaruiAplikasi()" style="background: #2563eb; color: white; padding: 9px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer;">🔄 Perbarui Aplikasi</button>
           <div id="update-app-status" style="font-size: 0.72rem; color: var(--text-muted); margin-top: 6px; text-align: center;"></div>
         </div>
 
-        <div style="border: 1px solid #f59e0b; border-radius: 8px; padding: 10px; background: var(--card-bg);">
-          <h4 style="margin: 0 0 5px; font-size: 0.92rem;">🧩 Advance Script</h4>
-          <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0 0 8px;">Script sementara untuk migrasi, maintenance, atau perbaikan data. Script tersimpan untuk toko aktif dan dapat dihapus setelah selesai.</p>
+        <div class="card" style="border: 1px solid #f59e0b; background: var(--card-bg); padding: 12px; margin-bottom: 8px;">
+          <h3 style="color: #b45309; margin-top: 0; font-size: 1rem;">🧩 Advance Script</h3>
+          <p style="color: var(--text-muted); font-size: 0.78rem; margin: 0 0 8px;">Script sementara untuk migrasi, maintenance, atau perbaikan data. Tersimpan untuk toko aktif dan dapat dihapus setelah selesai.</p>
           <textarea id="advance-script-input" rows="8" spellcheck="false" placeholder="// Masukkan JavaScript sementara di sini..." style="width:100%; box-sizing:border-box; resize:vertical; font-family:monospace; font-size:0.75rem; padding:8px; border:1px solid var(--input-border); border-radius:7px; background:var(--input-bg); color:var(--text-color);"></textarea>
           <div style="display:flex; gap:6px; margin-top:7px;">
             <button onclick="simpanAdvanceScript()" style="flex:1; background:#16a34a; color:white; padding:8px; font-weight:bold; border-radius:7px; border:none; cursor:pointer;">💾 Simpan</button>
