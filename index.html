@@ -1450,6 +1450,8 @@ function scrollKePengaturanBerandaPelanggan() {
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    // Firebase Authentication: initialize once and expose the same auth instance to script.js
+    const auth = firebase.auth();
 
     let onlineOrdersDataCache = [];
     let activeOnlineTab = 'berlangsung';
