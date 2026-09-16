@@ -554,16 +554,45 @@ function handleAuthState(user) {
     if (loginModal) loginModal.style.display = "none";
     const welcome = document.getElementById("kasirquhVisual4Welcome");
     if (welcome) welcome.remove();
-    db.collection("pengguna").doc(user.uid).set({
-      role: "admin",
-      tokoId: "toko_v13",
-      email: user.email || "",
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true }).then(() => {
-      currentAdminProfile = { uid: user.uid, email: user.email || "", role: "admin", tokoId: "toko_v13" };
-    }).catch(err => console.error("Gagal menyimpan profil pengguna:", err));
-    refreshData();
+
+    // Jangan membuat/menimpa role secara otomatis.
+    // Role dan toko adalah sumber otorisasi yang disimpan di Firestore.
+    db.collection("pengguna").doc(user.uid).get()
+      .then((doc) => {
+        if (!doc.exists) {
+          throw new Error("Profil pengguna belum ditemukan di Firestore.");
+        }
+        const profile = doc.data() || {};
+        currentAdminProfile = {
+          uid: user.uid,
+          email: user.email || profile.email || "",
+          role: profile.role || "",
+          tokoId: profile.tokoId || ""
+        };
+
+        if (currentAdminProfile.role !== "admin") {
+          currentAdminProfile = null;
+          if (loginModal) loginModal.style.display = "flex";
+          alert("Akun berhasil login, tetapi belum memiliki role admin.");
+          return;
+        }
+
+        if (!currentAdminProfile.tokoId) {
+          if (loginModal) loginModal.style.display = "flex";
+          alert("Akun admin belum memiliki tokoId.");
+          return;
+        }
+
+        refreshData();
+      })
+      .catch((err) => {
+        console.error("Gagal membaca profil pengguna:", err);
+        currentAdminProfile = null;
+        if (loginModal) loginModal.style.display = "flex";
+        alert("Login Firebase berhasil, tetapi profil admin belum siap di Firestore.");
+      });
   } else {
+    currentAdminProfile = null;
     if (loginModal) loginModal.style.display = "flex";
   }
 }
