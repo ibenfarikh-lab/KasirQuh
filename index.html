@@ -1451,16 +1451,8 @@ function scrollKePengaturanBerandaPelanggan() {
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     // Firebase Authentication: initialize once and expose the same auth instance to script.js
+    // Data router/auth guard is owned by script.js so there is only ONE global definition.
     const auth = firebase.auth();
-    // ===== V13 STORE DATA ROUTER =====
-    // Semua data operasional toko sekarang berada di: toko/{tokoId}/{koleksi}.
-    // tokoId bersifat stabil dan TIDAK mengikuti nama toko.
-    const ACTIVE_TOKO_ID = "toko_v13";
-    const V13_STORE_COLLECTIONS = new Set(["produk", "pelanggan", "transaksi", "catatan", "db_chat_rumpi", "chats"]);
-    function storeCollection(name) {
-      if (!V13_STORE_COLLECTIONS.has(name)) return db.collection(name);
-      return db.collection("toko").doc(ACTIVE_TOKO_ID).collection(name);
-    }
 
 
     let onlineOrdersDataCache = [];
@@ -2575,20 +2567,31 @@ function scrollKePengaturanBerandaPelanggan() {
 <script id="kasirquh-slide123-script">
 (function () {
   function initSlide123Welcome() {
-    // Firebase Auth may already be signed in before this welcome markup is initialized.
-    // In that case the welcome screen must never be recreated after script.js removed it.
-    try {
-      if (window.firebase && firebase.auth && firebase.auth().currentUser) {
-        const existingWelcome = document.getElementById('kasirquhVisual4Welcome');
-        if (existingWelcome) existingWelcome.remove();
-        const login = document.getElementById('loginModal');
-        if (login) login.style.display = 'none';
-        return;
-      }
-    } catch (e) {
-      console.warn('Welcome/Auth sync:', e);
-    }
+    const existingWelcome = document.getElementById('kasirquhVisual4Welcome');
+    const login = document.getElementById('loginModal');
 
+    // IMPORTANT: wait for Firebase Auth to resolve persistence before deciding whether
+    // Welcome should exist. Reading auth.currentUser synchronously can be null for a
+    // short time during startup even when a valid session is being restored.
+    if (window.firebase && firebase.auth) {
+      let settled = false;
+      const unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+        if (settled) return;
+        settled = true;
+        try { unsubscribe(); } catch (_) {}
+        if (user) {
+          if (existingWelcome) existingWelcome.remove();
+          if (login) login.style.display = 'none';
+          return;
+        }
+        initSlide123WelcomeBody();
+      });
+      return;
+    }
+    initSlide123WelcomeBody();
+  }
+
+  function initSlide123WelcomeBody() {
     const welcome = document.getElementById('kasirquhVisual4Welcome');
     const image = document.getElementById('kv4SlideImage');
     const customer = document.getElementById('kv4CustomerHotspot');
