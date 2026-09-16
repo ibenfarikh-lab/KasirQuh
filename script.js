@@ -1059,10 +1059,16 @@ function pindahCatatanUrutanDinamis(targetTabKey, index, direction) {
 }
 
 function cekStatusLogin() {
+  const gateway = document.getElementById('kasirquh-welcome-gateway');
+  const loginModal = document.getElementById('loginModal');
+  if (gateway && !gateway.hidden && !window.__kasirquhShowAdminLogin) {
+    if (loginModal) loginModal.style.display = 'none';
+    return;
+  }
   if (localStorage.getItem('isLoggedIn') === 'true') {
-    document.getElementById('loginModal').style.display = 'none';
+    if (loginModal) loginModal.style.display = 'none';
   } else {
-    document.getElementById('loginModal').style.display = 'flex';
+    if (loginModal) loginModal.style.display = 'flex';
   }
 }
 

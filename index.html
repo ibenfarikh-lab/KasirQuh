@@ -252,8 +252,57 @@
   --admin-solid-cyan: #14555A;
 }
 </style>
+
+<style id="kasirquh-welcome-gateway-v2">
+  #kasirquh-welcome-gateway{position:fixed;inset:0;z-index:100000;display:flex;align-items:stretch;justify-content:center;overflow:hidden;background:#071126;isolation:isolate}
+  #kasirquh-welcome-gateway[hidden]{display:none!important}
+  #kasirquh-welcome-slides{position:absolute;inset:0;overflow:hidden}
+  .kq-welcome-slide{position:absolute;inset:0;opacity:0;transition:opacity 900ms ease-in-out;pointer-events:none}
+  .kq-welcome-slide.is-active{opacity:1}
+  .kq-welcome-slide img{width:100%;height:100%;display:block;object-fit:cover;object-position:center;transform:scale(1.015)}
+  #kasirquh-welcome-overlay{position:absolute;inset:0;z-index:3;background:linear-gradient(to bottom,rgba(3,10,28,.18) 0%,rgba(3,10,28,.04) 38%,rgba(3,10,28,.35) 72%,rgba(3,10,28,.86) 100%);pointer-events:none}
+  #kasirquh-welcome-store{position:absolute;z-index:4;top:max(28px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(88vw,560px);text-align:center;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.5);pointer-events:none}
+  #kasirquh-welcome-brand{font-weight:900;font-size:clamp(1.05rem,4vw,1.45rem);letter-spacing:.08em}
+  #kasirquh-welcome-store-name{font-weight:1000;font-size:clamp(1.45rem,7vw,2.55rem);margin-top:4px;line-height:1.05}
+  #kasirquh-welcome-subtitle{margin-top:7px;font-size:clamp(.72rem,3vw,.95rem);font-weight:700;opacity:.95}
+  #kasirquh-welcome-ai{position:absolute;z-index:7;left:50%;bottom:max(92px,calc(env(safe-area-inset-bottom) + 86px));transform:translateX(-50%);min-height:44px;padding:10px 17px;border:1px solid rgba(255,255,255,.72);border-radius:999px;color:#fff;background:linear-gradient(135deg,rgba(124,58,237,.94),rgba(37,99,235,.92));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.30),0 0 18px rgba(124,58,237,.32);font:inherit;font-weight:900;font-size:.88rem;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .18s ease,filter .18s ease}
+  #kasirquh-welcome-ai:active{transform:translateX(-50%) scale(.95)}
+  #kasirquh-welcome-actions{position:absolute;z-index:6;left:50%;bottom:max(28px,calc(env(safe-area-inset-bottom) + 22px));transform:translateX(-50%);width:min(92vw,560px);display:flex;align-items:center;justify-content:center;gap:10px}
+  #kasirquh-welcome-actions button{border:0;cursor:pointer;-webkit-tap-highlight-color:transparent;font:inherit;font-weight:900;min-height:52px;box-shadow:0 10px 28px rgba(0,0,0,.28);transition:transform .18s ease,filter .18s ease}
+  #kasirquh-welcome-actions button:active{transform:scale(.96)}
+  #kq-start-shopping{flex:1;max-width:390px;border-radius:18px;padding:13px 20px;color:#14213d;background:linear-gradient(135deg,#ffe55a,#ffad1f);border:2px solid rgba(255,255,255,.82)!important;font-size:clamp(.95rem,4vw,1.12rem)}
+  #kq-admin-login{flex:0 0 auto;border-radius:15px;padding:12px 16px;color:#fff;background:rgba(8,20,45,.78);border:1px solid rgba(255,255,255,.6)!important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:.9rem}
+  #kasirquh-welcome-dots{position:absolute;z-index:5;left:50%;bottom:max(142px,calc(env(safe-area-inset-bottom) + 136px));transform:translateX(-50%);display:flex;gap:7px;pointer-events:none}
+  .kq-welcome-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.48);transition:transform .25s,background .25s}
+  .kq-welcome-dot.is-active{background:#fff;transform:scale(1.35)}
+  @media(max-width:480px){#kasirquh-welcome-actions{gap:8px}#kq-start-shopping{padding-left:14px;padding-right:14px}#kq-admin-login{padding-left:13px;padding-right:13px}}
+</style>
 </head>
 <body data-theme="colorful-v2">
+
+  <section id="kasirquh-welcome-gateway" aria-label="Selamat datang">
+    <div id="kasirquh-welcome-slides" aria-hidden="true">
+      <div class="kq-welcome-slide is-active"><img src="slide1.png" alt=""></div>
+      <div class="kq-welcome-slide"><img src="slide2.png" alt=""></div>
+      <div class="kq-welcome-slide"><img src="slide3.png" alt=""></div>
+      <div class="kq-welcome-slide"><img src="welcome-visual-4.png" alt=""></div>
+    </div>
+    <div id="kasirquh-welcome-overlay"></div>
+    <div id="kasirquh-welcome-store">
+      <div id="kasirquh-welcome-brand">🛍️ KASIRQUH</div>
+      <div id="kasirquh-welcome-store-name">TokoQuh</div>
+      <div id="kasirquh-welcome-subtitle">Selamat datang di toko online kami</div>
+    </div>
+    <div id="kasirquh-welcome-dots" aria-hidden="true">
+      <span class="kq-welcome-dot is-active"></span><span class="kq-welcome-dot"></span><span class="kq-welcome-dot"></span><span class="kq-welcome-dot"></span>
+    </div>
+    <button id="kasirquh-welcome-ai" type="button" onclick="bukaAssistantAIWelcome()" aria-label="Buka Assistant AI">🤖 Assistant AI</button>
+    <div id="kasirquh-welcome-actions">
+      <button id="kq-start-shopping" type="button" onclick="masukJalurPelanggan()">🛒 Mulai Belanja&nbsp; →</button>
+      <button id="kq-admin-login" type="button" onclick="bukaLoginAdmin()">🔐 Admin</button>
+    </div>
+  </section>
+
 
   <div id="loginModal" class="login-overlay" style="display: none;">
     <div class="login-card">
@@ -2705,6 +2754,25 @@ function scrollKePengaturanBerandaPelanggan() {
 </script>
 
 
+
+
+<script>
+(function(){
+  window.__kasirquhShowAdminLogin = false;
+  function tutupGatewayWelcome(){const el=document.getElementById('kasirquh-welcome-gateway');if(el)el.hidden=true;}
+  window.masukJalurPelanggan=function(){tutupGatewayWelcome();window.location.href='/pelanggan.html';};
+  window.bukaAssistantAIWelcome=function(){try{sessionStorage.setItem('kasirquh_open_ai_from_welcome','1')}catch(e){}tutupGatewayWelcome();window.location.href='/pelanggan.html';};
+  window.bukaLoginAdmin=function(){window.__kasirquhShowAdminLogin=true;tutupGatewayWelcome();if(typeof cekStatusLogin==='function')cekStatusLogin();else{const m=document.getElementById('loginModal');if(m)m.style.display='flex';}};
+  function init(){
+    const slides=[...document.querySelectorAll('.kq-welcome-slide')],dots=[...document.querySelectorAll('.kq-welcome-dot')];let i=0,timer=null;
+    function show(n){i=(n+slides.length)%slides.length;slides.forEach((x,j)=>x.classList.toggle('is-active',j===i));dots.forEach((x,j)=>x.classList.toggle('is-active',j===i));}
+    function next(){show(i+1)}
+    if(slides.length){show(0);timer=setInterval(next,4500);}
+    window.addEventListener('beforeunload',()=>{if(timer)clearInterval(timer)});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
 
 </body>
 </html>

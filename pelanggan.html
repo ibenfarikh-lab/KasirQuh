@@ -4150,6 +4150,19 @@ body[data-theme="modern"] .product-catalog-grid .modern-product-card .modern-pro
     document.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true, capture: true });
     window.addEventListener('resize', handleCatalogInfiniteScroll, { passive: true });
     window.addEventListener('load', setupCatalogInfiniteScroll, { once: true });
+
+    // Assistant AI dari welcome gateway.
+    window.addEventListener('load', () => {
+      let openAI = false;
+      try {
+        openAI = sessionStorage.getItem('kasirquh_open_ai_from_welcome') === '1';
+        if (openAI) sessionStorage.removeItem('kasirquh_open_ai_from_welcome');
+      } catch (e) {}
+      if (!openAI) return;
+      setTimeout(() => {
+        try { toggleAIChatModal(); } catch (e) { console.warn('Gagal membuka Assistant AI dari welcome:', e); }
+      }, 900);
+    }, { once: true });
     setTimeout(setupCatalogInfiniteScroll, 0);
 
     function renderCartPelanggan() {
