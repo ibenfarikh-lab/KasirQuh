@@ -1,7 +1,8 @@
-const CACHE_NAME = 'kasirquh-v5';
+const CACHE_NAME = 'kasirquh-v6';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/admin.html',
   '/pelanggan.html',
   '/style.css',
   '/manifest.json',
@@ -42,7 +43,13 @@ self.addEventListener('fetch', event => {
   // Keep navigation fresh, but fall back instantly to the cached app shell.
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('/index.html'))
+      fetch(event.request).catch(() => {
+        const path = new URL(event.request.url).pathname;
+        if (path === '/admin.html' || path === '/pelanggan.html') {
+          return caches.match(path);
+        }
+        return caches.match('/index.html');
+      })
     );
     return;
   }
