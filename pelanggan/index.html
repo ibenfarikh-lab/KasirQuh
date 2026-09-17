@@ -2519,7 +2519,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     </div>
   </div>
 
-  <div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
+  <div class="main-content" style="display: none; padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
     
     <div id="sticky-search-container" class="sticky-search-bar no-print" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
       <div style="display: flex; gap: 8px; align-items: center;">
@@ -2791,7 +2791,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     </div>
   </div>
 
-  <div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
+  <div class="fab-container no-print" style="display: none; position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
     <button id="fab-ai-btn" class="fab-main fab-ai-bounce" onclick="toggleAIChatModal()" title="Asisten Ai Toko" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;">😀</button>
     <button id="fab-search-btn" class="fab-main" onclick="bukaKolomPencarian()" title="Cari Barang" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;">
       <svg viewBox="0 0 24 24" width="20" height="20" style="fill: none !important;" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.17" y1="15.17" x2="21" y2="21"/></svg>
@@ -2876,7 +2876,7 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6.5 11.5 12 5l5.5 6.5"/></svg>
   </button>
 
-  <div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
+  <div class="permanent-bottom-bar no-print" style="display: none; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
     <span id="bottom-bar-title" style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">Belanja</span>
     <div id="pagination-box" style="display: none !important; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; padding: 2px 8px; gap: 6px;">
       <button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;">◄</button>
@@ -3273,7 +3273,11 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
       initChatRumpiListener();
       renderRecipeCards();
       if (currentCustomerPhone) {
-        document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('customerLoginModal').style.display = 'none';
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('customerLoginModal').style.display = 'none';
+        const mainContent = document.querySelector('.main-content'); if (mainContent) mainContent.style.display = 'block';
+        const fabContainer = document.querySelector('.fab-container'); if (fabContainer) fabContainer.style.display = 'flex';
+        const bottomBar = document.querySelector('.permanent-bottom-bar'); if (bottomBar) bottomBar.style.display = 'flex';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); periksaCheckinHarian(); tampilkanKoinDiProfil();
       } else { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); }
       initFirebaseListeners();
@@ -4038,10 +4042,13 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     function logoutPelanggan() { 
       if (confirm("Keluar dari sesi ini?")) { 
         localStorage.removeItem('cust_phone_v13'); 
-        currentCustomerPhone = ''; 
-        document.getElementById('customerLoginModal').style.display = 'flex'; 
-        gantiFormAuth('login'); 
-        window.location.href = './index.html'; 
+        currentCustomerPhone = '';
+        const mainContent = document.querySelector('.main-content'); if (mainContent) mainContent.style.display = 'none';
+        const fabContainer = document.querySelector('.fab-container'); if (fabContainer) fabContainer.style.display = 'none';
+        const bottomBar = document.querySelector('.permanent-bottom-bar'); if (bottomBar) bottomBar.style.display = 'none';
+        document.getElementById('customerLoginModal').style.display = 'flex';
+        gantiFormAuth('login');
+        window.location.href = '../index.html'; 
       } 
     }
 
