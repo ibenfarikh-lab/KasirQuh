@@ -2,16 +2,14 @@ const CACHE_NAME = 'kasirquh-v6';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/admin.html',
-  '/pelanggan.html',
-  '/style.css',
+  '/admin/index.html',
+  '/customer/index.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
   '/slide1.png',
   '/slide2.png',
   '/slide3.png',
-  '/welcome-visual-4.png'
 ];
 
 
