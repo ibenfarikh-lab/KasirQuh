@@ -3239,15 +3239,35 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
       const initial = { tab:'belanja', category: activeKategoriPelanggan || 'Home', search:false, modal:null, detailCode:null };
       history.replaceState({ __kasirquh: true, __kasirquhState: initial }, '', location.href);
       appNavReady = true;
-      window.addEventListener('popstate', function(event) {
-        const state = event.state && event.state.__kasirquhState;
-        if (state) {
-          appRestoreState(state);
+      window.addEventListener('popstate', function() {
+        // Android Back hanya ditangani bila masih ada elemen UI aktif.
+        // Tidak ada pemulihan tab/kategori/history internal di sini.
+        const search = document.getElementById('sticky-search-container');
+        const searchOpen = search && search.style.display === 'block';
+        if (searchOpen) {
+          const input = document.getElementById('inventory-search-input');
+          if (input) input.value = '';
+          search.style.display = 'none';
+          setModePencarianPelanggan(false);
+          perbaruiTampilanKategori();
+          filterKatalogPelanggan('');
           return;
         }
-        // Tidak ada state internal: jangan tahan tombol Back.
-        // Biarkan Chrome/Android menangani Back secara normal.
-        return;
+        const ids = ['customerLoginModal','dailyCheckinModal','menuToggleModal','promoTokoModal','cartModal','aiChatModal','qrCodeModal','productDetailModal'];
+        for (const id of ids) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const visible = id === 'customerLoginModal' || id === 'dailyCheckinModal'
+            ? getComputedStyle(el).display !== 'none'
+            : el.classList.contains('show');
+          if (visible) {
+            if (id === 'customerLoginModal' || id === 'dailyCheckinModal') el.style.display = 'none';
+            else el.classList.remove('show');
+            return;
+          }
+        }
+        // Tidak ada elemen aktif: jangan tahan/ubah Back.
+        // Chrome/Android menerima Back secara normal.
       });
     }
 
@@ -4171,12 +4191,13 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
 
     function switchTabPelanggan(tabId) {
       if (!appNavRestoring) {
-        const nextState = Object.assign({}, appGetState(), { tab:tabId, category:tabId === 'belanja' ? (activeKategoriPelanggan || 'Home') : 'Home', search:false, modal:null, detailCode:null });
+        // Pergantian halaman/tab bukan history Back. Back hanya untuk elemen aktif.
         const cur = history.state && history.state.__kasirquhState;
+        const nextState = Object.assign({}, appGetState(), { tab:tabId, category:tabId === 'belanja' ? (activeKategoriPelanggan || 'Home') : 'Home', search:false, modal:null, detailCode:null });
         const menuIsOpen = document.getElementById('menuToggleModal')?.classList.contains('show');
-        if (menuIsOpen && cur && cur.modal === 'menuToggleModal') history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
-        else if (cur && cur.modal === 'productDetailModal') history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
-        else history.pushState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
+        if ((menuIsOpen && cur && cur.modal === 'menuToggleModal') || (cur && cur.modal === 'productDetailModal')) {
+          history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
+        }
       }
       const previousTab = document.querySelector('.tab-content.active')?.id;
       if (previousTab === 'belanja' && tabId !== 'belanja') setHomeFeatureTransition(false);
