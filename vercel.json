@@ -1,18 +1,4 @@
 {
-  "rewrites": [
-    {
-      "source": "/admin.html",
-      "destination": "/admin/index.html"
-    },
-    {
-      "source": "/pelanggan.html",
-      "destination": "/pelanggan/index.html"
-    },
-    {
-      "source": "/customer/index.html",
-      "destination": "/pelanggan/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*\\.html)",
