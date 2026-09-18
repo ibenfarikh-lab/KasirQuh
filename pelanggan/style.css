@@ -1,0 +1,15 @@
+/*
+ * KasirQuh Pelanggan - stylesheet entry point
+ *
+ * This file restores the shared CSS foundation that pelanggan/index.html
+ * expects, then loads the ordered Customer-specific styles already present
+ * in pelanggan/css/. Keeping a single entry point preserves the existing
+ * HTML contract while making the mapped CSS modules actually active.
+ */
+@import url("../admin/css/base.css");
+@import url("./css/01-customer-ui.css");
+@import url("./css/02-customer-ui.css");
+@import url("./css/03-customer-ui.css");
+@import url("./css/04-customer-ui.css");
+@import url("./css/05-customer-ui.css");
+@import url("./css/06-customer-ui.css");
