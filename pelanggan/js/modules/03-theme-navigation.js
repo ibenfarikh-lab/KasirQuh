@@ -478,12 +478,13 @@ function gantiTemaPelanggan(theme) {
 
     function switchTabPelanggan(tabId) {
       if (!appNavRestoring) {
-        const nextState = Object.assign({}, appGetState(), { tab:tabId, category:tabId === 'belanja' ? (activeKategoriPelanggan || 'Home') : 'Home', search:false, modal:null, detailCode:null });
+        // Pergantian halaman/tab bukan history Back. Back hanya untuk elemen aktif.
         const cur = history.state && history.state.__kasirquhState;
+        const nextState = Object.assign({}, appGetState(), { tab:tabId, category:tabId === 'belanja' ? (activeKategoriPelanggan || 'Home') : 'Home', search:false, modal:null, detailCode:null });
         const menuIsOpen = document.getElementById('menuToggleModal')?.classList.contains('show');
-        if (menuIsOpen && cur && cur.modal === 'menuToggleModal') history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
-        else if (cur && cur.modal === 'productDetailModal') history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
-        else history.pushState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
+        if ((menuIsOpen && cur && cur.modal === 'menuToggleModal') || (cur && cur.modal === 'productDetailModal')) {
+          history.replaceState({ __kasirquh:true, __kasirquhState:nextState }, '', location.href);
+        }
       }
       const previousTab = document.querySelector('.tab-content.active')?.id;
       if (previousTab === 'belanja' && tabId !== 'belanja') setHomeFeatureTransition(false);

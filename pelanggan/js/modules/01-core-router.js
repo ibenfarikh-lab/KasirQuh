@@ -121,15 +121,35 @@ if (!window.firebase || !firebase.apps || !firebase.apps.length) {
       const initial = { tab:'belanja', category: activeKategoriPelanggan || 'Home', search:false, modal:null, detailCode:null };
       history.replaceState({ __kasirquh: true, __kasirquhState: initial }, '', location.href);
       appNavReady = true;
-      window.addEventListener('popstate', function(event) {
-        const state = event.state && event.state.__kasirquhState;
-        if (state) {
-          appRestoreState(state);
+      window.addEventListener('popstate', function() {
+        // Android Back hanya ditangani bila masih ada elemen UI aktif.
+        // Tidak ada pemulihan tab/kategori/history internal di sini.
+        const search = document.getElementById('sticky-search-container');
+        const searchOpen = search && search.style.display === 'block';
+        if (searchOpen) {
+          const input = document.getElementById('inventory-search-input');
+          if (input) input.value = '';
+          search.style.display = 'none';
+          setModePencarianPelanggan(false);
+          perbaruiTampilanKategori();
+          filterKatalogPelanggan('');
           return;
         }
-        // Tidak ada state internal: jangan tahan tombol Back.
-        // Biarkan Chrome/Android menangani Back secara normal.
-        return;
+        const ids = ['customerLoginModal','dailyCheckinModal','menuToggleModal','promoTokoModal','cartModal','aiChatModal','qrCodeModal','productDetailModal'];
+        for (const id of ids) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const visible = id === 'customerLoginModal' || id === 'dailyCheckinModal'
+            ? getComputedStyle(el).display !== 'none'
+            : el.classList.contains('show');
+          if (visible) {
+            if (id === 'customerLoginModal' || id === 'dailyCheckinModal') el.style.display = 'none';
+            else el.classList.remove('show');
+            return;
+          }
+        }
+        // Tidak ada elemen aktif: jangan tahan/ubah Back.
+        // Chrome/Android menerima Back secara normal.
       });
     }
 
