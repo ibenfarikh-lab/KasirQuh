@@ -26,7 +26,13 @@ function prosesLogin(e) {
 }
 
 function logout() {
-  if (confirm("Apakah Anda yakin ingin keluar?")) auth.signOut().catch(err => alert("Gagal keluar: " + err.message));
+  if (!confirm("Apakah Anda yakin ingin keluar?")) return;
+  auth.signOut()
+    .then(() => {
+      // Kembali ke Welcome Screen utama (root index.html), bukan admin/index.html.
+      window.location.href = "../index.html";
+    })
+    .catch(err => alert("Gagal keluar: " + err.message));
 }
 
 function simpanPengaturanAkun() {
