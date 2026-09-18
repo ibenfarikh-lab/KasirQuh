@@ -138,7 +138,7 @@
       welcome.classList.add(mode);
       setTimeout(function () {
         if (destination) {
-          window.location.href = destination;
+          window.location.replace(destination);
           return;
         }
         welcome.classList.add('kv4-leaving');
