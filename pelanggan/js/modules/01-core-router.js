@@ -127,8 +127,9 @@ if (!window.firebase || !firebase.apps || !firebase.apps.length) {
           appRestoreState(state);
           return;
         }
-        // Jika browser mengirim popstate tanpa state internal, kembalikan ke Home.
-        appRestoreState(initial);
+        // Tidak ada state internal: jangan tahan tombol Back.
+        // Biarkan Chrome/Android menangani Back secara normal.
+        return;
       });
     }
 
