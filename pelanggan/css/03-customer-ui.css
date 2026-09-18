@@ -1,0 +1,621 @@
+/* ===== modern-card-info-text-v4 ===== */
+/* Modern: info produk tepat di bawah badge, pure text, left aligned. */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  top: 28px !important;
+  left: 6px !important;
+  right: 6px !important;
+  bottom: auto !important;
+  z-index: 6 !important;
+
+  /* Pure text — tanpa kotak/background rounded. */
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  text-align: left !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  text-align: left !important;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,.85),
+    0 0 5px rgba(0,0,0,.45) !important;
+}
+
+/* ===== modern-photo-platform-v5 ===== */
+/* Modern V5 — foto lebih besar dan turun mendekati platform glow.
+   Hanya tema Modern; ukuran card tetap 125x125px. */
+body[data-theme="modern"] .modern-product-stage .modern-product {
+  width: 70px !important;
+  height: 68px !important;
+  top: 22px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  object-fit: contain !important;
+  z-index: 3 !important;
+}
+
+/* Glow tetap besar dan menjadi alas visual paling bawah. */
+body[data-theme="modern"] .modern-product-stage .modern-platform {
+  bottom: 5px !important;
+  z-index: 1 !important;
+}
+
+/* ===== modern-final-surfaces-v6 ===== */
+/* ============================================================
+   MODERN V6
+   1) Info produk berada di atas piringan glow; stock menjadi
+      baris terakhir tepat di bawah foto.
+   2) Floating promo/product card memakai identitas Modern.
+   3) Data Pelanggan + Pengaturan seluruh card memakai surface Modern.
+   Hanya Modern; Light/Dark tidak disentuh.
+   ============================================================ */
+
+/* ---- 1. INFO PRODUK: tepat di area antara foto dan glow ---- */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  left: 6px !important;
+  right: 6px !important;
+  top: 89px !important;
+  bottom: auto !important;
+  z-index: 12 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+/* Pure text + shadow. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock {
+  display: block !important;
+  text-align: left !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.95), 0 0 5px rgba(0,0,0,.65) !important;
+}
+
+/* Sedikit lebih padat agar tiga baris tetap muat di card 125px. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-name {
+  font-size: .57rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-price {
+  margin-top: 1px !important;
+  font-size: .62rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock,
+body[data-theme="modern"] .modern-product-card .modern-product-info .product-stock {
+  margin-top: 1px !important;
+  font-size: .45rem !important;
+  line-height: 1.05 !important;
+  color: #d7ecff !important;
+}
+
+/* ---- 2. FLOATING PROMO/PRODUCT CARD ---- */
+body[data-theme="modern"] .promo-floating-backdrop {
+  background: rgba(2,6,23,.76) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+body[data-theme="modern"] .promo-floating-card {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border: 1px solid #29456d !important;
+  box-shadow: 0 22px 60px rgba(0,0,0,.62), 0 0 24px rgba(37,99,235,.18) !important;
+}
+body[data-theme="modern"] .promo-floating-close {
+  background: #172a46 !important;
+  color: #fff !important;
+  border: 1px solid #365985 !important;
+}
+body[data-theme="modern"] .promo-floating-badge {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+body[data-theme="modern"] .promo-detail {
+  color: #f8fafc !important;
+}
+body[data-theme="modern"] .promo-detail img,
+body[data-theme="modern"] .promo-detail-placeholder {
+  background: #081426 !important;
+  border: 1px solid #29456d !important;
+}
+body[data-theme="modern"] .promo-detail-price {
+  color: #60a5fa !important;
+}
+body[data-theme="modern"] .promo-detail-price-label,
+body[data-theme="modern"] .promo-detail-stock {
+  color: #a9bdd6 !important;
+}
+body[data-theme="modern"] .promo-floating-nav button {
+  background: #2563eb !important;
+  color: #fff !important;
+}
+body[data-theme="modern"] .promo-floating-nav span {
+  color: #cbd5e1 !important;
+}
+
+/* ---- 3. DATA PELANGGAN + PENGATURAN ---- */
+body[data-theme="modern"] #data-pelanggan,
+body[data-theme="modern"] #pengaturan {
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #data-pelanggan .card,
+body[data-theme="modern"] #pengaturan .card {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border: 1px solid #263852 !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.28) !important;
+  border-radius: 16px !important;
+}
+
+body[data-theme="modern"] #data-pelanggan .card h3,
+body[data-theme="modern"] #pengaturan .card h3,
+body[data-theme="modern"] #data-pelanggan .card strong,
+body[data-theme="modern"] #pengaturan .card strong,
+body[data-theme="modern"] #data-pelanggan label,
+body[data-theme="modern"] #pengaturan label {
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #data-pelanggan .card p,
+body[data-theme="modern"] #data-pelanggan .card [style*="color: var(--text-muted)"],
+body[data-theme="modern"] #pengaturan .card p,
+body[data-theme="modern"] #pengaturan .card [style*="color: var(--text-muted)"] {
+  color: #a9bdd6 !important;
+}
+
+/* Koin Warga: tetap emas sebagai aksen, tetapi wadahnya Modern. */
+body[data-theme="modern"] #data-pelanggan #profile-coins {
+  color: #fbbf24 !important;
+}
+body[data-theme="modern"] #data-pelanggan .card > div[style*="#fef3c7"] {
+  background: #1f2937 !important;
+  border-color: #8a6412 !important;
+}
+body[data-theme="modern"] #data-pelanggan .card > div[style*="#fef3c7"] div:first-child {
+  color: #fbbf24 !important;
+}
+
+/* Input/select/textarea di Pengaturan mengikuti surface Modern. */
+body[data-theme="modern"] #pengaturan input,
+body[data-theme="modern"] #pengaturan textarea,
+body[data-theme="modern"] #pengaturan select {
+  background: #081426 !important;
+  color: #f8fafc !important;
+  border-color: #29456d !important;
+}
+body[data-theme="modern"] #pengaturan input::placeholder,
+body[data-theme="modern"] #pengaturan textarea::placeholder {
+  color: #8ea5c0 !important;
+}
+
+/* Blok cache/error di Pengaturan tidak lagi menjadi putih. */
+body[data-theme="modern"] #pengaturan #card-install-pwa,
+body[data-theme="modern"] #pengaturan .card[style*="#fff5f5"] {
+  background: #111c2e !important;
+  border-color: #365985 !important;
+}
+
+/* ===== modern-v7-final-surface-and-info ===== */
+/* ============================================================
+   MODERN V7
+   - Nama/Harga/Stok masuk ke area bawah foto + tepat di atas glow.
+   - Seluruh floating product detail tidak lagi putih.
+   - Card Data Pelanggan + isi riwayat ikut surface Modern.
+   - Hanya Modern; Light/Dark tidak disentuh.
+   ============================================================ */
+
+/* 1) INFO PRODUK: overlay pada bagian bawah foto, sebelum glow */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  position: absolute !important;
+  left: 6px !important;
+  right: 6px !important;
+  top: 62px !important;
+  bottom: auto !important;
+  z-index: 12 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price,
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+  background: transparent !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.98), 0 0 5px rgba(0,0,0,.7) !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name {
+  font-size: .57rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price {
+  margin-top: 1px !important;
+  font-size: .62rem !important;
+  line-height: 1.05 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  margin-top: 1px !important;
+  font-size: .45rem !important;
+  line-height: 1.05 !important;
+  color: #d7ecff !important;
+}
+
+/* 2) MODAL DETAIL PRODUK: hilangkan surface putih */
+body[data-theme="modern"] #productDetailModal .product-detail-box {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border: 1px solid #29456d !important;
+  box-shadow: 0 22px 60px rgba(0,0,0,.68), 0 0 24px rgba(37,99,235,.18) !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box > div:nth-child(2) {
+  background: #0f1b2d !important;
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #productDetailModal #detail-name,
+body[data-theme="modern"] #productDetailModal #detail-stock,
+body[data-theme="modern"] #productDetailModal #detail-desc {
+  color: #f8fafc !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box > div:nth-child(2) > div[style*="background"] {
+  background: #081426 !important;
+  border-color: #29456d !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box input,
+body[data-theme="modern"] #productDetailModal .product-detail-box .qty-btn {
+  background: #13233b !important;
+  color: #f8fafc !important;
+  border-color: #365985 !important;
+}
+
+body[data-theme="modern"] #productDetailModal .product-detail-box .qty-btn {
+  box-shadow: none !important;
+}
+
+/* 3) DATA PELANGGAN: semua card dan box riwayat tidak putih */
+body[data-theme="modern"] #data-pelanggan .card {
+  background: #0f1b2d !important;
+  background-image: none !important;
+  color: #f8fafc !important;
+  border-color: #263852 !important;
+}
+
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div {
+  background: #0b172a !important;
+  color: #f8fafc !important;
+  border-color: #29456d !important;
+  box-shadow: 0 5px 14px rgba(0,0,0,.32) !important;
+}
+
+/* Box "Rincian Barang" yang dibuat inline oleh JS */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div div[style*="background: var(--input-bg)"] {
+  background: #13233b !important;
+  color: #e5eefb !important;
+  border-color: #29456d !important;
+}
+
+/* Teks yang sebelumnya mengambil warna hitam/abu dari inline style */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div span,
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div li,
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div strong {
+  color: #f8fafc !important;
+}
+
+/* Warna status dan total tetap menjadi aksen aslinya */
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div span[style*="#16a34a"] {
+  color: #fff !important;
+}
+body[data-theme="modern"] #data-pelanggan #customer-online-orders-container > div > div:last-child {
+  color: #4ade80 !important;
+}
+
+/* Koin Warga tetap emas */
+body[data-theme="modern"] #data-pelanggan #profile-coins {
+  color: #fbbf24 !important;
+}
+
+/* ===== modern-responsive-grid-v8 ===== */
+/* ============================================================
+   MODERN RESPONSIVE GRID
+   - Card tidak lagi dikunci 125x125.
+   - 125px = ukuran minimum.
+   - Card mengikuti ruang layar secara proporsional.
+   - Grid otomatis berubah 2 / 3 / 4 / dst.
+   - Batas maksimum ±190px agar desktop tidak menjadi terlalu besar.
+   - HANYA Modern. Light/Dark tetap memakai aturan sebelumnya.
+   ============================================================ */
+
+body[data-theme="modern"] .product-catalog-grid {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(125px, min(190px, 1fr))
+  ) !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: start !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+body[data-theme="modern"] .product-catalog-grid .modern-product-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 190px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1 !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  overflow: hidden !important;
+  container-type: size !important;
+}
+
+/* Semua layer visual mengikuti ukuran card. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Foto: proporsional terhadap card, bukan lagi fixed 70x68px. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage .modern-product {
+  width: 56% !important;
+  height: 54% !important;
+  top: 17% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  object-fit: contain !important;
+}
+
+/* Glow tetap menjadi alas dan ikut membesar/mengecil bersama card. */
+body[data-theme="modern"] .modern-product-card .modern-product-stage .modern-platform {
+  width: 94% !important;
+  height: 35% !important;
+  left: 50% !important;
+  bottom: 4% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Info tetap berada tepat di atas glow. */
+body[data-theme="modern"] .modern-product-card .modern-product-info {
+  left: 5% !important;
+  right: 5% !important;
+  top: 68% !important;
+  bottom: auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  line-height: 1 !important;
+}
+
+/* Tipografi ikut skala card. */
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name {
+  font-size: clamp(.57rem, 7.3cqw, .80rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price {
+  margin-top: 1% !important;
+  font-size: clamp(.62rem, 8.0cqw, .88rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+}
+
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock {
+  margin-top: 1% !important;
+  font-size: clamp(.45rem, 5.8cqw, .68rem) !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Badge ikut sedikit membesar tetapi tetap proporsional. */
+body[data-theme="modern"] .modern-product-card .modern-stock-badge {
+  left: 1% !important;
+  top: 1% !important;
+  padding: 2px 4px !important;
+  font-size: clamp(.46rem, 4.8cqw, .62rem) !important;
+}
+
+/* Tombol keranjang ikut skala card, tetapi tetap bulat. */
+body[data-theme="modern"] .modern-product-card .modern-cart-btn {
+  width: clamp(24px, 19cqw, 34px) !important;
+  height: clamp(24px, 19cqw, 34px) !important;
+  min-width: clamp(24px, 19cqw, 34px) !important;
+  min-height: clamp(24px, 19cqw, 34px) !important;
+  right: 1% !important;
+  bottom: 1% !important;
+  font-size: clamp(.68rem, 5.5cqw, .90rem) !important;
+}
+
+/* ===== customer-admin-scale-baseline-v1 ===== */
+/* ============================================================
+   CUSTOMER RESPONSIVE BASELINE
+   Mengikuti SISTEM SKALA/LAYOUT panel Admin, bukan desain Admin.
+   Tidak memakai transform/zoom. Tidak mengubah warna/theme.
+   ============================================================ */
+
+/* File pelanggan sebelumnya memiliki inline body font-size: .85rem.
+   Admin menggunakan ukuran browser normal. Kembalikan baseline ke 1rem. */
+body {
+  font-size: 1rem !important;
+}
+
+/* Admin memakai main-content dengan padding 15px.
+   Pelanggan mengikuti ruang kerja yang sama, tetap aman untuk bottom bar. */
+.main-content {
+  padding: 15px 15px 90px !important;
+  box-sizing: border-box !important;
+}
+
+/* Katalog menggunakan seluruh ruang kontainer, seperti grid Admin.
+   Jumlah kolom ditentukan otomatis oleh ruang yang tersedia. */
+.product-catalog-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+  width: 100% !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* Jangan biarkan isi grid membuat halaman melebar horizontal. */
+.product-catalog-grid > * {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Tablet/desktop: manfaatkan lebar layar tanpa mengubah identitas visual. */
+@media (min-width: 700px) {
+  .main-content {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* Layar sangat lebar: beri ruang tepi sedikit lebih lega,
+   tetapi tidak mengunci max-width agar katalog tetap mengikuti layar. */
+@media (min-width: 1200px) {
+  .main-content {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+
+/* ===== modern-layout-preservation-v8 ===== */
+/* ============================================================
+   MASTER MODERN V8
+   Hanya menyempurnakan layout yang sudah ada.
+   Glow/product-stage TIDAK diubah.
+   ============================================================ */
+
+/* Bottom navigation: skala nyaman seperti Admin, tetap full viewport. */
+body[data-theme="modern"] .bottom-nav {
+  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  min-height: 64px !important;
+  box-sizing: border-box !important;
+}
+
+body[data-theme="modern"] .bottom-nav .nav-item {
+  min-height: 56px !important;
+  font-size: 0.82rem !important;
+}
+
+body[data-theme="modern"] .bottom-nav .nav-item i,
+body[data-theme="modern"] .bottom-nav .nav-item svg {
+  font-size: 1.25rem !important;
+}
+
+/* Toggle/menu: lebih nyaman dibaca tanpa mengubah struktur menu. */
+body[data-theme="modern"] .menu-toggle,
+body[data-theme="modern"] .toggle-menu {
+  min-width: 52px !important;
+  min-height: 52px !important;
+}
+
+body[data-theme="modern"] .menu-panel,
+body[data-theme="modern"] .toggle-panel {
+  width: min(240px, calc(100vw - 24px)) !important;
+}
+
+body[data-theme="modern"] .menu-panel button,
+body[data-theme="modern"] .toggle-panel button,
+body[data-theme="modern"] .menu-panel a,
+body[data-theme="modern"] .toggle-panel a {
+  min-height: 52px !important;
+  font-size: 1rem !important;
+}
+
+/* Carousel informasi: full-bleed hanya pada layar sempit.
+   Judul/section wrapper tetap mengikuti layout utama. */
+@media (max-width: 699px) {
+  body[data-theme="modern"] .horizontal-scroll,
+  body[data-theme="modern"] .promo-scroll,
+  body[data-theme="modern"] .stock-scroll,
+  body[data-theme="modern"] .best-scroll {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: 0 !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+  }
+}
+
+/* Mencegah wrapper produk menciptakan ruang horizontal tersembunyi. */
+body[data-theme="modern"] .main-content,
+body[data-theme="modern"] .content,
+body[data-theme="modern"] main {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+/* ===== fix-modern-stock-align-photo-v2 ===== */
+/* MODERN: teks produk dinaikkan agar baris stok sejajar dengan batas bawah foto */
+.product-catalog-grid .kq-platform-card .kq-product-info {
+  bottom: 260px !important;
+}
+@media (max-width:520px) {
+  .product-catalog-grid .kq-platform-card .kq-product-info {
+    bottom: 260px !important;
+  }
+}
+@media (max-width:360px) {
+  .product-catalog-grid .kq-platform-card .kq-product-info {
+    bottom: 260px !important;
+  }
+}

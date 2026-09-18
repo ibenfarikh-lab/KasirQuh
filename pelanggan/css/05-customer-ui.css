@@ -1,0 +1,647 @@
+/* ===== modern-cart-modal-fix-v2 ===== */
+/* ============================================================
+   MODERN — KERANJANG BELANJA
+   Khusus tema Modern. Tidak mengubah Light / Dark.
+   ============================================================ */
+body[data-theme="modern"] #cartModal {
+  background: rgba(2, 7, 18, .78) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  padding: 12px !important;
+}
+
+body[data-theme="modern"] #cartModal > .modal-content {
+  width: min(95%, 400px) !important;
+  max-width: 400px !important;
+  max-height: 88vh !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+  border-radius: 22px !important;
+  background: #0b1629 !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(70,145,255,.48) !important;
+  box-shadow: 0 0 24px rgba(37,99,235,.24), 0 18px 45px rgba(0,0,0,.58), inset 0 0 22px rgba(0,95,255,.07) !important;
+}
+
+body[data-theme="modern"] #cartModal .modal-header {
+  flex-shrink: 0 !important;
+  padding: 12px 14px !important;
+  background: #101f36 !important;
+  border-bottom: 1px solid rgba(70,145,255,.25) !important;
+}
+body[data-theme="modern"] #cartModal .modal-header h3 {
+  color: #fff !important;
+  font-size: .98rem !important;
+  font-weight: 900 !important;
+}
+body[data-theme="modern"] #cartModal .btn-close-modal {
+  color: #cbd5e1 !important;
+  transition: .15s ease !important;
+}
+body[data-theme="modern"] #cartModal .btn-close-modal:active {
+  transform: scale(.9) !important;
+  color: #fff !important;
+}
+
+body[data-theme="modern"] #cartModal .receipt-header {
+  margin: 0 !important;
+  padding: 9px 14px 7px !important;
+  background: #0d1a2d !important;
+  border-bottom: 1px solid rgba(70,145,255,.20) !important;
+}
+body[data-theme="modern"] #cartModal #receipt-shop-name {
+  color: #fff !important;
+  font-weight: 900 !important;
+}
+body[data-theme="modern"] #cartModal #receipt-shop-address {
+  color: #8fb3df !important;
+}
+
+body[data-theme="modern"] #cartModal .cart-table-wrapper {
+  max-height: 30vh !important;
+  background: #081321 !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+}
+body[data-theme="modern"] #cartModal .cart-table {
+  color: #f8fafc !important;
+  border-collapse: separate !important;
+  border-spacing: 0 5px !important;
+}
+body[data-theme="modern"] #cartModal .cart-table thead th {
+  color: #8fb3df !important;
+  background: #0b1728 !important;
+  border: none !important;
+  padding: 6px 4px !important;
+  font-size: .66rem !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody tr {
+  background: #111f34 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td {
+  color: #f8fafc !important;
+  border-top: 1px solid rgba(70,145,255,.13) !important;
+  border-bottom: 1px solid rgba(70,145,255,.13) !important;
+  padding: 6px 4px !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:first-child {
+  border-left: 1px solid rgba(70,145,255,.13) !important;
+  border-radius: 9px 0 0 9px !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:last-child {
+  border-right: 1px solid rgba(70,145,255,.13) !important;
+  border-radius: 0 9px 9px 0 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td span,
+body[data-theme="modern"] #cartModal .cart-table tbody td[style*="color:var(--text-color)"] {
+  color: #f8fafc !important;
+}
+
+/* Tombol +/- tetap kontras, tetapi masuk palet Modern. */
+body[data-theme="modern"] #cartModal .cart-table button[onclick*="-1"] {
+  background: #b91c1c !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+  box-shadow: 0 0 7px rgba(239,68,68,.18) !important;
+}
+body[data-theme="modern"] #cartModal .cart-table button[onclick*="1"] {
+  background: #1677d2 !important;
+  color: #fff !important;
+  border: 1px solid rgba(143,201,255,.35) !important;
+  box-shadow: 0 0 7px rgba(37,99,235,.20) !important;
+}
+
+body[data-theme="modern"] #cartModal .summary-box {
+  padding: 9px 14px 5px !important;
+  background: #0b1629 !important;
+  border-top: 1px solid rgba(70,145,255,.18) !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > div:first-child {
+  color: #fff !important;
+  font-size: .88rem !important;
+}
+body[data-theme="modern"] #cartModal #grand-total {
+  color: #ffe100 !important;
+  text-shadow: 0 0 7px rgba(255,225,0,.16) !important;
+}
+body[data-theme="modern"] #cartModal select,
+body[data-theme="modern"] #cartModal input,
+body[data-theme="modern"] #cartModal textarea {
+  background: #101f36 !important;
+  color: #f8fafc !important;
+  border-color: #294564 !important;
+}
+body[data-theme="modern"] #cartModal select option {
+  background: #101f36 !important;
+  color: #f8fafc !important;
+}
+body[data-theme="modern"] #cartModal label {
+  color: #dbeafe !important;
+}
+body[data-theme="modern"] #cartModal #wrapper-tf-proof,
+body[data-theme="modern"] #cartModal #wrapper-save-recipe-fields,
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div {
+  background: #0e1b2e !important;
+  border-color: #294564 !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div label,
+body[data-theme="modern"] #cartModal #wrapper-save-recipe-fields label {
+  color: #dbeafe !important;
+}
+
+body[data-theme="modern"] #cartModal .btn-success {
+  background: #1677d2 !important;
+  color: #fff !important;
+  border: 1px solid rgba(143,201,255,.35) !important;
+  box-shadow: 0 0 10px rgba(37,99,235,.20) !important;
+}
+body[data-theme="modern"] #cartModal .btn-clear-cart {
+  background: #9f1239 !important;
+  color: #fff !important;
+  border: 1px solid rgba(251,113,133,.25) !important;
+}
+body[data-theme="modern"] #cartModal button[onclick="prosesSimpanMenuSaja()"] {
+  background: #4f46a5 !important;
+  color: #fff !important;
+  border: 1px solid rgba(167,139,250,.30) !important;
+}
+body[data-theme="modern"] #cartModal .btn-success:active,
+body[data-theme="modern"] #cartModal .btn-clear-cart:active,
+body[data-theme="modern"] #cartModal button[onclick="prosesSimpanMenuSaja()"]:active {
+  transform: scale(.98) !important;
+}
+
+@media (max-width: 420px) {
+  body[data-theme="modern"] #cartModal > .modal-content {
+    width: 96% !important;
+    max-height: 89vh !important;
+    border-radius: 20px !important;
+  }
+  body[data-theme="modern"] #cartModal .cart-table-wrapper { max-height: 28vh !important; }
+}
+
+/* ===== modern-cart-white-surface-final-v4 ===== */
+/* MODERN — bersihkan seluruh sisa surface putih di modal Keranjang.
+   Tidak memengaruhi Light/Dark. */
+body[data-theme="modern"] #cartModal .cart-table,
+body[data-theme="modern"] #cartModal .cart-table thead,
+body[data-theme="modern"] #cartModal .cart-table tbody,
+body[data-theme="modern"] #cartModal .cart-table tr,
+body[data-theme="modern"] #cartModal .cart-table th,
+body[data-theme="modern"] #cartModal .cart-table td {
+  border-color: transparent !important;
+}
+body[data-theme="modern"] #cartModal .cart-table thead th {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+body[data-theme="modern"] #cartModal .cart-table-wrapper {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+body[data-theme="modern"] #cartModal .summary-box {
+  border: 0 !important;
+  border-top: 1px solid rgba(70,145,255,.18) !important;
+  border-radius: 0 !important;
+}
+/* Kotak Simpan jadi Menu Resep: navy Modern, bukan putih dari var(--input-bg). */
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div[style*="background"] {
+  background: #0e1b2e !important;
+  color: #dbeafe !important;
+  border: 1px solid #294564 !important;
+  box-shadow: none !important;
+}
+/* Checkbox mengikuti Modern, termasuk saat dicentang/fokus. */
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  margin: 0 !important;
+  border-radius: 5px !important;
+  border: 1px solid #416487 !important;
+  background: #101f36 !important;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.15) !important;
+  cursor: pointer !important;
+  position: relative !important;
+}
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle:checked,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle:checked {
+  background: #1677d2 !important;
+  border-color: #8fc9ff !important;
+}
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle:checked::after,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle:checked::after {
+  content: "✓" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle:focus,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(37,99,235,.22) !important;
+}
+
+/* ===== kq-no3-no4-exact-rail-final ===== */
+\n/* FINAL: No.3 & No.4 mengikuti RAIL GEOMETRY No.2 (Stok Rumah).\n   Header/Bottom Navbar tidak disentuh. */\n#recipe-section-wrapper, #trending-section-wrapper {\n  box-sizing: border-box !important;\n  overflow: visible !important;\n}\n#recipe-section-wrapper > div:first-child,\n#trending-section-wrapper > div:first-child {\n  box-sizing: border-box !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n}\n#recipe-scroll-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 14px !important;\n  padding-right: 14px !important;\n  padding-top: 2px !important;\n  padding-bottom: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: hidden !important;\n  scrollbar-width: none !important;\n}\n#trending-container {\n  box-sizing: border-box !important;\n  width: 100% !important;\n  max-width: 100% !important;\n  padding-left: 4px !important;\n  padding-right: 4px !important;\n  overflow-x: auto !important;\n  overflow-y: visible !important;\n  scrollbar-width: none !important;\n}\n#trending-container .auto-scroll-track {\n  box-sizing: border-box !important;\n  padding-left: 10px !important;\n  padding-right: 10px !important;\n  padding-top: 4px !important;\n  padding-bottom: 6px !important;\n}\n#recipe-scroll-container > *,\n#trending-container > *,\n#trending-container .auto-scroll-track > * {\n  flex-shrink: 0 !important;\n}\n@media (max-width: 699px) {\n  /* Samakan OUTER WRAPPER dengan No.2: full viewport.\n     Rail kartu tetap 14px dari viewport: No.2 = 4px + 10px. */\n  #recipe-section-wrapper, #trending-section-wrapper {\n    width: 100vw !important;\n    max-width: 100vw !important;\n    margin-left: calc(50% - 50vw) !important;\n    margin-right: calc(50% - 50vw) !important;\n    box-sizing: border-box !important;\n  }\n}\n
+
+/* ===== kq-no3-card-inner-spacing-final-v4 ===== */
+/* No.3: outer card tetap mengikuti edge; KONTEN di dalam card tidak menempel. */
+.recipe-card {
+  box-sizing: border-box !important;
+  padding: 14px !important;
+}
+.recipe-card > img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 5px 0 !important;
+}
+.recipe-card > div:last-child {
+  margin-bottom: 3px !important;
+}
+.recipe-card .recipe-btn-action {
+  box-sizing: border-box !important;
+}
+
+/* ===== fix-three-items-final-v1 ===== */
+/* 1) Pagination/page navigation is no longer needed with infinite scroll. */
+#pagination-box { display: none !important; }
+
+/* 2) Light theme uses the existing white logo artwork. */
+body[data-theme="light"] #customer-home-header .customer-home-logo,
+body[data-theme="light"] #customer-home-header .customer-home-logo-light {
+  color: #fff !important;
+}
+
+/* 3) Modern: make the current page name in the fixed bottom bar explicitly visible. */
+body[data-theme="modern"] .permanent-bottom-bar #bottom-bar-title {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #f8fafc !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,.45) !important;
+  z-index: 5 !important;
+}
+
+/* ===== inline-style-38 ===== */
+/* ADMIN: kotak pembungkus halaman utama & daftar barang = BLACK
+   berlaku Colorful v.1 dan Colorful v.2 */
+[data-theme="colorful"] .main-page,
+[data-theme="colorful-v2"] .main-page,
+[data-theme="colorful"] .catalog-section,
+[data-theme="colorful-v2"] .catalog-section,
+[data-theme="colorful"] .available-products,
+[data-theme="colorful-v2"] .available-products,
+[data-theme="colorful"] .products-container,
+[data-theme="colorful-v2"] .products-container,
+body.theme-colorful .main-page,
+body.theme-colorful-v2 .main-page,
+body.theme-colorful .catalog-section,
+body.theme-colorful-v2 .catalog-section,
+body.theme-colorful .available-products,
+body.theme-colorful-v2 .available-products,
+body.theme-colorful .products-container,
+body.theme-colorful-v2 .products-container {
+  background: #000 !important;
+  background-image: none !important;
+}
+
+/* ===== inline-style-39 ===== */
+/* =========================================================
+   ADMIN COLORFUL v1/v2 — CONTRAST + / -
+   Tombol quantity sengaja berbeda dari warna card.
+   ========================================================= */
+
+/* Default control colors */
+[data-theme="colorful"] .quantity-btn,
+[data-theme="colorful-v2"] .quantity-btn,
+[data-theme="colorful2"] .quantity-btn,
+[data-theme="colorful-v.2"] .quantity-btn,
+[data-theme="colorful"] .qty-btn,
+[data-theme="colorful-v2"] .qty-btn,
+[data-theme="colorful2"] .qty-btn,
+[data-theme="colorful-v.2"] .qty-btn {
+  background-image: none !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.45) !important;
+  font-weight: 800 !important;
+}
+
+/* If the existing markup uses common +/- buttons, color them by
+   button order rather than inheriting the product/card color. */
+[data-theme="colorful"] .quantity-btn:nth-of-type(odd),
+[data-theme="colorful-v2"] .quantity-btn:nth-of-type(odd),
+[data-theme="colorful2"] .quantity-btn:nth-of-type(odd),
+[data-theme="colorful-v.2"] .quantity-btn:nth-of-type(odd),
+[data-theme="colorful"] .qty-btn:nth-of-type(odd),
+[data-theme="colorful-v2"] .qty-btn:nth-of-type(odd),
+[data-theme="colorful2"] .qty-btn:nth-of-type(odd),
+[data-theme="colorful-v.2"] .qty-btn:nth-of-type(odd) {
+  background: #10b981 !important;
+}
+
+[data-theme="colorful"] .quantity-btn:nth-of-type(even),
+[data-theme="colorful-v2"] .quantity-btn:nth-of-type(even),
+[data-theme="colorful2"] .quantity-btn:nth-of-type(even),
+[data-theme="colorful-v.2"] .quantity-btn:nth-of-type(even),
+[data-theme="colorful"] .qty-btn:nth-of-type(even),
+[data-theme="colorful-v2"] .qty-btn:nth-of-type(even),
+[data-theme="colorful2"] .qty-btn:nth-of-type(even),
+[data-theme="colorful-v.2"] .qty-btn:nth-of-type(even) {
+  background: #f97316 !important;
+}
+
+/* Strong fallback for actual +/- text inside buttons. */
+[data-theme="colorful"] button[aria-label*="Tambah"],
+[data-theme="colorful"] button[aria-label*="Kurang"],
+[data-theme="colorful-v2"] button[aria-label*="Tambah"],
+[data-theme="colorful-v2"] button[aria-label*="Kurang"],
+[data-theme="colorful2"] button[aria-label*="Tambah"],
+[data-theme="colorful2"] button[aria-label*="Kurang"],
+[data-theme="colorful-v.2"] button[aria-label*="Tambah"],
+[data-theme="colorful-v.2"] button[aria-label*="Kurang"] {
+  color: #fff !important;
+  background-image: none !important;
+}
+
+/* Keep v2 strictly solid for these controls too. */
+[data-theme="colorful-v2"] .quantity-btn,
+[data-theme="colorful-v2"] .qty-btn,
+[data-theme="colorful2"] .quantity-btn,
+[data-theme="colorful2"] .qty-btn,
+[data-theme="colorful-v.2"] .quantity-btn,
+[data-theme="colorful-v.2"] .qty-btn {
+  background-image: none !important;
+}
+
+
+    /* HEADER PELANGGAN — menempel ke atas, promo kecil, Info Toko melebar */
+    .customer-home-header { padding-right: 112px !important; min-height: 104px !important; }
+    #customer-home-info-line { width: calc(100% + 112px) !important; }
+    .promo-banner { width: 50px !important; min-height: 42px !important; height: 42px !important; right: 7px !important; top: 10px !important; padding: 5px 7px !important; border-radius: 12px !important; box-shadow: 0 4px 12px rgba(225,29,72,.22) !important; }
+    .promo-banner::before, .promo-banner::after { display:none !important; }
+    .promo-stage { padding-top:0 !important; }
+    .promo-stage > div:first-child { font-size:.68rem !important; }
+    .promo-stage > div:nth-child(2), .promo-slide-content { display:none !important; }
+    .promo-floating-backdrop { z-index: 9999 !important; background: rgba(2,6,23,.52) !important; backdrop-filter: blur(3px); padding: 16px !important; }
+    .promo-floating-card { position:relative; width:min(330px,92vw); max-height:82vh; overflow:hidden; border-radius:24px; padding:14px; background:var(--card-bg); color:var(--text-color); box-shadow:0 22px 60px rgba(0,0,0,.34); border:1px solid var(--border-color); }
+    .promo-floating-close { position:absolute; right:10px; top:10px; z-index:4; width:32px; height:32px; border:0; border-radius:50%; background:var(--input-bg); color:var(--text-color); font-weight:900; cursor:pointer; }
+    .promo-floating-badge { display:inline-flex; align-items:center; padding:5px 9px; border-radius:999px; background:#ef4444; color:#fff; font-size:.62rem; font-weight:900; margin-bottom:8px; }
+    .promo-toko-slider { width:100%; overflow:hidden; touch-action:pan-y; }
+    .promo-toko-track { display:flex; transition:transform .28s ease; will-change:transform; }
+    html.dev-no-nav-animation .promo-toko-track { transition: none !important; }
+html.dev-no-nav-animation .fab-ai-bounce,
+html.dev-no-nav-animation #promo-banner-section,
+html.dev-no-nav-animation .customer-promo,
+html.dev-no-nav-animation .customerPromo,
+html.dev-no-nav-animation .promo-trigger,
+html.dev-no-nav-animation .promo-float,
+html.dev-no-nav-animation #customerPromo,
+html.dev-no-nav-animation #promoTrigger {
+  animation: none !important;
+  will-change: auto !important;
+}
+
+    .promo-detail { flex:0 0 100%; min-width:100%; box-sizing:border-box; text-align:center; padding:4px 4px 8px; }
+    .promo-detail img, .promo-detail-placeholder { width:100%; height:190px; object-fit:cover; border-radius:18px; background:var(--input-bg); display:flex; align-items:center; justify-content:center; font-size:3rem; }
+    .promo-detail-name { margin:10px 4px 3px; font-size:1.05rem; font-weight:900; }
+    .promo-detail-price-label { font-size:.68rem; color:var(--text-muted); }
+    .promo-detail-price { margin-top:2px; font-size:1.15rem; font-weight:900; color:#e11d48; }
+    .promo-detail-stock { margin-top:3px; font-size:.68rem; color:var(--text-muted); }
+    .promo-detail-add { margin-top:10px; width:100%; border:0; border-radius:12px; padding:10px; background:#16a34a; color:#fff; font-size:.78rem; font-weight:900; cursor:pointer; }
+    .promo-floating-nav { display:flex; align-items:center; justify-content:center; gap:12px; margin-top:2px; }
+    .promo-floating-nav button { width:32px; height:32px; border:0; border-radius:50%; background:#2563eb; color:#fff; font-size:1.35rem; line-height:1; cursor:pointer; }
+    .promo-floating-nav button:disabled { opacity:.3; cursor:default; }
+    .promo-floating-nav span { min-width:48px; text-align:center; font-size:.68rem; font-weight:900; color:var(--text-muted); }
+
+    /* Semua card pelanggan: colorful solid, tanpa gradient */
+    .recipe-card, .reorder-card, .trending-card, .inv-card, .catalog-list-item { background-image:none !important; }
+    .recipe-card:nth-child(5n+1), .reorder-card:nth-child(5n+1), .trending-card:nth-child(5n+1), .inv-card:nth-child(5n+1), .catalog-list-item:nth-child(5n+1) { background:#2563eb !important; color:#fff !important; }
+    .recipe-card:nth-child(5n+2), .reorder-card:nth-child(5n+2), .trending-card:nth-child(5n+2), .inv-card:nth-child(5n+2), .catalog-list-item:nth-child(5n+2) { background:#f97316 !important; color:#fff !important; }
+    .recipe-card:nth-child(5n+3), .reorder-card:nth-child(5n+3), .trending-card:nth-child(5n+3), .inv-card:nth-child(5n+3), .catalog-list-item:nth-child(5n+3) { background:#10b981 !important; color:#fff !important; }
+    .recipe-card:nth-child(5n+4), .reorder-card:nth-child(5n+4), .trending-card:nth-child(5n+4), .inv-card:nth-child(5n+4), .catalog-list-item:nth-child(5n+4) { background:#8b5cf6 !important; color:#fff !important; }
+    .recipe-card:nth-child(5n+5), .reorder-card:nth-child(5n+5), .trending-card:nth-child(5n+5), .inv-card:nth-child(5n+5), .catalog-list-item:nth-child(5n+5) { background:#ec4899 !important; color:#fff !important; }
+    .trending-card *, .reorder-card *, .recipe-card *, .inv-card *, .catalog-list-item * { }
+    .trending-card > div:first-of-type, .reorder-card > div { }
+    .inv-card [style*="color: #fde047"], .trending-card [style*="color: #fde047"], .reorder-card [style*="color: #fde047"] { color:#fff !important; }
+    .recipe-card .recipe-btn-action { background:#111827 !important; color:#fff !important; border:none !important; }
+    .btn-quick-cart-icon { background:#111827 !important; color:#fff !important; }
+
+    /* ============================================================
+       LIGHT / DARK — CARD PRODUK COMPACT 125x125
+       Hanya ukuran & proporsi card grid. Warna/tema tetap mengikuti
+       aturan yang sudah ada. Tidak berlaku untuk Modern dan List.
+       ============================================================ */
+    body[data-theme="light"] .product-catalog-grid,
+    body[data-theme="dark"] .product-catalog-grid {
+      grid-template-columns: repeat(auto-fill, 125px) !important;
+      justify-content: center !important;
+      align-items: start !important;
+      gap: 10px !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card,
+    body[data-theme="dark"] .product-catalog-grid .inv-card {
+      width: 125px !important;
+      min-width: 125px !important;
+      max-width: 125px !important;
+      height: 125px !important;
+      min-height: 125px !important;
+      max-height: 125px !important;
+      box-sizing: border-box !important;
+      padding: 5px !important;
+      border-radius: 14px !important;
+      position: relative !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card > div:first-of-type,
+    body[data-theme="dark"] .product-catalog-grid .inv-card > div:first-of-type {
+      height: 62px !important;
+      min-height: 62px !important;
+      margin-bottom: 3px !important;
+      flex: 0 0 62px !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card > div:first-of-type img,
+    body[data-theme="dark"] .product-catalog-grid .inv-card > div:first-of-type img {
+      width: 100% !important;
+      height: 62px !important;
+      object-fit: cover !important;
+      border-radius: 10px !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card > div:first-of-type .btn-quick-cart-icon,
+    body[data-theme="dark"] .product-catalog-grid .inv-card > div:first-of-type .btn-quick-cart-icon {
+      width: 25px !important;
+      height: 25px !important;
+      min-width: 25px !important;
+      min-height: 25px !important;
+      right: 2px !important;
+      bottom: 2px !important;
+      font-size: .68rem !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card [style*="font-weight: bold"],
+    body[data-theme="dark"] .product-catalog-grid .inv-card [style*="font-weight: bold"] {
+      font-size: .66rem !important;
+      line-height: 1.05 !important;
+      margin-bottom: 2px !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card [style*="font-size: 0.65rem"],
+    body[data-theme="dark"] .product-catalog-grid .inv-card [style*="font-size: 0.65rem"] {
+      font-size: .54rem !important;
+      line-height: 1.05 !important;
+      margin-bottom: 1px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    body[data-theme="light"] .product-catalog-grid .inv-card [style*="color: #fde047"],
+    body[data-theme="dark"] .product-catalog-grid .inv-card [style*="color: #fde047"] {
+      font-size: .68rem !important;
+      line-height: 1.05 !important;
+      margin-top: 1px !important;
+    }
+
+    /* Modern tetap 125x125; aturan di atas sengaja tidak menyentuhnya. */
+
+    /* ============================================================
+       KATALOG PRODUCT SHELF — SEMUA TEMA
+       Ukuran card Grid dikunci 125x125 tanpa mengubah List.
+       ============================================================ */
+    .product-catalog-grid {
+      grid-template-columns: repeat(auto-fill, 125px) !important;
+      justify-content: space-evenly !important;
+      align-items: start !important;
+      width: 100% !important;
+      gap: 10px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* Compact card Light/Dark: desain lama dipertahankan,
+       hanya proporsinya disesuaikan agar muat 125x125. */
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card {
+      width: 125px !important;
+      min-width: 125px !important;
+      max-width: 125px !important;
+      height: 125px !important;
+      min-height: 125px !important;
+      max-height: 125px !important;
+      box-sizing: border-box !important;
+      padding: 5px !important;
+      border-radius: 14px !important;
+      overflow: hidden !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div:first-of-type {
+      margin-bottom: 2px !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card img {
+      width: 100% !important;
+      height: 58px !important;
+      object-fit: cover !important;
+      border-radius: 6px !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div:not(:first-of-type) {
+      line-height: 1.05 !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card .btn-quick-cart-icon {
+      transform: scale(.82) !important;
+      transform-origin: bottom right !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div[style*="font-weight: bold"] {
+      font-size: .68rem !important;
+      margin-bottom: 1px !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div[style*="font-size: 0.65rem"] {
+      font-size: .57rem !important;
+      margin-bottom: 1px !important;
+    }
+
+    body:not([data-theme="modern"]) .product-catalog-grid .inv-card > div[style*="font-size: 0.78rem"] {
+      font-size: .68rem !important;
+      margin-top: 1px !important;
+    }
+
+    /* Modern tetap 125x125; hanya distribusi shelf yang disamakan. */
+    body[data-theme="modern"] .product-catalog-grid {
+      grid-template-columns: repeat(auto-fill, 125px) !important;
+      justify-content: space-evenly !important;
+      gap: 10px !important;
+    }
+
+/* ===== kq-no3-no4-true-edge-final ===== */
+/* FINAL EDGE: No.3 & No.4 mengikuti FULL-BLEED EDGE No.2 (Stok Rumah).
+   Tidak menyentuh Header, No.2, katalog, atau bottom navbar. */
+@media (max-width: 699px) {
+  #recipe-section-wrapper,
+  #trending-section-wrapper {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+  }
+
+  #recipe-section-wrapper > div:first-child,
+  #trending-section-wrapper > div:first-child {
+    box-sizing: border-box !important;
+    padding-left: 26px !important;
+    padding-right: 26px !important;
+  }
+
+  #recipe-scroll-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  #recipe-scroll-container > * {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  #trending-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+
+  #trending-container .auto-scroll-track {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+}

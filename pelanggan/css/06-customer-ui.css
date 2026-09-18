@@ -1,0 +1,258 @@
+/* ===== kq-no3-card-inner-spacing-v5-final ===== */
+/* FIX V5: rail/card outer edge tetap full-bleed, tetapi isi card punya ruang dalam.
+   Selector ini sengaja lebih spesifik daripada aturan rail yang mereset padding card. */
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card {
+  box-sizing: border-box !important;
+  padding: 12px !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 6px 0 !important;
+  box-sizing: border-box !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > div:last-child {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 0 !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card .recipe-btn-action {
+  box-sizing: border-box !important;
+}
+
+/* ===== fix-ide-masak-inner-gap-v7 ===== */
+/* IDE MASAK: kembalikan tinggi/original card, tetapi isi tetap punya jarak dari tepi */
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card {
+  box-sizing: border-box !important;
+  padding: 10px !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > img {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 0 5px 0 !important;
+  box-sizing: border-box !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > div {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card > div:last-child {
+  margin: 0 !important;
+}
+#recipe-scroll-container.horizontal-scroll-container > .recipe-card .recipe-btn-action {
+  box-sizing: border-box !important;
+}
+
+/* ===== fix-no5-category-edge-to-edge ===== */
+/* NO.5 KATEGORI: bentangan ujung-ke-ujung mengikuti patokan layar seperti No.1/2/3 */
+@media (max-width:699px) {
+  #category-container {
+    width:100vw !important;
+    min-width:100vw !important;
+    max-width:100vw !important;
+    margin-left:calc(50% - 50vw) !important;
+    margin-right:calc(50% - 50vw) !important;
+    padding:8px 26px 10px !important;
+    box-sizing:border-box !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:0 !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+  }
+
+  #category-container .chip-btn {
+    flex:0 0 28px !important;
+    width:28px !important;
+    min-width:28px !important;
+    max-width:28px !important;
+    height:28px !important;
+    min-height:28px !important;
+    margin:0 !important;
+  }
+}
+
+@media (max-width:420px) {
+  #category-container {
+    padding-left:26px !important;
+    padding-right:26px !important;
+  }
+  #category-container .chip-btn {
+    flex-basis:26px !important;
+    width:26px !important;
+    min-width:26px !important;
+    max-width:26px !important;
+    height:26px !important;
+    min-height:26px !important;
+  }
+}
+
+/* ===== fix-category-gap-all-hp-v1 ===== */
+/* KATEGORI: jarak antar ikon dibuat konsisten di semua ukuran HP */
+@media (max-width:699px) {
+  #category-container {
+    gap:36px !important;
+    justify-content:flex-start !important;
+  }
+}
+
+/* ===== desktop-portrait-viewport-v1 ===== */
+/* ============================================================
+   DESKTOP PORTRAIT VIEWPORT V1
+   Desktop saja: aplikasi pelanggan dibatasi seperti layar HP
+   dan dipusatkan. Tampilan mobile tidak disentuh.
+   Tema Modern tetap memakai visual/glow yang sudah ada.
+   ============================================================ */
+@media (min-width: 768px) {
+  html {
+    background: #0b0f16 !important;
+  }
+
+  body {
+    width: min(430px, 100vw) !important;
+    max-width: 430px !important;
+    min-width: 430px !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    position: relative !important;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 0 55px rgba(0,0,0,.45) !important;
+  }
+
+  /* Elemen fixed yang merupakan bagian dari UI utama ikut berada
+     di dalam lebar portrait, bukan melebar mengikuti monitor. */
+  body > .bottom-nav,
+  body > .permanent-bottom-bar,
+  .fab-container {
+    width: min(430px, 100vw) !important;
+    max-width: 430px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+  }
+
+  .bottom-nav,
+  .permanent-bottom-bar {
+    width: min(430px, 100vw) !important;
+    max-width: 430px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Modal/login tetap proporsional seperti viewport HP. */
+  .modal-backdrop,
+  .login-overlay,
+  .fab-scanner-modal {
+    width: min(430px, 100vw) !important;
+    max-width: 430px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    box-sizing: border-box !important;
+  }
+
+  /* FAB kanan tetap berada di sudut kanan layar portrait. */
+  #scroll-helper-fab {
+    left: auto !important;
+    right: max(10px, calc((100vw - 430px) / 2 + 10px)) !important;
+    transform: none !important;
+  }
+
+  /* Toast tetap berada di tengah viewport portrait. */
+  .toast {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    max-width: calc(430px - 32px) !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ===== modern-fab-cart-no-white-v3 ===== */
+/* MODERN — FAB KERANJANG: hilangkan sisa surface putih.
+   Khusus tombol FAB keranjang + badge, tema lain tidak disentuh. */
+body[data-theme="modern"] #fab-cart-btn {
+  background: #1677d2 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(143,201,255,.42) !important;
+  box-shadow: 0 0 10px rgba(37,99,235,.28), 0 4px 12px rgba(0,0,0,.45) !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
+}
+body[data-theme="modern"] #fab-cart-btn svg {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+body[data-theme="modern"] #fab-cart-btn .cart-badge {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border: 2px solid #0b1629 !important;
+  box-shadow: 0 0 6px rgba(239,68,68,.28) !important;
+}
+body[data-theme="modern"] #fab-cart-btn:focus,
+body[data-theme="modern"] #fab-cart-btn:focus-visible {
+  outline: none !important;
+  border-color: #8fc9ff !important;
+  box-shadow: 0 0 0 2px rgba(22,119,210,.28), 0 0 12px rgba(37,99,235,.35), 0 4px 12px rgba(0,0,0,.45) !important;
+}
+
+/* ===== modern-cart-final-white-strip-v5 ===== */
+/* MODERN CART — final cleanup for any inherited white strips/surfaces. */
+body[data-theme="modern"] #cartModal .cart-table-wrapper,
+body[data-theme="modern"] #cartModal .cart-table,
+body[data-theme="modern"] #cartModal .cart-table thead,
+body[data-theme="modern"] #cartModal .cart-table tbody,
+body[data-theme="modern"] #cartModal .cart-table tr,
+body[data-theme="modern"] #cartModal .cart-table th,
+body[data-theme="modern"] #cartModal .cart-table td {
+  background-color: #0b1728 !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+body[data-theme="modern"] #cartModal .cart-table thead th {
+  background: #0b1728 !important;
+  color: #8fb3df !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(70,145,255,.18) !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody tr {
+  background: #111f34 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td {
+  background: #111f34 !important;
+  border-top: 1px solid rgba(70,145,255,.12) !important;
+  border-bottom: 1px solid rgba(70,145,255,.12) !important;
+}
+/* Remove native scrollbar surfaces from the cart area. */
+body[data-theme="modern"] #cartModal .cart-table-wrapper::-webkit-scrollbar {
+  width: 5px !important;
+  height: 0 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table-wrapper::-webkit-scrollbar-track {
+  background: #081321 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table-wrapper::-webkit-scrollbar-thumb {
+  background: #294564 !important;
+  border-radius: 10px !important;
+}
+/* Any direct child surface inside the summary must stay Modern. */
+body[data-theme="modern"] #cartModal .summary-box,
+body[data-theme="modern"] #cartModal .summary-box > div,
+body[data-theme="modern"] #cartModal .summary-box > .no-print,
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div {
+  background-color: #0b1629 !important;
+  background-image: none !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div {
+  background-color: #0e1b2e !important;
+  background-image: none !important;
+  border-color: #294564 !important;
+}
