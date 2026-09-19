@@ -27,13 +27,17 @@
     <div class="catalog-top"><button class="back-btn" id="catalog-back">←</button><b>Semua Produk</b><span>⌗</span></div>
     <div class="chips" id="category-chips"></div><div class="products catalog-grid" id="catalog-products"></div>
   </section>
-  <section class="login-screen" id="login-screen" hidden>
-    <div class="login-logo">K</div><h1>KasirQuh</h1><p>Belanja mudah, hidup lebih praktis.</p>
-    <form id="login-form" class="auth-card"><div class="auth-tabs"><button type="button" class="active" data-mode="login">Masuk</button><button type="button" data-mode="register">Daftar</button></div>
-      <div id="login-fields"><input id="login-phone" inputmode="tel" placeholder="No. WhatsApp (Contoh: 08123...)" required><input id="login-pass" type="password" placeholder="Sandi" required><button class="primary-btn">Masuk</button></div>
-      <div id="register-fields" hidden><input id="reg-name" placeholder="Nama"><input id="reg-phone" inputmode="tel" placeholder="No. WhatsApp"><input id="reg-address" placeholder="Alamat"><input id="reg-pass" type="password" placeholder="Sandi"><button class="primary-btn">Daftar</button></div>
-      <small class="auth-note">Dengan melanjutkan, Anda menyetujui ketentuan dan kebijakan toko.</small>
-    </form>
+  <section class="login-screen" id="login-screen" hidden aria-modal="true" role="dialog" aria-labelledby="login-title">
+    <div class="login-backdrop" id="login-backdrop"></div>
+    <div class="login-modal">
+      <button class="login-close" id="login-close" type="button" aria-label="Tutup login">×</button>
+      <div class="login-logo">K</div><h1 id="login-title">KasirQuh</h1><p>Belanja mudah, hidup lebih praktis.</p>
+      <form id="login-form" class="auth-card"><div class="auth-tabs"><button type="button" class="active" data-mode="login">Masuk</button><button type="button" data-mode="register">Daftar</button></div>
+        <div id="login-fields"><input id="login-phone" inputmode="tel" placeholder="No. WhatsApp (Contoh: 08123...)" required><input id="login-pass" type="password" placeholder="Sandi" required><button class="primary-btn">Masuk</button></div>
+        <div id="register-fields" hidden><input id="reg-name" placeholder="Nama"><input id="reg-phone" inputmode="tel" placeholder="No. WhatsApp"><input id="reg-address" placeholder="Alamat"><input id="reg-pass" type="password" placeholder="Sandi"><button class="primary-btn">Daftar</button></div>
+        <small class="auth-note">Dengan melanjutkan, Anda menyetujui ketentuan dan kebijakan toko.</small>
+      </form>
+    </div>
   </section>
   <section class="detail-sheet" id="detail-sheet" hidden aria-modal="true">
     <div class="sheet-backdrop" data-close="detail"></div>
