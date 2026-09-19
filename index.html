@@ -623,7 +623,7 @@
       <div style="display:flex;align-items:center;gap:6px"><strong style="font-size:.9rem">😀 Asisten Belanja AI</strong><button id="index-ai-sound" type="button">🔊 Suara: ON</button></div>
       <button id="index-ai-close" type="button">&times;</button>
     </div>
-    <div id="index-ai-messages"><div style="align-self:flex-start;background:#fff;border:1px solid #e5e7eb;color:#111827;padding:6px 10px;border-radius:8px;max-width:80%">HALOOOO BESTIE! 👋 Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu? 😁</div></div>
+    <div id="index-ai-messages"><div style="align-self:flex-start;background:#fff;border:1px solid #e5e7eb;color:#111827;padding:6px 10px;border-radius:8px;max-width:80%">HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?</div></div>
     <div id="index-ai-input-row"><input id="index-ai-input" type="text" placeholder="Tanya atau ngobrol..." autocomplete="off"><button id="index-ai-mic" type="button" title="Ngomong pakai suara">🎤</button><button id="index-ai-send" type="button">Kirim</button></div>
   </div>
 </div>
@@ -650,7 +650,7 @@
   fab.addEventListener('pointerup',end); fab.addEventListener('pointercancel',end);
   async function playWelcomeVoice(){
     if(!isSound)return;
-    const teksSambutan='HALOOOO BESTIE! WELCOME... di Warunge Mimi! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari Warunge Mimi siap baturi belanja makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget!';
+    const teksSambutan='HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?';
     try{
       if(window._indexAiWelcomeAudio){try{window._indexAiWelcomeAudio.pause();}catch(e){} try{URL.revokeObjectURL(window._indexAiWelcomeAudioUrl);}catch(e){}}
       const r=await fetch('/api/tts?text='+encodeURIComponent(teksSambutan));

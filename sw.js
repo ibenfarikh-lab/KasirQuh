@@ -11,7 +11,6 @@ const urlsToCache = [
   '/slide1.png',
   '/slide2.png',
   '/slide3.png',
-  '/welcome-visual-4.png'
 ];
 
 
