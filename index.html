@@ -145,7 +145,7 @@
   }
   #kasirquhVisual4Welcome.kv4-focus-customer .kv4-slide-image,
   #kasirquhVisual4Welcome.kv4-focus-admin .kv4-slide-image {
-    transform: scale(1.12) translateY(-2%);
+    transform: scale(1) translateY(-1);
     filter: brightness(.78) saturate(1.08) blur(.7px);
   }
   #kasirquhVisual4Welcome .kv4-dim {
@@ -172,6 +172,17 @@
   #kv4CustomerGlow, #kv4AdminGlow {
     left: 0; top: 0; width: 0; height: 0;
   }
+  /* Customer outline follows the large rounded corners already baked into the PNG.
+     Only the CSS glow is adjusted; the PNG itself is untouched. */
+  #kv4CustomerGlow {
+    border-radius: 52px;
+    border-width: 2px;
+    box-shadow:
+      0 0 5px rgba(255,255,255,.72),
+      0 0 12px rgba(255,255,255,.38),
+      0 0 22px rgba(255,210,90,.22),
+      inset 0 0 7px rgba(255,255,255,.14);
+  }
   #kasirquhVisual4Welcome .kv4-button-glow.kv4-glow-active {
     animation: kv4GlowReveal .88s ease-in-out forwards;
   }
@@ -190,10 +201,91 @@
     100% { opacity: 0; transform: scale(1.055); }
   }
   @media (max-width: 480px) {
-    #kasirquhVisual4Welcome .kv4-button-glow { border-radius: 16px; border-width: 1.5px; }
+    #kasirquhVisual4Welcome .kv4-button-glow { border-width: 1.5px; }
+    #kv4CustomerGlow { border-radius: 52px; }
+    #kv4AdminGlow { border-radius: 36px; }
   }
   @media (prefers-reduced-motion: reduce) {
     #kasirquhVisual4Welcome .kv4-button-glow { animation-duration: .2s !important; }
+  }
+
+  #kasirquhVisual4Welcome .kv4-customer-swipe {
+    position: absolute;
+    z-index: 2.5;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 52px;
+    --swipe-x: 0px;
+    --swipe-progress: 0;
+    opacity: 1;
+  }
+  /* Opaque orange fill: it progressively covers the PNG button underneath. */
+  #kasirquhVisual4Welcome .kv4-customer-swipe::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(var(--swipe-progress) * 100%);
+    height: 100%;
+    border-radius: inherit;
+    background: #FF8A00;
+    box-shadow:
+      0 0 10px rgba(255,138,0,.55),
+      0 0 22px rgba(255,138,0,.28),
+      inset 0 0 10px rgba(255,190,70,.28);
+    transition: width .35s cubic-bezier(.2,.85,.25,1);
+    z-index: 1;
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-swiping::before {
+    transition: none;
+    box-shadow:
+      0 0 12px rgba(255,138,0,.72),
+      0 0 28px rgba(255,138,0,.38),
+      inset 0 0 12px rgba(255,205,90,.32);
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-swipe-success::before {
+    width: 100%;
+    transition: width .24s cubic-bezier(.2,.9,.2,1);
+  }
+  #kasirquhVisual4Welcome .kv4-swipe-handle {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: 42px;
+    height: 42px;
+    margin-top: -21px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: rgba(255,255,255,.96);
+    font: 700 24px/1 Arial, sans-serif;
+    background: rgba(255,255,255,.10);
+    border: 1.5px solid rgba(255,255,255,.55);
+    box-shadow: 0 0 8px rgba(255,255,255,.42), 0 0 18px rgba(255,210,90,.28);
+    transform: translate3d(var(--swipe-x),0,0);
+    transition: transform .35s cubic-bezier(.2,.85,.25,1), opacity .25s ease, box-shadow .25s ease;
+    animation: kv4SwipeHint 1.9s ease-in-out infinite;
+    z-index: 2;
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-resetting::before {
+    transition: none !important;
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-swiping .kv4-swipe-handle {
+    animation: none;
+    box-shadow: 0 0 10px rgba(255,255,255,.78), 0 0 28px rgba(255,210,90,.46);
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-swipe-success .kv4-swipe-handle {
+    animation: kv4SwipeSuccess .38s ease-out forwards;
+  }
+  @keyframes kv4SwipeHint {
+    0%, 100% { transform: translate3d(0,0,0); opacity: .72; }
+    48% { transform: translate3d(13px,0,0); opacity: 1; }
+    62% { transform: translate3d(7px,0,0); opacity: .92; }
+  }
+  @keyframes kv4SwipeSuccess {
+    0% { transform: translate3d(var(--swipe-x),0,0) scale(1); opacity: 1; }
+    55% { transform: translate3d(var(--swipe-x),0,0) scale(1.18); opacity: 1; }
+    100% { transform: translate3d(var(--swipe-x),0,0) scale(1.04); opacity: 0; }
   }
 
   #kasirquhVisual4Welcome .kv4-hotspot {
@@ -209,6 +301,8 @@
     box-shadow: none !important;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
     appearance: none;
     -webkit-appearance: none;
   }
@@ -228,7 +322,8 @@
   <div class="kv4-dim" aria-hidden="true"></div>
   <div id="kv4CustomerGlow" class="kv4-button-glow kv4-glow-customer" aria-hidden="true"></div>
   <div id="kv4AdminGlow" class="kv4-button-glow kv4-glow-admin" aria-hidden="true"></div>
-  <button id="kv4CustomerHotspot" class="kv4-hotspot" type="button" aria-label="Mulai Belanja"></button>
+  <div id="kv4CustomerSwipe" class="kv4-customer-swipe" aria-hidden="true"><span class="kv4-swipe-handle">→</span></div>
+  <button id="kv4CustomerHotspot" class="kv4-hotspot" type="button" aria-label="Geser untuk Mulai Belanja"></button>
   <button id="kv4AdminHotspot" class="kv4-hotspot" type="button" aria-label="Admin"></button>
 </div>
 
@@ -266,6 +361,8 @@
     const admin = document.getElementById('kv4AdminHotspot');
     const customerGlow = document.getElementById('kv4CustomerGlow');
     const adminGlow = document.getElementById('kv4AdminGlow');
+    const customerSwipe = document.getElementById('kv4CustomerSwipe');
+    const swipeHandle = customerSwipe ? customerSwipe.querySelector('.kv4-swipe-handle') : null;
     if (!welcome || !image || !customer || !admin) return;
 
     const slides = ['./slide1.png', './slide2.png', './slide3.png'];
@@ -285,6 +382,29 @@
     // and different screen aspect ratios cannot shift them away from the photo buttons.
     const customerBox = { x: 38 / 688, y: 1270 / 1536, w: 612 / 688, h: 95 / 1536 };
     const adminBox = { x: 490 / 688, y: 1370 / 1536, w: 170 / 688, h: 72 / 1536 };
+
+    let swipeStartX = 0;
+    let swipeCurrentX = 0;
+    let swipeMaxX = 0;
+    let swipeDragging = false;
+    let swipeCompleted = false;
+
+    function resetSwipeVisual(animated) {
+      if (!customerSwipe || !swipeHandle) return;
+      customerSwipe.classList.remove('kv4-swiping', 'kv4-swipe-success');
+      if (!animated) {
+        customerSwipe.classList.add('kv4-resetting');
+        swipeHandle.style.transition = 'none';
+      }
+      swipeHandle.style.setProperty('--swipe-x', '0px');
+      swipeHandle.style.setProperty('--swipe-progress', '0');
+      if (!animated) {
+        requestAnimationFrame(function () {
+          if (customerSwipe) customerSwipe.classList.remove('kv4-resetting');
+          if (swipeHandle) swipeHandle.style.removeProperty('transition');
+        });
+      }
+    }
 
     function syncSlideButtonPositions() {
       const imgRect = image.getBoundingClientRect();
@@ -313,6 +433,18 @@
       if (image.naturalWidth && image.naturalHeight) {
         apply(customerBox, customer, customerGlow);
         apply(adminBox, admin, adminGlow);
+        if (customerSwipe) {
+          const left = customerBox.x * image.naturalWidth * scale - cropX;
+          const top = customerBox.y * image.naturalHeight * scale - cropY;
+          const width = customerBox.w * image.naturalWidth * scale;
+          const height = customerBox.h * image.naturalHeight * scale;
+          customerSwipe.style.left = left + 'px';
+          customerSwipe.style.top = top + 'px';
+          customerSwipe.style.width = width + 'px';
+          customerSwipe.style.height = height + 'px';
+          swipeMaxX = Math.max(0, width - 62);
+          if (!swipeDragging && !swipeCompleted) resetSwipeVisual(false);
+        }
       }
     }
 
@@ -371,10 +503,69 @@
       }, 430);
     }
 
-    customer.addEventListener('click', function () {
-      if (customerGlow) { customerGlow.classList.remove('kv4-glow-active'); void customerGlow.offsetWidth; customerGlow.classList.add('kv4-glow-pressed'); }
-      leave('kv4-focus-customer', './pelanggan.html');
+    customer.addEventListener('click', function (event) {
+      // Deliberately do not open on a simple tap. The customer action is a swipe-to-start control.
+      event.preventDefault();
     });
+
+    customer.addEventListener('pointerdown', function (event) {
+      if (leaving || swipeCompleted) return;
+      swipeDragging = true;
+      swipeStartX = event.clientX;
+      swipeCurrentX = 0;
+      customer.setPointerCapture?.(event.pointerId);
+      if (customerSwipe) {
+        customerSwipe.classList.add('kv4-swiping');
+        customerSwipe.style.setProperty('--swipe-progress', '0');
+      }
+      if (swipeHandle) swipeHandle.style.transition = 'none';
+      event.preventDefault();
+    });
+
+    customer.addEventListener('pointermove', function (event) {
+      if (!swipeDragging || leaving || swipeCompleted) return;
+      const delta = event.clientX - swipeStartX;
+      swipeCurrentX = Math.max(0, Math.min(swipeMaxX, delta));
+      const progress = swipeMaxX > 0 ? swipeCurrentX / swipeMaxX : 0;
+      if (customerSwipe) {
+        customerSwipe.style.setProperty('--swipe-progress', progress.toFixed(3));
+      }
+      if (swipeHandle) {
+        swipeHandle.style.setProperty('--swipe-x', swipeCurrentX + 'px');
+        swipeHandle.style.setProperty('--swipe-progress', progress.toFixed(3));
+      }
+      event.preventDefault();
+    });
+
+    function finishCustomerSwipe(event) {
+      if (!swipeDragging) return;
+      swipeDragging = false;
+      try { customer.releasePointerCapture?.(event.pointerId); } catch (_) {}
+      const threshold = Math.max(120, swipeMaxX * 0.78);
+      if (swipeCurrentX >= threshold) {
+        swipeCompleted = true;
+        if (customerSwipe) customerSwipe.classList.add('kv4-swipe-success');
+        if (customerSwipe) {
+          customerSwipe.style.setProperty('--swipe-progress', '1');
+        }
+        if (swipeHandle) {
+          swipeHandle.style.transition = 'transform .24s cubic-bezier(.2,.9,.2,1)';
+          swipeHandle.style.setProperty('--swipe-x', swipeMaxX + 'px');
+        }
+        if (customerGlow) {
+          customerGlow.classList.remove('kv4-glow-active', 'kv4-glow-pressed');
+          void customerGlow.offsetWidth;
+          customerGlow.classList.add('kv4-glow-pressed');
+        }
+        setTimeout(function () { leave('kv4-focus-customer', './pelanggan.html'); }, 180);
+      } else {
+        resetSwipeVisual(true);
+      }
+      event.preventDefault();
+    }
+
+    customer.addEventListener('pointerup', finishCustomerSwipe);
+    customer.addEventListener('pointercancel', finishCustomerSwipe);
 
     admin.addEventListener('click', function () {
       if (adminGlow) { adminGlow.classList.remove('kv4-glow-active'); void adminGlow.offsetWidth; adminGlow.classList.add('kv4-glow-pressed'); }
