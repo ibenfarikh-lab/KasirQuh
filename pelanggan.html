@@ -329,6 +329,22 @@
     .fab-ai-bounce { animation: aiBounceThree 4.8s ease-in-out infinite; will-change: transform; }
     .fab-ai-bounce:hover { animation-play-state: paused; }
 
+    /* FAB AI pelanggan bisa digeser bebas di layar. */
+    #fab-ai-btn {
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-touch-callout: none !important;
+      position: fixed !important;
+      z-index: 10000 !important;
+      margin: 0 !important;
+    }
+    #fab-ai-btn.is-dragging {
+      animation: none !important;
+      transition: none !important;
+      cursor: grabbing !important;
+    }
+
     html.dev-no-nav-animation #scroll-helper-fab {
     transition: none !important;
     transform: none !important;
@@ -3795,6 +3811,93 @@ body[data-theme="modern"] .product-catalog-list .catalog-list-item > .modern-lis
     }
 
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
+    /* === DRAG FAB AI PELANGGAN === */
+    (function initDraggableAiFab(){
+      const fab = document.getElementById('fab-ai-btn');
+      if (!fab || fab.dataset.dragReady === '1') return;
+      fab.dataset.dragReady = '1';
+
+      const saved = (() => {
+        try { return JSON.parse(localStorage.getItem('kasirquh_ai_fab_pos') || 'null'); } catch(e) { return null; }
+      })();
+      let dragging = false;
+      let moved = false;
+      let pointerId = null;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+      function place(x, y, save = true){
+        const maxX = Math.max(0, window.innerWidth - fab.offsetWidth);
+        const maxY = Math.max(0, window.innerHeight - fab.offsetHeight);
+        x = clamp(x, 0, maxX);
+        y = clamp(y, 0, maxY);
+        fab.style.left = x + 'px';
+        fab.style.top = y + 'px';
+        fab.style.right = 'auto';
+        fab.style.bottom = 'auto';
+        if(save){
+          try { localStorage.setItem('kasirquh_ai_fab_pos', JSON.stringify({x,y})); } catch(e) {}
+        }
+      }
+
+      function applyInitialPosition(){
+        if(saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)){
+          place(saved.x, saved.y, false);
+        } else {
+          const rect = fab.getBoundingClientRect();
+          place(window.innerWidth - rect.width - 10, (window.innerHeight - rect.height) / 2, false);
+        }
+      }
+
+      fab.addEventListener('pointerdown', (e) => {
+        if(e.pointerType === 'mouse' && e.button !== 0) return;
+        const rect = fab.getBoundingClientRect();
+        pointerId = e.pointerId;
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        dragging = true;
+        moved = false;
+        fab.classList.add('is-dragging');
+        try { fab.setPointerCapture(pointerId); } catch(err) {}
+        e.preventDefault();
+      }, {passive:false});
+
+      fab.addEventListener('pointermove', (e) => {
+        if(!dragging || e.pointerId !== pointerId) return;
+        const rect = fab.getBoundingClientRect();
+        if(Math.abs((e.clientX - rect.left) - offsetX) > 3 || Math.abs((e.clientY - rect.top) - offsetY) > 3) moved = true;
+        place(e.clientX - offsetX, e.clientY - offsetY);
+        e.preventDefault();
+      }, {passive:false});
+
+      function endDrag(e){
+        if(!dragging || (e && e.pointerId !== pointerId)) return;
+        dragging = false;
+        fab.classList.remove('is-dragging');
+        try { if(pointerId != null) fab.releasePointerCapture(pointerId); } catch(err) {}
+        pointerId = null;
+      }
+      fab.addEventListener('pointerup', endDrag);
+      fab.addEventListener('pointercancel', endDrag);
+
+      /* Setelah digeser, jangan sampai pointerup dianggap sebagai tap pembuka AI. */
+      fab.addEventListener('click', (e) => {
+        if(moved){
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          moved = false;
+        }
+      }, true);
+
+      window.addEventListener('resize', () => {
+        const rect = fab.getBoundingClientRect();
+        place(rect.left, rect.top, true);
+      });
+
+      requestAnimationFrame(applyInitialPosition);
+    })();
+
     async function toggleAIChatModal() {
       const modal = document.getElementById('aiChatModal');
       const willOpen = !modal.classList.contains('show');
