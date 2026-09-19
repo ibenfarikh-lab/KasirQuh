@@ -595,10 +595,11 @@
     position:fixed; left:auto; top:auto; right:10px; bottom:65px;
     width:44px; height:44px; padding:0; border:0; border-radius:50%;
     background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 3px 10px rgba(0,0,0,.3); cursor:grab; font-size:18px;
+    box-shadow:0 3px 10px rgba(0,0,0,.3); cursor:grab; font-size:18px; overflow:hidden;
     z-index:2147483646; touch-action:none; user-select:none;
     animation:indexAiBounceThree 4.8s ease-in-out infinite; will-change:transform,left,top;
   }
+  #index-ai-fab img { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
   #index-ai-fab.dragging { cursor:grabbing; animation:none; transform:none; }
   #index-ai-fab:active { cursor:grabbing; }
   #index-ai-modal { display:none; position:fixed; inset:0; z-index:2147483647; background:rgba(0,0,0,.55); align-items:center; justify-content:center; padding:12px; box-sizing:border-box; }
@@ -615,7 +616,7 @@
   #index-ai-sound { background:rgba(255,255,255,.2); padding:2px 6px; font-size:.65rem; }
   @media (prefers-reduced-motion:reduce){#index-ai-fab{animation:none!important}}
 </style>
-<button id="index-ai-fab" type="button" aria-label="Asisten AI" title="Asisten AI">😀</button>
+<button id="index-ai-fab" type="button" aria-label="Asisten AI" title="Asisten AI"><img src="./robot-head-ai.png" alt="Kepala robot Asisten AI"></button>
 <div id="index-ai-modal" aria-hidden="true">
   <div id="index-ai-panel">
     <div id="index-ai-head">
@@ -647,7 +648,21 @@
   fab.addEventListener('pointermove',e=>{if(!dragging||e.pointerId!==pid)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.hypot(dx,dy)>5)moved=true;place(sl+dx,st+dy,false);e.preventDefault();});
   function end(e){if(!dragging||e.pointerId!==pid)return;dragging=false;fab.releasePointerCapture?.(pid);fab.classList.remove('dragging');place(fab.getBoundingClientRect().left,fab.getBoundingClientRect().top,true);if(!moved)openAI();e.preventDefault();}
   fab.addEventListener('pointerup',end); fab.addEventListener('pointercancel',end);
-  function openAI(){modal.classList.add('show');modal.setAttribute('aria-hidden','false');setTimeout(()=>input.focus(),40);}
+  async function playWelcomeVoice(){
+    if(!isSound)return;
+    const teksSambutan='HALOOOO BESTIE! WELCOME... di Warunge Mimi! Toko serba ada paling hits, tempat nongkrong bumbu dapur lengkap, sayuran, kopi sachet biar gak ngantuk, sampe bahan masakan siap tempur pawone bestie! Kenalin kula asisten kece dari Warunge Mimi siap baturi belanja makin gampang dan cepet. Mau saya bantuin apa nih? Mau ngobrol atau tanya-tanya dulu boleh banget!';
+    try{
+      if(window._indexAiWelcomeAudio){try{window._indexAiWelcomeAudio.pause();}catch(e){} try{URL.revokeObjectURL(window._indexAiWelcomeAudioUrl);}catch(e){}}
+      const r=await fetch('/api/tts?text='+encodeURIComponent(teksSambutan));
+      if(!r.ok)throw new Error('TTS gagal');
+      const u=URL.createObjectURL(await r.blob());
+      const a=new Audio(u);
+      window._indexAiWelcomeAudio=a; window._indexAiWelcomeAudioUrl=u;
+      a.onended=()=>{try{URL.revokeObjectURL(u);}catch(e){} window._indexAiWelcomeAudio=null;window._indexAiWelcomeAudioUrl=null;};
+      await a.play();
+    }catch(e){console.warn('TTS sambutan AI index:',e);}
+  }
+  function openAI(){modal.classList.add('show');modal.setAttribute('aria-hidden','false');setTimeout(()=>input.focus(),40);playWelcomeVoice();}
   function closeAI(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}
   close.onclick=closeAI; modal.addEventListener('click',e=>{if(e.target===modal)closeAI();});
   sound.onclick=()=>{isSound=!isSound;sound.textContent=isSound?'🔊 Suara: ON':'🔇 Suara: OFF';if(!isSound&&speechSynthesis)speechSynthesis.cancel();};
