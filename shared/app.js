@@ -1,1 +1,1 @@
-
+window.KQV4=window.KQV4||{};window.KQV4.ready=fn=>document.readyState==='loading'?document.addEventListener('DOMContentLoaded',fn,{once:true}):fn();window.KQV4.qs=(s,r=document)=>r.querySelector(s);window.KQV4.qsa=(s,r=document)=>Array.from(r.querySelectorAll(s));window.KQV4.escape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));window.KQV4.formatRupiah=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0);
