@@ -1,5 +1,0 @@
-/* Legacy compatibility stylesheet. New pages load css/base.css and ordered overrides directly. */
-@import url("./css/base.css");
-@import url("./css/overrides-01.css");
-@import url("./css/overrides-02.css");
-@import url("./css/overrides-03.css");
