@@ -1,0 +1,1 @@
+window.KQV4=window.KQV4||{};window.KQV4.StoreContext=(()=>{let state={tokoId:null,user:null,role:null,settings:null};return{get:()=>({...state}),set(p){state={...state,...p};dispatchEvent(new CustomEvent('kq:store-context',{detail:{...state}}));return state},clear(){state={tokoId:null,user:null,role:null,settings:null}},hasStore(){return!!state.tokoId}}})();
