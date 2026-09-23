@@ -1,16 +1,21 @@
-const CACHE_NAME = 'kasirquh-v6';
+const CACHE_NAME = 'kasirquh-v11';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/admin.html',
-  '/pelanggan.html',
-  '/style.css',
+  '/admin/',
+  '/admin/index.html',
+  '/admin/style.css',
+  '/admin/script.js',
+  '/pelanggan/',
+  '/pelanggan/index.html',
+  '/pelanggan/style.css',
+  '/pelanggan/script.js',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
-  '/slide1.png',
-  '/slide2.png',
-  '/slide3.png',
+  '/assets/gateway/slide1.png',
+  '/assets/gateway/slide2.png',
+  '/assets/gateway/slide3.png',
 ];
 
 
@@ -44,8 +49,9 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetch(event.request).catch(() => {
         const path = new URL(event.request.url).pathname;
-        if (path === '/admin.html' || path === '/pelanggan.html') {
-          return caches.match(path);
+        if (path === '/admin/' || path === '/admin/index.html' || path === '/pelanggan/' || path === '/pelanggan/index.html') {
+          if (path === '/admin/' || path === '/admin/index.html') return caches.match('/admin/index.html');
+          return caches.match(path === '/pelanggan/' ? '/pelanggan/index.html' : path);
         }
         return caches.match('/index.html');
       })
@@ -54,7 +60,7 @@ self.addEventListener('fetch', event => {
   }
 
   // Static opening/PWA assets: cache first for the fastest possible startup.
-  const isLocalStatic = /\/(manifest\.json|icon-192\.png|icon-512\.png|slide[123]\.png|welcome-visual-4\.png|style\.css)(\?|$)/.test(new URL(url).pathname);
+  const isLocalStatic = /\/(manifest\.json|icon-192\.png|icon-512\.png|assets/gateway/slide[123]\.png|welcome-visual-4\.png|style\.css|script\.js)(\?|$)/.test(new URL(url).pathname);
   if (isLocalStatic) {
     event.respondWith(
       caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {

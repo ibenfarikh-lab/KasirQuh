@@ -1479,3 +1479,51 @@ PERUBAHAN     : Menghapus root `pelanggan.html` dan root `style.css`. Memperbaru
 VERIFIKASI    : Tidak ada file runtime yang tersisa dengan referensi ke `pelanggan.html`. `/pelanggan/index.html` tetap memakai `style.css` dan `script.js` lokal. Gateway tetap mengarah ke `/pelanggan/index.html`. JavaScript syntax check dan ZIP integrity dilakukan setelah perubahan.
 STATUS        : PASS — CUSTOMER LEGACY ROOT DIPENSIUNKAN.
 CATATAN       : QR/Share sekarang mengarah ke runtime `/pelanggan/`. Migrasi berikutnya dapat melanjutkan pengembangan Gateway/QR tanpa ketergantungan pada `pelanggan.html`.
+
+### LOG AKTIVITAS — H-07-K — AUDIT & MIGRASI MANIFEST PELANGGAN — 2026-09-23
+
+[LOG AKTIVITAS]
+
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-K-MANIFEST-PELANGGAN`
+SCOPE         : `manifest-pelanggan.json` + `pelanggan/index.html` + `sw.js` + `manifest.json` + `readme.md`
+AKTIVITAS     : AUDIT → UBAH → HAPUS → VERIFIKASI
+FILE TERKAIT  : `manifest-pelanggan.json`, `pelanggan/index.html`, `sw.js`, `manifest.json`, `readme.md`
+TUJUAN        : Mengakhiri ketergantungan manifest standalone pelanggan setelah `/pelanggan/` menjadi bagian dari aplikasi utama.
+TEMUAN        : `manifest-pelanggan.json` masih aktif direferensikan oleh `pelanggan/index.html` dan `sw.js`. Manifest tersebut memiliki identitas/start_url khusus standalone pelanggan, sedangkan `manifest.json` utama sudah menjadi manifest aplikasi dengan scope `/` dan start_url `/`.
+PERUBAHAN    : `pelanggan/index.html` dialihkan dari `manifest-pelanggan.json` ke `manifest.json`; referensi serta precache `manifest-pelanggan.json` di `sw.js` dihapus; rule static-cache khusus `manifest-pelanggan.json` dihapus; file `manifest-pelanggan.json` dihapus. `manifest.json` utama dipertahankan tanpa perubahan.
+VERIFIKASI    : Referensi `manifest-pelanggan.json` = 0 pada source aktif; `pelanggan/index.html` memakai `../manifest.json`; `sw.js` tidak lagi memuat nama manifest standalone; `manifest.json` utama tetap valid JSON; source JavaScript terkait tetap dapat diperiksa tanpa error sintaks.
+STATUS        : PASS
+CATATAN       : Keputusan ini mengonsolidasikan PWA pelanggan ke identitas aplikasi utama. Tidak ada perubahan pada icon identitas aplikasi.
+
+
+### LOG AKTIVITAS — H-07-L — KONSOLIDASI MANIFEST KE GATEWAY ROOT — 2026-09-23
+
+[LOG AKTIVITAS]
+
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-L-MANIFEST-ROOT`
+SCOPE         : `manifest.json`, `index.html`, `admin/index.html`, `pelanggan/index.html`, `sw.js`, `readme.md`
+AKTIVITAS     : AUDIT → PEMBERSIHAN REFERENSI → VERIFIKASI
+TUJUAN        : Menetapkan `manifest.json` sebagai manifest tunggal aplikasi pada Gateway/root, bukan manifest per modul.
+TEMUAN        : `manifest.json` utama valid dan memakai scope `/` serta start_url `/`. Gateway `index.html` adalah entry point utama dan tetap menjadi pemilik manifest. `admin/index.html` dan `pelanggan/index.html` sebelumnya masih mendeklarasikan manifest utama; Admin juga memiliki referensi `icon-192.png` relatif yang tidak tersedia di folder `/admin/`.
+PERUBAHAN    : Menghapus deklarasi `<link rel="manifest">` dan `<link rel="apple-touch-icon">` dari `admin/index.html`; menghapus deklarasi manifest dari `pelanggan/index.html`. `manifest.json` root, `index.html` Gateway, icon identitas, dan `sw.js` tidak diubah.
+VERIFIKASI    : Hanya `index.html` yang mendeklarasikan manifest. Referensi `manifest-pelanggan.json` = 0. `admin/index.html` dan `pelanggan/index.html` tidak lagi mendeklarasikan manifest/icon relatif. `manifest.json` tetap valid JSON dan `sw.js` tetap melakukan precache manifest + icon identitas utama.
+STATUS        : PASS
+CATATAN       : Struktur PWA sekarang dikonsolidasikan: Gateway/root = pemilik manifest dan identitas aplikasi; `/admin/` dan `/pelanggan/` = modul runtime tanpa manifest sendiri. Icon `icon-192.png` dan `icon-512.png` tetap berada di ROOT sebagai aset identitas aplikasi.
+
+
+### LOG AKTIVITAS — H-07-O — PEMINDAHAN ASSET GATEWAY KE FOLDER ASSETS — 2026-09-23
+
+[LOG AKTIVITAS]
+
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-O-GATEWAY-ASSETS`
+SCOPE         : `index.html`, `sw.js`, `slide1.png`, `slide2.png`, `slide3.png`, `robot-head-ai.png`, `assets/gateway/`, `readme.md`
+AKTIVITAS     : PEMINDAHAN ASSET → UPDATE PATH → VERIFIKASI
+TUJUAN        : Merapikan asset visual Gateway ke folder `assets/gateway/` tanpa mengubah icon identitas PWA.
+TEMUAN        : Empat PNG (`slide1.png`, `slide2.png`, `slide3.png`, `robot-head-ai.png`) merupakan asset visual Gateway/index.html. Icon `icon-192.png` dan `icon-512.png` tetap merupakan identitas PWA di ROOT dan tidak dipindahkan.
+PERUBAHAN    : Memindahkan empat PNG Gateway ke `assets/gateway/`. Memperbarui referensi gambar dan array slide pada `index.html`. Memperbarui precache dan rule static-cache `slide[123].png` pada `sw.js` agar membaca path `/assets/gateway/`.
+VERIFIKASI    : Keempat PNG berada di `assets/gateway/`; referensi lama `./slide1.png`, `./slide2.png`, `./slide3.png`, `./robot-head-ai.png` pada `index.html` = 0; path baru terdeteksi; icon PWA tetap di ROOT; struktur ZIP valid.
+STATUS        : PASS
+CATATAN       : Pemindahan hanya berlaku untuk asset visual Gateway. Tidak ada perubahan pada `manifest.json` atau icon identitas PWA.

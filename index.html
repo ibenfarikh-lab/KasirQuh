@@ -318,7 +318,7 @@
 </style>
 
 <div id="kasirquhVisual4Welcome" aria-label="Welcome screen">
-  <img id="kv4SlideImage" class="kv4-slide-image" src="./slide1.png" alt="" aria-hidden="true">
+  <img id="kv4SlideImage" class="kv4-slide-image" src="./assets/gateway/slide1.png" alt="" aria-hidden="true">
   <div class="kv4-dim" aria-hidden="true"></div>
   <div id="kv4CustomerGlow" class="kv4-button-glow kv4-glow-customer" aria-hidden="true"></div>
   <div id="kv4AdminGlow" class="kv4-button-glow kv4-glow-admin" aria-hidden="true"></div>
@@ -365,7 +365,7 @@
     const swipeHandle = customerSwipe ? customerSwipe.querySelector('.kv4-swipe-handle') : null;
     if (!welcome || !image || !customer || !admin) return;
 
-    const slides = ['./slide1.png', './slide2.png', './slide3.png'];
+    const slides = ['./assets/gateway/slide1.png', './assets/gateway/slide2.png', './assets/gateway/slide3.png'];
     let current = 0;
     let leaving = false;
     let slideTimer = null;
@@ -616,7 +616,7 @@
   #index-ai-sound { background:rgba(255,255,255,.2); padding:2px 6px; font-size:.65rem; }
   @media (prefers-reduced-motion:reduce){#index-ai-fab{animation:none!important}}
 </style>
-<button id="index-ai-fab" type="button" aria-label="Asisten AI" title="Asisten AI"><img src="./robot-head-ai.png" alt="Kepala robot Asisten AI"></button>
+<button id="index-ai-fab" type="button" aria-label="Asisten AI" title="Asisten AI"><img src="./assets/gateway/robot-head-ai.png" alt="Kepala robot Asisten AI"></button>
 <div id="index-ai-modal" aria-hidden="true">
   <div id="index-ai-panel">
     <div id="index-ai-head">
