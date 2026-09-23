@@ -317,6 +317,96 @@
   }
 </style>
 
+<!-- KASIRQUH GATEWAY PWA INSTALL FAB -->
+<style id="kasirquh-gateway-pwa-install-v1">
+  #gateway-pwa-install {
+    position: fixed;
+    top: max(14px, env(safe-area-inset-top));
+    right: max(14px, env(safe-area-inset-right));
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,.65);
+    border-radius: 999px;
+    background: rgba(6,19,45,.78);
+    color: #fff;
+    box-shadow: 0 5px 18px rgba(0,0,0,.35), 0 0 18px rgba(59,130,246,.28);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font: 700 12px/1 system-ui, sans-serif;
+    letter-spacing: .15px;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #gateway-pwa-install.show { display: inline-flex; }
+  #gateway-pwa-install:active { transform: scale(.97); }
+  #gateway-pwa-install-icon { font-size: 17px; line-height: 1; }
+  @media (max-width: 480px) {
+    #gateway-pwa-install { right: 12px; padding: 8px 11px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #gateway-pwa-install { transition: none; }
+  }
+</style>
+<button id="gateway-pwa-install" type="button" aria-label="Install Aplikasi KasirQuh" title="Install Aplikasi KasirQuh">
+  <span id="gateway-pwa-install-icon" aria-hidden="true">📲</span>
+  <span>Install</span>
+</button>
+<script id="kasirquh-gateway-pwa-install-js">
+(function () {
+  const installButton = document.getElementById('gateway-pwa-install');
+  if (!installButton) return;
+
+  let deferredInstallPrompt = null;
+
+  function hideInstallButton() {
+    installButton.classList.remove('show');
+  }
+
+  function showInstallButton() {
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return;
+    if (window.navigator.standalone === true) return;
+    installButton.classList.add('show');
+  }
+
+  window.addEventListener('beforeinstallprompt', function (event) {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    showInstallButton();
+  });
+
+  installButton.addEventListener('click', async function () {
+    if (!deferredInstallPrompt) return;
+    const promptEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    hideInstallButton();
+    try {
+      promptEvent.prompt();
+      await promptEvent.userChoice;
+    } catch (error) {
+      console.warn('Gateway PWA install prompt:', error);
+    }
+  });
+
+  window.addEventListener('appinstalled', function () {
+    deferredInstallPrompt = null;
+    hideInstallButton();
+  });
+
+  if (window.matchMedia) {
+    const standaloneQuery = window.matchMedia('(display-mode: standalone)');
+    if (standaloneQuery.matches) hideInstallButton();
+    standaloneQuery.addEventListener?.('change', function (event) {
+      if (event.matches) hideInstallButton();
+    });
+  }
+})();
+</script>
+
 <div id="kasirquhVisual4Welcome" aria-label="Welcome screen">
   <img id="kv4SlideImage" class="kv4-slide-image" src="./assets/gateway/slide1.png" alt="" aria-hidden="true">
   <div class="kv4-dim" aria-hidden="true"></div>
