@@ -19,17 +19,6 @@
 /* ===== EXTRACTED FROM pelanggan.html <script> #4 id=none ===== */
 
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log(err)); }); }
-    function triggerInstallPWA() {
-      // PWA installation is centralized at the Gateway, which is the verified
-      // native-install entry point for KasirQuh. Customer must not create a
-      // shortcut install from /pelanggan/.
-      const origin = window.location.origin;
-      const gatewayUrl = (!origin || origin.includes('null') || origin.includes('file:'))
-        ? 'https://kasirquh.vercel.app/'
-        : origin + '/';
-      window.location.href = gatewayUrl + '?install=1';
-    }
-
     let isAiSoundOn = true; let aiRecognition = null; let isAiListening = false;
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; aiRecognition = new SpeechRecognition(); aiRecognition.lang = 'id-ID';
@@ -1244,14 +1233,12 @@
       });
     }
 
-    function logoutPelanggan() { 
-      if (confirm("Keluar dari sesi ini?")) { 
-        localStorage.removeItem('cust_phone_v13'); 
-        currentCustomerPhone = ''; 
-        document.getElementById('customerLoginModal').style.display = 'flex'; 
-        gantiFormAuth('login'); 
-        window.location.reload(); 
-      } 
+    function logoutPelanggan() {
+      if (confirm("Keluar dari sesi ini?")) {
+        localStorage.removeItem('cust_phone_v13');
+        currentCustomerPhone = '';
+        window.location.href = '/';
+      }
     }
 
     function initFirebaseListeners() {

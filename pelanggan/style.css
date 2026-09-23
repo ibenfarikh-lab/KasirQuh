@@ -3404,7 +3404,6 @@ body[data-theme="modern"] #pengaturan textarea::placeholder {
 }
 
 /* Blok cache/error di Pengaturan tidak lagi menjadi putih. */
-body[data-theme="modern"] #customerLoginInstallCard,
 body[data-theme="modern"] #pengaturan .card[style*="#fff5f5"] {
   background: #111c2e !important;
   border-color: #365985 !important;
