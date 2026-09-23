@@ -1623,3 +1623,20 @@ FILE TIDAK BERUBAH : `admin/`, `index.html` Gateway, `manifest.json`, `sw.js`, C
 VERIFIKASI    : Fungsi logout Customer hanya menghapus sesi lalu redirect ke `/`; tidak lagi reload/login-modal. JavaScript lulus `node --check`; ZIP dipaketkan ulang dan isi proyek diverifikasi.
 STATUS        : PASS
 CATATAN       : Scope sengaja dibatasi hanya Customer Logout. PWA Customer tetap tanpa install UI/logic; Gateway tetap menjadi satu-satunya hub instalasi PWA.
+
+
+### LOG AKTIVITAS — H-07-V — CUSTOMER DESKTOP RESPONSIVE VIEW — 2026-09-23
+
+[LOG AKTIVITAS]
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-V-CUSTOMER-DESKTOP-RESPONSIVE`
+SCOPE         : `pelanggan/style.css`, `README FIRST/readme.md`
+AKTIVITAS     : PERBAIKAN VIEW DESKTOP CUSTOMER
+TUJUAN        : Memisahkan canvas Gateway yang tetap terkontrol dari layout Customer agar `/pelanggan/` tidak lagi dipaksa selebar 430px pada layar desktop.
+TEMUAN        : CSS Customer memiliki blok `DESKTOP PORTRAIT VIEWPORT V1` yang mengunci `body`, bottom navigation, modal, FAB, dan toast ke lebar maksimum 430px pada viewport >= 768px. Fondasi responsive Customer sendiri sudah memiliki media query 700px/1200px dan grid katalog yang dapat memanfaatkan ruang layar.
+PERUBAHAN     : Mengganti blok penguncian portrait 430px menjadi aturan desktop responsive >= 768px: `body` mengikuti lebar viewport, navigasi menjadi full-width, FAB kembali ke sisi kanan viewport, modal mengikuti viewport, dan toast tetap terpusat dengan batas wajar. Tampilan mobile < 768px tidak diubah.
+FILE BERUBAH : `h07j_work/pelanggan/style.css`, `h07j_work/README FIRST/readme.md`
+FILE TIDAK BERUBAH : Gateway `index.html`, Slide 1/2/3, hotspot Gateway, `manifest.json`, `sw.js`, icon PWA, `pelanggan/index.html`, `pelanggan/script.js`, Firebase/DB, `ACTIVE_TOKO_ID`, `cust_*`, dan seluruh `admin/`.
+VERIFIKASI    : Blok `width/min-width/max-width: 430px` pada desktop Customer dihapus; aturan responsive 700px/1200px tetap ada; hanya dua file proyek berubah; struktur ZIP diverifikasi; JavaScript Customer tetap berasal dari H-07-U tanpa perubahan.
+STATUS        : PASS — CUSTOMER DESKTOP VIEW UNLOCKED
+CATATAN       : Gateway sengaja tetap menggunakan canvas portrait untuk menjaga Slide 1/2/3 dan posisi tombol. Perubahan ini hanya berlaku untuk `/pelanggan/` pada viewport >= 768px.
