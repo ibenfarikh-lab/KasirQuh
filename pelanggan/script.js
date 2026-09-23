@@ -19,20 +19,15 @@
 /* ===== EXTRACTED FROM pelanggan.html <script> #4 id=none ===== */
 
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log(err)); }); }
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const cardInstall = document.getElementById('customerLoginInstallCard');
-      if (cardInstall) cardInstall.style.display = 'block';
-    });
-    async function triggerInstallPWA() {
-      if (!deferredPrompt) return alert("Bisa install lewat menu Chrome.");
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      const cardInstall = document.getElementById('customerLoginInstallCard');
-      if (cardInstall) cardInstall.style.display = 'none';
+    function triggerInstallPWA() {
+      // PWA installation is centralized at the Gateway, which is the verified
+      // native-install entry point for KasirQuh. Customer must not create a
+      // shortcut install from /pelanggan/.
+      const origin = window.location.origin;
+      const gatewayUrl = (!origin || origin.includes('null') || origin.includes('file:'))
+        ? 'https://kasirquh.vercel.app/'
+        : origin + '/';
+      window.location.href = gatewayUrl + '?install=1';
     }
 
     let isAiSoundOn = true; let aiRecognition = null; let isAiListening = false;
