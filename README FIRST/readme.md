@@ -1640,3 +1640,233 @@ FILE TIDAK BERUBAH : Gateway `index.html`, Slide 1/2/3, hotspot Gateway, `manife
 VERIFIKASI    : Blok `width/min-width/max-width: 430px` pada desktop Customer dihapus; aturan responsive 700px/1200px tetap ada; hanya dua file proyek berubah; struktur ZIP diverifikasi; JavaScript Customer tetap berasal dari H-07-U tanpa perubahan.
 STATUS        : PASS — CUSTOMER DESKTOP VIEW UNLOCKED
 CATATAN       : Gateway sengaja tetap menggunakan canvas portrait untuk menjaga Slide 1/2/3 dan posisi tombol. Perubahan ini hanya berlaku untuk `/pelanggan/` pada viewport >= 768px.
+
+### LOG AKTIVITAS — H-07-W — ADMIN DESKTOP RESPONSIVE / ROOT UNLOCK — 2026-09-23
+
+[LOG AKTIVITAS]
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-W-ADMIN-DESKTOP-RESPONSIVE`
+SCOPE         : `admin/index.html`, `README FIRST/readme.md`
+AKTIVITAS     : AUDIT → PEMBERSIHAN DESKTOP FORCED VIEW → VERIFIKASI
+TUJUAN        : Mengembalikan layout Admin desktop ke fondasi responsive yang sudah tersedia tanpa membuat tambalan CSS baru.
+TEMUAN        : `admin/index.html` memiliki blok `admin-desktop-portrait-viewport-v1` yang pada viewport >= 768px mengunci `body`, main content, modal/backdrop, bottom bar, FAB, AI, scanner, opening/welcome, dan toast ke frame 430px. CSS dasar Admin sendiri sudah menyediakan `body` full viewport, `.main-content` fleksibel, modal fixed full viewport, FAB fixed viewport, dan scanner `100vw × 100vh`.
+PERUBAHAN     : Menghapus satu blok forced desktop portrait tersebut secara utuh. Tidak mengganti dengan `!important` baru. Dengan demikian desktop kembali memakai aturan dasar responsive; mobile tidak disentuh.
+FILE BERUBAH : `admin/index.html`, `README FIRST/readme.md`
+FILE TIDAK BERUBAH : `admin/script.js`, `admin/style.css`, `pelanggan/`, Gateway, Firebase/DB, API, manifest, service worker, dan asset Gateway.
+VERIFIKASI    : Marker `admin-desktop-portrait-viewport-v1` = 0; referensi `430px` pada `admin/index.html` = 0; CSS dasar `.modal-backdrop`, `.fab-scanner-modal`, `.scanner-fullscreen-box`, `.fab-container`, `.permanent-bottom-bar`, dan `.main-content` tetap tersedia; struktur ZIP valid.
+STATUS        : PASS — ADMIN DESKTOP ROOT UNLOCKED
+CATATAN       : Ini adalah tahap akar masalah. POS, modal, bottom bar/FAB, AI, dan scanner selanjutnya diaudit sebagai komponen individual tanpa mengubah logic JavaScript. Scanner tetap menggunakan layout fullscreen `100vw × 100vh` dari `admin/style.css`.
+
+
+
+### LOG AKTIVITAS — H-07-X — POS CART MODAL RESPONSIVE — 2026-09-23
+Trace ID: `KQ-V3.0.3-H07-X-POS-CART-RESPONSIVE`
+
+Status: PASS — perubahan presentation-only.
+
+Perubahan:
+- Menyesuaikan `#cartModal` pada desktop agar memanfaatkan ruang viewport secara proporsional.
+- Lebar desktop dibatasi nyaman (`min(92vw, 820px)`) dan tinggi dibatasi viewport.
+- Mobile tetap menggunakan perilaku modal sebelumnya.
+- Struktur DOM POS tidak dirombak.
+- `admin/script.js` tidak diubah.
+- Tidak ada perubahan Firebase, transaksi, scanner, atau logika keranjang.
+
+Validasi:
+- Forced 430px Admin: tetap 0.
+- Perubahan file: `admin/style.css` + dokumentasi README FIRST.
+- Tujuan: memperbaiki presentasi cart desktop tanpa mengubah mesin POS.
+
+
+### LOG AKTIVITAS — H-07-Y-R1 — ADMIN NAVBAR POSITION CLEANUP — 2026-09-23
+Trace ID: KQ-V3.0.3-H07-Y-R1-ADMIN-NAVBAR-CLEANUP
+Status: PASS — koreksi presentation-only setelah uji lokal.
+
+Keputusan layout final:
+- Desktop >=768px: navbar/toggle menu berada di ATAS.
+- Mobile <768px: navbar/toggle menu tetap di BAWAH.
+- FAB TIDAK DIPINDAHKAN oleh breakpoint desktop; posisi dasarnya tetap di samping bawah.
+- Pada mobile, posisi FAB tetap berada di atas bottom navbar sesuai aturan existing.
+
+Perubahan:
+- Menghapus override desktop khusus `.fab-container` dari H-07-Y yang sebelumnya mengubah `bottom/right`.
+- Aturan posisi FAB kembali mengikuti baseline existing.
+- Aturan desktop navbar dan floating-menu tetap dipertahankan.
+- `admin/index.html` dan `admin/script.js` tidak diubah.
+- Firebase/transaksi/scanner tidak disentuh.
+
+Verifikasi:
+- Forced 430px Admin: tetap 0.
+- FAB desktop: tidak lagi mendapat posisi khusus dari breakpoint.
+- FAB mobile: tidak berubah.
+- Perubahan file: `admin/style.css` + dokumentasi README FIRST.
+
+
+### LOG AKTIVITAS — H-07-Z — MODAL & OVERLAY CLEANING — 2026-09-23
+- Fokus: membersihkan positioning Floating Menu dari inline HTML tanpa mengubah perilaku.
+- `#floating-menu-popup`: `position/bottom/right` dipindahkan ke `admin/style.css`.
+- Override desktop H-07-Y tetap menentukan navbar-top placement (`top:70px`, `bottom:auto`).
+- Mobile tetap `bottom:70px; right:14px`.
+- `admin/script.js`: tidak diubah.
+- Firebase/DB: tidak diubah.
+- POS/scanner: tidak diubah.
+- Status audit: PASS — perubahan presentasi/layout minimum.
+- Trace ID: KQ-V3.0.3-H07-Z-MODAL-OVERLAY-CLEANING
+
+
+### LOG AKTIVITAS — H-07-AA — CSS OVERRIDE AUDIT — 2026-09-23
+**Trace ID:** KQ-V3.0.3-H07-AA-CSS-OVERRIDE-AUDIT
+**Status:** PASS — AUDIT / NO UNSAFE MASS CLEANUP
+
+**Temuan:**
+- `admin/style.css` masih memiliki 387 deklarasi `!important`; tidak dihapus massal karena banyak berada pada layer tema/colorful dan safety overrides yang dapat mengubah tampilan bila dicabut.
+- Tidak ditemukan kembali forced viewport `430px` pada `admin/style.css`.
+- Selector berulang yang ditemukan tidak diperlakukan sebagai duplikasi otomatis; beberapa berasal dari layer tema/media yang berbeda dan tetap memiliki fungsi cascade.
+- Tidak dilakukan perubahan JS, Firebase/DB, POS, scanner, atau struktur navigasi.
+
+**Keputusan cleaning:** hanya override yang terbukti redundant dan aman yang boleh dihapus pada tahap berikutnya. Audit ini sengaja tidak melakukan penghapusan massal agar tidak mengulang pola tambal-sulam.
+
+### LOG AKTIVITAS — H-07-AB — CHAT / DRAWER / AI FLOATING AUDIT — 2026-09-23
+**Trace ID:** KQ-V3.0.3-H07-AB-CHAT-DRAWER-AI-AUDIT
+**Status:** PASS — AUDIT / NO CODE CHANGE
+
+**Temuan:**
+- Chat pribadi menggunakan wrapper relatif dengan drawer absolut; tidak ditemukan ketergantungan kembali pada viewport 430px.
+- Drawer daftar pelanggan memiliki lebar responsif dan breakpoint mobile tersendiri (`min(330px, 88%)`).
+- Area pesan chat menggunakan overflow internal sehingga drawer/chat tidak perlu memaksa halaman utama bergeser.
+- AI Admin menggunakan wrapper `position: fixed` dan fungsi JS yang menghitung posisi berdasarkan viewport aktual (`getBoundingClientRect`, `innerWidth`, `innerHeight`).
+- Kotak AI sudah membatasi ukuran terhadap viewport dan menghitung ulang posisi saat dibuka/digeser; tidak ditemukan forced 430px pada jalur ini.
+- Tidak ditemukan alasan aman untuk memindahkan logika positioning AI dari JS ke CSS; hal tersebut justru berpotensi mengganggu fitur drag dan penyimpanan posisi.
+
+**Keputusan cleaning:**
+- Tidak ada perubahan pada `admin/index.html`, `admin/style.css`, atau `admin/script.js` pada tahap ini.
+- Tidak menghapus inline style chat/AI secara massal karena sebagian merupakan state/struktur visual yang terhubung dengan JS.
+- Firebase/DB, POS, scanner, navbar, dan FAB tidak disentuh.
+
+**Verifikasi:**
+- Forced viewport 430px Admin: tetap 0.
+- Chat drawer: responsive dan tidak mengunci layout utama.
+- AI floating: tetap viewport-aware dan draggable.
+- Status: PASS — tidak diperlukan patch baru.
+
+### LOG AKTIVITAS — H-07-AC — FINAL ADMIN DESKTOP/MOBILE LAYOUT AUDIT — 2026-09-23
+Trace ID: KQ-V3.0.3-H07-AC-FINAL-ADMIN-AUDIT
+Status: PASS
+
+Ruang lingkup:
+- Verifikasi sisa forced desktop 430px pada Admin.
+- Verifikasi positioning navbar, FAB, floating menu, modal, POS, scanner, chat/drawer, dan AI.
+- Tidak melakukan refactor massal terhadap legacy inline style atau !important.
+
+Hasil:
+- admin/index.html: tidak memiliki referensi 430px/desktop-portrait.
+- admin/style.css: tidak memiliki referensi 430px/desktop-portrait.
+- admin/script.js: tidak memiliki referensi 430px/desktop-portrait.
+- Navbar desktop tetap berada di atas; mobile tetap menggunakan bottom navigation.
+- FAB tidak dipindahkan oleh breakpoint desktop; tetap berada di area samping bawah sesuai desain.
+- Floating menu mengikuti positioning navbar pada desktop dan tetap kompatibel dengan bottom navigation pada mobile.
+- POS cart tetap menggunakan modal architecture yang ada; desktop hanya diberi ruang responsive.
+- Scanner tetap komponen fullscreen khusus.
+- Chat/drawer/AI tidak menunjukkan ketergantungan pada frame 430px.
+- Tidak ada perubahan JavaScript/Firebase pada tahap audit ini.
+
+Keputusan cleaning:
+Legacy inline styles dan !important yang belum terbukti redundant sengaja tidak dihapus massal untuk menghindari regresi visual/fungsional. Tahap ini dinyatakan sebagai final layout audit; perubahan berikutnya hanya dilakukan jika hasil test lokal menemukan regresi konkret.
+
+
+
+### LOG AKTIVITAS — H-07-AD — ADMIN CLEANING FINAL CONSOLIDATION — 2026-09-23
+Trace ID: KQ-V3.0.3-H07-AD-ADMIN-CLEANING-FINAL-CONSOLIDATION
+Status: PASS — DOCUMENTATION / BASELINE LOCK
+
+Tujuan:
+- Mengunci hasil rangkaian cleaning Admin H-07-W sampai H-07-AC sebagai baseline kerja.
+- Memisahkan perubahan layout yang diperlukan dari legacy CSS yang sengaja tidak disentuh karena belum terbukti redundant.
+
+Baseline terkunci:
+- Admin desktop tidak lagi dipaksa ke viewport 430px.
+- Desktop navbar/toggle berada di atas; mobile navbar tetap di bawah.
+- FAB tidak berpindah karena breakpoint desktop; mobile tetap berada di atas bottom navbar.
+- POS cart tetap menggunakan modal architecture existing dengan ruang desktop yang responsif.
+- Scanner tetap fullscreen khusus.
+- Chat/drawer/AI tetap viewport-aware dan tidak dipaksa ke frame 430px.
+- Firebase/DB dan logic JavaScript tidak menjadi target cleaning.
+
+Keputusan final:
+- Tidak dilakukan mass cleanup terhadap inline style atau !important.
+- Tidak ada fitur baru pada rangkaian cleaning ini.
+- Perubahan lanjutan hanya dilakukan jika ditemukan regresi konkret pada pengujian.
+
+Validasi paket:
+- Struktur ZIP dipertahankan dari H-07-AC.
+- README FIRST tetap berada di lokasi `README FIRST/readme.md`.
+- Baseline source berasal dari H-07-AC yang telah diuji lokal oleh pengguna.
+
+
+### LOG AKTIVITAS — H-07-AE — CUSTOMER FINAL LAYOUT AUDIT — 2026-09-23
+Trace ID: KQ-V3.0.3-H07-AE-CUSTOMER-FINAL-LAYOUT-AUDIT
+Status: PASS — AUDIT ONLY
+
+Baseline: H-07-AD Admin Cleaning Final Consolidation.
+Scope: audit responsive Customer tanpa perubahan logic/JS/Firebase.
+
+Hasil:
+- Customer tidak memiliki forced desktop 430px aktif; aturan desktop mulai 768px menggunakan viewport penuh.
+- Bottom navigation dan FAB memiliki aturan responsive desktop/mobile.
+- Modal/overlay desktop diarahkan mengikuti viewport, bukan frame Gateway.
+- Customer tidak memakai beforeinstallprompt/deferredPrompt aktif.
+- Tidak dilakukan penghapusan massal !important/inline-style karena CSS Customer memiliki banyak aturan legacy yang saling bergantung.
+- Tidak ada perubahan kode aplikasi pada tahap ini; audit dinyatakan PASS.
+
+
+### LOG AKTIVITAS — H-07-AF — GATEWAY FINAL AUDIT — 2026-09-23
+Trace ID: KQ-V3.0.3-H07-AF-GATEWAY-FINAL-AUDIT
+Status: PASS — AUDIT / NO CODE CHANGE
+
+Scope:
+- Gateway tetap menggunakan controlled portrait/mobile canvas; tidak dipaksa mengikuti layout desktop Admin/Customer.
+- Hotspot Customer dan Admin tetap menuju `./pelanggan/index.html` dan `./admin/index.html`.
+- Asset slide Gateway berada di `assets/gateway/`.
+- Root manifest tetap satu (`manifest.json`).
+- Audit menemukan `sw.js` tidak termasuk dalam baseline ZIP ini; tidak dibuat atau ditambahkan pada tahap ini agar tidak mengubah arsitektur PWA tanpa bukti kebutuhan.
+- `beforeinstallprompt` masih berada pada Gateway sebagai entry install PWA.
+- Tidak ada perubahan Firebase, database, Customer, Admin, atau routing.
+
+Keputusan:
+Gateway dinyatakan LOCKED untuk layout. Tidak dilakukan patch visual/desktop-resize karena perilaku portrait adalah desain yang disengaja.
+
+
+### LOG AKTIVITAS — H-07-AG — CROSS-ROUTE AUDIT — 2026-09-23
+Trace ID: KQ-V3.0.3-H07-AG-CROSS-ROUTE
+Status: PASS — NO CODE CHANGE
+
+Audit alur utama:
+- Gateway Customer -> ./pelanggan/index.html: PASS
+- Gateway Admin -> ./admin/index.html: PASS
+- Customer logout -> /: PASS
+- Customer session key cust_phone_v13 dihapus saat logout: PASS
+- Tidak ditemukan perubahan Firebase/DB pada audit: PASS
+- Tidak ditemukan perubahan JS/HTML/CSS pada tahap ini: PASS
+
+Keputusan: route chain Gateway -> Customer -> logout -> Gateway dan Gateway -> Admin dikunci. Tidak ada patch kode pada H-07-AG.
+
+
+### LOG AKTIVITAS — H-07-AH — PWA / SERVICE WORKER AUDIT — 2026-09-23
+Trace ID: KQ-V3.0.3-H07-AH-PWA-AUDIT
+Status: PASS
+
+Root Gateway menjadi satu-satunya entry yang memiliki manifest aktif dan beforeinstallprompt. Referensi manifest PWA yang tidak diperlukan pada Admin dibersihkan. Customer tidak memiliki manifest aktif maupun beforeinstallprompt. Tidak ada sw.js/service worker pada baseline ini, sehingga tidak dibuat atau ditambahkan. Root manifest.json tetap satu-satunya manifest. Firebase/database tidak disentuh.
+
+
+### LOG AKTIVITAS — H-07-AI — FINAL CROSS-PROJECT CLEANING GATE — 2026-09-23
+Trace ID: `KQ-V3.0.3-H07-AI-FINAL-CROSS-CLEANING`
+Status: PASS
+
+- Audit root, Gateway, Admin, dan Customer terhadap route/PWA/layout residue.
+- Root `manifest.json` tetap satu dan Gateway tetap menjadi entry PWA.
+- Gateway tetap memakai canvas portrait dan `beforeinstallprompt`.
+- Ditemukan registrasi `/sw.js` di `pelanggan/script.js`, sementara baseline tidak memiliki file `sw.js` dan Customer bukan entry PWA.
+- Registrasi Service Worker Customer dihapus sebagai dead/stale registration; tidak ada penggantian Service Worker baru.
+- Admin, Gateway, Firebase, dan database tidak diubah.
+- Tidak menghapus CSS legacy secara massal.
+- ZIP integrity dan syntax check PASS.
