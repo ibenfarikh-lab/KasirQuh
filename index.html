@@ -557,7 +557,7 @@
           void customerGlow.offsetWidth;
           customerGlow.classList.add('kv4-glow-pressed');
         }
-        setTimeout(function () { leave('kv4-focus-customer', './pelanggan.html'); }, 180);
+        setTimeout(function () { leave('kv4-focus-customer', './pelanggan/index.html'); }, 180);
       } else {
         resetSwipeVisual(true);
       }
@@ -569,7 +569,7 @@
 
     admin.addEventListener('click', function () {
       if (adminGlow) { adminGlow.classList.remove('kv4-glow-active'); void adminGlow.offsetWidth; adminGlow.classList.add('kv4-glow-pressed'); }
-      leave('kv4-focus-admin', './admin.html');
+      leave('kv4-focus-admin', './admin/index.html');
     });
   }
 
@@ -624,7 +624,7 @@
       <button id="index-ai-close" type="button">&times;</button>
     </div>
     <div id="index-ai-messages"><div style="align-self:flex-start;background:#fff;border:1px solid #e5e7eb;color:#111827;padding:6px 10px;border-radius:8px;max-width:80%">HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?</div></div>
-    <div id="index-ai-input-row"><input id="index-ai-input" type="text" placeholder="Tanya atau ngobrol..." autocomplete="off"><button id="index-ai-mic" type="button" title="Ngomong pakai suara">🎤</button><button id="index-ai-send" type="button">Kirim</button></div>
+    <div id="index-ai-input-row"><input id="index-ai-input" type="text" placeholder="Tanya atau ngobrol..." autocomplete="off" aria-label="Pesan untuk Asisten AI"><button id="index-ai-mic" type="button" title="Ngomong pakai suara">🎤</button><button id="index-ai-send" type="button">Kirim</button></div>
   </div>
 </div>
 <script id="index-ai-fab-js">
