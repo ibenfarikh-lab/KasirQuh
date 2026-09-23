@@ -18,7 +18,6 @@
 
 /* ===== EXTRACTED FROM pelanggan.html <script> #4 id=none ===== */
 
-    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log(err)); }); }
     let isAiSoundOn = true; let aiRecognition = null; let isAiListening = false;
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; aiRecognition = new SpeechRecognition(); aiRecognition.lang = 'id-ID';
