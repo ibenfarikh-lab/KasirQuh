@@ -1655,3 +1655,62 @@ body.theme-colorful-v2 [style*="#ec4899"] {
 /* H-04-A: shared static label typography extracted from identical inline styles. */
 .h04a-form-label { font-size: 0.85rem; }
 
+
+/* H-07-X: POS cart modal desktop responsiveness — keep cart JS/modal architecture intact. */
+@media (min-width: 768px) {
+  #cartModal {
+    padding: 24px;
+  }
+
+  #cartModal > #printable-area {
+    width: min(92vw, 820px);
+    max-width: 820px;
+    max-height: min(88vh, 900px);
+    padding: 24px;
+  }
+
+  #cartModal .cart-table {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  #cartModal > #printable-area {
+    width: 100%;
+    max-width: 500px;
+  }
+}
+
+/* H-07-Z — MODAL/OVERLAY CLEANING: keep floating menu positioning in CSS, not inline HTML. */
+#floating-menu-popup {
+  position: absolute;
+  bottom: 70px;
+  right: 14px;
+  box-sizing: border-box;
+}
+
+/* H-07-Y — ADMIN DESKTOP NAV/FAB RESPONSIVE */
+@media (min-width: 768px) {
+  .permanent-bottom-bar {
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    min-height: 58px;
+    padding: 8px 20px;
+    border-top: 0;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+  .main-content {
+    padding-top: 75px;
+    padding-bottom: 15px;
+  }
+  #floating-menu-popup {
+    top: 70px !important;
+    bottom: auto !important;
+    right: 14px !important;
+  }
+}
