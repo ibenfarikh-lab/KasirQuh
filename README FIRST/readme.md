@@ -1527,3 +1527,99 @@ PERUBAHAN    : Memindahkan empat PNG Gateway ke `assets/gateway/`. Memperbarui r
 VERIFIKASI    : Keempat PNG berada di `assets/gateway/`; referensi lama `./slide1.png`, `./slide2.png`, `./slide3.png`, `./robot-head-ai.png` pada `index.html` = 0; path baru terdeteksi; icon PWA tetap di ROOT; struktur ZIP valid.
 STATUS        : PASS
 CATATAN       : Pemindahan hanya berlaku untuk asset visual Gateway. Tidak ada perubahan pada `manifest.json` atau icon identitas PWA.
+
+
+### LOG AKTIVITAS — H-07-P — README FIRST FOLDER — 2026-09-23
+[LOG AKTIVITAS]
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-P-README-FIRST`
+SCOPE         : `readme.md`, `README FIRST/`, ZIP project
+AKTIVITAS     : PEMINDAHAN DOKUMENTASI
+TUJUAN        : Menempatkan `readme.md` ke folder `README FIRST/` sebagai lokasi dokumentasi utama tanpa mengubah file aplikasi lainnya.
+TEMUAN        : README sebelumnya berada di `h07j_work/readme.md`.
+PERUBAHAN     : `h07j_work/readme.md` dipindahkan menjadi `h07j_work/README FIRST/readme.md`.
+VERIFIKASI    : Seluruh isi proyek selain lokasi README dipertahankan; README hanya memiliki satu lokasi baru; struktur ZIP valid.
+STATUS        : PASS
+CATATAN       : Tidak ada perubahan pada Gateway, Admin, Pelanggan, PWA identity, asset, API, atau file runtime lainnya.
+
+
+### LOG AKTIVITAS — H-07-Q — CUSTOMER LOGIN-FIRST / WELCOME REMOVAL — 2026-09-23
+
+[LOG AKTIVITAS]
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-Q-CUSTOMER-LOGIN-FIRST`
+SCOPE         : `pelanggan/index.html`, `pelanggan/script.js`, `pelanggan/style.css`, `README FIRST/readme.md`
+AKTIVITAS     : PEMBERSIHAN LEGACY → PENYESUAIAN ALUR LOGIN → VERIFIKASI
+TUJUAN        : Menghapus Welcome Screen pelanggan lama dan menjadikan Login Modal sebagai pintu masuk utama Customer.
+TEMUAN        : Welcome Screen pelanggan masih menjadi lapisan pembuka lama dan memiliki dependency JavaScript untuk hide/show, store name, tombol install, serta transisi ke login. Mekanisme PWA install sudah tersedia dan dapat dipertahankan tanpa Welcome Screen.
+PERUBAHAN     : Menghapus Welcome Screen beserta seluruh dependency `welcomeScreen`, `welcomeStoreName`, `welcomeInstallBtn`, `bukaLoginDariWelcome()`, `tutupWelcomeScreen()`, dan pengecekan standalone khusus Welcome. Login Modal kini tampil langsung untuk pelanggan yang belum login. Fitur `Install Aplikasi KasirQuh` dipindahkan ke bawah area Login/Daftar menggunakan mekanisme `beforeinstallprompt` yang sama. Card install lama di Pengaturan dihapus agar tidak duplikat.
+VERIFIKASI    : Referensi Welcome pada `pelanggan/` = 0. Referensi install aktif hanya melalui `customerLoginInstallCard` + `triggerInstallPWA()`. JavaScript `pelanggan/script.js` lolos `node --check`. PWA root, Gateway, Admin, Firebase schema, manifest, service worker, dan icon identitas tidak diubah.
+STATUS        : PASS — CUSTOMER LOGIN-FIRST CLEANUP
+CATATAN       : Setelah logout, sesi Customer dibersihkan dan halaman pelanggan di-reload sehingga tetap kembali ke Login Modal; tidak lagi diarahkan ke root Gateway atau Welcome Screen pelanggan.
+
+
+### LOG AKTIVITAS — H-07-R — CUSTOMER PWA INSTALL PROMPT ROOT MANIFEST FIX — 2026-09-23
+
+[LOG AKTIVITAS]
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-R-CUSTOMER-PWA-INSTALL-ROOT-MANIFEST`
+SCOPE         : `pelanggan/index.html`, `pelanggan/script.js`, `manifest.json`, `README FIRST/readme.md`
+AKTIVITAS     : AUDIT REFERENSI H06E → PERBAIKAN TERARAH → VERIFIKASI
+TUJUAN        : Mengembalikan native install prompt Customer tanpa menghidupkan kembali manifest pelanggan terpisah.
+TEMUAN        : H06E yang diuji pengguna berhasil menampilkan native prompt “Instal aplikasi KasirQuh pelanggan”. Pada H-07-Q, `pelanggan/index.html` tidak lagi memiliki deklarasi `<link rel="manifest">`, sementara `pelanggan/script.js` tetap bergantung pada event `beforeinstallprompt`. Akibatnya `deferredPrompt` dapat tetap `null` dan tombol jatuh ke fallback menu Chrome.
+PERUBAHAN     : Menambahkan satu deklarasi `<link href="/manifest.json" rel="manifest">` pada `pelanggan/index.html` untuk menghubungkan modul Customer ke manifest aplikasi root yang sudah dikonsolidasikan. Tidak menghidupkan kembali `manifest-pelanggan.json`.
+FILE BERUBAH : `h07j_work/pelanggan/index.html`, `h07j_work/README FIRST/readme.md`
+FILE TIDAK BERUBAH : `manifest.json`, `sw.js`, icon PWA, Gateway, Admin, Firebase, `pelanggan/script.js`, `pelanggan/style.css`.
+VERIFIKASI    : Link manifest Customer = 1 dan menunjuk `/manifest.json`; `manifest-pelanggan.json` tidak direferensikan oleh file runtime aktif; riwayat penyebutan lama pada dokumentasi dipertahankan sebagai arsip; `beforeinstallprompt` dan `triggerInstallPWA()` tetap utuh; JavaScript `pelanggan/script.js` lolos `node --check`; struktur ZIP dan isi file diverifikasi setelah packaging.
+STATUS        : PASS — ROOT MANIFEST LINK RESTORED FOR CUSTOMER INSTALL PROMPT
+CATATAN       : Ini adalah fix minimal berdasarkan perbedaan nyata H06E → H-07-Q. Tidak ada fallback patch tambahan dan tidak ada perubahan pada identitas PWA root.
+
+### LOG AKTIVITAS — H-07-S — GATEWAY PWA INSTALL HUB — 2026-09-23
+
+[LOG AKTIVITAS]
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-S-GATEWAY-PWA-INSTALL-HUB`
+SCOPE         : `index.html`, `pelanggan/script.js`, `README FIRST/readme.md`
+AKTIVITAS     : PEMUSATAN INSTALL PWA DI GATEWAY
+TUJUAN        : Menjadikan Gateway (`/index.html`) sebagai satu-satunya entry point tombol native PWA install karena hasil uji pengguna menunjukkan instalasi native Chrome berhasil dari Gateway, sedangkan `/pelanggan/` dan `/admin/` menghasilkan shortcut.
+TEMUAN        : Gateway menggunakan root manifest dan merupakan entry point yang terbukti dapat di-install sebagai PWA native melalui Chrome. Customer sebelumnya menangkap `beforeinstallprompt` sendiri dan mencoba meng-install `/pelanggan/`, sehingga hasilnya dapat berupa shortcut.
+PERUBAHAN     : Menambahkan tombol floating `📲 Install` di atas slide Gateway. Tombol hanya tampil ketika Chrome memberikan `beforeinstallprompt`, lalu memanggil native install prompt. Pada Customer, mekanisme `beforeinstallprompt` lokal dihapus; kartu/tombol Install tetap terlihat dan diarahkan ke Gateway dengan query `?install=1`. Manifest root, service worker, icon PWA, slider PNG, tombol Mulai Belanja, dan tombol Admin tidak diubah.
+FILE BERUBAH : `h07j_work/index.html`, `h07j_work/pelanggan/script.js`, `h07j_work/README FIRST/readme.md`
+FILE TIDAK BERUBAH : `manifest.json`, `sw.js`, icon PWA, `assets/gateway/*.png`, `pelanggan/index.html`, `pelanggan/style.css`, Admin runtime, Firebase.
+VERIFIKASI : Struktur tombol install Gateway menggunakan event `beforeinstallprompt`; Customer tidak lagi memiliki handler `beforeinstallprompt` atau `deferredPrompt` aktif; fungsi Customer hanya mengarahkan ke root Gateway; JavaScript Customer lolos `node --check`; HTML Gateway memiliki satu tombol install floating dan slider tetap menggunakan PNG yang sama.
+STATUS        : PASS — GATEWAY DIJADIKAN PUSAT INSTALL PWA
+CATATAN       : Query `?install=1` menjadi penanda konteks dari Customer menuju Gateway. Pada tahap ini Gateway belum memaksa prompt otomatis; prompt hanya dipanggil melalui tombol floating setelah Chrome menyediakan event install.
+
+
+### LOG AKTIVITAS — H-07-T — CUSTOMER PWA INSTALL REMOVAL — 2026-09-23
+
+[LOG AKTIVITAS]
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-T-CUSTOMER-PWA-INSTALL-REMOVAL`
+SCOPE         : `pelanggan/index.html`, `pelanggan/script.js`, `pelanggan/style.css`, `README FIRST/readme.md`
+AKTIVITAS     : AUDIT → PEMBERSIHAN ENTRY INSTALL CUSTOMER → VERIFIKASI
+TUJUAN        : Menghapus seluruh UI dan handler instalasi PWA dari modul Customer karena instalasi native telah dipusatkan dan terbukti berhasil melalui Gateway.
+TEMUAN        : `/pelanggan/` masih memiliki kartu/tombol Install, fungsi `triggerInstallPWA()`, dan deklarasi manifest root yang tidak diperlukan untuk modul Customer. Service worker tetap dibutuhkan sebagai runtime/cache aplikasi dan bukan sebagai tombol install.
+PERUBAHAN     : Menghapus link manifest dari `pelanggan/index.html`, menghapus kartu/tombol Install Customer, menghapus fungsi `triggerInstallPWA()`, dan menghapus aturan CSS khusus `#customerLoginInstallCard`. Tidak mengubah service worker registration, login/register, katalog, Firebase, Gateway, Admin, manifest root, icon PWA, atau asset Gateway.
+FILE BERUBAH : `h07j_work/pelanggan/index.html`, `h07j_work/pelanggan/script.js`, `h07j_work/pelanggan/style.css`, `h07j_work/README FIRST/readme.md`
+FILE TIDAK BERUBAH : `manifest.json`, `sw.js`, icon PWA, `index.html` Gateway, `assets/gateway/*.png`, Admin runtime, Firebase.
+VERIFIKASI    : Referensi install/manifest pada runtime `pelanggan/` = 0; `triggerInstallPWA`, `customerLoginInstallCard`, `card-install-pwa`, `beforeinstallprompt`, dan `deferredPrompt` = 0; service worker registration Customer tetap ada; JavaScript Customer lolos `node --check`; struktur ZIP valid.
+STATUS        : PASS — CUSTOMER BUKAN ENTRY INSTALL PWA
+CATATAN       : Instalasi PWA hanya melalui Gateway. `/pelanggan/` tetap menjadi modul belanja/login biasa dan tidak menawarkan instalasi PWA maupun shortcut.
+
+
+### LOG AKTIVITAS — H-07-U — CUSTOMER LOGOUT → GATEWAY — 2026-09-23
+
+[LOG AKTIVITAS]
+Tanggal/Waktu : 2026-09-23
+TRACE ID      : `KQ-V3.0.3-H07-U-CUSTOMER-LOGOUT-GATEWAY`
+SCOPE         : `pelanggan/script.js`, `README FIRST/readme.md`
+AKTIVITAS     : PERBAIKAN CUSTOMER LOGOUT
+TUJUAN        : Mengarahkan logout Customer langsung kembali ke Gateway root `/` tanpa mengubah jalur Admin atau mekanisme PWA Gateway.
+TEMUAN        : `logoutPelanggan()` sebelumnya menghapus sesi Customer lalu membuka kembali login modal dan `window.location.reload()`, sehingga pengguna tetap berada di `/pelanggan/`.
+PERUBAHAN     : Setelah sesi Customer dihapus, fungsi sekarang menjalankan `window.location.href = '/'` agar logout kembali ke Gateway.
+FILE BERUBAH : `h07j_work/pelanggan/script.js`, `h07j_work/README FIRST/readme.md`
+FILE TIDAK BERUBAH : `admin/`, `index.html` Gateway, `manifest.json`, `sw.js`, Customer HTML/CSS, Firebase, API, dan asset Gateway.
+VERIFIKASI    : Fungsi logout Customer hanya menghapus sesi lalu redirect ke `/`; tidak lagi reload/login-modal. JavaScript lulus `node --check`; ZIP dipaketkan ulang dan isi proyek diverifikasi.
+STATUS        : PASS
+CATATAN       : Scope sengaja dibatasi hanya Customer Logout. PWA Customer tetap tanpa install UI/logic; Gateway tetap menjadi satu-satunya hub instalasi PWA.
