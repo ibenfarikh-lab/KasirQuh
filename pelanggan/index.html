@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 
 <html lang="id">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>Belanja - KasirQuh</title>
-<link href="../manifest-pelanggan.json" rel="manifest"/>
 <meta content="#2563eb" name="theme-color"/>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -43,13 +41,7 @@
 </head>
 
 <body data-theme="modern" style="font-size: 0.85rem;">
-<div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2563eb; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; text-align: center; padding: 15px; box-sizing: border-box;">
-<h1 id="welcomeStoreName" style="font-size: 2.2rem; margin: 0 0 8px 0; font-weight: 800; letter-spacing: 1px;">KasirQuh</h1>
-<p style="font-size: 0.95rem; opacity: 0.9; margin: 0 0 20px 0;">Selamat Datang di Toko Kami</p>
-<button id="welcomeInstallBtn" style="background: white; color: #2563eb; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);" type="button">📲 Install Aplikasi KasirQuh</button>
-<button onclick="bukaLoginDariWelcome()" style="position: absolute; bottom: 15px; left: 15px; background: transparent; color: white; border: 1px solid rgba(255,255,255,0.6); padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;" type="button">Masuk / Daftar</button>
-</div>
-<div class="login-overlay" id="customerLoginModal" style="display: none;">
+<div class="login-overlay" id="customerLoginModal" style="display: flex;">
 <div class="login-card" style="max-height: 90vh; overflow-y: auto; padding: 16px;">
 <h2 style="margin-top: 0; margin-bottom: 4px; font-size: 1.3rem;">KasirQuh</h2>
 <div id="formLoginContainer">
@@ -71,6 +63,10 @@
 <button style="margin-top: 6px; border-radius: 6px; padding: 10px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;" type="submit">Kirim Pendaftaran</button>
 </form>
 <p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Sudah punya akun? <a data-kq-static-action="auth-login" href="javascript:void(0)" style="color: #2563eb; font-weight: bold;">Masuk di sini</a></p>
+</div>
+<div id="customerLoginInstallCard" style="display: block; margin-top: 14px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+<p style="margin: 0 0 8px 0; font-size: 0.78rem; color: #64748b;">📱 Akses lebih cepat dari layar utama HP.</p>
+<button id="card-install-pwa" onclick="triggerInstallPWA()" style="background: #2563eb; color: white; padding: 10px; font-weight: bold; border-radius: 8px; width: 100%; border: none; cursor: pointer; font-size: 0.82rem;" type="button">📲 Install Aplikasi KasirQuh</button>
 </div>
 </div>
 </div>
@@ -285,11 +281,6 @@
 </div>
 <!-- 4. HALAMAN PENGATURAN -->
 <div class="tab-content" id="pengaturan" style="display: none;">
-<div class="card" id="card-install-pwa" style="display: none; border: 1px solid #2563eb; background-color: var(--card-bg); padding: 12px; margin-bottom: 8px;">
-<h3 style="color: #2563eb; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">📱 Install Aplikasi ke HP</h3>
-<p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Pasang KasirQuh di layar utama HP Anda agar lebih mudah diakses.</p>
-<button onclick="triggerInstallPWA()" style="background: #2563eb; color: white; padding: 8px; font-weight: bold; border-radius: 6px; width: 100%; border: none; cursor: pointer; font-size: 0.8rem;" type="button">📲 Install Sekarang</button>
-</div>
 <div class="card" style="padding: 12px; margin-bottom: 8px;">
 <h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Identitas Pelanggan</h3>
 <div class="form-vertical" style="gap: 6px;">

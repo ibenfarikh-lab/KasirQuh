@@ -1,57 +1,45 @@
 
-/* ===== EXTRACTED FROM pelanggan.html <script> #3 id=none ===== */
-
+/* ===== H-07-Q: CUSTOMER LOGIN-FIRST AUTH GUARD ===== */
 (function () {
   function updateFabAuthVisibility() {
-    const welcome = document.getElementById('welcomeScreen');
     const login = document.getElementById('customerLoginModal');
-
-    const welcomeVisible = !!welcome && getComputedStyle(welcome).display !== 'none';
     const loginVisible = !!login && getComputedStyle(login).display !== 'none';
-
-    document.body.classList.toggle('fab-auth-hidden', welcomeVisible || loginVisible);
+    document.body.classList.toggle('fab-auth-hidden', loginVisible);
   }
-
   function installFabAuthGuard() {
     updateFabAuthVisibility();
-
-    ['welcomeScreen', 'customerLoginModal'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      new MutationObserver(updateFabAuthVisibility)
-        .observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
-    });
-
-    // Menangkap perubahan display dari kode lama tanpa mengubah alur login.
+    const el = document.getElementById('customerLoginModal');
+    if (el) new MutationObserver(updateFabAuthVisibility).observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
     setInterval(updateFabAuthVisibility, 250);
   }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', installFabAuthGuard);
-  } else {
-    installFabAuthGuard();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installFabAuthGuard);
+  else installFabAuthGuard();
 })();
-
 
 /* ===== EXTRACTED FROM pelanggan.html <script> #4 id=none ===== */
 
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log(err)); }); }
-    let deferredPrompt; const welcomeScreen = document.getElementById('welcomeScreen'); const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-    if (isStandalone && welcomeScreen) welcomeScreen.style.display = 'none';
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const cardInstall = document.getElementById('card-install-pwa'); if (cardInstall) cardInstall.style.display = 'block'; });
-    async function triggerInstallPWA() { if (!deferredPrompt) return alert("Bisa install lewat menu Chrome."); deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') tutupWelcomeScreen(); deferredPrompt = null; document.getElementById('card-install-pwa').style.display = 'none'; }
-    function tutupWelcomeScreen() {
-      // Tutup secara langsung dan ambil elemen terbaru agar tidak terpengaruh cache/urutan inisialisasi.
-      const screen = document.getElementById('welcomeScreen');
-      if (!screen) return;
-      screen.style.setProperty('opacity', '0', 'important');
-      screen.style.setProperty('pointer-events', 'none', 'important');
-      screen.style.setProperty('display', 'none', 'important');
-      document.body.classList.remove('fab-auth-hidden');
-      if (typeof updateFabAuthVisibility === 'function') updateFabAuthVisibility();
+    let deferredPrompt;
+    function syncCustomerInstallCard() {
+      const cardInstall = document.getElementById('customerLoginInstallCard');
+      if (!cardInstall) return;
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      cardInstall.style.display = isStandalone ? 'none' : 'block';
     }
-    function bukaLoginDariWelcome() { tutupWelcomeScreen(); if (!currentCustomerPhone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      syncCustomerInstallCard();
+    });
+    document.addEventListener('DOMContentLoaded', syncCustomerInstallCard);
+    async function triggerInstallPWA() {
+      if (!deferredPrompt) return alert("Bisa install lewat menu Chrome.");
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      const cardInstall = document.getElementById('customerLoginInstallCard');
+      if (cardInstall) cardInstall.style.display = 'none';
+    }
 
     let isAiSoundOn = true; let aiRecognition = null; let isAiListening = false;
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -417,13 +405,13 @@
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
-      const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('welcomeStoreName').innerText = cachedStoreName; document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
+      const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
       initChatRumpiListener();
       renderRecipeCards();
       if (currentCustomerPhone) {
-        document.getElementById('welcomeScreen').style.display = 'none'; document.getElementById('customerLoginModal').style.display = 'none';
+        document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); periksaCheckinHarian(); tampilkanKoinDiProfil();
-      } else { if (isStandalone) { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); } }
+      } else { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); }
       initFirebaseListeners();
       initPromoTokoPelanggan();
       initCustomerHomeInfoListener();
@@ -1210,8 +1198,6 @@
             // Refresh HANYA setelah tombol Masuk pada form login berhasil.
             // Tidak terkait dengan bottom navbar/menu.
             setTimeout(() => { window.location.reload(); }, 150);
-            // Setelah login berhasil, tutup layar welcome secara langsung agar konten pelanggan terlihat.
-            tutupWelcomeScreen();
             muatDataPelangganRealtime();
             muatRiwayatPesananOnlinePelanggan();
             initCustomerChatListener();
@@ -1275,12 +1261,12 @@
         currentCustomerPhone = ''; 
         document.getElementById('customerLoginModal').style.display = 'flex'; 
         gantiFormAuth('login'); 
-        window.location.href = '../index.html'; 
+        window.location.reload(); 
       } 
     }
 
     function initFirebaseListeners() {
-      storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('welcomeStoreName')) document.getElementById('welcomeStoreName').innerText = namaToko; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
+      storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
       storeCollection("produk").onSnapshot((snapshot) => { 
         databaseProduk = {}; 
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
@@ -2489,7 +2475,6 @@ function makeModernProductTransparent(img) {
 
 // H-05-A: selective migration of safe ID-based no-argument click handlers.
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById('welcomeInstallBtn')?.addEventListener("click", triggerInstallPWA);
   document.getElementById('promo-banner-section')?.addEventListener("click", bukaPromoTokoPelanggan);
   document.getElementById('Opsi Developer')?.addEventListener("click", toggleOpsiDeveloper);
   document.getElementById('fab-ai-btn')?.addEventListener("click", toggleAIChatModal);
