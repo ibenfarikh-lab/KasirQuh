@@ -20,18 +20,12 @@
 
     if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => console.log(err)); }); }
     let deferredPrompt;
-    function syncCustomerInstallCard() {
-      const cardInstall = document.getElementById('customerLoginInstallCard');
-      if (!cardInstall) return;
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-      cardInstall.style.display = isStandalone ? 'none' : 'block';
-    }
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      syncCustomerInstallCard();
+      const cardInstall = document.getElementById('customerLoginInstallCard');
+      if (cardInstall) cardInstall.style.display = 'block';
     });
-    document.addEventListener('DOMContentLoaded', syncCustomerInstallCard);
     async function triggerInstallPWA() {
       if (!deferredPrompt) return alert("Bisa install lewat menu Chrome.");
       deferredPrompt.prompt();
