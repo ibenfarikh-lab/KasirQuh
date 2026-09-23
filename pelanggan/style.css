@@ -4958,75 +4958,56 @@ html.dev-no-nav-animation #promo-banner-section {
 /* ===== EXTRACTED FROM pelanggan.html <style> #45 ===== */
 
 /* ============================================================
-   DESKTOP PORTRAIT VIEWPORT V1
-   Desktop saja: aplikasi pelanggan dibatasi seperti layar HP
-   dan dipusatkan. Tampilan mobile tidak disentuh.
-   Tema Modern tetap memakai visual/glow yang sudah ada.
+   DESKTOP RESPONSIVE VIEWPORT
+   Gateway tetap memakai canvas portrait-nya sendiri. Customer tidak
+   mewarisi penguncian 430px dari Gateway; mulai 768px, halaman Customer
+   mengikuti lebar viewport agar katalog dan navigasi dapat memanfaatkan
+   layar desktop.
    ============================================================ */
 @media (min-width: 768px) {
   html {
-    background: #0b0f16 !important;
+    width: 100%;
   }
 
   body {
-    width: min(430px, 100vw) !important;
-    max-width: 430px !important;
-    min-width: 430px !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
-    margin: 0 auto !important;
-    overflow: hidden !important;
-    position: relative !important;
-    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 0 55px rgba(0,0,0,.45) !important;
-  }
-
-  /* Elemen fixed yang merupakan bagian dari UI utama ikut berada
-     di dalam lebar portrait, bukan melebar mengikuti monitor. */
-  body > .bottom-nav,
-  body > .permanent-bottom-bar,
-  .fab-container {
-    width: min(430px, 100vw) !important;
-    max-width: 430px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
   }
 
   .bottom-nav,
   .permanent-bottom-bar {
-    width: min(430px, 100vw) !important;
-    max-width: 430px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
+    width: 100% !important;
+    max-width: none !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
     box-sizing: border-box !important;
   }
 
-  /* Modal/login tetap proporsional seperti viewport HP. */
-  .modal-backdrop,
-  .login-overlay,
-  .fab-scanner-modal {
-    width: min(430px, 100vw) !important;
-    max-width: 430px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    box-sizing: border-box !important;
-  }
-
-  /* FAB kanan tetap berada di sudut kanan layar portrait. */
-  #scroll-helper-fab {
+  .fab-container {
     left: auto !important;
-    right: max(10px, calc((100vw - 430px) / 2 + 10px)) !important;
+    right: 16px !important;
     transform: none !important;
   }
 
-  /* Toast tetap berada di tengah viewport portrait. */
+  .modal-backdrop,
+  .login-overlay,
+  .fab-scanner-modal {
+    width: 100% !important;
+    max-width: none !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+  }
+
   .toast {
     left: 50% !important;
     transform: translateX(-50%) !important;
-    max-width: calc(430px - 32px) !important;
+    max-width: min(520px, calc(100vw - 32px)) !important;
     box-sizing: border-box !important;
   }
 }
