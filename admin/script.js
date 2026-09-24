@@ -1167,6 +1167,12 @@ function simpanPengaturanAkun() {
 }
 
 let databaseProduk = {};
+const ADMIN_PRODUCT_BATCH_SIZE = 6;
+let adminPosVisibleCount = ADMIN_PRODUCT_BATCH_SIZE;
+let adminStokVisibleCount = ADMIN_PRODUCT_BATCH_SIZE;
+let adminPosLazyKey = "";
+let adminStokLazyKey = "";
+let adminProductScrollLoading = false;
 storeCollection("produk").onSnapshot((snapshot) => {
   databaseProduk = {};
   snapshot.forEach((doc) => {
@@ -2255,18 +2261,18 @@ function updatePermanentBarTitle() {
   const stokPag = document.getElementById("stok-pagination-wrapper");
   const catatanPag = document.getElementById("catatan-pagination-wrapper");
 
-  posPag.classList.remove("show");
-  stokPag.classList.remove("show");
+  if (posPag) posPag.classList.remove("show");
+  if (stokPag) stokPag.classList.remove("show");
   if (catatanPag) catatanPag.classList.remove("show");
 
   if (activeTab === 'penjualan') {
     titleEl.innerText = (currentLang === 'en') ? "POS Page" : ((currentLang === 'ar') ? "صفحة الكاشير" : "Halaman Kasir");
-    posPag.classList.add("show");
+    // Pagination produk dihilangkan; produk memakai lazy batch saat scroll.
   } else if (activeTab === 'kasir-online') {
     titleEl.innerText = (currentLang === 'en') ? "Online POS" : ((currentLang === 'ar') ? "كاشير أونلاين" : "Kasir Online");
   } else if (activeTab === 'data-barang') {
     titleEl.innerText = (currentLang === 'en') ? "Stock Management" : ((currentLang === 'ar') ? "إدارة المخزون" : "Manajemen Stok");
-    stokPag.classList.add("show");
+    // Pagination produk dihilangkan; produk memakai lazy batch saat scroll.
   } else if (activeTab === 'belanja-stok') {
     titleEl.innerText = (currentLang === 'en') ? "Restock" : ((currentLang === 'ar') ? "إعادة التخزين" : "Belanja Stok");
   } else if (activeTab === 'laporan') {
@@ -2399,21 +2405,37 @@ function switchTab(tabId, pushHistory = true) {
   refreshData();
 }
 
-function changeStokPage(delta) { 
-  stokCurrentPage += delta; 
-  refreshData(); 
+function handleAdminProductLazyScroll() {
+  if (adminProductScrollLoading) return;
+  if (activeTab !== 'penjualan' && activeTab !== 'data-barang') return;
+
   const mainContent = document.querySelector('.main-content');
-  if (mainContent) mainContent.scrollTop = 0;
-  window.scrollTo(0, 0);
+  if (!mainContent) return;
+  const nearBottom = mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 420;
+  if (!nearBottom) return;
+
+  const currentVisible = activeTab === 'penjualan' ? adminPosVisibleCount : adminStokVisibleCount;
+  const currentKey = activeTab === 'penjualan' ? adminPosLazyKey : adminStokLazyKey;
+  if (!currentKey) return;
+
+  const totalSource = Object.keys(databaseProduk || {}).length;
+  if (currentVisible >= totalSource) return;
+
+  if (activeTab === 'penjualan') {
+    adminPosVisibleCount = Math.min(adminPosVisibleCount + ADMIN_PRODUCT_BATCH_SIZE, totalSource);
+  } else {
+    adminStokVisibleCount = Math.min(adminStokVisibleCount + ADMIN_PRODUCT_BATCH_SIZE, totalSource);
+  }
+
+  adminProductScrollLoading = true;
+  refreshData();
+  requestAnimationFrame(() => { adminProductScrollLoading = false; });
 }
 
-function changePosPage(delta) { 
-  posCurrentPage += delta; 
-  refreshData(); 
+document.addEventListener('DOMContentLoaded', () => {
   const mainContent = document.querySelector('.main-content');
-  if (mainContent) mainContent.scrollTop = 0;
-  window.scrollTo(0, 0);
-}
+  if (mainContent) mainContent.addEventListener('scroll', handleAdminProductLazyScroll, { passive: true });
+});
 
 function playBeep() {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3080,17 +3102,14 @@ function refreshData() {
 
     if (invList && invGrid) {
       invList.innerHTML = ""; invGrid.innerHTML = "";
-      let itemsPerPageStok = 24;
-      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
-      if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
-      if (stokCurrentPage < 1) stokCurrentPage = 1;
 
-      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
-      let paginatedStokItems = filteredItems.slice(stokStartIndex, stokStartIndex + itemsPerPageStok);
+      const stokLazyKey = `${searchKeyword}::${filterKat}::${filteredItems.map(item => item.code).join("|")}`;
+      if (adminStokLazyKey !== stokLazyKey) {
+        adminStokLazyKey = stokLazyKey;
+        adminStokVisibleCount = ADMIN_PRODUCT_BATCH_SIZE;
+      }
 
-      document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
-      document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
-      document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
+      const paginatedStokItems = filteredItems.slice(0, adminStokVisibleCount);
 
       if (paginatedStokItems.length === 0) {
         const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
@@ -3224,19 +3243,13 @@ function renderKatalogKasirPaginated(filteredItems) {
   catalogList.style.display = (viewMode === 'list') ? 'flex' : 'none';
   catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
 
-  let itemsPerPagePos = 24;
-  let totalPosPages = Math.ceil(filteredItems.length / itemsPerPagePos) || 1;
-  if (posCurrentPage > totalPosPages) posCurrentPage = totalPosPages;
-  if (posCurrentPage < 1) posCurrentPage = 1;
-
-  let posStartIndex = (posCurrentPage - 1) * itemsPerPagePos;
-  let paginatedPosItems = filteredItems.slice(posStartIndex, posStartIndex + itemsPerPagePos);
-
-  if (filteredItems.length > 0) {
-    document.getElementById("pos-page-info").innerText = `${posCurrentPage}/${totalPosPages}`;
-    document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
-    document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
+  const posLazyKey = `${filteredItems.map(item => item.code).join("|")}`;
+  if (adminPosLazyKey !== posLazyKey) {
+    adminPosLazyKey = posLazyKey;
+    adminPosVisibleCount = ADMIN_PRODUCT_BATCH_SIZE;
   }
+
+  const paginatedPosItems = filteredItems.slice(0, adminPosVisibleCount);
 
   if (paginatedPosItems.length === 0) {
     const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia.</div>`;

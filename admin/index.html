@@ -1265,6 +1265,12 @@ function scrollKePengaturanBerandaPelanggan() {
     <button class="admin-bottom-nav-item" id="admin-nav-stok" type="button" onclick="switchTab('data-barang', false)" aria-label="Stok">
       <span class="admin-bottom-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg></span><span>Stok</span>
     </button>
+    <button class="admin-bottom-nav-item" id="admin-nav-catatan" type="button" onclick="switchTab('catatan', false)" aria-label="Catatan">
+      <span class="admin-bottom-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"/><path d="M14 3.5V8h5M8 12h8M8 16h6"/></svg></span><span>Catatan</span>
+    </button>
+    <button class="admin-bottom-nav-item" id="admin-nav-kalkulator" type="button" onclick="switchTab('kalkulator', false)" aria-label="Kalkulator">
+      <span class="admin-bottom-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M14 11h2M8 15h2M14 15h2M8 18h8"/></svg></span><span>Kalkulator</span>
+    </button>
     <button class="admin-bottom-nav-item" id="admin-nav-belanjastok" type="button" onclick="switchTab('belanja-stok', false)" aria-label="Belanja Stok">
       <span class="admin-bottom-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6h14l-1 13H6L5 6Z"/><path d="M9 6a3 3 0 0 1 6 0M8 10h8"/></svg></span><span>Belanja</span>
     </button>
@@ -1274,19 +1280,11 @@ function scrollKePengaturanBerandaPelanggan() {
     <button class="admin-bottom-nav-item" id="admin-nav-data" type="button" onclick="switchTab('laporan', false)" aria-label="Data">
       <span class="admin-bottom-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/><path d="M3 20h18"/></svg></span><span>Data</span>
     </button>
-    <button class="admin-bottom-nav-item" id="admin-nav-catatan" type="button" onclick="switchTab('catatan', false)" aria-label="Catatan">
-      <span class="admin-bottom-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"/><path d="M14 3.5V8h5M8 12h8M8 16h6"/></svg></span><span>Catatan</span>
-    </button>
-    <button class="admin-bottom-nav-item" id="admin-nav-kalkulator" type="button" onclick="switchTab('kalkulator', false)" aria-label="Kalkulator">
-      <span class="admin-bottom-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M14 11h2M8 15h2M14 15h2M8 18h8"/></svg></span><span>Kalkulator</span>
-    </button>
     <button class="admin-bottom-nav-item" id="admin-nav-pengaturan" type="button" onclick="switchTab('pengaturan', false)" aria-label="Pengaturan">
       <span class="admin-bottom-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-2.6V20a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H6v-2.6h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V5h2.6v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v2.6h-.2a1.7 1.7 0 0 0-1.6 1Z"/></svg></span><span>Pengaturan</span>
     </button>
   </div>
   <div class="admin-bottom-pagination" aria-live="polite">
-    <div class="inline-pagination" id="pos-pagination-wrapper"><button class="inline-page-btn" id="pos-prev-btn" onclick="changePosPage(-1)">◀</button><span id="pos-page-info">1/1</span><button class="inline-page-btn" id="pos-next-btn" onclick="changePosPage(1)">▶</button></div>
-    <div class="inline-pagination" id="stok-pagination-wrapper"><button class="inline-page-btn" id="stok-prev-btn" onclick="changeStokPage(-1)">◀</button><span id="stok-page-info">1/1</span><button class="inline-page-btn" id="stok-next-btn" onclick="changeStokPage(1)">▶</button></div>
     <div class="inline-pagination" id="catatan-pagination-wrapper"><button class="inline-page-btn" onclick="navigasiHariCatatan(-1)">◀</button><span id="catatan-bottom-date-info">Tgl</span><button class="inline-page-btn" onclick="navigasiHariCatatan(1)">▶</button></div>
   </div>
 </div>
