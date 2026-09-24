@@ -501,27 +501,15 @@ function gantiViewModeSetting(mode) {
 function toggleFloatingMenu() {
   const backdrop = document.getElementById("floating-menu-backdrop");
   if (!backdrop) return;
-
   const opening = !backdrop.classList.contains("show");
-  if (opening) {
-    backdrop.classList.add("show");
-    history.pushState({tab: activeTab, floating: 'menu'}, "", "");
-    return;
-  }
-
-  // Closing the floating menu must also consume its dedicated history entry.
-  // This keeps Android Back and browser Back synchronized with the visible UI.
-  backdrop.classList.remove("show");
-  if (history.state && history.state.floating === 'menu') {
-    history.back();
-  }
+  backdrop.classList.toggle("show", opening);
+  if (opening) history.pushState({tab: activeTab, floating: 'menu'}, "", "");
 }
 
 window.addEventListener('scroll', function() {
   const backdrop = document.getElementById("floating-menu-backdrop");
   if (backdrop && backdrop.classList.contains('show')) {
     backdrop.classList.remove('show');
-    if (history.state && history.state.floating === 'menu') history.back();
   }
 }, true);
 
@@ -1167,12 +1155,6 @@ function simpanPengaturanAkun() {
 }
 
 let databaseProduk = {};
-const ADMIN_PRODUCT_BATCH_SIZE = 6;
-let adminPosVisibleCount = ADMIN_PRODUCT_BATCH_SIZE;
-let adminStokVisibleCount = ADMIN_PRODUCT_BATCH_SIZE;
-let adminPosLazyKey = "";
-let adminStokLazyKey = "";
-let adminProductScrollLoading = false;
 storeCollection("produk").onSnapshot((snapshot) => {
   databaseProduk = {};
   snapshot.forEach((doc) => {
@@ -2261,18 +2243,18 @@ function updatePermanentBarTitle() {
   const stokPag = document.getElementById("stok-pagination-wrapper");
   const catatanPag = document.getElementById("catatan-pagination-wrapper");
 
-  if (posPag) posPag.classList.remove("show");
-  if (stokPag) stokPag.classList.remove("show");
+  posPag.classList.remove("show");
+  stokPag.classList.remove("show");
   if (catatanPag) catatanPag.classList.remove("show");
 
   if (activeTab === 'penjualan') {
     titleEl.innerText = (currentLang === 'en') ? "POS Page" : ((currentLang === 'ar') ? "صفحة الكاشير" : "Halaman Kasir");
-    // Pagination produk dihilangkan; produk memakai lazy batch saat scroll.
+    posPag.classList.add("show");
   } else if (activeTab === 'kasir-online') {
     titleEl.innerText = (currentLang === 'en') ? "Online POS" : ((currentLang === 'ar') ? "كاشير أونلاين" : "Kasir Online");
   } else if (activeTab === 'data-barang') {
     titleEl.innerText = (currentLang === 'en') ? "Stock Management" : ((currentLang === 'ar') ? "إدارة المخزون" : "Manajemen Stok");
-    // Pagination produk dihilangkan; produk memakai lazy batch saat scroll.
+    stokPag.classList.add("show");
   } else if (activeTab === 'belanja-stok') {
     titleEl.innerText = (currentLang === 'en') ? "Restock" : ((currentLang === 'ar') ? "إعادة التخزين" : "Belanja Stok");
   } else if (activeTab === 'laporan') {
@@ -2304,24 +2286,6 @@ function updatePermanentBarTitle() {
   if (activeBtnMap[activeTab]) {
     let btnEl = document.getElementById(activeBtnMap[activeTab]);
     if (btnEl) btnEl.classList.add('active-menu');
-  }
-
-  const adminNavMap = {
-    'penjualan': 'admin-nav-penjualan',
-    'kasir-online': 'admin-nav-kasironline',
-    'data-barang': 'admin-nav-stok',
-    'belanja-stok': 'admin-nav-belanjastok',
-    'live-chat-admin': 'admin-nav-livechat',
-    'laporan': 'admin-nav-data',
-    'catatan': 'admin-nav-catatan',
-    'kalkulator': 'admin-nav-kalkulator',
-    'pengaturan': 'admin-nav-pengaturan'
-  };
-  document.querySelectorAll('.admin-bottom-nav-item').forEach(btn => btn.classList.remove('active'));
-  const adminNavBtn = document.getElementById(adminNavMap[activeTab]);
-  if (adminNavBtn) {
-    adminNavBtn.classList.add('active');
-    adminNavBtn.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'});
   }
 }
 
@@ -2405,37 +2369,21 @@ function switchTab(tabId, pushHistory = true) {
   refreshData();
 }
 
-function handleAdminProductLazyScroll() {
-  if (adminProductScrollLoading) return;
-  if (activeTab !== 'penjualan' && activeTab !== 'data-barang') return;
-
+function changeStokPage(delta) { 
+  stokCurrentPage += delta; 
+  refreshData(); 
   const mainContent = document.querySelector('.main-content');
-  if (!mainContent) return;
-  const nearBottom = mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 420;
-  if (!nearBottom) return;
-
-  const currentVisible = activeTab === 'penjualan' ? adminPosVisibleCount : adminStokVisibleCount;
-  const currentKey = activeTab === 'penjualan' ? adminPosLazyKey : adminStokLazyKey;
-  if (!currentKey) return;
-
-  const totalSource = Object.keys(databaseProduk || {}).length;
-  if (currentVisible >= totalSource) return;
-
-  if (activeTab === 'penjualan') {
-    adminPosVisibleCount = Math.min(adminPosVisibleCount + ADMIN_PRODUCT_BATCH_SIZE, totalSource);
-  } else {
-    adminStokVisibleCount = Math.min(adminStokVisibleCount + ADMIN_PRODUCT_BATCH_SIZE, totalSource);
-  }
-
-  adminProductScrollLoading = true;
-  refreshData();
-  requestAnimationFrame(() => { adminProductScrollLoading = false; });
+  if (mainContent) mainContent.scrollTop = 0;
+  window.scrollTo(0, 0);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function changePosPage(delta) { 
+  posCurrentPage += delta; 
+  refreshData(); 
   const mainContent = document.querySelector('.main-content');
-  if (mainContent) mainContent.addEventListener('scroll', handleAdminProductLazyScroll, { passive: true });
-});
+  if (mainContent) mainContent.scrollTop = 0;
+  window.scrollTo(0, 0);
+}
 
 function playBeep() {
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -3102,14 +3050,17 @@ function refreshData() {
 
     if (invList && invGrid) {
       invList.innerHTML = ""; invGrid.innerHTML = "";
+      let itemsPerPageStok = 24;
+      let totalStokPages = Math.ceil(filteredItems.length / itemsPerPageStok) || 1;
+      if (stokCurrentPage > totalStokPages) stokCurrentPage = totalStokPages;
+      if (stokCurrentPage < 1) stokCurrentPage = 1;
 
-      const stokLazyKey = `${searchKeyword}::${filterKat}::${filteredItems.map(item => item.code).join("|")}`;
-      if (adminStokLazyKey !== stokLazyKey) {
-        adminStokLazyKey = stokLazyKey;
-        adminStokVisibleCount = ADMIN_PRODUCT_BATCH_SIZE;
-      }
+      let stokStartIndex = (stokCurrentPage - 1) * itemsPerPageStok;
+      let paginatedStokItems = filteredItems.slice(stokStartIndex, stokStartIndex + itemsPerPageStok);
 
-      const paginatedStokItems = filteredItems.slice(0, adminStokVisibleCount);
+      document.getElementById("stok-page-info").innerText = `${stokCurrentPage}/${totalStokPages}`;
+      document.getElementById("stok-prev-btn").disabled = (stokCurrentPage <= 1);
+      document.getElementById("stok-next-btn").disabled = (stokCurrentPage >= totalStokPages);
 
       if (paginatedStokItems.length === 0) {
         const emptyStokMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada data barang stok.</div>`;
@@ -3243,13 +3194,19 @@ function renderKatalogKasirPaginated(filteredItems) {
   catalogList.style.display = (viewMode === 'list') ? 'flex' : 'none';
   catalogGrid.innerHTML = ""; catalogList.innerHTML = "";
 
-  const posLazyKey = `${filteredItems.map(item => item.code).join("|")}`;
-  if (adminPosLazyKey !== posLazyKey) {
-    adminPosLazyKey = posLazyKey;
-    adminPosVisibleCount = ADMIN_PRODUCT_BATCH_SIZE;
-  }
+  let itemsPerPagePos = 24;
+  let totalPosPages = Math.ceil(filteredItems.length / itemsPerPagePos) || 1;
+  if (posCurrentPage > totalPosPages) posCurrentPage = totalPosPages;
+  if (posCurrentPage < 1) posCurrentPage = 1;
 
-  const paginatedPosItems = filteredItems.slice(0, adminPosVisibleCount);
+  let posStartIndex = (posCurrentPage - 1) * itemsPerPagePos;
+  let paginatedPosItems = filteredItems.slice(posStartIndex, posStartIndex + itemsPerPagePos);
+
+  if (filteredItems.length > 0) {
+    document.getElementById("pos-page-info").innerText = `${posCurrentPage}/${totalPosPages}`;
+    document.getElementById("pos-prev-btn").disabled = (posCurrentPage <= 1);
+    document.getElementById("pos-next-btn").disabled = (posCurrentPage >= totalPosPages);
+  }
 
   if (paginatedPosItems.length === 0) {
     const emptyMsg = `<div class="empty-state" style="grid-column: 1/-1;">⚠️ Belum ada barang tersedia.</div>`;
@@ -3936,17 +3893,15 @@ let adminRumpiBadgeListener = null;
 
 function updateAdminLiveChatBadge() {
   const badgeChat = document.getElementById("badge-chat-count");
-  const badgeChatNav = document.getElementById("admin-nav-chat-badge");
-  if (!badgeChat && !badgeChatNav) return;
+  if (!badgeChat) return;
 
   const totalUnread = (typeof adminPrivateUnreadTotal === "number" ? adminPrivateUnreadTotal : 0) + unreadRumpiAdmin;
 
   if (totalUnread > 0) {
-    if (badgeChat) { badgeChat.innerText = totalUnread; badgeChat.style.display = "inline-block"; }
-    if (badgeChatNav) { badgeChatNav.innerText = totalUnread; badgeChatNav.style.display = "inline-block"; }
+    badgeChat.innerText = totalUnread;
+    badgeChat.style.display = "inline-block";
   } else {
-    if (badgeChat) badgeChat.style.display = "none";
-    if (badgeChatNav) badgeChatNav.style.display = "none";
+    badgeChat.style.display = "none";
   }
 }
 
