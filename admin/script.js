@@ -501,15 +501,27 @@ function gantiViewModeSetting(mode) {
 function toggleFloatingMenu() {
   const backdrop = document.getElementById("floating-menu-backdrop");
   if (!backdrop) return;
+
   const opening = !backdrop.classList.contains("show");
-  backdrop.classList.toggle("show", opening);
-  if (opening) history.pushState({tab: activeTab, floating: 'menu'}, "", "");
+  if (opening) {
+    backdrop.classList.add("show");
+    history.pushState({tab: activeTab, floating: 'menu'}, "", "");
+    return;
+  }
+
+  // Closing the floating menu must also consume its dedicated history entry.
+  // This keeps Android Back and browser Back synchronized with the visible UI.
+  backdrop.classList.remove("show");
+  if (history.state && history.state.floating === 'menu') {
+    history.back();
+  }
 }
 
 window.addEventListener('scroll', function() {
   const backdrop = document.getElementById("floating-menu-backdrop");
   if (backdrop && backdrop.classList.contains('show')) {
     backdrop.classList.remove('show');
+    if (history.state && history.state.floating === 'menu') history.back();
   }
 }, true);
 
@@ -604,17 +616,6 @@ function handleAuthState(user) {
 }
 
 if (typeof auth !== "undefined") auth.onAuthStateChanged(handleAuthState);
-
-// ===== MIGRASI DATA GLOBAL -> TOKO V13 (AMAN, TIDAK MENGHAPUS DATA LAMA) =====
-let v13MigrationRunning = false;
-async function migrateGlobalDataToV13() {
-  // DISABLED: migrasi global -> V13 tidak boleh berjalan otomatis.
-  // Fungsi lama sengaja dipertahankan sebagai placeholder agar referensi lama
-  // tidak error, tetapi tidak melakukan read/write ke koleksi global.
-  console.warn("Migrasi global -> V13 dinonaktifkan.");
-  return;
-}
-
 
 let pengaturanToko = { nama: "", alamat: "", phone: "" };
 storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
@@ -2298,6 +2299,24 @@ function updatePermanentBarTitle() {
     let btnEl = document.getElementById(activeBtnMap[activeTab]);
     if (btnEl) btnEl.classList.add('active-menu');
   }
+
+  const adminNavMap = {
+    'penjualan': 'admin-nav-penjualan',
+    'kasir-online': 'admin-nav-kasironline',
+    'data-barang': 'admin-nav-stok',
+    'belanja-stok': 'admin-nav-belanjastok',
+    'live-chat-admin': 'admin-nav-livechat',
+    'laporan': 'admin-nav-data',
+    'catatan': 'admin-nav-catatan',
+    'kalkulator': 'admin-nav-kalkulator',
+    'pengaturan': 'admin-nav-pengaturan'
+  };
+  document.querySelectorAll('.admin-bottom-nav-item').forEach(btn => btn.classList.remove('active'));
+  const adminNavBtn = document.getElementById(adminNavMap[activeTab]);
+  if (adminNavBtn) {
+    adminNavBtn.classList.add('active');
+    adminNavBtn.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'});
+  }
 }
 
 function switchTab(tabId, pushHistory = true) {
@@ -2982,28 +3001,6 @@ function simpanPengaturanScan() {
     alert("Gagal menyimpan jeda scan: " + err.message);
   });
 }
-
-async function resetRiwayat() {
-  if (confirm("Kosongkan SELURUH riwayat transaksi di Cloud?")) {
-    let snapshot = await storeCollection("transaksi").get();
-    let batch = db.batch();
-    snapshot.forEach(doc => {
-      batch.delete(doc.ref);
-    });
-    await batch.commit();
-    alert("Riwayat transaksi dikosongkan dari Cloud.");
-    refreshData();
-  }
-}
-
-function resetDatabaseBarang() {
-  if (confirm("Hapus SELURUH database barang?")) {
-    for (let code in databaseProduk) { storeCollection("produk").doc(code).delete(); }
-    alert("Database barang dikosongkan.");
-    refreshData();
-  }
-}
-
 function refreshData() {
   const setUsr = document.getElementById("setting-user");
   if (setUsr) setUsr.value = userAuth.user;
@@ -3926,15 +3923,17 @@ let adminRumpiBadgeListener = null;
 
 function updateAdminLiveChatBadge() {
   const badgeChat = document.getElementById("badge-chat-count");
-  if (!badgeChat) return;
+  const badgeChatNav = document.getElementById("admin-nav-chat-badge");
+  if (!badgeChat && !badgeChatNav) return;
 
   const totalUnread = (typeof adminPrivateUnreadTotal === "number" ? adminPrivateUnreadTotal : 0) + unreadRumpiAdmin;
 
   if (totalUnread > 0) {
-    badgeChat.innerText = totalUnread;
-    badgeChat.style.display = "inline-block";
+    if (badgeChat) { badgeChat.innerText = totalUnread; badgeChat.style.display = "inline-block"; }
+    if (badgeChatNav) { badgeChatNav.innerText = totalUnread; badgeChatNav.style.display = "inline-block"; }
   } else {
-    badgeChat.style.display = "none";
+    if (badgeChat) badgeChat.style.display = "none";
+    if (badgeChatNav) badgeChatNav.style.display = "none";
   }
 }
 

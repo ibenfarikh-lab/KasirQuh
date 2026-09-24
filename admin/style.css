@@ -355,14 +355,28 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
 .inv-card-details { background: var(--table-header); padding: 6px; border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
 .inv-card-row { display: flex; justify-content: space-between; }
 
-.permanent-bottom-bar { 
-  position: fixed; bottom: 0; left: 0; width: 100%; 
-  background-color: var(--card-bg); border-top: 1px solid var(--border-color); 
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.06); display: flex; 
-  justify-content: space-between; align-items: center; padding: 10px 16px; z-index: 998; 
+.permanent-bottom-bar {
+  position: fixed; bottom: 0; left: 0; width: 100%;
+  box-sizing: border-box;
+  background-color: var(--card-bg); border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center; padding: 9px 16px; z-index: 998;
+  gap: 10px;
 }
 
-.bottom-right-menu-container { position: relative; display: flex; align-items: center; margin-right: 1px; }
+.admin-navbar-title-wrap { min-width: 0; display: flex; align-items: center; justify-content: flex-start; }
+.admin-navbar-title {
+  margin: 0; font-size: 1.02rem; line-height: 1.2; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.admin-navbar-center {
+  min-width: 0; display: flex; align-items: center; justify-content: center;
+}
+.admin-navbar-center .inline-pagination { margin: 0; }
+
+
+.bottom-right-menu-container { position: relative; display: flex; align-items: center; justify-content: flex-end; margin-right: 1px; }
 
 /* Menu Popup Admin dengan Efek Backdrop Blur dan Transparansi yang Sesuai */
 .floating-menu-popup {
@@ -411,7 +425,7 @@ body { margin: 0; display: flex; height: 100vh; background-color: var(--bg-color
   border-radius: 2px;
 }
 
-.inline-pagination { display: none; align-items: center; gap: 6px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; }
+.inline-pagination { display: none; align-items: center; justify-content: center; gap: 6px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 8px; font-size: 0.75rem; white-space: nowrap; }
 .inline-pagination.show { display: flex; }
 .inline-page-btn { background: #2563eb; color: white; border: none; width: 26px; height: 26px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; }
 .inline-page-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
@@ -574,11 +588,6 @@ button:hover { background: #1d4ed8; }
 [data-theme="colorful"] .cart-table,
 [data-theme="colorful"] .inline-pagination {
   background: linear-gradient(135deg,#172554,#4c1d95,#831843) !important;
-  color: #fff !important;
-}
-[data-theme="colorful"] table tr,
-[data-theme="colorful"] .cart-table tr {
-  background: rgba(255,255,255,.08) !important;
   color: #fff !important;
 }
 [data-theme="colorful"] input,
@@ -1713,4 +1722,117 @@ body.theme-colorful-v2 [style*="#ec4899"] {
     bottom: auto !important;
     right: 14px !important;
   }
+}
+
+/* H-10.7 — Admin mobile-first bottom shortcut navigation */
+.admin-bottom-nav {
+  display: block !important;
+  padding: 6px 8px !important;
+  height: auto;
+  min-height: 64px;
+  box-sizing: border-box;
+  background: var(--card-bg) !important;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 0;
+  box-shadow: 0 -4px 14px rgba(0,0,0,0.08);
+}
+.admin-bottom-nav-scroll {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+.admin-bottom-nav-scroll::-webkit-scrollbar { display: none; }
+.admin-bottom-nav-item {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 68px;
+  min-height: 54px;
+  padding: 5px 8px 4px;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  color: var(--text-muted);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  scroll-snap-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.admin-bottom-nav-item.active {
+  color: #2563eb;
+  background: rgba(37,99,235,0.10);
+  transform: translateY(-1px);
+}
+.admin-bottom-nav-icon {
+  width: 23px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.admin-bottom-nav-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.admin-bottom-nav-badge {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.58rem;
+  line-height: 15px;
+  font-weight: 700;
+  display: none;
+  box-sizing: border-box;
+}
+.admin-bottom-nav-badge-chat { right: 10px; }
+.admin-bottom-pagination {
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2px;
+}
+.admin-bottom-pagination .inline-pagination { margin: 0; }
+
+/* Admin now uses the same bottom-first interaction model on desktop; content gets its space below. */
+@media (min-width: 768px) {
+  .admin-bottom-nav {
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    min-height: 64px !important;
+    padding: 6px 18px !important;
+    border-top: 1px solid var(--border-color) !important;
+    border-bottom: 0 !important;
+    box-shadow: 0 -4px 14px rgba(0,0,0,0.08) !important;
+  }
+  .admin-bottom-nav-scroll { justify-content: center; }
+  .main-content { padding-top: 15px !important; padding-bottom: 78px !important; }
 }
