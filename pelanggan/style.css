@@ -576,11 +576,6 @@ button:hover { background: #1d4ed8; }
   background: linear-gradient(135deg,#172554,#4c1d95,#831843) !important;
   color: #fff !important;
 }
-[data-theme="colorful"] table tr,
-[data-theme="colorful"] .cart-table tr {
-  background: rgba(255,255,255,.08) !important;
-  color: #fff !important;
-}
 [data-theme="colorful"] input,
 [data-theme="colorful"] select,
 [data-theme="colorful"] textarea {
@@ -5015,32 +5010,7 @@ html.dev-no-nav-animation #promo-banner-section {
 
 /* ===== EXTRACTED FROM pelanggan.html <style> #46 ===== */
 
-/* MODERN — FAB KERANJANG: hilangkan sisa surface putih.
-   Khusus tombol FAB keranjang + badge, tema lain tidak disentuh. */
-body[data-theme="modern"] #fab-cart-btn {
-  background: #1677d2 !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(143,201,255,.42) !important;
-  box-shadow: 0 0 10px rgba(37,99,235,.28), 0 4px 12px rgba(0,0,0,.45) !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-}
-body[data-theme="modern"] #fab-cart-btn svg {
-  fill: #ffffff !important;
-  color: #ffffff !important;
-}
-body[data-theme="modern"] #fab-cart-btn .cart-badge {
-  background: #dc2626 !important;
-  color: #ffffff !important;
-  border: 2px solid #0b1629 !important;
-  box-shadow: 0 0 6px rgba(239,68,68,.28) !important;
-}
-body[data-theme="modern"] #fab-cart-btn:focus,
-body[data-theme="modern"] #fab-cart-btn:focus-visible {
-  outline: none !important;
-  border-color: #8fc9ff !important;
-  box-shadow: 0 0 0 2px rgba(22,119,210,.28), 0 0 12px rgba(37,99,235,.35), 0 4px 12px rgba(0,0,0,.45) !important;
-}
+
 
 
 /* ===== EXTRACTED FROM pelanggan.html <style> #47 ===== */
@@ -5099,3 +5069,46 @@ body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div {
   border-color: #294564 !important;
 }
 
+
+
+/* ===== CUSTOMER NAVBAR MODERNISASI — H09H ===== */
+.customer-bottom-navbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10030; display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); min-height: 64px; padding: 6px 6px max(6px,env(safe-area-inset-bottom)); box-sizing: border-box; background: var(--card-bg,#fff); border-top: 1px solid var(--border-color,#e5e7eb); box-shadow: 0 -4px 18px rgba(0,0,0,.08); }
+.customer-nav-item { position: relative; min-width: 0; border: 0; background: transparent; color: var(--text-muted,#64748b); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 2px; border-radius: 12px; font: inherit; font-size: .68rem; font-weight: 700; cursor: pointer; }
+.customer-nav-item.active { color: #2563eb; background: rgba(37,99,235,.08); }
+.customer-nav-icon { width:26px; height:26px; display:flex; align-items:center; justify-content:center; line-height:1; }
+.customer-nav-icon svg { width:24px; height:24px; display:block; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:transform .2s ease, stroke-width .2s ease; }
+.customer-nav-item.active .customer-nav-icon svg { stroke-width:2.15; transform:translateY(-1px) scale(1.04); }
+.customer-nav-item:active .customer-nav-icon svg { transform:scale(.9); }
+.customer-nav-icon-cart svg .cart-wheel { transform-box:fill-box; transform-origin:center; transition:transform .2s ease; }
+.customer-nav-item.active .customer-nav-icon-cart svg .cart-wheel { transform:translateY(1px); }
+.customer-nav-badge { position: absolute; top: 2px; margin-left: 22px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box; border-radius: 999px; background: #dc2626; color: #fff; font-size: .58rem; line-height: 16px; text-align: center; display: none; }
+.customer-account-menu { width: min(210px,calc(100vw - 28px)); padding: 8px; border-radius: 14px; background: var(--card-bg,#fff); color: var(--text-color,#111827); border: 1px solid var(--border-color,#e5e7eb); box-shadow: 0 12px 28px rgba(0,0,0,.22); }
+.customer-account-menu-title { padding: 7px 9px 8px; font-weight: 800; font-size: .82rem; }
+.customer-account-menu-list { display: flex; flex-direction: column; gap: 3px; }
+.customer-account-menu .popup-menu-btn { width: 100%; justify-content: flex-start; border: 0; border-radius: 9px; padding: 10px 11px; gap: 8px; }
+.customer-account-menu .account-logout-btn { color: #dc2626; }
+.customer-account-menu .account-logout-btn:hover { background: rgba(220,38,38,.08); }
+.main-content { padding-bottom: 78px !important; }
+@media (min-width:700px) { .customer-bottom-navbar { left:50%; right:auto; width:min(100%,700px); transform:translateX(-50%); border-left:1px solid var(--border-color,#e5e7eb); border-right:1px solid var(--border-color,#e5e7eb); border-radius:14px 14px 0 0; } }
+
+.customer-nav-item.cart-animating { animation: cartBounce 0.3s ease-in-out; }
+
+
+/* H-10.2 — Account popup identity + clean destination transition */
+.customer-account-menu .account-menu-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 22px;
+}
+.customer-account-menu .account-menu-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
