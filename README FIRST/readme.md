@@ -4,11 +4,9 @@ README FIRST
 
 ### 🔐 ATURAN WAJIB LOG PROYEK — README.md
 
-Setiap pihak, proses, alat, atau aktivitas yang **mengakses, membaca, memeriksa, mengaudit, menganalisis, mengubah, menambah, menghapus, memindahkan, merapikan, memperbaiki, mengganti, memverifikasi, atau melakukan tindakan apa pun terhadap file/proyek** wajib meninggalkan log yang sesuai di `readme.md`.
+Setiap pihak, proses, alat, atau aktivitas yang **mengakses, membaca, memeriksa, mengaudit, menganalisis, mengubah, menambah, menghapus, memindahkan, merapikan, memperbaiki, mengganti, memverifikasi, atau melakukan tindakan apa pun terhadap file/proyek** wajib meninggalkan log yang sesuai di `README FIRST`.
 
-Tidak boleh ada perubahan atau tindakan terhadap proyek yang dilakukan tanpa dicatat di `readme.md`.
-
-
+Tidak boleh ada perubahan atau tindakan terhadap proyek yang dilakukan tanpa dicatat di `README pembuatan
 
 Setiap log wajib mencantumkan:
 1. **Tanggal/Waktu** aktivitas.
@@ -22,7 +20,7 @@ Setiap log wajib mencantumkan:
 9. **Verifikasi** setelah perubahan atau pemeriksaan.
 10. **Status** — PASS / FAIL / BLOCKED / NO CHANGE.
 11. **Catatan** tambahan bila diperlukan.
-12. **WAJIB MEMBUAT FILE LOG MD BARU** Nama log sesuai denga Tanggal pembuatan log
+12. **WAJIB MEMBUAT FILE LOG MD BARU** Nama log sesuai dengan tanggal pembuatan log
 
 Jika aktivitas hanya berupa **baca, audit, pemeriksaan, atau diagnosis tanpa perubahan kode**, aktivitas tersebut tetap wajib dicatat dengan status `NO CHANGE`.
 
