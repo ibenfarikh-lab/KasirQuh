@@ -351,6 +351,23 @@ const storeCollection = (...args) => window.storeCollection(...args);
     let promoTokoPelangganCfg = { enabled: false, codes: [] };
 
     let promoTokoPelangganIndex = 0;
+    const homeExtraProductCache = new Set();
+
+    async function ensureHomeProductDocs(codes) {
+      const wanted = [...new Set((Array.isArray(codes) ? codes : []).map(code => String(code || '').trim()).filter(Boolean))];
+      const missing = wanted.filter(code => !databaseProduk[code] && !homeExtraProductCache.has(code));
+      if (!missing.length) return;
+      missing.forEach(code => homeExtraProductCache.add(code));
+      await Promise.all(missing.map(async code => {
+        try {
+          const doc = await storeCollection('produk').doc(code).get();
+          if (doc.exists) databaseProduk[code] = doc.data() || {};
+        } catch (err) {
+          homeExtraProductCache.delete(code);
+          console.warn('[KasirQuh] gagal memuat produk Home tambahan:', code, err);
+        }
+      }));
+    }
 
     function getPromoTokoPelangganCodes() {
       return Array.isArray(promoTokoPelangganCfg.codes) ? promoTokoPelangganCfg.codes.map(code => String(code)).filter(code => databaseProduk[code] && Number(databaseProduk[code].stok || 0) > 0) : [];
@@ -392,20 +409,24 @@ const storeCollection = (...args) => window.storeCollection(...args);
       promoTokoPelangganIndex=Math.max(0,Math.min(codes.length-1,promoTokoPelangganIndex+dir)); updatePromoTokoSlider();
     }
 
-    function initPromoTokoPelanggan() {
-      try {
-        const localCfg = JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{}');
-        if (localCfg && Array.isArray(localCfg.codes)) promoTokoPelangganCfg = { enabled: localCfg.enabled !== false, codes: localCfg.codes };
-      } catch(e) {}
+    async function initPromoTokoPelanggan() {
+      let localCfg = {};
+      try { localCfg = JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{}'); } catch(e) {}
+      if (Array.isArray(localCfg.codes)) {
+        promoTokoPelangganCfg = { enabled: localCfg.enabled !== false, codes: localCfg.codes.map(code => String(code)) };
+        await ensureHomeProductDocs(promoTokoPelangganCfg.codes);
+      }
       renderPromoTokoPelanggan();
-      storeCollection("pengaturan").doc('beranda_pelanggan_promo').onSnapshot(doc => {
+      storeCollection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(async doc => {
         if (doc.exists) {
           const data = doc.data() || {};
-          promoTokoPelangganCfg = { enabled: data.enabled !== false, codes: Array.isArray(data.codes) ? data.codes : [] };
+          promoTokoPelangganCfg = { enabled: data.enabled !== false, codes: Array.isArray(data.codes) ? data.codes.map(code => String(code)) : [] };
           localStorage.setItem('admin_promo_toko_v1', JSON.stringify(promoTokoPelangganCfg));
+          await ensureHomeProductDocs(promoTokoPelangganCfg.codes);
         } else {
-          const localCfg = (() => { try { return JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{}'); } catch(e) { return {}; } })();
+          try { localCfg = JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{}'); } catch(e) { localCfg = {}; }
           promoTokoPelangganCfg = Array.isArray(localCfg.codes) ? { enabled: localCfg.enabled !== false, codes: localCfg.codes.map(code => String(code)) } : { enabled: false, codes: [] };
+          await ensureHomeProductDocs(promoTokoPelangganCfg.codes);
         }
         renderPromoTokoPelanggan();
       }, err => {
@@ -996,7 +1017,8 @@ const storeCollection = (...args) => window.storeCollection(...args);
 
       // Product data is needed by Home, Catalog, Cart/Checkout and AI chat.
       if (needsProducts) {
-        storeCollection("produk").onSnapshot((snapshot) => { 
+        const productQuery = route === 'home' ? storeCollection("produk").limit(6) : storeCollection("produk");
+        productQuery.onSnapshot((snapshot) => { 
           databaseProduk = {};
           snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); });
           isProductsLoaded = true;
@@ -1242,18 +1264,15 @@ const storeCollection = (...args) => window.storeCollection(...args);
             if (qty <= 0) return;
 
             const code = String(it.code || '').trim();
-            if (code && databaseProduk[code]) {
+            if (code) {
               itemCounts[code] = (itemCounts[code] || 0) + qty;
               return;
             }
 
-            // Data transaksi lama kadang punya code berbeda dari ID produk.
-            // Cocokkan berdasarkan nama produk.
-            const nama = String(it.nama || '').trim().toLowerCase();
+            // Data transaksi lama kadang hanya membawa nama produk.
+            const nama = String(it.nama || it.name || '').trim().toLowerCase();
             const matchedCode = byName[nama];
-            if (matchedCode) {
-              itemCounts[matchedCode] = (itemCounts[matchedCode] || 0) + qty;
-            }
+            if (matchedCode) itemCounts[matchedCode] = (itemCounts[matchedCode] || 0) + qty;
           });
         });
 
@@ -1261,7 +1280,8 @@ const storeCollection = (...args) => window.storeCollection(...args);
           .sort((a,b) => itemCounts[b] - itemCounts[a])
           .slice(0, limit);
 
-        renderTrending(top);
+        await ensureHomeProductDocs(top);
+        renderTrending(top.filter(code => databaseProduk[code]));
 
         // Simpan info tanggal yang sedang ditampilkan agar mudah dicek/debug.
         window.__sedangLarisDateKey = targetDateKey;
@@ -1431,7 +1451,6 @@ const storeCollection = (...args) => window.storeCollection(...args);
         try { toggleAIChatModal(); } catch (e) { console.warn('Gagal membuka Assistant AI dari welcome:', e); }
       }, 900);
     }, { once: true });
-    setTimeout(setupCatalogInfiniteScroll, 0);
 
     /* PHASE 10: renderCartPelanggan extracted to _core/modules/cart.js */
 
