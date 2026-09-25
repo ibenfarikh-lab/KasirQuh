@@ -3,11 +3,11 @@
   function getRoute(){ return document.body?.dataset?.kqRoute || window.KQ_CUSTOMER_PAGE?.route || 'home'; }
 
   const routeModules = {
-    home:['common','auth'],
-    produk:['common','auth','products'],
-    keranjang:['common','auth','cart','transactions'],
-    chat:['common','auth','chat','products'],
-    akun:['common','auth','settings','transactions']
+    home:['common','icons','auth'],
+    produk:['common','icons','auth','products'],
+    keranjang:['common','icons','auth','cart','transactions'],
+    chat:['common','icons','auth','chat','products'],
+    akun:['common','icons','auth','settings','transactions']
   };
 
   function loadModule(name){
@@ -21,7 +21,7 @@
         return;
       }
       const s=document.createElement('script');
-      s.src='/pelanggan/_core/modules/'+name+'.js?v=20260925-fix2';
+      s.src='/pelanggan/_core/modules/'+name+'.js?v=20260925-iconsfix';
       s.dataset.kqModule=name;
       s.onload=()=>resolve(window.KQModules?.[name]);
       s.onerror=reject;

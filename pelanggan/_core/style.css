@@ -5106,3 +5106,10 @@ body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div {
 .kq-legacy-bottom-hooks{position:fixed;left:-9999px;bottom:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
 body{padding-bottom:62px}
 @media (min-width:700px){.kq-bottom-nav{max-width:560px;left:50%;right:auto;transform:translateX(-50%);border:1px solid var(--border-color,#e5e7eb);border-bottom:0;border-radius:18px 18px 0 0}.kq-nav-item{font-size:.7rem}}
+
+/* KQ FINAL: unified local SVG icon language */
+.kq-svg-icon{width:1.15em;height:1.15em;display:inline-block;vertical-align:-0.18em;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kq-svg-inline{width:1.05em;height:1.05em;vertical-align:-0.16em;margin-right:.08em}
+.kq-nav-icon .kq-svg-icon{width:22px;height:22px;vertical-align:middle;margin:0}
+.kq-session-pending #customerLoginModal{display:none!important}
+.kq-session-locked #customerLoginModal{display:flex!important}
