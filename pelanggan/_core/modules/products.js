@@ -319,7 +319,7 @@
                       <div class="modern-card-surface"></div>
                       <div class="modern-card-highlight"></div>
                     </div>
-                    <button type="button" class="btn-quick-cart-icon modern-card-cart-btn" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
+                    <button type="button" class="btn-quick-cart-icon modern-card-cart-btn" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">${typeof KQIcon === "function" ? KQIcon("cart") : ""}</button>
                   </div>
                   <div class="modern-card-info">
                     <div class="modern-card-name">${p.nama}</div>
@@ -334,7 +334,7 @@
                   <div class="generic-card-image-wrap">
                     ${sisaStokBadge}
                     <img src="${fotoSrc}" alt="${p.nama}" loading="lazy">
-                    <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
+                    <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">${typeof KQIcon === "function" ? KQIcon("cart") : ""}</button>
                   </div>
                   <div class="generic-card-name">${p.nama}</div>
                   <div class="generic-card-price">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
@@ -356,7 +356,7 @@
                       <div class="modern-surface"></div>
                       <div class="modern-highlight"></div>
                     </div>
-                    <button type="button" class="btn-quick-cart-icon modern-cart-btn" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
+                    <button type="button" class="btn-quick-cart-icon modern-cart-btn" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">${typeof KQIcon === "function" ? KQIcon("cart") : ""}</button>
                   </div>
                   <div class="modern-product-info">
                     <div class="modern-product-name">${p.nama}</div>
@@ -371,7 +371,7 @@
                   <div style="text-align: center; margin-bottom: 4px; position: relative;">
                     ${sisaStokBadge}
                     <img src="${fotoSrc}" style="width: 100%; height: 75px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
-                    <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
+                    <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">${typeof KQIcon === "function" ? KQIcon("cart") : ""}</button>
                   </div>
                   <div style="font-weight: bold; font-size: 0.75rem; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
                   <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Stok: ${p.stok || 0} ${satuan}</div>
@@ -394,7 +394,7 @@
                   </div>
                   <div class="modern-list-actions" style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
                     <div style="font-size: 0.8rem; font-weight: bold; color: #fde047;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
-                    <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position: static; width: 24px; height: 24px; font-size: 0.7rem;">🛒</button>
+                    <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position: static; width: 24px; height: 24px; font-size: 0.7rem;">${typeof KQIcon === "function" ? KQIcon("cart") : ""}</button>
                   </div>
                 </div>`;
             } else {
@@ -411,7 +411,7 @@
                   </div>
                   <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
                     <div style="font-size:.8rem; font-weight:bold; color:var(--text-color);">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
-                    <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position:static; width:24px; height:24px; font-size:.7rem;">🛒</button>
+                    <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position:static; width:24px; height:24px; font-size:.7rem;">${typeof KQIcon === "function" ? KQIcon("cart") : ""}</button>
                   </div>
                 </div>`;
             }
