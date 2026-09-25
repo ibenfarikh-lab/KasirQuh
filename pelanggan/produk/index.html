@@ -50,6 +50,23 @@
 </div>
 
 <main class="main-content kq-produk-main">
+  <!-- Header khusus halaman Produk: tanpa header/promo Home. -->
+  <section class="kq-produk-page-head" aria-labelledby="produk-page-title">
+    <div>
+      <div class="kq-produk-page-kicker">KATALOG</div>
+      <h1 id="produk-page-title">Produk</h1>
+      <small>/pelanggan/produk/</small>
+    </div>
+  </section>
+
+  <div class="sticky-search-bar kq-produk-search" id="sticky-search-container" style="display:block" role="search">
+    <div class="kq-produk-search-row">
+      <span class="kq-produk-search-icon" aria-hidden="true">⌕</span>
+      <input aria-label="Cari nama barang" id="inventory-search-input" oninput="filterKatalogPelanggan(this.value)" placeholder="Cari nama produk..." autocomplete="off" type="search">
+      <button aria-label="Kosongkan pencarian" data-kq-static-action="clear-produk-search" type="button">✕</button>
+    </div>
+  </div>
+
   <!-- SATU-SATUNYA KONTEN UTAMA: kategori + view + card produk. -->
   <div class="tab-content active" id="belanja" style="display:block">
     <div aria-label="Kategori produk" class="category-chips no-print" id="category-container">
