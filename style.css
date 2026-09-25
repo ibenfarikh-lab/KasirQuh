@@ -1,4 +1,0 @@
-@import url("_core/style.css");
-
-/* V14 Phase 3 — Home route */
-body[data-kq-route="home"] .kq-cart-page{display:none!important;}
