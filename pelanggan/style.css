@@ -2,3 +2,6 @@
 
 /* V14 Phase 3 — Home route */
 body[data-kq-route="home"] .kq-cart-page{display:none!important;}
+
+
+.home-more-products-btn{width:calc(100% - 12px);margin:8px 6px 14px;min-height:40px;border:1px solid rgba(59,130,246,.35);border-radius:12px;background:linear-gradient(135deg,rgba(37,99,235,.14),rgba(124,58,237,.14));color:var(--text-color);font-weight:800;font-size:.82rem;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:transform .16s ease,background .16s ease,border-color .16s ease}.home-more-products-btn:active{transform:scale(.98)}.home-more-products-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
