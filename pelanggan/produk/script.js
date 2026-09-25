@@ -1614,7 +1614,7 @@
         if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10;
         
         itemsHtml += `
-          <div onclick="openProductDetail('${code}')" class="trending-card">
+          <div onclick="goToProductDetail('${code}')" class="trending-card">
             <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3);">
             <div style="flex: 1; min-width: 0;">
               <div style="font-weight: bold; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
@@ -1668,6 +1668,12 @@
       renderCartPelanggan();
     }
 
+    function goToProductDetail(code) {
+      const id = String(code ?? '').trim();
+      if (!id) return;
+      window.location.href = `/pelanggan/produk/detail.html?id=${encodeURIComponent(id)}`;
+    }
+
     function refreshKatalogPelanggan() {
       const container = document.getElementById("pos-catalog-container"); const cardWrapper = document.getElementById("pos-card-wrapper");
       if (!container || !cardWrapper) return;
@@ -1713,7 +1719,7 @@
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
             container.innerHTML += `
-              <div class="catalog-card-view modern-product-card-view" onclick="openProductDetail('${code}')">
+              <div class="catalog-card-view modern-product-card-view" onclick="goToProductDetail('${code}')">
                 ${isHabis ? '<div class="modern-card-soldout"><span>HABIS</span></div>' : ''}
                 <div class="modern-card-stage">
                   ${sisaStokBadge ? `<div class="modern-card-stock-badge">🔥 Sisa ${p.stok}</div>` : ''}
@@ -1734,7 +1740,7 @@
               </div>`;
           } else {
             container.innerHTML += `
-              <div class="catalog-card-view generic-card-view" onclick="openProductDetail('${code}')">
+              <div class="catalog-card-view generic-card-view" onclick="goToProductDetail('${code}')">
                 ${isHabis ? '<div class="generic-card-soldout"><span>HABIS</span></div>' : ''}
                 <div class="generic-card-image-wrap">
                   ${sisaStokBadge}
@@ -1750,7 +1756,7 @@
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
             container.innerHTML += `
-              <div class="inv-card modern-product-card" onclick="openProductDetail('${code}')">
+              <div class="inv-card modern-product-card" onclick="goToProductDetail('${code}')">
                 ${isHabis ? '<div class="modern-product-soldout"><span>HABIS</span></div>' : ''}
                 <div class="modern-product-stage">
                   ${sisaStokBadge ? `<div class="modern-stock-badge">🔥 ${p.stok}</div>` : ''}
@@ -1771,7 +1777,7 @@
               </div>`;
           } else {
             container.innerHTML += `
-              <div class="inv-card" onclick="openProductDetail('${code}')">
+              <div class="inv-card" onclick="goToProductDetail('${code}')">
                 ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:8px; display:flex; align-items:center; justify-content:center;"><span style="background:#dc2626; color:#fff; font-weight:bold; padding:3px 8px; border-radius:6px; font-size:0.7rem; transform:rotate(-15deg);">HABIS</span></div>' : ''}
                 <div style="text-align: center; margin-bottom: 4px; position: relative;">
                   ${sisaStokBadge}
@@ -1787,7 +1793,7 @@
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
             container.innerHTML += `
-              <div class="catalog-list-item" onclick="openProductDetail('${code}')">
+              <div class="catalog-list-item" onclick="goToProductDetail('${code}')">
                 <div class="modern-list-photo-wrap" style="position: relative; flex-shrink: 0;">
                   ${sisaStokBadge}
                   <img src="${fotoSrc}" class="modern-list-photo" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
@@ -1804,7 +1810,7 @@
               </div>`;
           } else {
             container.innerHTML += `
-              <div class="catalog-list-item" onclick="openProductDetail('${code}')">
+              <div class="catalog-list-item" onclick="goToProductDetail('${code}')">
                 <div class="generic-list-image-wrap" style="position:relative; flex-shrink:0; width:45px; height:45px;">
                   ${sisaStokBadge}
                   <img src="${fotoSrc}" class="catalog-list-img" alt="${p.nama}">
@@ -2076,7 +2082,7 @@
           let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0; 
           if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10; 
           
-          itemsHtml += `<div class="reorder-card" onclick="openProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; 
+          itemsHtml += `<div class="reorder-card" onclick="goToProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; 
           renderedCount++; 
         } 
       });
