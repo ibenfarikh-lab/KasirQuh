@@ -1,54 +1,141 @@
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#2563eb"><title>Detail Produk - KasirQuh</title>
-<link rel="stylesheet" href="/pelanggan/style.css">
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Detail Produk - KasirQuh</title>
+<meta name="theme-color" content="#0f766e">
+<link rel="stylesheet" href="/pelanggan/produk/style.css?v=v14-detail">
+<style>
+/* Detail memakai bahasa visual halaman Produk; tidak membuat tema kedua. */
+.kq-detail-page{max-width:760px;margin:0 auto;padding:12px 10px 92px;min-height:100vh;box-sizing:border-box}
+.kq-detail-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.kq-detail-back{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--text-color);font-weight:800;font-size:.78rem}
+.kq-detail-title{font-size:.9rem;font-weight:800;color:var(--text-color)}
+.kq-detail-share{border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-color);border-radius:12px;width:38px;height:38px;cursor:pointer}
+.kq-detail-card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.08)}
+.kq-detail-photo{position:relative;background:var(--input-bg,#f8fafc);min-height:310px;display:grid;place-items:center;overflow:hidden}
+.kq-detail-photo img{width:100%;height:310px;object-fit:cover;display:block}
+.kq-detail-photo .placeholder{font-size:64px;opacity:.55}
+.kq-detail-body{padding:16px}
+.kq-detail-cat{font-size:.66rem;color:var(--text-muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.kq-detail-name{margin:5px 0 6px;font-size:1.22rem;line-height:1.2;color:var(--text-color)}
+.kq-detail-price{font-size:1.25rem;font-weight:900;color:#087f5b}
+body[data-theme="dark"] .kq-detail-price{color:#5ee0ae}
+.kq-detail-unit{font-size:.72rem;color:var(--text-muted);font-weight:600}
+.kq-detail-stock{display:inline-flex;margin-top:9px;padding:6px 9px;border-radius:999px;background:rgba(16,185,129,.12);color:#087f5b;font-size:.66rem;font-weight:800}
+.kq-detail-stock.out{background:rgba(239,68,68,.12);color:#dc2626}
+.kq-detail-desc{margin:13px 0 0;color:var(--text-color);opacity:.82;font-size:.78rem;line-height:1.55}
+.kq-detail-buy{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;margin-top:16px}
+.kq-detail-qty{display:flex;align-items:center;border:1px solid var(--border-color);border-radius:12px;overflow:hidden;background:var(--card-bg)}
+.kq-detail-qty button{width:38px;height:42px;border:0;background:transparent;color:var(--text-color);font-size:1.15rem;cursor:pointer}
+.kq-detail-qty output{min-width:30px;text-align:center;font-size:.82rem;font-weight:900;color:var(--text-color)}
+.kq-detail-add{height:42px;border:0;border-radius:12px;background:#087f5b;color:#fff;font-weight:900;cursor:pointer;padding:0 14px}
+.kq-detail-add:disabled{opacity:.45;cursor:not-allowed}
+.kq-detail-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.kq-detail-actions a,.kq-detail-actions button{min-height:38px;border:1px solid var(--border-color);border-radius:11px;background:var(--card-bg);color:var(--text-color);font-weight:800;font-size:.68rem;text-decoration:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.kq-detail-related{margin-top:18px}
+.kq-detail-related h2{font-size:.86rem;margin:0 0 9px;color:var(--text-color)}
+.kq-related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kq-related-card{border:1px solid var(--border-color);background:var(--card-bg);border-radius:13px;overflow:hidden;text-decoration:none;color:var(--text-color)}
+.kq-related-photo{height:78px;background:var(--input-bg);display:grid;place-items:center;font-size:25px}
+.kq-related-photo img{width:100%;height:100%;object-fit:cover}
+.kq-related-info{padding:7px}.kq-related-info strong{display:block;font-size:.67rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kq-related-info small{display:block;margin-top:3px;font-size:.61rem;font-weight:800;color:#087f5b}
+.kq-detail-empty{padding:35px 16px;text-align:center;color:var(--text-color)}
+.kq-detail-empty h1{font-size:1rem}.kq-detail-empty p{font-size:.75rem;color:var(--text-muted)}
+.kq-detail-toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%) translateY(12px);background:#111827;color:#fff;padding:9px 12px;border-radius:10px;font-size:.7rem;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:200}
+.kq-detail-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:720px){.kq-detail-photo,.kq-detail-photo img{height:420px}.kq-detail-photo{min-height:420px}.kq-detail-body{padding:20px}}
+</style>
 </head>
-<body>
-<header class="v14-header"><a href="/pelanggan/produk/" class="brand">← Produk</a><span>V14 · 03</span></header>
-<main class="v14-main detail-page">
-  <div id="detail" class="v14-detail" aria-live="polite"><p>Memuat produk…</p></div>
+<body data-theme="modern">
+<main class="kq-detail-page">
+  <div class="kq-detail-top">
+    <a class="kq-detail-back" href="/pelanggan/produk/">← Produk</a>
+    <span class="kq-detail-title">Detail Produk</span>
+    <button class="kq-detail-share" id="shareBtn" type="button" aria-label="Bagikan produk">↗</button>
+  </div>
+
+  <section id="detailRoot" aria-live="polite">
+    <div class="kq-detail-card kq-detail-empty"><p>Memuat produk…</p></div>
+  </section>
 </main>
-<nav class="v14-nav">
-  <a href="/pelanggan/">Beranda</a><a href="/pelanggan/produk/">Produk</a>
-  <a href="/pelanggan/keranjang/">Keranjang <span id="cartCount"></span></a>
-  <a href="/pelanggan/pesanan/">Pesanan</a><a href="/pelanggan/lainnya/">Lainnya</a>
+
+<nav class="permanent-bottom-bar no-print" aria-label="Navigasi pelanggan" style="display:flex;align-items:center;justify-content:space-around;padding:7px 6px;background:var(--card-bg);border-top:1px solid var(--border-color);position:fixed;bottom:0;left:0;width:100%;z-index:100;box-sizing:border-box;gap:4px">
+  <a href="/pelanggan/" class="v14-nav-link"><span>🏠</span><small>Home</small></a>
+  <a href="/pelanggan/produk/" class="v14-nav-link" aria-current="page"><span>🛍️</span><small>Produk</small></a>
+  <a href="/pelanggan/keranjang/" class="v14-nav-link"><span>🛒</span><small>Keranjang <b id="cartCount"></b></small></a>
+  <a href="/pelanggan/pesanan/" class="v14-nav-link"><span>📦</span><small>Pesanan</small></a>
+  <a href="/pelanggan/lainnya/" class="v14-nav-link"><span>☰</span><small>Lainnya</small></a>
 </nav>
+<div id="toast" class="kq-detail-toast" role="status"></div>
+
 <script type="module">
-import {initPage} from '/pelanggan/_core/page.js';
-import {subscribeProducts, normalizePrice, normalizeUnit} from '/pelanggan/_core/products.js';
-import {addCartItem, getCart} from '/pelanggan/_core/cart.js';
-import {escapeHtml, formatRupiah} from '/pelanggan/_core/utils.js';
-initPage({title:'Detail Produk',privatePage:false});
-const detail=document.getElementById('detail');
-const cartCount=document.getElementById('cartCount');
-const params=new URLSearchParams(location.search); const id=params.get('id');
-function updateCartCount(){const n=getCart().reduce((s,x)=>s+(Number(x.qty)||0),0); cartCount.textContent=n?`(${n})`:'';}
-function renderProduct(p){
- if(!p){detail.innerHTML='<div class="shell-card"><h1>Produk tidak ditemukan</h1><p>Produk mungkin sudah dihapus atau kode produk tidak valid.</p><a class="v14-btn" href="/pelanggan/produk/">Kembali ke Produk</a></div>'; return;}
- const stock=Math.max(0,Number(p.stok)||0); const price=normalizePrice(p); const unit=normalizeUnit(p);
- detail.innerHTML=`<article class="v14-detail-card">
-   <div class="v14-detail-photo">${p.foto?`<img src="${escapeHtml(p.foto)}" alt="${escapeHtml(p.nama||'Produk')}">`:'🛍️'}</div>
-   <div class="v14-detail-info">
-    <div class="eyebrow">DETAIL PRODUK</div><h1>${escapeHtml(p.nama||'Produk')}</h1>
-    <div class="v14-detail-price">${formatRupiah(price)} <small>/ ${escapeHtml(unit)}</small></div>
-    <div class="v14-stock">${stock>0?`Stok tersedia: ${stock}`:'Stok habis'}</div>
-    <p class="v14-detail-desc">${escapeHtml(p.deskripsi||p.keterangan||'Informasi produk tersedia dari data toko.')}</p>
-    <div class="v14-qty"><button id="minus" type="button">−</button><output id="qty">1</output><button id="plus" type="button">+</button></div>
-    <button id="add" class="v14-btn v14-btn-primary" type="button" ${stock<1?'disabled':''}>Tambah ke Keranjang</button>
-    <a class="v14-btn" href="/pelanggan/keranjang/">Lihat Keranjang</a>
-   </div>
- </article>`;
- let qty=1; const out=document.getElementById('qty');
- document.getElementById('minus').onclick=()=>{qty=Math.max(1,qty-1);out.value=qty;out.textContent=qty;};
- document.getElementById('plus').onclick=()=>{qty=Math.min(stock||1,qty+1);out.value=qty;out.textContent=qty;};
- document.getElementById('add').onclick=()=>{addCartItem({id:p.id,kode:p.kode||p.id,nama:p.nama||'Produk',harga:price,satuan:unit,foto:p.foto||'',qty});updateCartCount();};
+import { subscribeProducts, normalizePrice, normalizeUnit, productCategories } from '/pelanggan/_core/products.js';
+import { addCartItem, getCart } from '/pelanggan/_core/cart.js';
+import { escapeHtml, formatRupiah } from '/pelanggan/_core/utils.js';
+
+// Tema dan fungsi mengikuti halaman Produk; tidak membuat sistem tema baru.
+document.body.setAttribute('data-theme', ['light','dark','modern'].includes(localStorage.getItem('cust_theme_v13')) ? localStorage.getItem('cust_theme_v13') : 'modern');
+
+const root=document.getElementById('detailRoot');
+const params=new URLSearchParams(location.search);
+const id=params.get('id');
+let currentProduct=null;
+let currentQty=1;
+
+function cartTotal(){return getCart().reduce((n,item)=>n+(Number(item.qty)||0),0)}
+function updateCartCount(){const n=cartTotal();document.getElementById('cartCount').textContent=n?`(${n})`:''}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(window.__kqToast);window.__kqToast=setTimeout(()=>el.classList.remove('show'),1800)}
+function relatedProducts(products,p){
+  const cats=new Set(productCategories(p).map(x=>x.toLowerCase()));
+  return Object.values(products).filter(x=>x.id!==p.id && productCategories(x).some(c=>cats.has(c.toLowerCase()))).slice(0,3);
 }
+function render(p,products){
+  currentProduct=p;
+  if(!p){root.innerHTML='<div class="kq-detail-card kq-detail-empty"><h1>Produk tidak ditemukan</h1><p>Produk mungkin sudah dihapus atau ID produk tidak valid.</p><a class="v14-btn" href="/pelanggan/produk/">Kembali ke Produk</a></div>';return;}
+  const stock=Math.max(0,Number(p.stok)||0);
+  currentQty=Math.min(Math.max(1,currentQty),Math.max(stock,1));
+  const price=normalizePrice(p), unit=normalizeUnit(p);
+  const cats=productCategories(p);
+  const related=relatedProducts(products,p);
+  root.innerHTML=`
+  <article class="kq-detail-card">
+    <div class="kq-detail-photo">${p.foto?`<img src="${escapeHtml(p.foto)}" alt="${escapeHtml(p.nama||'Produk')}" loading="eager">`:'<span class="placeholder">🛍️</span>'}</div>
+    <div class="kq-detail-body">
+      <div class="kq-detail-cat">${escapeHtml(cats[0]||'Produk')}</div>
+      <h1 class="kq-detail-name">${escapeHtml(p.nama||'Produk')}</h1>
+      <div class="kq-detail-price">${formatRupiah(price)} <span class="kq-detail-unit">/ ${escapeHtml(unit)}</span></div>
+      <span class="kq-detail-stock ${stock<1?'out':''}">${stock>0?`Stok: ${stock} ${escapeHtml(unit)}`:'Stok habis'}</span>
+      <p class="kq-detail-desc">${escapeHtml(p.deskripsi||p.keterangan||'Produk pilihan toko. Silakan cek stok sebelum menambahkan ke keranjang.')}</p>
+      <div class="kq-detail-buy">
+        <div class="kq-detail-qty"><button id="minus" type="button" aria-label="Kurangi">−</button><output id="qty">${currentQty}</output><button id="plus" type="button" aria-label="Tambah">+</button></div>
+        <button id="add" class="kq-detail-add" type="button" ${stock<1?'disabled':''}>＋ Tambah ke Keranjang</button>
+      </div>
+      <div class="kq-detail-actions">
+        <a href="/pelanggan/keranjang/">🛒 Keranjang</a>
+        <button id="shareProduct" type="button">↗ Bagikan</button>
+        <a href="/pelanggan/ai/">✦ Tanya AI</a>
+      </div>
+    </div>
+  </article>
+  ${related.length?`<section class="kq-detail-related"><h2>Produk Terkait</h2><div class="kq-related-grid">${related.map(x=>`<a class="kq-related-card" href="/pelanggan/produk/detail.html?id=${encodeURIComponent(x.id)}"><div class="kq-related-photo">${x.foto?`<img src="${escapeHtml(x.foto)}" alt="${escapeHtml(x.nama||'Produk')}" loading="lazy">`:'🛍️'}</div><div class="kq-related-info"><strong>${escapeHtml(x.nama||'Produk')}</strong><small>${formatRupiah(normalizePrice(x))}</small></div></a>`).join('')}</div></section>`:''}`;
+  const qtyOut=document.getElementById('qty');
+  document.getElementById('minus').onclick=()=>{currentQty=Math.max(1,currentQty-1);qtyOut.textContent=currentQty};
+  document.getElementById('plus').onclick=()=>{currentQty=Math.min(stock||1,currentQty+1);qtyOut.textContent=currentQty};
+  document.getElementById('add').onclick=()=>{addCartItem({id:p.id,kode:p.kode||p.id,nama:p.nama||'Produk',harga:price,satuan:unit,foto:p.foto||'',qty:currentQty});updateCartCount();toast(`${p.nama||'Produk'} masuk keranjang`)};
+  document.getElementById('shareProduct').onclick=share;
+}
+async function share(){
+  if(!currentProduct)return;
+  const url=location.href;
+  const text=`${currentProduct.nama||'Produk'} — ${formatRupiah(normalizePrice(currentProduct))}`;
+  try{if(navigator.share){await navigator.share({title:currentProduct.nama||'Produk',text,url});}else{await navigator.clipboard.writeText(url);toast('Link produk disalin')}}catch{}
+}
+document.getElementById('shareBtn').onclick=share;
 updateCartCount();
 window.addEventListener('kq:cart-changed',updateCartCount);
-if(!id){renderProduct(null);} else {subscribeProducts((products,error)=>{if(error){detail.innerHTML='<div class="shell-card"><h1>Produk belum dapat dimuat</h1><p>Coba refresh halaman.</p></div>';return;} renderProduct(products[id]);});}
+if(!id){render(null,{});}else{subscribeProducts((products,error)=>{if(error){root.innerHTML='<div class="kq-detail-card kq-detail-empty"><h1>Produk belum dapat dimuat</h1><p>Coba refresh halaman.</p></div>';return;}render(products[id],products);});}
 </script>
-</body></html>
+</body>
+</html>
