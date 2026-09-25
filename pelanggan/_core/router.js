@@ -21,7 +21,7 @@
         return;
       }
       const s=document.createElement('script');
-      s.src='/pelanggan/_core/modules/'+name+'.js';
+      s.src='/pelanggan/_core/modules/'+name+'.js?v=20260925-fix2';
       s.dataset.kqModule=name;
       s.onload=()=>resolve(window.KQModules?.[name]);
       s.onerror=reject;

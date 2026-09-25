@@ -291,6 +291,8 @@ const storeCollection = (...args) => window.storeCollection(...args);
       // Phase 18: Firebase customer data/listeners are NEVER initialized from a cached phone alone.
       // The session must first be validated against Firestore by the auth module.
       const bootAuthenticatedCustomerData = () => {
+        if (window.__KQCustomerDataBooted) return;
+        window.__KQCustomerDataBooted = true;
         initFirebaseListeners();
         if (route === 'home' || route === 'akun' || route === 'keranjang' || route === 'chat') muatDataPelangganRealtime();
         if (route === 'home' || route === 'akun') muatRiwayatPesananOnlinePelanggan();
@@ -299,7 +301,9 @@ const storeCollection = (...args) => window.storeCollection(...args);
       };
 
       if (window.KQAuthSession) {
-        window.KQAuthSession.validate().then((ok) => {
+        if (window.KQAuthSession.isValidated && window.KQAuthSession.isValidated()) {
+          bootAuthenticatedCustomerData();
+        } else window.KQAuthSession.validate().then((ok) => {
           if (ok) bootAuthenticatedCustomerData();
         });
       } else {
@@ -441,7 +445,7 @@ const storeCollection = (...args) => window.storeCollection(...args);
 
     function periksaCheckinHarian() { if(!currentCustomerPhone) return; if(localStorage.getItem('admin_koin_warga_enabled') === 'false') return; let today = new Date().toLocaleDateString('id-ID'); let lastCheckin = localStorage.getItem('last_checkin_date_' + currentCustomerPhone); if(lastCheckin !== today) { const bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); const p=document.querySelector('#dailyCheckinModal p'); if(p) p.innerText='Selamat! Kamu rajin buka aplikasi hari ini. Ini ' + bonus + ' Koin untukmu!'; setTimeout(() => { appOpenModal('dailyCheckinModal'); document.getElementById('dailyCheckinModal').style.display = 'flex'; }, 1500); } }
     function klaimKoinHarian() { let today = new Date().toLocaleDateString('id-ID'); localStorage.setItem('last_checkin_date_' + currentCustomerPhone, today); let bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); let currentCoins = parseInt(localStorage.getItem('koin_warga_' + currentCustomerPhone)) || 0; localStorage.setItem('koin_warga_' + currentCustomerPhone, currentCoins + bonus); if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'dailyCheckinModal') history.back(); else document.getElementById('dailyCheckinModal').style.display = 'none'; showToast('🪙 Yey! ' + bonus + ' Koin berhasil ditambahkan ke dompetmu.'); playBeep(); tampilkanKoinDiProfil(); }
-    function tampilkanKoinDiProfil() { let coins = localStorage.getItem('koin_warga_' + currentCustomerPhone) || 0; document.getElementById('profile-coins').innerText = coins; }
+    function tampilkanKoinDiProfil() { let coins = localStorage.getItem('koin_warga_' + currentCustomerPhone) || 0; const el = document.getElementById('profile-coins'); if (el) el.innerText = coins; }
 
     window.__promoRenderHook = renderPromoTokoPelanggan;
 
