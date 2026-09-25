@@ -1,309 +1,155 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="id">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#2563eb"><title>Keranjang - KasirQuh</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Keranjang - KasirQuh</title>
+<meta content="#2563eb" name="theme-color"/>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<link rel="stylesheet" href="/pelanggan/style.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css">
-<style id="v14-modern-navbar-style">
-.has-v14-modern-navbar{padding-bottom:82px}
-@media (min-width:768px){.has-v14-modern-navbar{padding-bottom:104px}}
-.v14-modern-navbar{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;align-items:center;justify-content:space-around;gap:6px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--card-bg,#fff) 94%,transparent);border-top:1px solid var(--border-color,rgba(148,163,184,.25));box-shadow:0 -8px 28px rgba(15,23,42,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-.v14-modern-navbar .v14-nav-link{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 4px;border-radius:14px;text-decoration:none;color:var(--text-color,#64748b);font-weight:700;transition:transform .18s ease,color .18s ease,background .18s ease,box-shadow .18s ease}
-.v14-modern-navbar .v14-nav-icon{font-size:22px;line-height:1;display:grid;place-items:center;transition:transform .18s ease,filter .18s ease}
-.v14-modern-navbar small{font-size:.64rem;line-height:1.05;white-space:nowrap}
-.v14-modern-navbar .v14-nav-link:hover{transform:translateY(-1px)}
-.v14-modern-navbar .v14-nav-link.is-active{color:#2563eb;background:rgba(37,99,235,.10);box-shadow:inset 0 0 0 1px rgba(37,99,235,.12),0 4px 14px rgba(37,99,235,.10)}
-.v14-modern-navbar .v14-nav-link.is-active .v14-nav-icon{transform:translateY(-1px) scale(1.10);filter:drop-shadow(0 4px 8px rgba(37,99,235,.22))}
-.v14-modern-navbar .v14-nav-link.is-active::after{content:"";position:absolute;bottom:3px;width:18px;height:3px;border-radius:999px;background:currentColor}
-@media (min-width:768px){.v14-modern-navbar{left:50%;right:auto;width:min(680px,calc(100% - 32px));transform:translateX(-50%);bottom:16px;border:1px solid var(--border-color,rgba(148,163,184,.25));border-radius:22px;padding:9px 12px}.v14-modern-navbar .v14-nav-link{padding:9px 8px}.v14-modern-navbar small{font-size:.68rem}}
-</style>
-
-<style id="v14-cart-badge-style">
-.v14-nav-icon-wrap{position:relative;display:grid;place-items:center;line-height:1}
-.v14-cart-badge{position:absolute;top:-9px;right:-13px;min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;border-radius:999px;background:#dc2626;color:#fff;border:2px solid var(--card-bg,#fff);font-size:9px;line-height:1;font-weight:900;box-shadow:0 3px 8px rgba(220,38,38,.28);z-index:2}
-.v14-cart-badge[hidden]{display:none}
-</style>
+<link href="style.css" rel="stylesheet"/>
 </head>
+<body data-kq-route="keranjang" data-theme="modern" style="font-size: 0.85rem;"><div class="login-overlay" id="customerLoginModal" style="display: flex;">
+<div class="login-card" style="max-height: 90vh; overflow-y: auto; padding: 16px;">
+<h2 style="margin-top: 0; margin-bottom: 4px; font-size: 1.3rem;">KasirQuh</h2>
+<div id="formLoginContainer">
+<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Silakan masuk dengan No. WhatsApp &amp; Sandi</p>
+<form class="form-vertical" onsubmit="prosesLoginPelanggan(event)" style="gap: 8px;">
+<input aria-label="Nomor WhatsApp untuk masuk" id="cust-login-phone" placeholder="No. WhatsApp (Cth: 08123...)" required="" style="padding: 10px; font-size: 0.85rem;" type="text"/>
+<input aria-label="Sandi untuk masuk" id="cust-login-pass" placeholder="Sandi" required="" style="padding: 10px; font-size: 0.85rem;" type="password"/>
+<button style="margin-top: 6px; border-radius: 6px; padding: 10px; background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;" type="submit">Masuk</button>
+</form>
+<p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Belum punya akun? <a data-kq-static-action="auth-register" href="javascript:void(0)" style="color: #2563eb; font-weight: bold;">Daftar di sini</a></p>
+</div>
+<div id="formRegisterContainer" style="display: none;">
+<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Daftar Akun (Menunggu Persetujuan Admin)</p>
+<form class="form-vertical" onsubmit="prosesDaftarPelanggan(event)" style="gap: 8px;">
+<input aria-label="Nama lengkap pelanggan" id="cust-reg-name" placeholder="Nama Lengkap" required="" style="padding: 10px; font-size: 0.85rem;" type="text"/>
+<input aria-label="Nomor WhatsApp pelanggan" id="cust-reg-phone" placeholder="No. WhatsApp (Cth: 08123...)" required="" style="padding: 10px; font-size: 0.85rem;" type="text"/>
+<textarea aria-label="Alamat pengiriman lengkap" id="cust-reg-address" placeholder="Alamat Pengiriman Lengkap" required="" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px; font-size: 0.85rem;"></textarea>
+<input aria-label="Sandi pelanggan" id="cust-reg-pass" placeholder="Buat Sandi" required="" style="padding: 10px; font-size: 0.85rem;" type="password"/>
+<button style="margin-top: 6px; border-radius: 6px; padding: 10px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;" type="submit">Kirim Pendaftaran</button>
+</form>
+<p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Sudah punya akun? <a data-kq-static-action="auth-login" href="javascript:void(0)" style="color: #2563eb; font-weight: bold;">Masuk di sini</a></p>
+</div>
+</div>
+</div><div class="modal-backdrop" id="dailyCheckinModal" style="display: none;">
+<div class="modal-content modal-checkin-content" style="background: var(--card-bg); max-width: 300px;">
+<div style="font-size: 3rem; margin-bottom: 8px;">🪙</div>
+<h2 style="margin: 0 0 8px 0; color: #d97706; font-size: 1.2rem;">Bonus Warga!</h2>
+<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Selamat! Kamu rajin buka aplikasi hari ini. Ini 10 Koin untukmu!</p>
+<button data-kq-static-action="claim-coin" style="background: #16a34a; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; font-size: 0.85rem; cursor: pointer; width: 100%; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.3);" type="button">Klaim Koin Sekarang</button>
+</div>
+</div><div class="main-content" data-kq-page-content=""><div class="modal-backdrop" id="cartModal" onclick="if(event.target === this) closeCartModal()">
+<div class="modal-content" style="max-width: 380px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 12px; background: var(--card-bg); display: flex; flex-direction: column; gap: 6px;; width:100%; max-width:520px; max-height:none; min-height:70vh;">
+<div class="modal-header no-print" style="margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+<h3 style="font-size: 1rem; margin: 0;">Keranjang Belanja</h3>
+<button class="btn-close-modal" onclick="closeCartModal()" style="font-size: 1.1rem; background:none; border:none; cursor:pointer; color:var(--text-color);" type="button">×</button>
+</div>
+<div class="receipt-header" style="margin-bottom: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+<h3 id="receipt-shop-name" style="margin: 0; font-size: 0.9rem;">Nama Toko</h3>
+<p id="receipt-shop-address" style="margin: 0; font-size: 0.7rem; color: var(--text-muted);">Alamat Toko</p>
+</div>
+<div class="cart-table-wrapper" style="max-height: 26vh; overflow-y: auto;">
+<table class="cart-table" style="font-size: 0.78rem; width: 100%;">
+<thead>
+<tr>
+<th style="width: 42%;">Barang</th>
+<th style="width: 34%; text-align: center;">Atur Qty</th>
+<th style="width: 24%; text-align: right;">Total</th>
+</tr>
+</thead>
+<tbody id="cart-body"></tbody>
+</table>
+</div>
+<div class="summary-box" style="padding: 2px 0; display: flex; flex-direction: column; gap: 4px;">
+<div style="font-size: 0.85rem; font-weight: bold; display: flex; justify-content: space-between;"><span>Total:</span> <span style="color: #16a34a;">Rp <span id="grand-total">0</span></span></div>
+<div class="no-print" style="display: flex; flex-direction: column; gap: 4px;">
+<div style="display: flex; align-items: center; gap: 4px;">
+<label style="font-size: 0.72rem; font-weight: 600; width: 35%;">Pembayaran:</label>
+<select aria-label="Metode pembayaran" id="pay-method-cust" onchange="togglePayMethodCust()" style="flex: 1; font-size: 0.75rem; padding: 4px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
+<option value="COD">COD (Bayar di Tempat)</option>
+<option value="TF">Transfer Bank</option>
+<option value="WhatsApp">Pesan via WA</option>
+</select>
+</div>
+<div id="wrapper-tf-proof" style="display: none; padding: 4px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: 4px;">
+<label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 2px;">Bukti Transfer:</label>
+<input accept="image/*" aria-label="Bukti pembayaran" id="cust-proof-file" onchange="handleProofUpload(event)" style="font-size: 0.68rem; width: 100%;" type="file"/>
+<input id="cust-proof-base64" type="hidden" value=""/>
+</div>
+<div style="padding: 6px; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--input-border); display: flex; flex-direction: column; gap: 4px;">
+<label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.73rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
+<span>🌟 Simpan jadi Menu Resep</span>
+<input aria-label="Simpan resep pesanan" id="cust-save-recipe-toggle" onchange="toggleSaveRecipeOptions(this.checked)" style="margin: 0;" type="checkbox"/>
+</label>
+<div id="wrapper-save-recipe-fields" style="display: none; flex-direction: column; gap: 4px; margin-top: 2px;">
+<input aria-label="Nama resep" id="cust-save-recipe-name" placeholder="Nama Menu (Cth: Sop Spesial Weekend)" style="width: 100%; font-size: 0.73rem; padding: 5px 6px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;" type="text"/>
+<label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; cursor: pointer; color: var(--text-color); margin: 0;">
+<span>📢 Bagikan otomatis ke Chat Rumpi</span>
+<input aria-label="Bagikan ke Rumpi" checked="" id="cust-share-rumpi-toggle" style="margin: 0;" type="checkbox"/>
+</label>
+</div>
+</div>
+<textarea aria-label="Catatan pesanan" id="cust-order-note" placeholder="Catatan untuk toko (opsional)..." rows="1" style="width: 100%; font-size: 0.75rem; padding: 5px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;"></textarea>
+</div>
+</div>
+<div class="no-print" style="display: flex; gap: 4px;">
+<button class="btn-success" onclick="prosesCheckoutPelanggan()" style="flex: 1; background: #16a34a; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;" type="button">
+              🛒 Belanja Sekarang
+            </button>
+<button onclick="prosesSimpanMenuSaja()" style="flex: 1; background: #7c3aed; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;" type="button">
+              💾 Simpan Menu Saja
+            </button>
+</div>
+<button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 0; padding: 4px; font-size: 0.72rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;" type="button">🗑️ Kosongkan Keranjang</button>
+</div>
+</div></div><div class="modal-backdrop" id="productDetailModal" onclick="if(event.target === this) closeProductDetail()">
+<div class="product-detail-box">
+<div style="position: relative;">
+<img alt="Gambar produk" id="detail-img" src="" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px 16px 0 0;"/>
+<button onclick="closeProductDetail()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;" type="button">✕</button>
+</div>
+<div style="padding: 12px; overflow-y: auto;">
+<div id="detail-category" style="font-size: 0.65rem; color: #67e8f9; font-weight: bold; margin-bottom: 2px; text-transform: uppercase;">KATEGORI</div>
+<h2 id="detail-name" style="margin: 0 0 4px 0; font-size: 1rem; color: var(--text-color);">Nama Produk</h2>
+<div id="detail-price" style="font-size: 1.15rem; font-weight: 800; color: #4ade80; margin-bottom: 10px;">Rp 0</div>
+<div style="background: var(--bg-color); padding: 8px 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+<div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Sisa Stok: <strong id="detail-stock" style="color: var(--text-color);">0</strong></div>
+<div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">Deskripsi: <span id="detail-desc" style="color: var(--text-color);">Tidak ada deskripsi dari toko.</span></div>
+</div>
+<!-- Input Qty dan Tambah Keranjang -->
+<div style="display: flex; gap: 8px; margin-bottom: 8px;">
+<div style="display: flex; align-items: center; gap: 3px;">
+<button class="qty-btn" onclick="ubahQtyDetail(-1)" type="button">-</button>
+<input aria-label="Jumlah produk" id="detail-qty-input" readonly="" style="width: 55px; height: 34px; text-align: center; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); font-weight: bold; color: var(--text-color); font-size: 0.85rem;" type="text" value="1"/>
+<button class="qty-btn" onclick="ubahQtyDetail(1)" type="button">+</button>
+</div>
+<button id="btn-detail-add" style="flex: 1; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 3px 8px rgba(37,99,235,0.3); display: flex; justify-content: center; align-items: center; gap: 6px; padding: 0 10px;" type="button">
+<svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"></path></svg> Masukkan
+          </button>
+</div>
+<!-- Tombol Bagikan Produk via WA -->
+<button onclick="bagikanProdukViaWA()" style="width: 100%; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;" type="button">
+          💬 Bagikan Produk via WA
+        </button>
+<button onclick="tanyaAdminBarang()" style="width: 100%; background: var(--card-bg); color: #16a34a; border: 1.2px solid #16a34a; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;" type="button">
+          💬 Tanya Admin soal barang ini
+        </button>
+</div>
+</div>
+</div><div class="toast" id="toastNotification">Notifikasi</div><nav aria-label="Navigasi pelanggan" class="kq-bottom-nav no-print" id="kq-bottom-nav">
+<a class="kq-nav-item" data-route="home" href="/pelanggan/"><span class="kq-nav-icon">🏠</span><span>Beranda</span></a>
+<a class="kq-nav-item" data-route="produk" href="/pelanggan/produk/"><span class="kq-nav-icon">🛍️</span><span>Produk</span></a>
+<a class="kq-nav-item kq-nav-cart" data-route="keranjang" href="/pelanggan/keranjang/"><span class="kq-nav-icon">🛒</span><span>Keranjang</span><b id="kq-nav-cart-badge">0</b></a>
+<a class="kq-nav-item" data-route="chat" href="/pelanggan/chat/"><span class="kq-nav-icon">🗨️</span><span>Chat</span><b class="kq-nav-badge" id="kq-nav-chat-badge">0</b></a>
+<a class="kq-nav-item" data-route="akun" href="/pelanggan/akun/"><span class="kq-nav-icon">👤</span><span>Akun</span></a>
+</nav><div aria-hidden="true" class="kq-legacy-bottom-hooks"><span id="bottom-bar-title">Belanja</span><span id="pagination-box" style="display:none"><span id="pos-page-indicator">1/1</span></span></div><script src="../_core/modules/products.js"></script>
+<script src="../_core/modules/cart.js"></script><script src="../_core/modules/transactions.js"></script><script src="../_core/script.js"></script><script>window.KQ_CUSTOMER_PAGE={route:"keranjang",tab:"cart",category:"Home"};</script><script src="../_core/router.js"></script><script src="script.js"></script></body>
+\n\n
 
-</head><body>
-<main class="v14-cart-page">
-  <header class="v14-cart-page-head">
-    <div>
-      <span class="eyebrow">KERANJANG</span>
-      <h1>Keranjang</h1>
-      <p id="cartSubtitle">Memuat keranjang…</p>
-    </div>
-    <a class="v14-cart-head-action" href="/pelanggan/produk/" aria-label="Lanjut belanja"><i class="ti ti-shopping-bag"></i></a>
-  </header>
-  <section id="cartRoot" aria-live="polite"></section>
-</main>
-<section id="checkoutOverlay" class="v14-cart-checkout-layer" hidden aria-hidden="true">
-  <div class="v14-cart-checkout-sheet" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
-    <header class="v14-cart-checkout-head">
-      <button id="closeCheckout" class="v14-icon-btn" type="button" aria-label="Tutup checkout"><i class="ti ti-arrow-left"></i></button>
-      <div><span class="eyebrow">CHECKOUT</span><h1 id="checkoutTitle">Konfirmasi Pesanan</h1><p id="checkoutSubtitle">Memuat pesanan…</p></div>
-      <span class="v14-checkout-head-mark"><i class="ti ti-shopping-cart"></i></span>
-    </header>
-    <main id="checkoutRoot" class="v14-cart-checkout-content" aria-live="polite"></main>
-  </div>
-</section>
-
-<script type="module">
-import {initPage} from '/pelanggan/_core/page.js';
-import {getCart, updateCartItem, clearCart} from '/pelanggan/_core/cart.js';
-import {isCustomerLoggedIn, requireCustomer, getCustomerPhone} from '/pelanggan/_core/auth.js';
-import {storeCollection, db} from '/pelanggan/_core/firestore.js';
-import {subscribeProducts, getStoreConfig} from '/pelanggan/_core/products.js';
-import {escapeHtml, formatRupiah} from '/pelanggan/_core/utils.js';
-initPage({title:'Keranjang',privatePage:false});
-const cartRoot=document.getElementById('cartRoot'), cartSubtitle=document.getElementById('cartSubtitle');
-const checkoutOverlay=document.getElementById('checkoutOverlay');
-const closeCheckoutBtn=document.getElementById('closeCheckout');
-let checkoutProducts={}; let checkoutStore={}; let checkoutProofBase64='';
-function cartKey(item){ return String(item?.id ?? item?.code ?? item?.kode ?? item?.productId ?? item?.nama ?? ''); }
-function getProductForCart(item){
-  const key=cartKey(item);
-  return checkoutProducts[key] || checkoutProducts[String(item?.code ?? item?.kode ?? item?.id ?? '')] || null;
-}
-function cartStep(item){
-  const p=getProductForCart(item);
-  const satuan=String(p?.satuan ?? item?.satuan ?? '').toLowerCase().trim();
-  return (satuan==='kg'||satuan==='kilogram') ? 0.25 : 1;
-}
-function cartStock(item){
-  const p=getProductForCart(item);
-  return p ? Number(p.stok)||0 : Infinity;
-}
-function render(){
- const cart=getCart();
- const totalQty=cart.reduce((s,x)=>s+(Number(x.qty)||0),0);
- const total=cart.reduce((s,x)=>s+(Number(x.harga)||0)*(Number(x.qty)||0),0);
- cartSubtitle.textContent=cart.length?`${totalQty} item · ${cart.length} produk`:'Keranjang kamu masih kosong';
- if(!cart.length){
-   cartRoot.innerHTML=`<section class="v14-cart-empty"><div class="v14-cart-empty-icon"><i class="ti ti-shopping-cart-off"></i></div><h2>Keranjang masih kosong</h2><p>Pilih produk yang ingin kamu beli. Produk yang kamu masukkan akan muncul di sini.</p><a class="v14-btn v14-btn-primary" href="/pelanggan/produk/"><i class="ti ti-shopping-bag"></i> Mulai Belanja</a></section>`;
-   return;
- }
- cartRoot.innerHTML=`
-   <div class="v14-cart-items-head"><strong>${totalQty} item</strong><span>${cart.length} produk</span></div>
-   <div class="v14-cart-list">${cart.map(item=>{
-     const id=escapeHtml(cartKey(item));
-     const qty=Math.max(0,Number(item.qty)||0);
-     const price=Number(item.harga)||0;
-     const satuan=String(getProductForCart(item)?.satuan ?? item.satuan ?? '').trim();
-     const stock=cartStock(item);
-     const maxed=Number.isFinite(stock) && qty>=stock;
-     return `<article class="v14-cart-item" data-id="${id}">
-       <div class="v14-cart-photo">${item.foto?`<img src="${escapeHtml(item.foto)}" alt="${escapeHtml(item.nama||'Produk')}" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('is-fallback')">`:'<i class="ti ti-photo-off"></i>'}</div>
-       <div class="v14-cart-info">
-         <div class="v14-cart-name-row"><h2>${escapeHtml(item.nama||'Produk')}</h2><button class="cart-remove" type="button" aria-label="Hapus ${escapeHtml(item.nama||'produk')}"><i class="ti ti-trash"></i></button></div>
-         <p class="v14-cart-unit">${formatRupiah(price)}${satuan?` / ${escapeHtml(satuan)}`:''}</p>
-         <div class="v14-cart-bottom">
-           <div class="v14-qty-control" aria-label="Atur jumlah">
-             <button class="qty-minus" type="button" aria-label="Kurangi"><i class="ti ti-minus"></i></button>
-             <output>${qty}</output>
-             <button class="qty-plus" type="button" aria-label="Tambah" ${maxed?'disabled':''}><i class="ti ti-plus"></i></button>
-           </div>
-           <strong class="v14-cart-line">${formatRupiah(price*qty)}</strong>
-         </div>
-       </div>
-     </article>`;
-   }).join('')}</div>
-   <section class="v14-cart-summary">
-     <div class="v14-cart-summary-row"><span>Total (${totalQty} item)</span><strong>${formatRupiah(total)}</strong></div>
-     <p>Periksa kembali barang dan jumlahnya. Setelah siap, lanjut ke Checkout untuk memilih pembayaran.</p>
-     <div class="v14-cart-summary-actions"><button id="clearCart" class="v14-btn v14-btn-light" type="button"><i class="ti ti-trash"></i> Kosongkan</button><button id="openCheckout" class="v14-btn v14-btn-primary" type="button"><i class="ti ti-arrow-right"></i> Checkout</button></div>
-   </section>`;
- cartRoot.querySelectorAll('.v14-cart-item').forEach(card=>{
-   const id=card.dataset.id; const current=getCart().find(x=>cartKey(x)===id); if(!current) return;
-   const step=cartStep(current);
-   card.querySelector('.qty-minus').onclick=()=>{ const next=Math.max(0,(Number(current.qty)||0)-step); updateCartItem(id,Number(next.toFixed(3))); };
-   card.querySelector('.qty-plus').onclick=()=>{ const stock=cartStock(current); const next=(Number(current.qty)||0)+step; if(Number.isFinite(stock)&&next>stock){alert(`Stok ${current.nama||'produk'} hanya ${stock}.`);return;} updateCartItem(id,Number(next.toFixed(3))); };
-   card.querySelector('.cart-remove').onclick=()=>updateCartItem(id,0);
- });
- document.getElementById('clearCart').onclick=()=>{ if(confirm('Kosongkan semua isi keranjang?')) clearCart(); };
- document.getElementById('openCheckout').onclick=openCheckout;
-}
-window.addEventListener('kq:cart-changed',render);
-render();
 
 
 
-const checkoutRoot=document.getElementById('checkoutRoot');
-const checkoutSubtitle=document.getElementById('checkoutSubtitle');
-
-
-function showMessage(title,text,action=''){
- checkoutRoot.innerHTML=`<div class="shell-card v14-empty"><div class="v14-empty-icon">${action?'🛒':'ℹ️'}</div><h2>${escapeHtml(title)}</h2><p>${escapeHtml(text)}</p>${action?`<a class="v14-btn v14-btn-primary" href="${action}">Kembali ke Keranjang</a>`:''}</div>`;
-}
-function cartTotal(cart){return cart.reduce((sum,item)=>sum+(Number(item.harga)||0)*(Number(item.qty)||0),0);}
-function renderCheckout(){
- const cart=getCart();
- if(!cart.length){checkoutSubtitle.textContent='Tidak ada barang untuk diproses.';showMessage('Keranjang kosong','Tambahkan produk terlebih dahulu sebelum checkout.','/pelanggan/produk/');return;}
- const total=cartTotal(cart); const qty=cart.reduce((s,x)=>s+(Number(x.qty)||0),0);
- checkoutSubtitle.textContent=`${cart.length} produk · ${qty} item · ${formatRupiah(total)}`;
- checkoutRoot.innerHTML=`
- <div class="v14-checkout-grid">
-   <section class="v14-checkout-card">
-     <div class="v14-card-title"><span>🛍️</span><h2>Ringkasan Belanja</h2></div>
-     <div class="v14-checkout-items">${cart.map(item=>`<article class="v14-checkout-item">
-       <div class="v14-checkout-photo">${item.foto?`<img src="${escapeHtml(item.foto)}" alt="${escapeHtml(item.nama||'Produk')}">`:'🛍️'}</div>
-       <div><strong>${escapeHtml(item.nama||'Produk')}</strong><small>${Number(item.qty)||0} × ${formatRupiah(Number(item.harga)||0)}${item.satuan?` / ${escapeHtml(item.satuan)}`:''}</small></div>
-       <b>${formatRupiah((Number(item.harga)||0)*(Number(item.qty)||0))}</b>
-     </article>`).join('')}</div>
-     <div class="v14-checkout-total"><span>Total Belanja</span><strong>${formatRupiah(total)}</strong></div>
-   </section>
-   <section class="v14-checkout-card">
-     <div class="v14-card-title"><span>💳</span><h2>Pembayaran</h2></div>
-     <label class="v14-field"><span>Metode pembayaran</span><select id="payMethod"><option value="COD">COD (Bayar di Tempat)</option><option value="TF">Transfer Bank</option><option value="WhatsApp">Pesan via WhatsApp</option></select></label>
-     <div id="proofWrap" class="v14-proof" hidden><label class="v14-field"><span>Bukti transfer</span><input id="proofFile" type="file" accept="image/*"></label><small id="proofStatus">Belum ada bukti transfer.</small></div>
-     <label class="v14-field"><span>Catatan untuk toko <em>(opsional)</em></span><textarea id="orderNote" rows="3" placeholder="Contoh: kirim sore hari…"></textarea></label>
-   </section>
-   <section class="v14-checkout-card">
-     <div class="v14-card-title"><span>🌟</span><h2>Simpan sebagai Menu Resep</h2></div>
-     <label class="v14-check"><input id="saveRecipe" type="checkbox"><span>Simpan menu ini ke akun saya</span></label>
-     <div id="recipeOptions" class="v14-recipe-options" hidden>
-       <label class="v14-field"><span>Nama menu</span><input id="recipeName" type="text" placeholder="Contoh: Sop Spesial Weekend"></label>
-       <label class="v14-check"><input id="shareRumpi" type="checkbox" checked><span>Bagikan otomatis ke Chat Rumpi</span></label>
-     </div>
-     <button id="saveOnly" class="v14-btn" type="button">💾 Simpan Menu Saja</button>
-   </section>
-   <section class="v14-checkout-card v14-checkout-action-card">
-     <div class="v14-checkout-total"><span>Total yang diproses</span><strong>${formatRupiah(total)}</strong></div>
-     <button id="placeOrder" class="v14-btn v14-btn-primary" type="button">🛒 Belanja Sekarang</button>
-     <a class="v14-btn" href="/pelanggan/keranjang/">← Kembali ke Keranjang</a>
-     <p class="v14-muted">Pesanan akan disimpan ke transaksi toko. Untuk metode WhatsApp, detail pesanan juga akan dikirim ke nomor toko yang tersimpan.</p>
-   </section>
- </div>`;
- const pay=document.getElementById('payMethod'), proofWrap=document.getElementById('proofWrap');
- pay.onchange=()=>{proofWrap.hidden=pay.value!=='TF';};
- document.getElementById('proofFile').onchange=handleProofUpload;
- const save=document.getElementById('saveRecipe'); const options=document.getElementById('recipeOptions');
- save.onchange=()=>{options.hidden=!save.checked;};
- document.getElementById('saveOnly').onclick=()=>saveRecipeOnly();
- document.getElementById('placeOrder').onclick=()=>placeOrder();
-}
-function handleProofUpload(event){
- const file=event.target.files?.[0]; if(!file) return;
- const reader=new FileReader(); reader.onload=e=>{
-   const img=new Image(); img.onload=()=>{
-     const canvas=document.createElement('canvas'); const ctx=canvas.getContext('2d'); let w=img.width,h=img.height;
-     if(w>h&&w>600){h*=600/w;w=600;} else if(h>=w&&h>600){w*=600/h;h=600;}
-     canvas.width=Math.round(w); canvas.height=Math.round(h); ctx.drawImage(img,0,0,canvas.width,canvas.height);
-     checkoutProofBase64=canvas.toDataURL('image/jpeg',0.8); document.getElementById('proofStatus').textContent='Bukti transfer siap digunakan.';
-   }; img.src=e.target.result;
- }; reader.readAsDataURL(file);
-}
-function recipePayload(cart,name){return {nama:name,items:cart.map(i=>({code:i.code||i.kode||i.id,qty:i.qty}))};}
-async function getCustomerDoc(){
- const phone=getCustomerPhone(); if(!phone) throw new Error('Sesi pelanggan tidak ditemukan.');
- const snap=await storeCollection('pelanggan').where('phone','==',phone).get();
- if(snap.empty) return {doc:null,nama:'Pelanggan',alamat:'-'};
- const doc=snap.docs[0]; const data=doc.data()||{}; return {doc,nama:data.nama||'Pelanggan',alamat:data.alamat||'-'};
-}
-async function shareRecipe(cart,recipe,namaCust,total){
- if(!document.getElementById('shareRumpi')?.checked) return;
- const phone=getCustomerPhone(); if(!phone) return;
- const items=cart.map(i=>`- ${i.nama} (${i.qty})`).join('\n');
- await storeCollection('db_chat_rumpi').add({senderPhone:phone,senderName:namaCust,pesan:`🍳 *Menu Racikan dari ${namaCust}*\nNama Menu: "${recipe.nama}"\nBahan-bahan:\n${items}\nPerkiraan Total: Rp ${Math.round(total).toLocaleString('id-ID')}`,waktu:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+' '+new Date().toLocaleDateString('id-ID'),waktuTimestamp:firebase.firestore.FieldValue.serverTimestamp()});
-}
-async function saveRecipeOnly(){
- const cart=getCart(); if(!cart.length) return alert('Keranjang kosong, tidak ada menu untuk disimpan!');
- const name=document.getElementById('recipeName').value.trim(); if(!name) return alert('Harap isi nama menu resep terlebih dahulu!');
- try{
-   const customer=await getCustomerDoc(); if(!customer.doc) return alert('Data pelanggan belum tersedia. Silakan lengkapi akun terlebih dahulu.');
-   const recipe=recipePayload(cart,name);
-   await customer.doc.ref.update({savedRecipes:firebase.firestore.FieldValue.arrayUnion(recipe)});
-   try{await shareRecipe(cart,recipe,customer.nama,cartTotal(cart));}catch(e){console.warn('Bagikan Rumpi gagal:',e);}
-   alert('Menu resep berhasil disimpan ke database akunmu.');
- }catch(err){alert('Gagal menyimpan menu: '+err.message);}
-}
-async function placeOrder(){
- const cart=getCart(); if(!cart.length) return alert('Keranjang kosong!');
- const payMethod=document.getElementById('payMethod').value; const note=document.getElementById('orderNote').value.trim();
- const saveRecipe=document.getElementById('saveRecipe').checked; const recipeName=document.getElementById('recipeName').value.trim();
- if(payMethod==='TF'&&!checkoutProofBase64) return alert('Harap unggah bukti transfer!');
- if(saveRecipe&&!recipeName) return alert('Harap isi nama menu resep yang akan disimpan!');
- const button=document.getElementById('placeOrder'); button.disabled=true; button.textContent='Memproses…';
- try{
-   const customer=await getCustomerDoc(); const phone=getCustomerPhone(); const total=cartTotal(cart);
-   const totalQty=cart.reduce((s,x)=>s+(Number(x.qty)||0),0);
-   let totalModal=0; const batch=db.batch();
-   cart.forEach(item=>{
-     const code=String(item.code||item.kode||item.id||''); const p=checkoutProducts[code];
-     if(p){const qty=Number(item.qty)||0; totalModal+=(Number(p.modal)||0)*qty; const stok=Math.max(0,Number(p.stok)||0); batch.update(storeCollection('produk').doc(code),{stok:Math.max(0,parseFloat((stok-qty).toFixed(3)))});}
-   });
-   const namaMetode=payMethod==='TF'?'Transfer Bank':payMethod==='WhatsApp'?'Pesan via WhatsApp':'COD (Bayar di Tempat)';
-   const trx=storeCollection('transaksi').doc();
-   batch.set(trx,{waktu:new Date().toLocaleString('id-ID'),waktuTimestamp:firebase.firestore.FieldValue.serverTimestamp(),total,modal:totalModal,untung:total-totalModal,metode:namaMetode,qty:totalQty,customerNama:customer.nama,customerPhone:phone,customerAlamat:customer.alamat,catatanPelanggan:note,buktiTransfer:payMethod==='TF'?checkoutProofBase64:'',statusPesanan:'Menunggu Diproses',items:cart.map(i=>({nama:i.nama,qty:i.qty,subtotal:(Number(i.harga)||0)*(Number(i.qty)||0),code:i.code||i.kode||i.id}))});
-   await batch.commit();
-   if(saveRecipe&&customer.doc){const recipe=recipePayload(cart,recipeName); await customer.doc.ref.update({savedRecipes:firebase.firestore.FieldValue.arrayUnion(recipe)}); try{await shareRecipe(cart,recipe,customer.nama,total);}catch(e){console.warn('Bagikan Rumpi gagal:',e);}}
-   if(payMethod==='WhatsApp'){
-     let tokoPhone=String(checkoutStore.phone||'').replace(/[^0-9]/g,''); if(tokoPhone.startsWith('0')) tokoPhone='62'+tokoPhone.slice(1);
-     if(tokoPhone){let text=`*PESANAN BARU DARI PELANGGAN* 🛒\nNama : *${customer.nama}*\nNo WA : ${phone}\nAlamat : ${customer.alamat}\nMetode : *${namaMetode}*\n`; if(note) text+=`Catatan : _${note}_\n`; text+='------------------------------------\n'; cart.forEach((i,n)=>text+=`${n+1}. ${i.nama} (${i.qty}x) = Rp ${Math.round((Number(i.harga)||0)*(Number(i.qty)||0)).toLocaleString('id-ID')}\n`); text+=`------------------------------------\n*Total : Rp ${Math.round(total).toLocaleString('id-ID')}*`; window.open(`https://wa.me/${tokoPhone}?text=${encodeURIComponent(text)}`,'_blank');}
-   }
-   clearCart(); checkoutProofBase64='';
-   checkoutRoot.innerHTML=`<div class="shell-card v14-success"><div class="v14-empty-icon">✅</div><h2>Pesanan berhasil dibuat</h2><p>Pesanan kamu sudah dicatat dengan status <strong>Menunggu Diproses</strong>.</p><div class="v14-success-actions"><a class="v14-btn v14-btn-primary" href="/pelanggan/pesanan/">Lihat Pesanan</a><a class="v14-btn" href="/pelanggan/">Kembali ke Beranda</a></div></div>`;
-   checkoutSubtitle.textContent='Checkout selesai.';
- }catch(err){console.error(err); alert('Gagal memproses pesanan: '+err.message); button.disabled=false; button.textContent='🛒 Belanja Sekarang';}
-}
-
-function openCheckout(){
-  const cart=getCart();
-  if(!cart.length){ alert('Keranjang masih kosong.'); return; }
-  if(!isCustomerLoggedIn()){
-    requireCustomer({redirect:'/pelanggan/'});
-    return;
-  }
-  checkoutOverlay.hidden=false;
-  checkoutOverlay.setAttribute('aria-hidden','false');
-  document.body.classList.add('v14-checkout-open');
-  history.pushState({checkout:true},'',`${location.pathname}${location.search}#checkout`);
-  renderCheckout();
-}
-function closeCheckout(){
-  checkoutOverlay.hidden=true;
-  checkoutOverlay.setAttribute('aria-hidden','true');
-  document.body.classList.remove('v14-checkout-open');
-  if(location.hash==='#checkout') history.back();
-}
-window.addEventListener('popstate',()=>{
-  if(location.hash==='#checkout'){
-    if(!checkoutOverlay.hidden){ renderCheckout(); return; }
-    if(getCart().length && isCustomerLoggedIn()){
-      checkoutOverlay.hidden=false; checkoutOverlay.setAttribute('aria-hidden','false'); document.body.classList.add('v14-checkout-open'); renderCheckout();
-    }
-  }else if(!checkoutOverlay.hidden){
-    checkoutOverlay.hidden=true; checkoutOverlay.setAttribute('aria-hidden','true'); document.body.classList.remove('v14-checkout-open');
-  }
-});
-window.addEventListener('hashchange',()=>{
-  if(location.hash==='#checkout'){
-    if(getCart().length && isCustomerLoggedIn()){
-      checkoutOverlay.hidden=false; checkoutOverlay.setAttribute('aria-hidden','false'); document.body.classList.add('v14-checkout-open'); renderCheckout();
-    }
-  }else if(!checkoutOverlay.hidden){ checkoutOverlay.hidden=true; checkoutOverlay.setAttribute('aria-hidden','true'); document.body.classList.remove('v14-checkout-open'); }
-});
-document.getElementById('openCheckout')?.addEventListener('click',openCheckout);
-closeCheckoutBtn?.addEventListener('click',closeCheckout);
-subscribeProducts((data)=>{checkoutProducts=data||{}; render(); if(!checkoutOverlay.hidden) renderCheckout();});
-getStoreConfig().then(v=>{checkoutStore=v||{};}).catch(()=>{});
-if(location.hash==='#checkout' && getCart().length && isCustomerLoggedIn()){
-  checkoutOverlay.hidden=false; checkoutOverlay.setAttribute('aria-hidden','false'); document.body.classList.add('v14-checkout-open'); renderCheckout();
-}
-render();
-</script>
-
-<nav class="v14-modern-navbar" aria-label="Navigasi pelanggan">
-  <a href="/pelanggan/" class="v14-nav-link" data-nav="home"><i class="ti ti-home-2 v14-nav-icon" aria-hidden="true"></i><small>Home</small></a>
-  <a href="/pelanggan/produk/" class="v14-nav-link" data-nav="produk"><i class="ti ti-shopping-bag v14-nav-icon" aria-hidden="true"></i><small>Produk</small></a>
-  <a href="/pelanggan/keranjang/" class="v14-nav-link" data-nav="keranjang"><span class="v14-nav-icon-wrap"><i class="ti ti-shopping-cart v14-nav-icon" aria-hidden="true"></i><span class="v14-cart-badge" data-cart-badge hidden>0</span></span><small>Keranjang</small></a>
-  <a href="/pelanggan/pesanan/" class="v14-nav-link" data-nav="pesanan"><i class="ti ti-package v14-nav-icon" aria-hidden="true"></i><small>Pesanan</small></a>
-  <a href="/pelanggan/lainnya/" class="v14-nav-link" data-nav="lainnya"><i class="ti ti-menu-2 v14-nav-icon" aria-hidden="true"></i><small>Lainnya</small></a>
-</nav>
-<script id="v14-modern-navbar-script">(()=>{const active='keranjang';document.querySelectorAll('.v14-modern-navbar .v14-nav-link').forEach(link=>{const on=link.dataset.nav===active;link.classList.toggle('is-active',on);if(on)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');});document.body.classList.add('has-v14-modern-navbar');})();</script>
-
-<script type="module">import {initCartBadge} from "/pelanggan/_core/cart-badge.js"; initCartBadge();</script>
-</body></html>
+</html>
