@@ -1,1 +1,16 @@
-
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2563eb"><title>Produk / Katalog - KasirQuh</title><link rel="stylesheet" href="/pelanggan/style.css"><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script></head><body>
+<header class="v14-header"><a href="/pelanggan/" class="brand">KasirQuh</a><span>V14 · Produk</span></header>
+<main class="v14-main product-page">
+<div class="eyebrow">BELANJA</div><h1>Produk</h1>
+<div class="v14-search"><input id="search" class="v14-input" placeholder="Cari produk…" autocomplete="off"></div>
+<div id="categories" class="v14-chips" aria-label="Kategori produk"></div>
+<section id="catalog" class="v14-grid" aria-live="polite"><p>Memuat produk…</p></section>
+</main>
+<nav class="v14-nav"><a href="/pelanggan/">Beranda</a><a href="/pelanggan/produk/">Produk</a><a href="/pelanggan/keranjang/">Keranjang</a><a href="/pelanggan/pesanan/">Pesanan</a><a href="/pelanggan/lainnya/">Lainnya</a></nav>
+<script type="module">
+import {initPage} from '/pelanggan/_core/page.js'; import {subscribeProducts,normalizePrice,normalizeUnit,productCategories} from '/pelanggan/_core/products.js'; import {escapeHtml,formatRupiah} from '/pelanggan/_core/utils.js';
+initPage({title:'Produk / Katalog',privatePage:false}); const $=id=>document.getElementById(id); let products={}; let category='Semua';
+function render(){const q=$('search').value.trim().toLowerCase(); const entries=Object.entries(products).filter(([,p])=>{const cats=productCategories(p).map(x=>x.toLowerCase()); return (category==='Semua'||cats.includes(category.toLowerCase()))&&(!q||String(p.nama||'').toLowerCase().includes(q));}).sort((a,b)=>String(a[1].nama||'').localeCompare(String(b[1].nama||''),'id'); $('catalog').innerHTML=entries.length?entries.map(([code,p])=>{const stock=Number(p.stok)||0;return `<article class="v14-product"><a href="/pelanggan/produk/detail.html?id=${encodeURIComponent(code)}" class="v14-product-photo">${p.foto?`<img src="${escapeHtml(p.foto)}" alt="${escapeHtml(p.nama||'')}">`:'🛍️'}</a><strong>${escapeHtml(p.nama||'Produk')}</strong><span>${formatRupiah(normalizePrice(p))} / ${escapeHtml(normalizeUnit(p))}</span><small>${stock>0?`Stok: ${stock}`:'Stok habis'}</small><a class="v14-btn" href="/pelanggan/produk/detail.html?id=${encodeURIComponent(code)}">Detail</a></article>`}).join(''):'<p>Produk tidak ditemukan.</p>';}
+function renderCats(){const cats=new Set(['Semua']); Object.values(products).forEach(p=>productCategories(p).forEach(c=>cats.add(c))); $('categories').innerHTML=[...cats].map(c=>`<button class="v14-chip ${c===category?'active':''}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join(''); $('categories').querySelectorAll('button').forEach(b=>b.onclick=()=>{category=b.dataset.cat;renderCats();render();});}
+$('search').addEventListener('input',render); subscribeProducts((p,error)=>{products=p||{}; if(error){ $('catalog').innerHTML='<p>Produk belum dapat dimuat. Coba refresh halaman.</p>'; return; } renderCats();render();});
+</script></body></html>

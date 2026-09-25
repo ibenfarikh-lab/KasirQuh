@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2563eb"><title>Detail Produk - KasirQuh</title>
+<link rel="stylesheet" href="/pelanggan/style.css">
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<header class="v14-header"><a href="/pelanggan/produk/" class="brand">← Produk</a><span>V14 · 03</span></header>
+<main class="v14-main detail-page">
+  <div id="detail" class="v14-detail" aria-live="polite"><p>Memuat produk…</p></div>
+</main>
+<nav class="v14-nav">
+  <a href="/pelanggan/">Beranda</a><a href="/pelanggan/produk/">Produk</a>
+  <a href="/pelanggan/keranjang/">Keranjang <span id="cartCount"></span></a>
+  <a href="/pelanggan/pesanan/">Pesanan</a><a href="/pelanggan/lainnya/">Lainnya</a>
+</nav>
+<script type="module">
+import {initPage} from '/pelanggan/_core/page.js';
+import {subscribeProducts, normalizePrice, normalizeUnit} from '/pelanggan/_core/products.js';
+import {addCartItem, getCart} from '/pelanggan/_core/cart.js';
+import {escapeHtml, formatRupiah} from '/pelanggan/_core/utils.js';
+initPage({title:'Detail Produk',privatePage:false});
+const detail=document.getElementById('detail');
+const cartCount=document.getElementById('cartCount');
+const params=new URLSearchParams(location.search); const id=params.get('id');
+function updateCartCount(){const n=getCart().reduce((s,x)=>s+(Number(x.qty)||0),0); cartCount.textContent=n?`(${n})`:'';}
+function renderProduct(p){
+ if(!p){detail.innerHTML='<div class="shell-card"><h1>Produk tidak ditemukan</h1><p>Produk mungkin sudah dihapus atau kode produk tidak valid.</p><a class="v14-btn" href="/pelanggan/produk/">Kembali ke Produk</a></div>'; return;}
+ const stock=Math.max(0,Number(p.stok)||0); const price=normalizePrice(p); const unit=normalizeUnit(p);
+ detail.innerHTML=`<article class="v14-detail-card">
+   <div class="v14-detail-photo">${p.foto?`<img src="${escapeHtml(p.foto)}" alt="${escapeHtml(p.nama||'Produk')}">`:'🛍️'}</div>
+   <div class="v14-detail-info">
+    <div class="eyebrow">DETAIL PRODUK</div><h1>${escapeHtml(p.nama||'Produk')}</h1>
+    <div class="v14-detail-price">${formatRupiah(price)} <small>/ ${escapeHtml(unit)}</small></div>
+    <div class="v14-stock">${stock>0?`Stok tersedia: ${stock}`:'Stok habis'}</div>
+    <p class="v14-detail-desc">${escapeHtml(p.deskripsi||p.keterangan||'Informasi produk tersedia dari data toko.')}</p>
+    <div class="v14-qty"><button id="minus" type="button">−</button><output id="qty">1</output><button id="plus" type="button">+</button></div>
+    <button id="add" class="v14-btn v14-btn-primary" type="button" ${stock<1?'disabled':''}>Tambah ke Keranjang</button>
+    <a class="v14-btn" href="/pelanggan/keranjang/">Lihat Keranjang</a>
+   </div>
+ </article>`;
+ let qty=1; const out=document.getElementById('qty');
+ document.getElementById('minus').onclick=()=>{qty=Math.max(1,qty-1);out.value=qty;out.textContent=qty;};
+ document.getElementById('plus').onclick=()=>{qty=Math.min(stock||1,qty+1);out.value=qty;out.textContent=qty;};
+ document.getElementById('add').onclick=()=>{addCartItem({id:p.id,kode:p.kode||p.id,nama:p.nama||'Produk',harga:price,satuan:unit,foto:p.foto||'',qty});updateCartCount();};
+}
+updateCartCount();
+window.addEventListener('kq:cart-changed',updateCartCount);
+if(!id){renderProduct(null);} else {subscribeProducts((products,error)=>{if(error){detail.innerHTML='<div class="shell-card"><h1>Produk belum dapat dimuat</h1><p>Coba refresh halaman.</p></div>';return;} renderProduct(products[id]);});}
+</script>
+</body></html>
