@@ -1,16 +1,110 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2563eb"><title>Produk / Katalog - KasirQuh</title><link rel="stylesheet" href="/pelanggan/style.css"><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script></head><body>
-<header class="v14-header"><a href="/pelanggan/" class="brand">KasirQuh</a><span>V14 · Produk</span></header>
-<main class="v14-main product-page">
-<div class="eyebrow">BELANJA</div><h1>Produk</h1>
-<div class="v14-search"><input id="search" class="v14-input" placeholder="Cari produk…" autocomplete="off"></div>
-<div id="categories" class="v14-chips" aria-label="Kategori produk"></div>
-<section id="catalog" class="v14-grid" aria-live="polite"><p>Memuat produk…</p></section>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Produk - KasirQuh</title>
+<meta name="theme-color" content="#2563eb">
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="style.css?v=1.0.12">
+<style>
+.v14-page-navbar{box-shadow:0 -2px 10px rgba(0,0,0,.08)}
+.v14-nav-link{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:var(--text-color);font-weight:700;font-size:.72rem;padding:4px 2px;border-radius:8px}
+.v14-nav-link span{font-size:1.05rem;line-height:1}.v14-nav-link small{font-size:.62rem;line-height:1.1}
+.v14-nav-link[aria-current="page"]{color:#2563eb;background:rgba(37,99,235,.08)}
+/* Produk adalah katalog murni: tidak membawa header/promo/FAB Home. */
+.kq-produk-main{padding:10px 8px 78px;min-height:100vh;box-sizing:border-box}
+.kq-produk-main .pos-container{gap:0}
+.kq-produk-main #pos-card-wrapper{display:block!important}
+.kq-produk-hidden-stubs{display:none!important}
+</style>
+</head>
+<body data-theme="modern" style="font-size:0.85rem">
+
+<!-- Auth tetap menggunakan form asli Customer. -->
+<div class="login-overlay" id="customerLoginModal" style="display:flex">
+  <div class="login-card" style="max-height:90vh;overflow-y:auto;padding:16px">
+    <h2 style="margin-top:0;margin-bottom:4px;font-size:1.3rem">KasirQuh</h2>
+    <div id="formLoginContainer">
+      <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px">Silakan masuk dengan No. WhatsApp &amp; Sandi</p>
+      <form class="form-vertical" onsubmit="prosesLoginPelanggan(event)" style="gap:8px">
+        <input id="cust-login-phone" placeholder="No. WhatsApp (Cth: 08123...)" required type="text">
+        <input id="cust-login-pass" placeholder="Sandi" required type="password">
+        <button type="submit" style="margin-top:6px;border-radius:6px;padding:10px;background:#2563eb;color:white;border:none;font-weight:bold">Masuk</button>
+      </form>
+      <p style="text-align:center;margin-top:12px;font-size:.75rem">Belum punya akun? <a data-kq-static-action="auth-register" href="javascript:void(0)" style="color:#2563eb;font-weight:bold">Daftar di sini</a></p>
+    </div>
+    <div id="formRegisterContainer" style="display:none">
+      <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:12px">Daftar Akun (Menunggu Persetujuan Admin)</p>
+      <form class="form-vertical" onsubmit="prosesDaftarPelanggan(event)" style="gap:8px">
+        <input id="cust-reg-name" placeholder="Nama Lengkap" required type="text">
+        <input id="cust-reg-phone" placeholder="No. WhatsApp (Cth: 08123...)" required type="text">
+        <textarea id="cust-reg-address" placeholder="Alamat Pengiriman Lengkap" required rows="2"></textarea>
+        <input id="cust-reg-pass" placeholder="Buat Sandi" required type="password">
+        <button type="submit" style="margin-top:6px;border-radius:6px;padding:10px;background:#16a34a;color:white;border:none;font-weight:bold">Kirim Pendaftaran</button>
+      </form>
+      <p style="text-align:center;margin-top:12px;font-size:.75rem">Sudah punya akun? <a data-kq-static-action="auth-login" href="javascript:void(0)" style="color:#2563eb;font-weight:bold">Masuk di sini</a></p>
+    </div>
+  </div>
+</div>
+
+<main class="main-content kq-produk-main">
+  <!-- SATU-SATUNYA KONTEN UTAMA: kategori + view + card produk. -->
+  <div class="tab-content active" id="belanja" style="display:block">
+    <div aria-label="Kategori produk" class="category-chips no-print" id="category-container">
+      <button aria-label="Home" class="chip-btn active" data-category="Home" data-kq-static-action="category-home" title="Home" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"></path><path d="M6 10v10h12V10"></path><path d="M9 20v-6h6v6"></path><path d="M8 8.5h.01"></path></svg></button>
+      <button aria-label="Produk" class="chip-btn" data-category="Produk" data-kq-static-action="category-produk" title="Produk" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M4 8.5h16l-1.2 11H5.2L4 8.5Z"></path><path d="M8 8.5c.2-3 1.7-4.5 4-4.5s3.8 1.5 4 4.5"></path><path d="M9 12.5h.01M15 12.5h.01"></path></svg></button>
+      <button aria-label="Titipan Warga" class="chip-btn" data-category="Titipan Warga" data-kq-static-action="category-titipan-warga" title="Titipan Warga" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M4 9.5 12 3l8 6.5"></path><path d="M6 9v11h12V9"></path><path d="M8.5 20v-5h7v5"></path><path d="M4 20h16"></path><path d="M9 11.5h6"></path></svg></button>
+      <button aria-label="Sembako" class="chip-btn" data-category="Sembako" data-kq-static-action="category-sembako" title="Sembako" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M5 8.5h14l-1 11H6l-1-11Z"></path><path d="M8 8.5c.3-2.8 1.7-4.2 4-4.2s3.7 1.4 4 4.2"></path><path d="M8.5 12.5c1.2.8 2.2.8 3.5 0s2.3-.8 3.5 0"></path></svg></button>
+      <button aria-label="Minuman" class="chip-btn" data-category="Minuman" data-kq-static-action="category-minuman" title="Minuman" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M7 4h10"></path><path d="M8 4.5 9.2 20h5.6L16 4.5"></path><path d="M9 10h6"></path><path d="M10 14c1 .7 2 .7 3 0s2-.7 3 0"></path></svg></button>
+      <button aria-label="Makanan" class="chip-btn" data-category="Makanan" data-kq-static-action="category-makanan" title="Makanan" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M4 13h16"></path><path d="M6 13a6 6 0 0 1 12 0"></path><path d="M7 17h10"></path><path d="M9 17v3M15 17v3"></path><path d="M8 10h.01M16 10h.01"></path></svg></button>
+      <button aria-label="Snack" class="chip-btn" data-category="Snack" data-kq-static-action="category-snack" title="Snack" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M6 10h12l-1 10H7L6 10Z"></path><path d="M8 10c0-2 1-3 2-3 0-2 1-3 2-3s2 1 2 3c1 0 2 1 2 3"></path><path d="M9 14h.01M12 14h.01M15 14h.01"></path></svg></button>
+      <button aria-label="Bumbu" class="chip-btn" data-category="Bumbu" data-kq-static-action="category-bumbu" title="Bumbu" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M7 8h10v12H7z"></path><path d="M8.5 8c.3-2.1 1.5-3.3 3.5-3.3S15.2 5.9 15.5 8"></path><path d="M9.5 12.5h5M9.5 16h3.5"></path></svg></button>
+      <button aria-label="Perawatan" class="chip-btn" data-category="Perawatan" data-kq-static-action="category-perawatan" title="Perawatan" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M9 3h6v3H9z"></path><path d="M8 6h8l1 15H7L8 6Z"></path><path d="M10 11h4M10 15h4"></path><path d="M12 8v.01"></path></svg></button>
+      <button aria-label="Kebutuhan Rumah" class="chip-btn" data-category="Kebutuhan Rumah" data-kq-static-action="category-kebutuhan-rumah" title="Kebutuhan Rumah" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M5 10h14l-1 11H6L5 10Z"></path><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M9 14c1 .7 2 .7 3 0s2-.7 3 0"></path></svg></button>
+      <button aria-label="Lainnya" class="chip-btn" data-category="Lainnya" data-kq-static-action="category-lainnya" title="Lainnya" type="button"><svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M5 7h14v14H5z"></path><path d="M8 7V4h8v3"></path><path d="M9 12h6M9 16h4"></path><path d="M12 9.5v.01"></path></svg></button>
+    </div>
+
+    <div class="pos-container" style="gap:0">
+      <div aria-live="polite" class="catalog-category-title" id="catalog-category-title"></div>
+      <div aria-label="Pilih tampilan produk" class="catalog-view-switcher no-print">
+        <button aria-label="Tampilan list" class="catalog-view-btn" data-kq-static-action="view-list" data-view="list" title="List" type="button"><span class="catalog-view-icon">☷</span></button>
+        <button aria-label="Tampilan grid" class="catalog-view-btn" data-kq-static-action="view-grid" data-view="grid" title="Grid" type="button"><span class="catalog-view-icon">▦</span></button>
+        <button aria-label="Tampilan card" class="catalog-view-btn" data-kq-static-action="view-card" data-view="card" title="Card" type="button"><span class="catalog-view-icon">▣</span></button>
+      </div>
+      <div class="card no-print" id="pos-card-wrapper" style="margin-bottom:0;padding:0 6px 4px;background:transparent;border:none;box-shadow:none">
+        <div id="pos-catalog-container"></div>
+        <div aria-hidden="true" id="catalog-load-sentinel" style="height:1px;width:100%"></div>
+      </div>
+    </div>
+  </div>
 </main>
-<nav class="v14-nav"><a href="/pelanggan/">Beranda</a><a href="/pelanggan/produk/">Produk</a><a href="/pelanggan/keranjang/">Keranjang</a><a href="/pelanggan/pesanan/">Pesanan</a><a href="/pelanggan/lainnya/">Lainnya</a></nav>
-<script type="module">
-import {initPage} from '/pelanggan/_core/page.js'; import {subscribeProducts,normalizePrice,normalizeUnit,productCategories} from '/pelanggan/_core/products.js'; import {escapeHtml,formatRupiah} from '/pelanggan/_core/utils.js';
-initPage({title:'Produk / Katalog',privatePage:false}); const $=id=>document.getElementById(id); let products={}; let category='Semua';
-function render(){const q=$('search').value.trim().toLowerCase(); const entries=Object.entries(products).filter(([,p])=>{const cats=productCategories(p).map(x=>x.toLowerCase()); return (category==='Semua'||cats.includes(category.toLowerCase()))&&(!q||String(p.nama||'').toLowerCase().includes(q));}).sort((a,b)=>String(a[1].nama||'').localeCompare(String(b[1].nama||''),'id'); $('catalog').innerHTML=entries.length?entries.map(([code,p])=>{const stock=Number(p.stok)||0;return `<article class="v14-product"><a href="/pelanggan/produk/detail.html?id=${encodeURIComponent(code)}" class="v14-product-photo">${p.foto?`<img src="${escapeHtml(p.foto)}" alt="${escapeHtml(p.nama||'')}">`:'🛍️'}</a><strong>${escapeHtml(p.nama||'Produk')}</strong><span>${formatRupiah(normalizePrice(p))} / ${escapeHtml(normalizeUnit(p))}</span><small>${stock>0?`Stok: ${stock}`:'Stok habis'}</small><a class="v14-btn" href="/pelanggan/produk/detail.html?id=${encodeURIComponent(code)}">Detail</a></article>`}).join(''):'<p>Produk tidak ditemukan.</p>';}
-function renderCats(){const cats=new Set(['Semua']); Object.values(products).forEach(p=>productCategories(p).forEach(c=>cats.add(c))); $('categories').innerHTML=[...cats].map(c=>`<button class="v14-chip ${c===category?'active':''}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join(''); $('categories').querySelectorAll('button').forEach(b=>b.onclick=()=>{category=b.dataset.cat;renderCats();render();});}
-$('search').addEventListener('input',render); subscribeProducts((p,error)=>{products=p||{}; if(error){ $('catalog').innerHTML='<p>Produk belum dapat dimuat. Coba refresh halaman.</p>'; return; } renderCats();render();});
-</script></body></html>
+
+<!-- Stub tak terlihat: dipertahankan karena script.js asli masih mengakses state global ini. -->
+<div class="kq-produk-hidden-stubs" aria-hidden="true">
+  <div id="receipt-shop-name"></div><div id="receipt-shop-address"></div>
+  <div id="customer-home-store-name"></div><div id="customer-home-greeting"></div>
+  <div id="customer-home-running-text"></div>
+  <div id="recipe-scroll-container"></div>
+  <div id="reorder-container"></div><div id="reorder-section-wrapper"></div>
+  <div id="trending-container"></div><div id="trending-section-wrapper"></div>
+  <div id="recipe-section-wrapper"></div>
+  <div id="customer-notes-container"></div><div id="profile-name"></div><div id="profile-phone"></div><div id="profile-coins"></div>
+  <div id="customer-online-orders-container"></div><div id="customer-chat-messages"></div>
+  <div id="cart-body"></div><div id="grand-total"></div><div id="cart-count">0</div>
+  <div id="dailyCheckinModal"><p></p></div>
+</div>
+<div class="toast" id="toastNotification">Notifikasi</div>
+
+<nav class="permanent-bottom-bar no-print v14-page-navbar" aria-label="Navigasi pelanggan" style="display:flex;align-items:center;justify-content:space-around;padding:7px 6px;background:var(--card-bg);border-top:1px solid var(--border-color);position:fixed;bottom:0;left:0;width:100%;z-index:100;box-sizing:border-box;gap:4px">
+  <a href="/pelanggan/" class="v14-nav-link"><span>🏠</span><small>Home</small></a>
+  <a href="/pelanggan/produk/" class="v14-nav-link" aria-current="page"><span>🛍️</span><small>Produk</small></a>
+  <a href="/pelanggan/keranjang/" class="v14-nav-link"><span>🛒</span><small>Keranjang</small></a>
+  <a href="/pelanggan/pesanan/" class="v14-nav-link"><span>📦</span><small>Pesanan</small></a>
+  <a href="/pelanggan/lainnya/" class="v14-nav-link"><span>☰</span><small>Lainnya</small></a>
+</nav>
+
+<script src="script.js?v=v14-produk-copy"></script>
+</body>
+</html>
