@@ -38,6 +38,14 @@
 
 
 
+
+<style>
+.v14-page-navbar{box-shadow:0 -2px 10px rgba(0,0,0,.08)}
+.v14-nav-link{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-decoration:none;color:var(--text-color);font-weight:700;font-size:.72rem;padding:4px 2px;border-radius:8px}
+.v14-nav-link span{font-size:1.05rem;line-height:1}
+.v14-nav-link small{font-size:.62rem;line-height:1.1}
+.v14-nav-link[aria-current="page"]{color:#2563eb;background:rgba(37,99,235,.08)}
+</style>
 </head>
 
 <body data-theme="modern" style="font-size: 0.85rem;">
@@ -405,17 +413,13 @@
 <button aria-label="Kembali ke atas" class="no-print" id="scroll-helper-fab" title="Kembali ke atas" type="button">
 <svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 19V5M6.5 11.5 12 5l5.5 6.5"></path></svg>
 </button>
-<div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
-<span id="bottom-bar-title" style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">Belanja</span>
-<div id="pagination-box" style="display: none !important; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; padding: 2px 8px; gap: 6px;">
-<button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;" type="button">◄</button>
-<span id="pos-page-indicator" style="font-size: 0.72rem; font-weight: bold; color: var(--text-color);">1/1</span>
-<button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;" type="button">▶</button>
-</div>
-<div style="display:flex;align-items:center;gap:6px;">
-<button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu" type="button"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg></button>
-</div>
-</div>
+<nav class="permanent-bottom-bar no-print v14-page-navbar" aria-label="Navigasi pelanggan" style="display:flex;align-items:center;justify-content:space-around;padding:7px 6px;background:var(--card-bg);border-top:1px solid var(--border-color);position:fixed;bottom:0;left:0;width:100%;z-index:100;box-sizing:border-box;gap:4px;">
+<a href="/pelanggan/" class="v14-nav-link" aria-current="page"><span>🏠</span><small>Home</small></a>
+<a href="/pelanggan/produk/" class="v14-nav-link"><span>🛍️</span><small>Produk</small></a>
+<a href="/pelanggan/keranjang/" class="v14-nav-link"><span>🛒</span><small>Keranjang</small></a>
+<a href="/pelanggan/pesanan/" class="v14-nav-link"><span>📦</span><small>Pesanan</small></a>
+<a href="/pelanggan/lainnya/" class="v14-nav-link"><span>☰</span><small>Lainnya</small></a>
+</nav>
 
 
 
