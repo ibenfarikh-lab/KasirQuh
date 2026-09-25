@@ -1062,6 +1062,8 @@
         btnAdd.style.background = "#2563eb"; btnAdd.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> Masukkan`; btnAdd.disabled = false;
       }
       detailModal.classList.add("show");
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
     }
     
     function closeProductDetail(skipHistory = false) {
@@ -1069,6 +1071,8 @@
       const detailModal = document.getElementById('productDetailModal');
       detailModal.classList.remove('show');
       detailModal.classList.remove('modern-card-detail-mode');
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
     }
 
     function ubahQtyDetail(dir) {
@@ -1614,7 +1618,7 @@
         if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10;
         
         itemsHtml += `
-          <div onclick="goToProductDetail('${code}')" class="trending-card">
+          <div onclick="openProductDetail('${code}')" class="trending-card">
             <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3);">
             <div style="flex: 1; min-width: 0;">
               <div style="font-weight: bold; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
@@ -1668,10 +1672,9 @@
       renderCartPelanggan();
     }
 
+    // V14: Detail memakai floating legacy, dibuat full-page tanpa pindah route.
     function goToProductDetail(code) {
-      const id = String(code ?? '').trim();
-      if (!id) return;
-      window.location.href = `/pelanggan/produk/detail.html?id=${encodeURIComponent(id)}`;
+      openProductDetail(code);
     }
 
     function refreshKatalogPelanggan() {
@@ -1719,7 +1722,7 @@
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
             container.innerHTML += `
-              <div class="catalog-card-view modern-product-card-view" onclick="goToProductDetail('${code}')">
+              <div class="catalog-card-view modern-product-card-view" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div class="modern-card-soldout"><span>HABIS</span></div>' : ''}
                 <div class="modern-card-stage">
                   ${sisaStokBadge ? `<div class="modern-card-stock-badge">🔥 Sisa ${p.stok}</div>` : ''}
@@ -1740,7 +1743,7 @@
               </div>`;
           } else {
             container.innerHTML += `
-              <div class="catalog-card-view generic-card-view" onclick="goToProductDetail('${code}')">
+              <div class="catalog-card-view generic-card-view" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div class="generic-card-soldout"><span>HABIS</span></div>' : ''}
                 <div class="generic-card-image-wrap">
                   ${sisaStokBadge}
@@ -1756,7 +1759,7 @@
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
             container.innerHTML += `
-              <div class="inv-card modern-product-card" onclick="goToProductDetail('${code}')">
+              <div class="inv-card modern-product-card" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div class="modern-product-soldout"><span>HABIS</span></div>' : ''}
                 <div class="modern-product-stage">
                   ${sisaStokBadge ? `<div class="modern-stock-badge">🔥 ${p.stok}</div>` : ''}
@@ -1777,7 +1780,7 @@
               </div>`;
           } else {
             container.innerHTML += `
-              <div class="inv-card" onclick="goToProductDetail('${code}')">
+              <div class="inv-card" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:8px; display:flex; align-items:center; justify-content:center;"><span style="background:#dc2626; color:#fff; font-weight:bold; padding:3px 8px; border-radius:6px; font-size:0.7rem; transform:rotate(-15deg);">HABIS</span></div>' : ''}
                 <div style="text-align: center; margin-bottom: 4px; position: relative;">
                   ${sisaStokBadge}
@@ -1793,7 +1796,7 @@
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
             container.innerHTML += `
-              <div class="catalog-list-item" onclick="goToProductDetail('${code}')">
+              <div class="catalog-list-item" onclick="openProductDetail('${code}')">
                 <div class="modern-list-photo-wrap" style="position: relative; flex-shrink: 0;">
                   ${sisaStokBadge}
                   <img src="${fotoSrc}" class="modern-list-photo" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);">
@@ -1810,7 +1813,7 @@
               </div>`;
           } else {
             container.innerHTML += `
-              <div class="catalog-list-item" onclick="goToProductDetail('${code}')">
+              <div class="catalog-list-item" onclick="openProductDetail('${code}')">
                 <div class="generic-list-image-wrap" style="position:relative; flex-shrink:0; width:45px; height:45px;">
                   ${sisaStokBadge}
                   <img src="${fotoSrc}" class="catalog-list-img" alt="${p.nama}">
@@ -2082,7 +2085,7 @@
           let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0; 
           if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10; 
           
-          itemsHtml += `<div class="reorder-card" onclick="goToProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; 
+          itemsHtml += `<div class="reorder-card" onclick="openProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; 
           renderedCount++; 
         } 
       });

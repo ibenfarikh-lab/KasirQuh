@@ -112,6 +112,42 @@
   <div id="cart-body"></div><div id="grand-total"></div><div id="cart-count">0</div>
   <div id="dailyCheckinModal"><p></p></div>
 </div>
+<!-- MODAL DETAIL PRODUK FLOATING DI TENGAH -->
+<div class="modal-backdrop" id="productDetailModal" onclick="if(event.target === this) closeProductDetail()">
+<div class="product-detail-box">
+<div style="position: relative;">
+<img alt="Gambar produk" id="detail-img" src="" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px 16px 0 0;"/>
+<button onclick="closeProductDetail()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;" type="button">✕</button>
+</div>
+<div style="padding: 12px; overflow-y: auto;">
+<div id="detail-category" style="font-size: 0.65rem; color: #67e8f9; font-weight: bold; margin-bottom: 2px; text-transform: uppercase;">KATEGORI</div>
+<h2 id="detail-name" style="margin: 0 0 4px 0; font-size: 1rem; color: var(--text-color);">Nama Produk</h2>
+<div id="detail-price" style="font-size: 1.15rem; font-weight: 800; color: #4ade80; margin-bottom: 10px;">Rp 0</div>
+<div style="background: var(--bg-color); padding: 8px 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
+<div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Sisa Stok: <strong id="detail-stock" style="color: var(--text-color);">0</strong></div>
+<div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">Deskripsi: <span id="detail-desc" style="color: var(--text-color);">Tidak ada deskripsi dari toko.</span></div>
+</div>
+<!-- Input Qty dan Tambah Keranjang -->
+<div style="display: flex; gap: 8px; margin-bottom: 8px;">
+<div style="display: flex; align-items: center; gap: 3px;">
+<button class="qty-btn" onclick="ubahQtyDetail(-1)" type="button">-</button>
+<input aria-label="Jumlah produk" id="detail-qty-input" readonly="" style="width: 55px; height: 34px; text-align: center; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); font-weight: bold; color: var(--text-color); font-size: 0.85rem;" type="text" value="1"/>
+<button class="qty-btn" onclick="ubahQtyDetail(1)" type="button">+</button>
+</div>
+<button id="btn-detail-add" style="flex: 1; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 3px 8px rgba(37,99,235,0.3); display: flex; justify-content: center; align-items: center; gap: 6px; padding: 0 10px;" type="button">
+<svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"></path></svg> Masukkan
+          </button>
+</div>
+<!-- Tombol Bagikan Produk via WA -->
+<button onclick="bagikanProdukViaWA()" style="width: 100%; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;" type="button">
+          💬 Bagikan Produk via WA
+        </button>
+<button onclick="tanyaAdminBarang()" style="width: 100%; background: var(--card-bg); color: #16a34a; border: 1.2px solid #16a34a; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;" type="button">
+          💬 Tanya Admin soal barang ini
+        </button>
+</div>
+</div>
+</div>
 <div class="toast" id="toastNotification">Notifikasi</div>
 
 <nav class="permanent-bottom-bar no-print v14-page-navbar" aria-label="Navigasi pelanggan" style="display:flex;align-items:center;justify-content:space-around;padding:7px 6px;background:var(--card-bg);border-top:1px solid var(--border-color);position:fixed;bottom:0;left:0;width:100%;z-index:100;box-sizing:border-box;gap:4px">
