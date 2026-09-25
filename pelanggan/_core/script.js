@@ -1,4 +1,21 @@
 
+/* PHASE 20 FINAL FIX: shared runtime bridges must exist before core boot. */
+(function(){
+  if (typeof window.storeCollection !== 'function') {
+    window.storeCollection = function(){
+      throw new Error('[KasirQuh] Firebase/Firestore belum siap.');
+    };
+  }
+  if (typeof window.applyThemePelanggan !== 'function') {
+    window.applyThemePelanggan = function(theme){
+      const safeTheme = ['light','dark','modern'].includes(theme) ? theme : 'modern';
+      document.body?.setAttribute('data-theme', safeTheme);
+    };
+  }
+})();
+const storeCollection = (...args) => window.storeCollection(...args);
+
+
 /* ===== EXTRACTED FROM pelanggan.html <script> #4 id=none ===== */
 
     function getPelangganVercelUrl() {
@@ -251,10 +268,14 @@
       { nama: "Es Teh Manis Segar", desc: "Pelepas dahaga di siang hari yang panas dan menyegarkan.", keywords: ['teh', 'gula', 'es'] }
     ];
 
-    window.onload = function() {
+    window.onload = async function() {
+      // Router/module loading is dynamic. Wait for it before touching helpers
+      // extracted into route modules. The common module also provides the
+      // theme/view compatibility bridge for every route.
+      try { if (window.KQModulesReady) await window.KQModulesReady; } catch (err) { console.warn('[KasirQuh] module bootstrap warning:', err); }
       const route = document.body?.dataset?.kqRoute || window.KQ_CUSTOMER_PAGE?.route || 'home';
       // Common boot: theme, Android history, cached store identity and auth UI.
-      applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
+      window.applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { if(document.getElementById('receipt-shop-name')) document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
 
