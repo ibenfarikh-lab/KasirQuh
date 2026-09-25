@@ -353,7 +353,7 @@ const storeCollection = (...args) => window.storeCollection(...args);
     let promoTokoPelangganIndex = 0;
 
     function getPromoTokoPelangganCodes() {
-      return Array.isArray(promoTokoPelangganCfg.codes) ? promoTokoPelangganCfg.codes.filter(code => databaseProduk[code] && Number(databaseProduk[code].stok || 0) > 0) : [];
+      return Array.isArray(promoTokoPelangganCfg.codes) ? promoTokoPelangganCfg.codes.map(code => String(code)).filter(code => databaseProduk[code] && Number(databaseProduk[code].stok || 0) > 0) : [];
     }
 
     function renderPromoTokoPelanggan() {
@@ -404,7 +404,8 @@ const storeCollection = (...args) => window.storeCollection(...args);
           promoTokoPelangganCfg = { enabled: data.enabled !== false, codes: Array.isArray(data.codes) ? data.codes : [] };
           localStorage.setItem('admin_promo_toko_v1', JSON.stringify(promoTokoPelangganCfg));
         } else {
-          promoTokoPelangganCfg = { enabled: false, codes: [] };
+          const localCfg = (() => { try { return JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{}'); } catch(e) { return {}; } })();
+          promoTokoPelangganCfg = Array.isArray(localCfg.codes) ? { enabled: localCfg.enabled !== false, codes: localCfg.codes.map(code => String(code)) } : { enabled: false, codes: [] };
         }
         renderPromoTokoPelanggan();
       }, err => {
@@ -1133,7 +1134,7 @@ const storeCollection = (...args) => window.storeCollection(...args);
       
       let d = displays[tabId];
       document.getElementById('bottom-bar-title').innerText = d.title; document.getElementById('pagination-box').style.display = d.pBox;
-      if(document.getElementById('fab-cart-btn')) document.getElementById('fab-cart-btn').style.display = d.fabCart; if(document.getElementById('fab-ai-btn')) document.getElementById('fab-ai-btn').style.display = d.fabAi;
+      if(document.getElementById('fab-cart-btn')) document.getElementById('fab-cart-btn').style.display = 'none'; if(document.getElementById('fab-search-btn')) document.getElementById('fab-search-btn').style.display = 'none'; if(document.getElementById('fab-ai-btn')) document.getElementById('fab-ai-btn').style.display = d.fabAi;
       const searchContainer = document.getElementById('sticky-search-container');
       const searchFab = document.getElementById('fab-search-btn');
       if (tabId === 'belanja') {
@@ -1142,7 +1143,7 @@ const storeCollection = (...args) => window.storeCollection(...args);
         if (searchContainer) searchContainer.style.display = 'none';
         if (searchFab) searchFab.style.display = 'none';
       }
-      const catContainer = document.getElementById('category-container'); if(catContainer) catContainer.style.display = d.cat;
+      const catContainer = document.getElementById('category-container'); if(catContainer) catContainer.style.display = 'none';
 
       if(tabId === 'belanja') { perbaruiTampilanKategori(); const pb=document.getElementById('promo-banner-section'); if(pb && pb.getAttribute('aria-hidden') === 'false' && activeKategoriPelanggan === 'Home') pb.style.display = 'flex'; }
       else { 
@@ -1412,10 +1413,11 @@ const storeCollection = (...args) => window.storeCollection(...args);
 /* PHASE 9: handleCatalogInfiniteScroll extracted to _core/modules/products.js */
 
 
-    window.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true });
-    document.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true, capture: true });
-    window.addEventListener('resize', handleCatalogInfiniteScroll, { passive: true });
-    window.addEventListener('load', setupCatalogInfiniteScroll, { once: true });
+    const isHomeCatalogRoute = () => (document.body?.dataset?.kqRoute || window.KQ_CUSTOMER_PAGE?.route || 'home') === 'home';
+    window.addEventListener('scroll', (e) => { if (!isHomeCatalogRoute()) handleCatalogInfiniteScroll(e); }, { passive: true });
+    document.addEventListener('scroll', (e) => { if (!isHomeCatalogRoute()) handleCatalogInfiniteScroll(e); }, { passive: true, capture: true });
+    window.addEventListener('resize', (e) => { if (!isHomeCatalogRoute()) handleCatalogInfiniteScroll(e); }, { passive: true });
+    window.addEventListener('load', () => { if (!isHomeCatalogRoute()) setupCatalogInfiniteScroll(); }, { once: true });
 
     // Assistant AI dari welcome gateway.
     window.addEventListener('load', () => {
