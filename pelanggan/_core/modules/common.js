@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'menu-live-chat': () => { switchTabPelanggan('live-chat'); toggleMenuModal(); },
     'menu-pengaturan': () => { switchTabPelanggan('pengaturan'); toggleMenuModal(); },
     'close-search': () => tutupKolomPencarian(),
+    'home-more-products': () => { window.location.href = '/pelanggan/produk/'; },
     'close-promo': () => tutupPromoTokoPelanggan(),
     'promo-prev': () => geserPromoTokoPelanggan(-1),
     'promo-next': () => geserPromoTokoPelanggan(1),

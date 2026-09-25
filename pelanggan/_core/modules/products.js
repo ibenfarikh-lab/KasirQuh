@@ -266,9 +266,12 @@
   window.refreshKatalogPelanggan = function refreshKatalogPelanggan() {
         const container = document.getElementById("pos-catalog-container"); const cardWrapper = document.getElementById("pos-card-wrapper");
         if (!container || !cardWrapper) return;
-        if (!['list','grid','card'].includes(catalogViewMode)) catalogViewMode = 'grid';
+        const isHomeRoute = (document.body?.dataset?.kqRoute || window.KQ_CUSTOMER_PAGE?.route || 'home') === 'home';
+        if (isHomeRoute) {
+          catalogViewMode = 'card';
+        } else if (!['list','grid','card'].includes(catalogViewMode)) catalogViewMode = 'grid';
         container.className = catalogViewMode === 'list' ? "product-catalog-list" : (catalogViewMode === 'card' ? "product-catalog-card" : "product-catalog-grid");
-        updateCatalogViewButtons();
+        if (!isHomeRoute) updateCatalogViewButtons();
         if (!isProductsLoaded) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
   
         let matchedProducts = [];
@@ -286,15 +289,16 @@
         }
         
         matchedProducts.sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
-        // TAHAP 1: hanya card katalog yang dibatasi. databaseProduk tetap lengkap untuk seluruh dashboard.
-        let paginatedItems = matchedProducts.slice(0, catalogVisibleCount);
+        const visibleCount = isHomeRoute ? 6 : catalogVisibleCount;
+        let paginatedItems = matchedProducts.slice(0, visibleCount);
         container.innerHTML = "";
   
         const loadSentinel = document.getElementById('catalog-load-sentinel');
         cardWrapper.dataset.catalogTotal = String(matchedProducts.length);
-        if (loadSentinel) loadSentinel.style.display = (catalogVisibleCount < matchedProducts.length) ? 'block' : 'none';
+        if (loadSentinel) loadSentinel.style.display = isHomeRoute ? 'none' : ((catalogVisibleCount < matchedProducts.length) ? 'block' : 'none');
   
-        if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; document.getElementById("pos-page-indicator").innerText = `1/1`; if (loadSentinel) loadSentinel.style.display='none'; return; }
+        if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; const pi=document.getElementById("pos-page-indicator"); if(pi) pi.innerText = `1/1`; if (loadSentinel) loadSentinel.style.display='none'; return; }
+        const imageLoadingAttr = isHomeRoute ? '' : ' loading="lazy"';
   
         paginatedItems.forEach(p => {
           let code = p.code; let isHabis = (p.stok || 0) <= 0;
@@ -312,7 +316,7 @@
                   ${isHabis ? '<div class="modern-card-soldout"><span>HABIS</span></div>' : ''}
                   <div class="modern-card-stage">
                     ${sisaStokBadge ? `<div class="modern-card-stock-badge">🔥 Sisa ${p.stok}</div>` : ''}
-                    <img class="modern-card-product" src="${fotoSrc}" alt="${p.nama}" loading="lazy" onload="makeModernProductTransparent(this)">
+                    <img class="modern-card-product" src="${fotoSrc}" alt="${p.nama}" ${imageLoadingAttr} onload="makeModernProductTransparent(this)">
                     <div class="modern-card-platform" aria-hidden="true">
                       <div class="modern-card-base"></div>
                       <div class="modern-card-rim"></div>
@@ -333,7 +337,7 @@
                   ${isHabis ? '<div class="generic-card-soldout"><span>HABIS</span></div>' : ''}
                   <div class="generic-card-image-wrap">
                     ${sisaStokBadge}
-                    <img src="${fotoSrc}" alt="${p.nama}" loading="lazy">
+                    <img src="${fotoSrc}" alt="${p.nama}" ${imageLoadingAttr}>
                     <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">${typeof KQIcon === "function" ? KQIcon("cart") : ""}</button>
                   </div>
                   <div class="generic-card-name">${p.nama}</div>
@@ -416,7 +420,9 @@
                 </div>`;
             }
           }
-        }); document.getElementById("pos-page-indicator").innerText = `${Math.min(catalogVisibleCount, matchedProducts.length)}/${matchedProducts.length}`;
+        });
+        const pageIndicator = document.getElementById("pos-page-indicator");
+        if (pageIndicator) pageIndicator.innerText = `${Math.min(visibleCount, matchedProducts.length)}/${matchedProducts.length}`;
       }
   window.ubahHalamanPos = function ubahHalamanPos(d) { return; }
   window.filterKatalogPelanggan = function filterKatalogPelanggan(v) {
