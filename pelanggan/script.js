@@ -246,7 +246,7 @@
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "", phone: "" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24;
-    // TAHAP 1: jumlah card katalog yang ditampilkan saat awal. Ini TIDAK membatasi databaseProduk/dashboard.
+    // Dashboard Home hanya menampilkan 6 produk. Katalog lengkap berada di /pelanggan/produk/.
     const CATALOG_INITIAL_VISIBLE = 6;
     let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
     let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
@@ -1695,11 +1695,11 @@
       let paginatedItems = matchedProducts.slice(0, catalogVisibleCount);
       container.innerHTML = "";
 
-      const loadSentinel = document.getElementById('catalog-load-sentinel');
       cardWrapper.dataset.catalogTotal = String(matchedProducts.length);
-      if (loadSentinel) loadSentinel.style.display = (catalogVisibleCount < matchedProducts.length) ? 'block' : 'none';
+      const showMoreBtn = document.getElementById('home-show-more-products');
+      if (showMoreBtn) showMoreBtn.style.display = matchedProducts.length > CATALOG_INITIAL_VISIBLE ? 'flex' : 'none';
 
-      if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; document.getElementById("pos-page-indicator").innerText = `1/1`; if (loadSentinel) loadSentinel.style.display='none'; return; }
+      if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; const pageIndicator = document.getElementById("pos-page-indicator"); if (pageIndicator) pageIndicator.innerText = `1/1`; if (showMoreBtn) showMoreBtn.style.display='none'; return; }
 
       paginatedItems.forEach(p => {
         let code = p.code; let isHabis = (p.stok || 0) <= 0;
@@ -1821,7 +1821,7 @@
               </div>`;
           }
         }
-      }); document.getElementById("pos-page-indicator").innerText = `${Math.min(catalogVisibleCount, matchedProducts.length)}/${matchedProducts.length}`;
+      }); const pageIndicator = document.getElementById("pos-page-indicator"); if (pageIndicator) pageIndicator.innerText = `${Math.min(catalogVisibleCount, matchedProducts.length)}/${matchedProducts.length}`;
     }
 
     // Pagination lama tidak lagi mengubah sumber data. Tahap berikutnya akan menggantinya dengan infinite scroll.
@@ -1834,51 +1834,8 @@
       refreshKatalogPelanggan();
     }
 
-    // TAHAP 2: lazy rendering + infinite scroll.
-    // DatabaseProduk tetap penuh. Sentinel dipakai agar tidak bergantung
-    // pada window.scroll atau jenis container scroll yang dipakai halaman.
-    let catalogScrollLoading = false;
-    let catalogLoadObserver = null;
-
-    function loadNextCatalogBatch() {
-      if (catalogScrollLoading) return;
-      const wrapper = document.getElementById('pos-card-wrapper');
-      if (!wrapper || wrapper.style.display === 'none') return;
-
-      const total = parseInt(wrapper.dataset.catalogTotal || '0', 10);
-      if (!total || catalogVisibleCount >= total) return;
-
-      catalogScrollLoading = true;
-      catalogVisibleCount = Math.min(catalogVisibleCount + CATALOG_INITIAL_VISIBLE, total);
-      refreshKatalogPelanggan();
-      requestAnimationFrame(() => { catalogScrollLoading = false; });
-    }
-
-    function setupCatalogInfiniteScroll() {
-      const sentinel = document.getElementById('catalog-load-sentinel');
-      if (!sentinel || !('IntersectionObserver' in window)) return;
-      if (catalogLoadObserver) catalogLoadObserver.disconnect();
-
-      catalogLoadObserver = new IntersectionObserver((entries) => {
-        if (entries.some(entry => entry.isIntersecting)) loadNextCatalogBatch();
-      }, { root: null, rootMargin: '500px 0px 500px 0px', threshold: 0 });
-      catalogLoadObserver.observe(sentinel);
-    }
-
-    // Fallback tambahan untuk browser/scroll container yang tidak memicu
-    // observer secara konsisten. Capture=true menangkap scroll dari elemen anak.
-    function handleCatalogInfiniteScroll() {
-      if (catalogScrollLoading) return;
-      const sentinel = document.getElementById('catalog-load-sentinel');
-      if (!sentinel || sentinel.style.display === 'none') return;
-      const rect = sentinel.getBoundingClientRect();
-      if (rect.top <= window.innerHeight + 500) loadNextCatalogBatch();
-    }
-
-    window.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true });
-    document.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true, capture: true });
-    window.addEventListener('resize', handleCatalogInfiniteScroll, { passive: true });
-    window.addEventListener('load', setupCatalogInfiniteScroll, { once: true });
+    // Dashboard Home sengaja tidak memakai infinite scroll.
+    // Katalog lengkap tersedia di /pelanggan/produk/.
 
     // Assistant AI dari welcome gateway.
     window.addEventListener('load', () => {
@@ -1892,7 +1849,6 @@
         try { toggleAIChatModal(); } catch (e) { console.warn('Gagal membuka Assistant AI dari welcome:', e); }
       }, 900);
     }, { once: true });
-    setTimeout(setupCatalogInfiniteScroll, 0);
 
     function renderCartPelanggan() {
       const tbody = document.getElementById("cart-body"); tbody.innerHTML = ""; let total = 0, totalQty = 0;
