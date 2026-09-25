@@ -267,9 +267,7 @@
         const container = document.getElementById("pos-catalog-container"); const cardWrapper = document.getElementById("pos-card-wrapper");
         if (!container || !cardWrapper) return;
         const isHomeRoute = (document.body?.dataset?.kqRoute || window.KQ_CUSTOMER_PAGE?.route || 'home') === 'home';
-        if (isHomeRoute) {
-          catalogViewMode = 'card';
-        } else if (!['list','grid','card'].includes(catalogViewMode)) catalogViewMode = 'grid';
+        if (!['list','grid','card'].includes(catalogViewMode)) catalogViewMode = 'grid';
         container.className = catalogViewMode === 'list' ? "product-catalog-list" : (catalogViewMode === 'card' ? "product-catalog-card" : "product-catalog-grid");
         if (!isHomeRoute) updateCatalogViewButtons();
         if (!isProductsLoaded) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
