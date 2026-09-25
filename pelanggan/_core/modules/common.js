@@ -3,6 +3,42 @@
   window.KQModules = window.KQModules || {};
   window.KQModules.common = window.KQModules.common || {name:'common'};
 
+  // Shared customer presentation helpers. These used to live in script.js,
+  // but Phase 12 moved them to settings.js. Every customer route needs the
+  // theme/view helpers, so keep their shared bridge here and let settings.js
+  // replace them with the same implementation on the Account route.
+  function applyThemePelanggan(theme) {
+    const safeTheme = ['light', 'dark', 'modern'].includes(theme) ? theme : 'modern';
+    document.body?.setAttribute('data-theme', safeTheme);
+  }
+  function gantiTemaPelanggan(theme) {
+    const safeTheme = ['light', 'dark', 'modern'].includes(theme) ? theme : 'modern';
+    const previousTheme = localStorage.getItem('cust_theme_v13') || 'modern';
+    localStorage.setItem('cust_theme_v13', safeTheme);
+    applyThemePelanggan(safeTheme);
+    if (previousTheme !== safeTheme) window.location.reload();
+  }
+  function updateCatalogViewButtons() {
+    const selected = localStorage.getItem('cust_view_v13') || 'grid';
+    document.querySelectorAll('.catalog-view-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.view === selected);
+    });
+  }
+  function gantiViewModePelanggan(mode) {
+    if (!['list','grid','card'].includes(mode)) mode = 'grid';
+    localStorage.setItem('cust_view_v13', mode);
+    updateCatalogViewButtons();
+    if (typeof window.refreshKatalogPelanggan === 'function') {
+      try { window.refreshKatalogPelanggan(); } catch (err) {
+        console.warn('[KasirQuh] refresh katalog setelah ubah tampilan gagal:', err);
+      }
+    }
+  }
+  window.applyThemePelanggan = window.applyThemePelanggan || applyThemePelanggan;
+  window.gantiTemaPelanggan = window.gantiTemaPelanggan || gantiTemaPelanggan;
+  window.updateCatalogViewButtons = window.updateCatalogViewButtons || updateCatalogViewButtons;
+  window.gantiViewModePelanggan = window.gantiViewModePelanggan || gantiViewModePelanggan;
+
 /* ===== EXTRACTED FROM pelanggan.html <script> #9 id=none ===== */
 
 // H-05-A: selective migration of safe ID-based no-argument click handlers.
