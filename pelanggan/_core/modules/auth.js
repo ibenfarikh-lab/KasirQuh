@@ -87,6 +87,11 @@
 
   async function validateSession() {
     if (validationInFlight) return validationInFlight;
+    const existingPhone = (localStorage.getItem(SESSION_KEY) || '').trim();
+    if (validatedPhone && existingPhone && validatedPhone === existingPhone) {
+      showAuthenticated();
+      return true;
+    }
     const phone = (localStorage.getItem(SESSION_KEY) || '').trim();
     if (!phone) {
       showLogin();
@@ -119,7 +124,16 @@
         return true;
       } catch (err) {
         console.warn('[KasirQuh Phase 13] validasi sesi gagal:', err);
-        // Do not silently trust a cached session when Firebase cannot verify it.
+        // A transient network/Firestore transport failure must not turn a valid
+        // local session into an apparent logout. Keep the UI locked and retry.
+        const code = String(err && err.code || '');
+        const message = String(err && err.message || '');
+        const transient = code.includes('unavailable') || code.includes('deadline-exceeded') || code.includes('aborted') || code.includes('internal') || /failed to fetch|network|transport|listen|channel/i.test(message);
+        if (transient && localStorage.getItem(SESSION_KEY) === phone) {
+          document.body.classList.add('kq-session-pending');
+          setTimeout(() => { if (localStorage.getItem(SESSION_KEY) === phone) validateSession(); }, 1800);
+          return false;
+        }
         clearSession();
         showLogin();
         return false;
