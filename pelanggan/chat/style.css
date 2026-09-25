@@ -1,0 +1,5 @@
+@import url("../_core/style.css");
+
+/* V14 Phase 3 — Chat route */
+body[data-kq-route="chat"] .main-content{padding-bottom:78px;}
+body[data-kq-route="chat"] #live-chat{display:flex!important;}
