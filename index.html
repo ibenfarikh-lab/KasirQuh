@@ -1,264 +1,771 @@
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>Beranda - KasirQuh</title>
-<meta content="#2563eb" name="theme-color"/>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<link href="style.css" rel="stylesheet"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>KasirQuh</title>
+  <meta name="theme-color" content="#06132d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    html { min-height: 100%; background: #06132d; }
+    body { margin: 0; min-height: 100dvh; height: 100dvh; overflow: hidden; background: #06132d; }
+  </style>
+
+<style id="kasirquh-gateway-portrait-viewport-v1">
+@media (min-width: 768px) {
+  html { background: #05080f !important; min-height: 100% !important; }
+  body {
+    width: 430px !important; min-width: 430px !important; max-width: 430px !important;
+    height: 100vh !important; min-height: 100vh !important; max-height: 100vh !important;
+    margin: 0 auto !important; overflow: hidden !important; position: relative !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 0 60px rgba(0,0,0,.55) !important;
+  }
+  #kasirquhPwaOpening, #kasirquhVisual4Welcome {
+    width: 430px !important; max-width: 430px !important; min-width: 430px !important;
+    height: 100vh !important; min-height: 100vh !important;
+    left: 50% !important; right: auto !important; top: 0 !important; bottom: auto !important;
+    inset-inline-start: 50% !important; inset-inline-end: auto !important;
+    transform: translateX(-50%) !important; box-sizing: border-box !important;
+  }
+  #kasirquhPwaOpening .kpo-grid, #kasirquhPwaOpening .kpo-glow,
+  #kasirquhVisual4Welcome .kv4-slide-image, #kasirquhVisual4Welcome .kv4-dim {
+    max-width: none !important;
+  }
+}
+</style>
 </head>
-<body data-kq-route="home" data-theme="modern" style="font-size: 0.85rem;"><div class="login-overlay" id="customerLoginModal" style="display: flex;">
-<div class="login-card" style="max-height: 90vh; overflow-y: auto; padding: 16px;">
-<h2 style="margin-top: 0; margin-bottom: 4px; font-size: 1.3rem;">KasirQuh</h2>
-<div id="formLoginContainer">
-<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Silakan masuk dengan No. WhatsApp &amp; Sandi</p>
-<form class="form-vertical" onsubmit="prosesLoginPelanggan(event)" style="gap: 8px;">
-<input aria-label="Nomor WhatsApp untuk masuk" id="cust-login-phone" placeholder="No. WhatsApp (Cth: 08123...)" required="" style="padding: 10px; font-size: 0.85rem;" type="text"/>
-<input aria-label="Sandi untuk masuk" id="cust-login-pass" placeholder="Sandi" required="" style="padding: 10px; font-size: 0.85rem;" type="password"/>
-<button style="margin-top: 6px; border-radius: 6px; padding: 10px; background: #2563eb; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;" type="submit">Masuk</button>
-</form>
-<p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Belum punya akun? <a data-kq-static-action="auth-register" href="javascript:void(0)" style="color: #2563eb; font-weight: bold;">Daftar di sini</a></p>
+<body>
+<!-- KASIRQUH FUTURISTIC PWA OPENING -->
+<style>
+#kasirquhPwaOpening{
+  position:fixed; inset:0; z-index:2147483647;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; background:#06132d;
+  opacity:1; visibility:visible;
+  transition:opacity .65s ease, visibility .65s ease;
+}
+#kasirquhPwaOpening.hide{opacity:0;visibility:hidden;pointer-events:none}
+#kasirquhPwaOpening .kpo-grid{
+  position:absolute; inset:-20%; opacity:.22;
+  background-image:linear-gradient(rgba(80,170,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(80,170,255,.12) 1px,transparent 1px);
+  background-size:42px 42px; transform:perspective(500px) rotateX(58deg) scale(1.35);
+  transform-origin:center bottom; animation:kpoGrid 5s linear infinite;
+}
+#kasirquhPwaOpening .kpo-glow{
+  position:absolute; width:78vmax; height:78vmax; border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,.38) 0%,rgba(14,165,233,.17) 28%,rgba(37,99,235,.06) 48%,transparent 70%);
+  filter:blur(10px); animation:kpoPulse 2.2s ease-in-out infinite;
+}
+#kasirquhPwaOpening .kpo-orbit{
+  position:absolute; width:230px; height:230px; border-radius:50%;
+  border:1px solid rgba(125,211,252,.22); box-shadow:0 0 35px rgba(37,99,235,.2),inset 0 0 35px rgba(14,165,233,.12);
+  animation:kpoOrbit 3.8s linear infinite;
+}
+#kasirquhPwaOpening .kpo-orbit:before,
+#kasirquhPwaOpening .kpo-orbit:after{
+  content:""; position:absolute; inset:17px; border-radius:50%; border:1px solid rgba(96,165,250,.13);
+}
+#kasirquhPwaOpening .kpo-orbit:after{inset:-17px;border-color:rgba(56,189,248,.10)}
+#kasirquhPwaOpening .kpo-logo{
+  position:relative; width:min(34vw,180px); height:min(34vw,180px); object-fit:contain;
+  filter:drop-shadow(0 0 10px rgba(59,130,246,.75)) drop-shadow(0 0 30px rgba(14,165,233,.48));
+  animation:kpoLogo 1.35s cubic-bezier(.2,.8,.2,1) both;
+}
+#kasirquhPwaOpening .kpo-shine{
+  position:absolute; width:230%; height:28%; left:-65%; top:36%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);
+  transform:rotate(-18deg); filter:blur(5px); animation:kpoShine 1.35s .35s ease-out both;
+}
+#kasirquhPwaOpening .kpo-text{
+  position:absolute; bottom:11%; left:0; right:0; text-align:center;
+  color:rgba(219,234,254,.92); font:700 12px/1.2 system-ui,sans-serif; letter-spacing:4px;
+  text-transform:uppercase; opacity:0; animation:kpoText .7s .55s ease-out forwards;
+}
+@keyframes kpoLogo{0%{transform:scale(.52);opacity:0}65%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes kpoPulse{0%,100%{transform:scale(.92);opacity:.72}50%{transform:scale(1.08);opacity:1}}
+@keyframes kpoOrbit{to{transform:rotate(360deg)}}
+@keyframes kpoShine{0%{transform:translateX(-70%) rotate(-18deg);opacity:0}25%{opacity:1}100%{transform:translateX(70%) rotate(-18deg);opacity:0}}
+@keyframes kpoGrid{to{background-position:0 42px,42px 0}}
+@keyframes kpoText{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#kasirquhPwaOpening *{animation:none!important}}
+</style>
+<div id="kasirquhPwaOpening" aria-hidden="true">
+  <div class="kpo-grid"></div>
+  <div class="kpo-glow"></div>
+  <div class="kpo-orbit"></div>
+  <div style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:min(34vw,180px);height:min(34vw,180px);border-radius:28%;">
+    <img class="kpo-logo" src="icon-512.png" alt="KasirQuh">
+    <div class="kpo-shine"></div>
+  </div>
+  <div class="kpo-text">KasirQuh</div>
 </div>
-<div id="formRegisterContainer" style="display: none;">
-<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Daftar Akun (Menunggu Persetujuan Admin)</p>
-<form class="form-vertical" onsubmit="prosesDaftarPelanggan(event)" style="gap: 8px;">
-<input aria-label="Nama lengkap pelanggan" id="cust-reg-name" placeholder="Nama Lengkap" required="" style="padding: 10px; font-size: 0.85rem;" type="text"/>
-<input aria-label="Nomor WhatsApp pelanggan" id="cust-reg-phone" placeholder="No. WhatsApp (Cth: 08123...)" required="" style="padding: 10px; font-size: 0.85rem;" type="text"/>
-<textarea aria-label="Alamat pengiriman lengkap" id="cust-reg-address" placeholder="Alamat Pengiriman Lengkap" required="" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 8px; font-size: 0.85rem;"></textarea>
-<input aria-label="Sandi pelanggan" id="cust-reg-pass" placeholder="Buat Sandi" required="" style="padding: 10px; font-size: 0.85rem;" type="password"/>
-<button style="margin-top: 6px; border-radius: 6px; padding: 10px; background: #16a34a; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 0.85rem;" type="submit">Kirim Pendaftaran</button>
-</form>
-<p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Sudah punya akun? <a data-kq-static-action="auth-login" href="javascript:void(0)" style="color: #2563eb; font-weight: bold;">Masuk di sini</a></p>
-</div>
-</div>
-</div><div class="modal-backdrop" id="dailyCheckinModal" style="display: none;">
-<div class="modal-content modal-checkin-content" style="background: var(--card-bg); max-width: 300px;">
-<div style="font-size: 3rem; margin-bottom: 8px;">🪙</div>
-<h2 style="margin: 0 0 8px 0; color: #d97706; font-size: 1.2rem;">Bonus Warga!</h2>
-<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Selamat! Kamu rajin buka aplikasi hari ini. Ini 10 Koin untukmu!</p>
-<button data-kq-static-action="claim-coin" style="background: #16a34a; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; font-size: 0.85rem; cursor: pointer; width: 100%; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.3);" type="button">Klaim Koin Sekarang</button>
-</div>
-</div><div class="main-content" data-kq-page-content=""><div class="tab-content active" id="belanja" style="display: block;">
-<div class="customer-home-header no-print" id="customer-home-header">
-<div aria-hidden="true" class="customer-home-logo-wrap">
-<svg aria-label="KasirQuh Warunge Mimi" class="customer-home-logo" role="img" viewbox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="7">
-<path d="M48 78h164l-18-26H66L48 78Z"></path>
-<path d="M48 78c4 27 22 35 39 13 17 22 35 22 52 0 17 22 35 22 52 0 17 22 35 14 39-13"></path>
-<path d="M72 92v74M188 92v74M60 166h140"></path>
-<path d="M91 166v-47h39v47M91 128h39M153 166v-31h36"></path>
-<path d="M154 129c0-18 36-18 36 0"></path>
-<path d="M157 111c-3-10 5-13 4-21M171 111c-3-10 5-13 4-21M185 111c-3-10 5-13 4-21"></path>
-<path d="M39 190l-12-8M39 204l-15 2M39 218l-12 8M221 190l12-8M221 204l15 2M221 218l12 8"></path>
-</g>
-<g fill="currentColor" font-family="Arial,Helvetica,sans-serif" text-anchor="middle">
-<text font-size="35" font-weight="900" letter-spacing="-1.5" x="130" y="203">KasirQuh</text>
-<text font-size="21" font-weight="900" letter-spacing="-0.8" x="130" y="228">Warunge Mimi</text>
-</g>
-</svg>
-</div>
-<div class="customer-home-title-row">
-<h1 class="customer-home-title"><span id="customer-home-store-name">Nama Toko</span></h1>
-<p class="customer-home-greeting" id="customer-home-greeting">Selamat pagi 👋</p>
-<div class="customer-home-info-line" id="customer-home-info-line"><span class="customer-info-label">📢  Info Toko:</span><span aria-live="polite" class="customer-running-window"><span class="customer-running-text" id="customer-home-running-text"> </span></span></div>
-</div>
-<button aria-label="Lihat promo toko" class="promo-banner no-print" id="promo-banner-section" style="display:none;" type="button">
-<div class="promo-stage">
-<div style="font-size:2rem;line-height:1;margin-bottom:10px;">🎁</div>
-<div style="font-size:.82rem;font-weight:900;line-height:1.05;">Ada Promo Nih!</div>
-<div style="font-size:.58rem;font-weight:800;margin-top:5px;opacity:.95;">💥</div>
-<div id="promo-slide-content" style="display:none;"></div>
-</div>
+<script>
+(function(){
+  const o=document.getElementById('kasirquhPwaOpening');
+  if(!o)return;
+  const close=()=>o.classList.add('hide');
+  window.addEventListener('load',()=>setTimeout(close,1050),{once:true});
+  setTimeout(close,1800);
+})();
+</script>
+
+
+<!-- KASIRQUH SLIDE 1-2-3 WELCOME PATCH -->
+<style id="kasirquh-slide123-patch">
+  #kasirquhVisual4Welcome {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    overflow: hidden;
+    background: #000;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .72s ease, visibility .72s ease;
+  }
+  #kasirquhVisual4Welcome.kv4-leaving {
+    opacity: 0;
+    visibility: hidden;
+  }
+  #kasirquhVisual4Welcome .kv4-slide-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity .55s ease, transform .82s cubic-bezier(.2,.75,.2,1), filter .72s ease;
+  }
+  #kasirquhVisual4Welcome.kv4-focus-customer .kv4-slide-image,
+  #kasirquhVisual4Welcome.kv4-focus-admin .kv4-slide-image {
+    transform: scale(1) translateY(0);
+    filter: brightness(.78) saturate(1.08) blur(.7px);
+  }
+  #kasirquhVisual4Welcome .kv4-dim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 65%, rgba(255,255,255,.04), rgba(0,0,0,.18) 70%, rgba(0,0,0,.28));
+    opacity: .28;
+    transition: opacity .7s ease;
+  }
+  #kasirquhVisual4Welcome.kv4-focus-customer .kv4-dim,
+  #kasirquhVisual4Welcome.kv4-focus-admin .kv4-dim { opacity: .72; }
+  #kasirquhVisual4Welcome .kv4-button-glow {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    box-sizing: border-box;
+    border: 1.5px solid rgba(255,255,255,.86);
+    border-radius: 16px;
+    background: rgba(255,255,255,.012);
+    opacity: 0;
+    box-shadow: 0 0 4px rgba(255,255,255,.58), 0 0 11px rgba(255,255,255,.30), inset 0 0 6px rgba(255,255,255,.12);
+  }
+  #kv4CustomerGlow, #kv4AdminGlow {
+    left: 0; top: 0; width: 0; height: 0;
+  }
+  /* Customer outline follows the large rounded corners already baked into the PNG.
+     Only the CSS glow is adjusted; the PNG itself is untouched. */
+  #kv4CustomerGlow {
+    border-radius: 52px;
+    border-width: 2px;
+    box-shadow:
+      0 0 5px rgba(255,255,255,.72),
+      0 0 12px rgba(255,255,255,.38),
+      0 0 22px rgba(255,210,90,.22),
+      inset 0 0 7px rgba(255,255,255,.14);
+  }
+  #kasirquhVisual4Welcome .kv4-button-glow.kv4-glow-active {
+    animation: kv4GlowReveal .88s ease-in-out forwards;
+  }
+  #kasirquhVisual4Welcome .kv4-button-glow.kv4-glow-pressed {
+    animation: kv4GlowPressed .34s ease-out forwards;
+  }
+  @keyframes kv4GlowReveal {
+    0% { opacity: 0; transform: scale(.985); filter: brightness(.96); }
+    20% { opacity: .78; transform: scale(1); filter: brightness(1.18); }
+    58% { opacity: .52; transform: scale(1.008); filter: brightness(1.08); }
+    100% { opacity: 0; transform: scale(1.018); filter: brightness(1); }
+  }
+  @keyframes kv4GlowPressed {
+    0% { opacity: .35; transform: scale(1); }
+    45% { opacity: 1; transform: scale(1.035); filter: brightness(1.55); box-shadow: 0 0 8px rgba(255,255,255,.95), 0 0 24px rgba(255,255,255,.7), inset 0 0 12px rgba(255,255,255,.28); }
+    100% { opacity: 0; transform: scale(1.055); }
+  }
+  @media (max-width: 480px) {
+    #kasirquhVisual4Welcome .kv4-button-glow { border-width: 1.5px; }
+    #kv4CustomerGlow { border-radius: 52px; }
+    #kv4AdminGlow { border-radius: 36px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #kasirquhVisual4Welcome .kv4-button-glow { animation-duration: .2s !important; }
+  }
+
+  #kasirquhVisual4Welcome .kv4-customer-swipe {
+    position: absolute;
+    z-index: 2.5;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 52px;
+    --swipe-x: 0px;
+    --swipe-progress: 0;
+    opacity: 1;
+  }
+  /* Opaque orange fill: it progressively covers the PNG button underneath. */
+  #kasirquhVisual4Welcome .kv4-customer-swipe::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: calc(var(--swipe-progress) * 100%);
+    height: 100%;
+    border-radius: inherit;
+    background: #FF8A00;
+    box-shadow:
+      0 0 10px rgba(255,138,0,.55),
+      0 0 22px rgba(255,138,0,.28),
+      inset 0 0 10px rgba(255,190,70,.28);
+    transition: width .35s cubic-bezier(.2,.85,.25,1);
+    z-index: 1;
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-swiping::before {
+    transition: none;
+    box-shadow:
+      0 0 12px rgba(255,138,0,.72),
+      0 0 28px rgba(255,138,0,.38),
+      inset 0 0 12px rgba(255,205,90,.32);
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-swipe-success::before {
+    width: 100%;
+    transition: width .24s cubic-bezier(.2,.9,.2,1);
+  }
+  #kasirquhVisual4Welcome .kv4-swipe-handle {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    width: 42px;
+    height: 42px;
+    margin-top: -21px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: rgba(255,255,255,.96);
+    font: 700 24px/1 Arial, sans-serif;
+    background: rgba(255,255,255,.10);
+    border: 1.5px solid rgba(255,255,255,.55);
+    box-shadow: 0 0 8px rgba(255,255,255,.42), 0 0 18px rgba(255,210,90,.28);
+    transform: translate3d(var(--swipe-x),0,0);
+    transition: transform .35s cubic-bezier(.2,.85,.25,1), opacity .25s ease, box-shadow .25s ease;
+    animation: kv4SwipeHint 1.9s ease-in-out infinite;
+    z-index: 2;
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-resetting::before {
+    transition: none !important;
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-swiping .kv4-swipe-handle {
+    animation: none;
+    box-shadow: 0 0 10px rgba(255,255,255,.78), 0 0 28px rgba(255,210,90,.46);
+  }
+  #kasirquhVisual4Welcome .kv4-customer-swipe.kv4-swipe-success .kv4-swipe-handle {
+    animation: kv4SwipeSuccess .38s ease-out forwards;
+  }
+  @keyframes kv4SwipeHint {
+    0%, 100% { transform: translate3d(0,0,0); opacity: .72; }
+    48% { transform: translate3d(13px,0,0); opacity: 1; }
+    62% { transform: translate3d(7px,0,0); opacity: .92; }
+  }
+  @keyframes kv4SwipeSuccess {
+    0% { transform: translate3d(var(--swipe-x),0,0) scale(1); opacity: 1; }
+    55% { transform: translate3d(var(--swipe-x),0,0) scale(1.18); opacity: 1; }
+    100% { transform: translate3d(var(--swipe-x),0,0) scale(1.04); opacity: 0; }
+  }
+
+  #kasirquhVisual4Welcome .kv4-hotspot {
+    position: absolute;
+    z-index: 3;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    outline: 0;
+    background: transparent !important;
+    background-image: none !important;
+    color: transparent !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  #kv4CustomerHotspot, #kv4AdminHotspot {
+    left: 0; top: 0; width: 0; height: 0;
+  }
+  @media (max-width: 480px) { }
+  @media (prefers-reduced-motion: reduce) {
+    #kasirquhVisual4Welcome,
+    #kasirquhVisual4Welcome .kv4-slide-image,
+    #kasirquhVisual4Welcome .kv4-dim { transition-duration: .2s; }
+  }
+</style>
+
+<!-- KASIRQUH GATEWAY PWA INSTALL FAB -->
+<style id="kasirquh-gateway-pwa-install-v1">
+  #gateway-pwa-install {
+    position: fixed;
+    top: max(14px, env(safe-area-inset-top));
+    right: max(14px, env(safe-area-inset-right));
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,.65);
+    border-radius: 999px;
+    background: rgba(6,19,45,.78);
+    color: #fff;
+    box-shadow: 0 5px 18px rgba(0,0,0,.35), 0 0 18px rgba(59,130,246,.28);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    font: 700 12px/1 system-ui, sans-serif;
+    letter-spacing: .15px;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #gateway-pwa-install.show { display: inline-flex; }
+  #gateway-pwa-install:active { transform: scale(.97); }
+  #gateway-pwa-install-icon { font-size: 17px; line-height: 1; }
+  @media (max-width: 480px) {
+    #gateway-pwa-install { right: 12px; padding: 8px 11px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #gateway-pwa-install { transition: none; }
+  }
+</style>
+<button id="gateway-pwa-install" type="button" aria-label="Install Aplikasi KasirQuh" title="Install Aplikasi KasirQuh">
+  <span id="gateway-pwa-install-icon" aria-hidden="true">📲</span>
+  <span>Install</span>
 </button>
-</div>
-<div class="no-print" id="reorder-section-wrapper" style="display: none; margin-bottom: 10px;">
-<div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
-<div class="auto-scroll-wrapper" id="reorder-container"></div>
-</div>
-<!-- 5 MENU DEFAULT + MENU KUSTOM DI RENDER BANNER MULTI-WARNA -->
-<div class="no-print" id="recipe-section-wrapper" style="margin: 1px 0 10px 0;">
-<div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🍜  ide Masak Warga Hari Ini</div>
-<div class="horizontal-scroll-container" id="recipe-scroll-container">
-<!-- Rendered via JavaScript -->
-</div>
-</div>
-<!-- Barang Laris Hari Ini -->
-<div class="no-print" id="trending-section-wrapper" style="margin: 1px 0 2px 0;">
-<div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
-<div class="auto-scroll-wrapper" id="trending-container"></div>
-</div>
-<!-- Kategori katalog: ikon saja; judul muncul hanya setelah masuk mode Produk/kategori. -->
-<div aria-label="Kategori produk" class="category-chips no-print" id="category-container">
-<button aria-label="Home" class="chip-btn active" data-category="Home" data-kq-static-action="category-home" title="Home" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"></path><path d="M6 10v10h12V10"></path><path d="M9 20v-6h6v6"></path><path d="M8 8.5h.01"></path></svg></button>
-<button aria-label="Produk" class="chip-btn" data-category="Produk" data-kq-static-action="category-produk" title="Produk" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M4 8.5h16l-1.2 11H5.2L4 8.5Z"></path><path d="M8 8.5c.2-3 1.7-4.5 4-4.5s3.8 1.5 4 4.5"></path><path d="M9 12.5h.01M15 12.5h.01"></path></svg></button>
-<button aria-label="Titipan Warga" class="chip-btn" data-category="Titipan Warga" data-kq-static-action="category-titipan-warga" title="Titipan Warga" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M4 9.5 12 3l8 6.5"></path><path d="M6 9v11h12V9"></path><path d="M8.5 20v-5h7v5"></path><path d="M4 20h16"></path><path d="M9 11.5h6"></path></svg></button>
-<button aria-label="Sembako" class="chip-btn" data-category="Sembako" data-kq-static-action="category-sembako" title="Sembako" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M5 8.5h14l-1 11H6l-1-11Z"></path><path d="M8 8.5c.3-2.8 1.7-4.2 4-4.2s3.7 1.4 4 4.2"></path><path d="M8.5 12.5c1.2.8 2.2.8 3.5 0s2.3-.8 3.5 0"></path></svg></button>
-<button aria-label="Minuman" class="chip-btn" data-category="Minuman" data-kq-static-action="category-minuman" title="Minuman" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M7 4h10"></path><path d="M8 4.5 9.2 20h5.6L16 4.5"></path><path d="M9 10h6"></path><path d="M10 14c1 .7 2 .7 3 0s2-.7 3 0"></path></svg></button>
-<button aria-label="Makanan" class="chip-btn" data-category="Makanan" data-kq-static-action="category-makanan" title="Makanan" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M4 13h16"></path><path d="M6 13a6 6 0 0 1 12 0"></path><path d="M7 17h10"></path><path d="M9 17v3M15 17v3"></path><path d="M8 10h.01M16 10h.01"></path></svg></button>
-<button aria-label="Snack" class="chip-btn" data-category="Snack" data-kq-static-action="category-snack" title="Snack" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M6 10h12l-1 10H7L6 10Z"></path><path d="M8 10c0-2 1-3 2-3 0-2 1-3 2-3s2 1 2 3c1 0 2 1 2 3"></path><path d="M9 14h.01M12 14h.01M15 14h.01"></path></svg></button>
-<button aria-label="Bumbu" class="chip-btn" data-category="Bumbu" data-kq-static-action="category-bumbu" title="Bumbu" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M7 8h10v12H7z"></path><path d="M8.5 8c.3-2.1 1.5-3.3 3.5-3.3S15.2 5.9 15.5 8"></path><path d="M9.5 12.5h5M9.5 16h3.5"></path></svg></button>
-<button aria-label="Perawatan" class="chip-btn" data-category="Perawatan" data-kq-static-action="category-perawatan" title="Perawatan" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M9 3h6v3H9z"></path><path d="M8 6h8l1 15H7L8 6Z"></path><path d="M10 11h4M10 15h4"></path><path d="M12 8v.01"></path></svg></button>
-<button aria-label="Kebutuhan Rumah" class="chip-btn" data-category="Kebutuhan Rumah" data-kq-static-action="category-kebutuhan-rumah" title="Kebutuhan Rumah" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M5 10h14l-1 11H6L5 10Z"></path><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M9 14c1 .7 2 .7 3 0s2-.7 3 0"></path></svg></button>
-<button aria-label="Lainnya" class="chip-btn" data-category="Lainnya" data-kq-static-action="category-lainnya" title="Lainnya" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M5 7h14v14H5z"></path><path d="M8 7V4h8v3"></path><path d="M9 12h6M9 16h4"></path><path d="M12 9.5v.01"></path></svg></button>
-</div>
-<div class="pos-container" style="gap: 0;">
-<div aria-live="polite" class="catalog-category-title" id="catalog-category-title"></div>
-<div aria-label="Pilih tampilan produk" class="catalog-view-switcher no-print">
-<button aria-label="Tampilan list" class="catalog-view-btn" data-kq-static-action="view-list" data-view="list" title="List" type="button"><span class="catalog-view-icon">☷</span></button>
-<button aria-label="Tampilan grid" class="catalog-view-btn" data-kq-static-action="view-grid" data-view="grid" title="Grid" type="button"><span class="catalog-view-icon">▦</span></button>
-<button aria-label="Tampilan card" class="catalog-view-btn" data-kq-static-action="view-card" data-view="card" title="Card" type="button"><span class="catalog-view-icon">▣</span></button>
-</div>
-<div class="card no-print" id="pos-card-wrapper" style="margin-bottom: 0; display: none; padding: 0 6px 4px 6px; background: transparent; border: none; box-shadow: none;">
-<div id="pos-catalog-container"></div><div aria-hidden="true" id="catalog-load-sentinel" style="height:1px;width:100%;"></div>
-</div>
-</div>
-<!-- MODAL KERANJANG -->
+<script id="kasirquh-gateway-pwa-install-js">
+(function () {
+  const installButton = document.getElementById('gateway-pwa-install');
+  if (!installButton) return;
 
-</div></div><div class="sticky-search-bar no-print" id="sticky-search-container" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
-<div style="display: flex; gap: 8px; align-items: center;">
-<input aria-label="Cari nama barang" id="inventory-search-input" oninput="filterKatalogPelanggan(this.value)" placeholder="🔍 Cari nama barang..." style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;" type="text"/>
-<button data-kq-static-action="close-search" style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" type="button">✕</button>
-</div>
-</div><div class="modal-backdrop promo-floating-backdrop" id="promoTokoModal" onclick="if(event.target === this) tutupPromoTokoPelanggan()">
-<div aria-label="Promo toko" aria-modal="true" class="promo-floating-card" role="dialog">
-<button aria-label="Tutup promo" class="promo-floating-close" data-kq-static-action="close-promo" type="button">✕</button>
-<div class="promo-floating-badge">🎁 PROMO</div>
-<div class="promo-toko-slider" id="promo-toko-slider"></div>
-<div class="promo-floating-nav">
-<button aria-label="Promo sebelumnya" data-kq-static-action="promo-prev" id="promo-prev-btn" type="button">‹</button>
-<span id="promo-counter">1 / 1</span>
-<button aria-label="Promo berikutnya" data-kq-static-action="promo-next" id="promo-next-btn" type="button">›</button>
-</div>
-</div>
-</div><div class="modal-backdrop" id="cartModal" onclick="if(event.target === this) closeCartModal()">
-<div class="modal-content" style="max-width: 380px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 12px; background: var(--card-bg); display: flex; flex-direction: column; gap: 6px;">
-<div class="modal-header no-print" style="margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
-<h3 style="font-size: 1rem; margin: 0;">Keranjang Belanja</h3>
-<button class="btn-close-modal" onclick="closeCartModal()" style="font-size: 1.1rem; background:none; border:none; cursor:pointer; color:var(--text-color);" type="button">×</button>
-</div>
-<div class="receipt-header" style="margin-bottom: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
-<h3 id="receipt-shop-name" style="margin: 0; font-size: 0.9rem;">Nama Toko</h3>
-<p id="receipt-shop-address" style="margin: 0; font-size: 0.7rem; color: var(--text-muted);">Alamat Toko</p>
-</div>
-<div class="cart-table-wrapper" style="max-height: 26vh; overflow-y: auto;">
-<table class="cart-table" style="font-size: 0.78rem; width: 100%;">
-<thead>
-<tr>
-<th style="width: 42%;">Barang</th>
-<th style="width: 34%; text-align: center;">Atur Qty</th>
-<th style="width: 24%; text-align: right;">Total</th>
-</tr>
-</thead>
-<tbody id="cart-body"></tbody>
-</table>
-</div>
-<div class="summary-box" style="padding: 2px 0; display: flex; flex-direction: column; gap: 4px;">
-<div style="font-size: 0.85rem; font-weight: bold; display: flex; justify-content: space-between;"><span>Total:</span> <span style="color: #16a34a;">Rp <span id="grand-total">0</span></span></div>
-<div class="no-print" style="display: flex; flex-direction: column; gap: 4px;">
-<div style="display: flex; align-items: center; gap: 4px;">
-<label style="font-size: 0.72rem; font-weight: 600; width: 35%;">Pembayaran:</label>
-<select aria-label="Metode pembayaran" id="pay-method-cust" onchange="togglePayMethodCust()" style="flex: 1; font-size: 0.75rem; padding: 4px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);">
-<option value="COD">COD (Bayar di Tempat)</option>
-<option value="TF">Transfer Bank</option>
-<option value="WhatsApp">Pesan via WA</option>
-</select>
-</div>
-<div id="wrapper-tf-proof" style="display: none; padding: 4px; background: var(--input-bg); border: 1px dashed var(--input-border); border-radius: 4px;">
-<label style="font-size: 0.7rem; font-weight: 600; display: block; margin-bottom: 2px;">Bukti Transfer:</label>
-<input accept="image/*" aria-label="Bukti pembayaran" id="cust-proof-file" onchange="handleProofUpload(event)" style="font-size: 0.68rem; width: 100%;" type="file"/>
-<input id="cust-proof-base64" type="hidden" value=""/>
-</div>
-<div style="padding: 6px; background: var(--input-bg); border-radius: 6px; border: 1px solid var(--input-border); display: flex; flex-direction: column; gap: 4px;">
-<label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.73rem; font-weight: bold; cursor: pointer; color: var(--text-color); margin: 0;">
-<span>🌟 Simpan jadi Menu Resep</span>
-<input aria-label="Simpan resep pesanan" id="cust-save-recipe-toggle" onchange="toggleSaveRecipeOptions(this.checked)" style="margin: 0;" type="checkbox"/>
-</label>
-<div id="wrapper-save-recipe-fields" style="display: none; flex-direction: column; gap: 4px; margin-top: 2px;">
-<input aria-label="Nama resep" id="cust-save-recipe-name" placeholder="Nama Menu (Cth: Sop Spesial Weekend)" style="width: 100%; font-size: 0.73rem; padding: 5px 6px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;" type="text"/>
-<label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.7rem; cursor: pointer; color: var(--text-color); margin: 0;">
-<span>📢 Bagikan otomatis ke Chat Rumpi</span>
-<input aria-label="Bagikan ke Rumpi" checked="" id="cust-share-rumpi-toggle" style="margin: 0;" type="checkbox"/>
-</label>
-</div>
-</div>
-<textarea aria-label="Catatan pesanan" id="cust-order-note" placeholder="Catatan untuk toko (opsional)..." rows="1" style="width: 100%; font-size: 0.75rem; padding: 5px; border-radius: 4px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); box-sizing: border-box;"></textarea>
-</div>
-</div>
-<div class="no-print" style="display: flex; gap: 4px;">
-<button class="btn-success" onclick="prosesCheckoutPelanggan()" style="flex: 1; background: #16a34a; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;" type="button">
-              🛒 Belanja Sekarang
-            </button>
-<button onclick="prosesSimpanMenuSaja()" style="flex: 1; background: #7c3aed; margin-top: 0; padding: 7px; font-size: 0.8rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; border: none; color: white; font-weight: bold; cursor: pointer;" type="button">
-              💾 Simpan Menu Saja
-            </button>
-</div>
-<button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 0; padding: 4px; font-size: 0.72rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;" type="button">🗑️ Kosongkan Keranjang</button>
-</div>
-</div><div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
-<button class="fab-main fab-ai-bounce" id="fab-ai-btn" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;" title="Asisten Ai Toko" type="button">😀</button>
-<button class="fab-main" id="fab-search-btn" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;" title="Cari Barang" type="button">
-<svg height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="fill: none !important;" viewbox="0 0 24 24" width="20"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" x2="21" y1="15.17" y2="21"></line></svg>
-</button>
-<button class="fab-main" id="fab-cart-btn" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;" title="Buka Keranjang" type="button"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.89-2-1.99-2z"></path></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
-</div><div class="modal-backdrop" id="aiChatModal" onclick="if(event.target === this) toggleAIChatModal()">
-<div class="modal-content" style="max-width: 380px; width: 95%; height: 65vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 16px;">
-<div class="modal-header" style="padding: 10px 14px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
-<div style="display: flex; align-items: center; gap: 6px;"><h3 style="margin: 0; font-size: 0.9rem;">😀 Asisten Belanja AI</h3><button id="aiSoundToggle" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 0.65rem;" type="button">🔊 Suara: ON</button></div>
-<div style="display: flex; gap: 6px; align-items: center;"><button class="btn-close-modal" onclick="toggleAIChatModal()" style="color: white; background: none; border: none; font-size: 1.1rem; cursor: pointer;" type="button">×</button></div>
-</div>
-<div id="ai-chat-messages" style="flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color);"><div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; white-space: pre-line;">HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?</div></div>
-<div style="padding: 8px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 6px; align-items: center;"><input aria-label="Pesan untuk Asisten AI" id="ai-chat-input" onkeypress="if(event.key==='Enter') kirimPesanKeAI()" placeholder="Tanya stok, harga, atau ngobrol..." style="flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.78rem;" type="text"/><button id="aiMicButton" style="background: #374151; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;" title="Ngomong pakai suara" type="button">🎤</button><button onclick="kirimPesanKeAI()" style="background: #7c3aed; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.78rem;" type="button">Kirim</button></div>
-</div>
-</div><div class="modal-backdrop" id="productDetailModal" onclick="if(event.target === this) closeProductDetail()">
-<div class="product-detail-box">
-<div style="position: relative;">
-<img alt="Gambar produk" id="detail-img" src="" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px 16px 0 0;"/>
-<button onclick="closeProductDetail()" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;" type="button">✕</button>
-</div>
-<div style="padding: 12px; overflow-y: auto;">
-<div id="detail-category" style="font-size: 0.65rem; color: #67e8f9; font-weight: bold; margin-bottom: 2px; text-transform: uppercase;">KATEGORI</div>
-<h2 id="detail-name" style="margin: 0 0 4px 0; font-size: 1rem; color: var(--text-color);">Nama Produk</h2>
-<div id="detail-price" style="font-size: 1.15rem; font-weight: 800; color: #4ade80; margin-bottom: 10px;">Rp 0</div>
-<div style="background: var(--bg-color); padding: 8px 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
-<div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">Sisa Stok: <strong id="detail-stock" style="color: var(--text-color);">0</strong></div>
-<div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.3;">Deskripsi: <span id="detail-desc" style="color: var(--text-color);">Tidak ada deskripsi dari toko.</span></div>
-</div>
-<!-- Input Qty dan Tambah Keranjang -->
-<div style="display: flex; gap: 8px; margin-bottom: 8px;">
-<div style="display: flex; align-items: center; gap: 3px;">
-<button class="qty-btn" onclick="ubahQtyDetail(-1)" type="button">-</button>
-<input aria-label="Jumlah produk" id="detail-qty-input" readonly="" style="width: 55px; height: 34px; text-align: center; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); font-weight: bold; color: var(--text-color); font-size: 0.85rem;" type="text" value="1"/>
-<button class="qty-btn" onclick="ubahQtyDetail(1)" type="button">+</button>
-</div>
-<button id="btn-detail-add" style="flex: 1; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 3px 8px rgba(37,99,235,0.3); display: flex; justify-content: center; align-items: center; gap: 6px; padding: 0 10px;" type="button">
-<svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"></path></svg> Masukkan
-          </button>
-</div>
-<!-- Tombol Bagikan Produk via WA -->
-<button onclick="bagikanProdukViaWA()" style="width: 100%; background: #16a34a; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;" type="button">
-          💬 Bagikan Produk via WA
-        </button>
-<button onclick="tanyaAdminBarang()" style="width: 100%; background: var(--card-bg); color: #16a34a; border: 1.2px solid #16a34a; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 8px;" type="button">
-          💬 Tanya Admin soal barang ini
-        </button>
-</div>
-</div>
-</div><button aria-label="Kembali ke atas" class="no-print" id="scroll-helper-fab" title="Kembali ke atas" type="button">
-<svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 19V5M6.5 11.5 12 5l5.5 6.5"></path></svg>
-</button><div class="toast" id="toastNotification">Notifikasi</div><nav aria-label="Navigasi pelanggan" class="kq-bottom-nav no-print" id="kq-bottom-nav">
-<a class="kq-nav-item" data-route="home" href="/pelanggan/"><span class="kq-nav-icon">🏠</span><span>Beranda</span></a>
-<a class="kq-nav-item" data-route="produk" href="/pelanggan/produk/"><span class="kq-nav-icon">🛍️</span><span>Produk</span></a>
-<a class="kq-nav-item kq-nav-cart" data-route="keranjang" href="/pelanggan/keranjang/"><span class="kq-nav-icon">🛒</span><span>Keranjang</span><b id="kq-nav-cart-badge">0</b></a>
-<a class="kq-nav-item" data-route="chat" href="/pelanggan/chat/"><span class="kq-nav-icon">🗨️</span><span>Chat</span><b class="kq-nav-badge" id="kq-nav-chat-badge">0</b></a>
-<a class="kq-nav-item" data-route="akun" href="/pelanggan/akun/"><span class="kq-nav-icon">👤</span><span>Akun</span></a>
-</nav><div aria-hidden="true" class="kq-legacy-bottom-hooks"><span id="bottom-bar-title">Belanja</span><span id="pagination-box" style="display:none"><span id="pos-page-indicator">1/1</span></span></div><script src="_core/modules/products.js"></script>
-<script src="_core/modules/cart.js"></script><script src="_core/modules/transactions.js"></script><script src="_core/script.js"></script><script>window.KQ_CUSTOMER_PAGE={route:"home",tab:"belanja",category:"Home"};</script><script src="_core/router.js"></script><script src="script.js"></script></body>
-\n\n
+  let deferredInstallPrompt = null;
 
+  function hideInstallButton() {
+    installButton.classList.remove('show');
+  }
 
+  function showInstallButton() {
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return;
+    if (window.navigator.standalone === true) return;
+    installButton.classList.add('show');
+  }
 
+  window.addEventListener('beforeinstallprompt', function (event) {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    showInstallButton();
+  });
 
+  installButton.addEventListener('click', async function () {
+    if (!deferredInstallPrompt) return;
+    const promptEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    hideInstallButton();
+    try {
+      promptEvent.prompt();
+      await promptEvent.userChoice;
+    } catch (error) {
+      console.warn('Gateway PWA install prompt:', error);
+    }
+  });
+
+  window.addEventListener('appinstalled', function () {
+    deferredInstallPrompt = null;
+    hideInstallButton();
+  });
+
+  if (window.matchMedia) {
+    const standaloneQuery = window.matchMedia('(display-mode: standalone)');
+    if (standaloneQuery.matches) hideInstallButton();
+    standaloneQuery.addEventListener?.('change', function (event) {
+      if (event.matches) hideInstallButton();
+    });
+  }
+})();
+</script>
+
+<div id="kasirquhVisual4Welcome" aria-label="Welcome screen">
+  <img id="kv4SlideImage" class="kv4-slide-image" src="./assets/gateway/slide1.png" alt="" aria-hidden="true">
+  <div class="kv4-dim" aria-hidden="true"></div>
+  <div id="kv4CustomerGlow" class="kv4-button-glow kv4-glow-customer" aria-hidden="true"></div>
+  <div id="kv4AdminGlow" class="kv4-button-glow kv4-glow-admin" aria-hidden="true"></div>
+  <div id="kv4CustomerSwipe" class="kv4-customer-swipe" aria-hidden="true"><span class="kv4-swipe-handle">→</span></div>
+  <button id="kv4CustomerHotspot" class="kv4-hotspot" type="button" aria-label="Geser untuk Mulai Belanja"></button>
+  <button id="kv4AdminHotspot" class="kv4-hotspot" type="button" aria-label="Admin"></button>
+</div>
+
+<script id="kasirquh-slide123-script">
+(function () {
+  function initSlide123Welcome() {
+    const existingWelcome = document.getElementById('kasirquhVisual4Welcome');
+    const login = document.getElementById('loginModal');
+
+    // IMPORTANT: wait for Firebase Auth to resolve persistence before deciding whether
+    // Welcome should exist. Reading auth.currentUser synchronously can be null for a
+    // short time during startup even when a valid session is being restored.
+    if (window.firebase && firebase.auth) {
+      let settled = false;
+      const unsubscribe = firebase.auth().onAuthStateChanged(function(user) {
+        if (settled) return;
+        settled = true;
+        try { unsubscribe(); } catch (_) {}
+        if (user) {
+          if (existingWelcome) existingWelcome.remove();
+          if (login) login.style.display = 'none';
+          return;
+        }
+        initSlide123WelcomeBody();
+      });
+      return;
+    }
+    initSlide123WelcomeBody();
+  }
+
+  function initSlide123WelcomeBody() {
+    const welcome = document.getElementById('kasirquhVisual4Welcome');
+    const image = document.getElementById('kv4SlideImage');
+    const customer = document.getElementById('kv4CustomerHotspot');
+    const admin = document.getElementById('kv4AdminHotspot');
+    const customerGlow = document.getElementById('kv4CustomerGlow');
+    const adminGlow = document.getElementById('kv4AdminGlow');
+    const customerSwipe = document.getElementById('kv4CustomerSwipe');
+    const swipeHandle = customerSwipe ? customerSwipe.querySelector('.kv4-swipe-handle') : null;
+    if (!welcome || !image || !customer || !admin) return;
+
+    const slides = ['./assets/gateway/slide1.png', './assets/gateway/slide2.png', './assets/gateway/slide3.png'];
+    let current = 0;
+    let leaving = false;
+    let slideTimer = null;
+
+    // Preload every slide before it is ever shown. This prevents a black flash
+    // when the image source changes during the transition.
+    const preloadedSlides = slides.map(function (src) {
+      const img = new Image();
+      img.src = src;
+      return img;
+    });
+
+    // Position hotspots/glows against the actual rendered image, so object-fit:cover
+    // and different screen aspect ratios cannot shift them away from the photo buttons.
+    const customerBox = { x: 38 / 688, y: 1270 / 1536, w: 612 / 688, h: 95 / 1536 };
+    const adminBox = { x: 490 / 688, y: 1370 / 1536, w: 170 / 688, h: 72 / 1536 };
+
+    let swipeStartX = 0;
+    let swipeCurrentX = 0;
+    let swipeMaxX = 0;
+    let swipeDragging = false;
+    let swipeCompleted = false;
+
+    function resetSwipeVisual(animated) {
+      if (!customerSwipe || !swipeHandle) return;
+      customerSwipe.classList.remove('kv4-swiping', 'kv4-swipe-success');
+      if (!animated) {
+        customerSwipe.classList.add('kv4-resetting');
+        swipeHandle.style.transition = 'none';
+      }
+      swipeHandle.style.setProperty('--swipe-x', '0px');
+      swipeHandle.style.setProperty('--swipe-progress', '0');
+      if (!animated) {
+        requestAnimationFrame(function () {
+          if (customerSwipe) customerSwipe.classList.remove('kv4-resetting');
+          if (swipeHandle) swipeHandle.style.removeProperty('transition');
+        });
+      }
+    }
+
+    function syncSlideButtonPositions() {
+      const imgRect = image.getBoundingClientRect();
+      const parentRect = welcome.getBoundingClientRect();
+      const parentW = parentRect.width;
+      const parentH = parentRect.height;
+      const scale = Math.max(parentW / image.naturalWidth, parentH / image.naturalHeight);
+      const renderedW = image.naturalWidth * scale;
+      const renderedH = image.naturalHeight * scale;
+      const cropX = (renderedW - parentW) / 2;
+      const cropY = (renderedH - parentH) / 2;
+      function apply(box, hotspot, glow) {
+        if (!hotspot) return;
+        const left = box.x * image.naturalWidth * scale - cropX;
+        const top = box.y * image.naturalHeight * scale - cropY;
+        const width = box.w * image.naturalWidth * scale;
+        const height = box.h * image.naturalHeight * scale;
+        [hotspot, glow].forEach(function(el) {
+          if (!el) return;
+          el.style.left = left + 'px';
+          el.style.top = top + 'px';
+          el.style.width = width + 'px';
+          el.style.height = height + 'px';
+        });
+      }
+      if (image.naturalWidth && image.naturalHeight) {
+        apply(customerBox, customer, customerGlow);
+        apply(adminBox, admin, adminGlow);
+        if (customerSwipe) {
+          const left = customerBox.x * image.naturalWidth * scale - cropX;
+          const top = customerBox.y * image.naturalHeight * scale - cropY;
+          const width = customerBox.w * image.naturalWidth * scale;
+          const height = customerBox.h * image.naturalHeight * scale;
+          customerSwipe.style.left = left + 'px';
+          customerSwipe.style.top = top + 'px';
+          customerSwipe.style.width = width + 'px';
+          customerSwipe.style.height = height + 'px';
+          swipeMaxX = Math.max(0, width - 62);
+          if (!swipeDragging && !swipeCompleted) resetSwipeVisual(false);
+        }
+      }
+    }
+
+    image.addEventListener('load', syncSlideButtonPositions);
+    window.addEventListener('resize', syncSlideButtonPositions);
+    requestAnimationFrame(syncSlideButtonPositions);
+
+    function pulseButtonGlows() {
+      [customerGlow, adminGlow].forEach(function (el) {
+        if (!el) return;
+        el.classList.remove('kv4-glow-active', 'kv4-glow-pressed');
+        void el.offsetWidth;
+        el.classList.add('kv4-glow-active');
+      });
+    }
+
+    function showNextSlide() {
+      if (leaving) return;
+      const next = (current + 1) % slides.length;
+      const nextImage = preloadedSlides[next];
+
+      function commitNextSlide() {
+        if (leaving) return;
+        current = next;
+        // The next image is already loaded, so swap it without ever fading
+        // through the black background. The existing glow timing is preserved.
+        image.src = slides[current];
+        syncSlideButtonPositions();
+        pulseButtonGlows();
+      }
+
+      if (nextImage && nextImage.complete) {
+        commitNextSlide();
+      } else if (nextImage) {
+        nextImage.addEventListener('load', commitNextSlide, { once: true });
+      } else {
+        commitNextSlide();
+      }
+    }
+
+    pulseButtonGlows();
+    slideTimer = setInterval(showNextSlide, 4500);
+
+    function leave(mode, destination) {
+      if (leaving) return;
+      leaving = true;
+      if (slideTimer) clearInterval(slideTimer);
+      welcome.classList.add(mode);
+      setTimeout(function () {
+        if (destination) {
+          window.location.href = destination;
+          return;
+        }
+        welcome.classList.add('kv4-leaving');
+        setTimeout(function () { welcome.remove(); }, 760);
+      }, 430);
+    }
+
+    customer.addEventListener('click', function (event) {
+      // Deliberately do not open on a simple tap. The customer action is a swipe-to-start control.
+      event.preventDefault();
+    });
+
+    customer.addEventListener('pointerdown', function (event) {
+      if (leaving || swipeCompleted) return;
+      swipeDragging = true;
+      swipeStartX = event.clientX;
+      swipeCurrentX = 0;
+      customer.setPointerCapture?.(event.pointerId);
+      if (customerSwipe) {
+        customerSwipe.classList.add('kv4-swiping');
+        customerSwipe.style.setProperty('--swipe-progress', '0');
+      }
+      if (swipeHandle) swipeHandle.style.transition = 'none';
+      event.preventDefault();
+    });
+
+    customer.addEventListener('pointermove', function (event) {
+      if (!swipeDragging || leaving || swipeCompleted) return;
+      const delta = event.clientX - swipeStartX;
+      swipeCurrentX = Math.max(0, Math.min(swipeMaxX, delta));
+      const progress = swipeMaxX > 0 ? swipeCurrentX / swipeMaxX : 0;
+      if (customerSwipe) {
+        customerSwipe.style.setProperty('--swipe-progress', progress.toFixed(3));
+      }
+      if (swipeHandle) {
+        swipeHandle.style.setProperty('--swipe-x', swipeCurrentX + 'px');
+        swipeHandle.style.setProperty('--swipe-progress', progress.toFixed(3));
+      }
+      event.preventDefault();
+    });
+
+    function finishCustomerSwipe(event) {
+      if (!swipeDragging) return;
+      swipeDragging = false;
+      try { customer.releasePointerCapture?.(event.pointerId); } catch (_) {}
+      const threshold = Math.max(120, swipeMaxX * 0.78);
+      if (swipeCurrentX >= threshold) {
+        swipeCompleted = true;
+        if (customerSwipe) customerSwipe.classList.add('kv4-swipe-success');
+        if (customerSwipe) {
+          customerSwipe.style.setProperty('--swipe-progress', '1');
+        }
+        if (swipeHandle) {
+          swipeHandle.style.transition = 'transform .24s cubic-bezier(.2,.9,.2,1)';
+          swipeHandle.style.setProperty('--swipe-x', swipeMaxX + 'px');
+        }
+        if (customerGlow) {
+          customerGlow.classList.remove('kv4-glow-active', 'kv4-glow-pressed');
+          void customerGlow.offsetWidth;
+          customerGlow.classList.add('kv4-glow-pressed');
+        }
+        setTimeout(function () { leave('kv4-focus-customer', './pelanggan/index.html'); }, 180);
+      } else {
+        resetSwipeVisual(true);
+      }
+      event.preventDefault();
+    }
+
+    customer.addEventListener('pointerup', finishCustomerSwipe);
+    customer.addEventListener('pointercancel', finishCustomerSwipe);
+
+    admin.addEventListener('click', function () {
+      if (adminGlow) { adminGlow.classList.remove('kv4-glow-active'); void adminGlow.offsetWidth; adminGlow.classList.add('kv4-glow-pressed'); }
+      leave('kv4-focus-admin', './admin/index.html');
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSlide123Welcome);
+  } else {
+    initSlide123Welcome();
+  }
+})();
+</script>
+<!-- INDEX AI ASSISTANT FAB: copied customer style, draggable -->
+<style id="index-ai-fab-v1">
+  @keyframes indexAiBounceThree {
+    0%,37.5%,100% { transform: translateY(0) scale(1); }
+    5% { transform: translateY(-9px) scale(1.03); }
+    10% { transform: translateY(0) scale(1); }
+    15% { transform: translateY(-9px) scale(1.03); }
+    20% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-9px) scale(1.03); }
+    30% { transform: translateY(0) scale(1); }
+  }
+  #index-ai-fab {
+    position:fixed; left:auto; top:auto; right:10px; bottom:65px;
+    width:44px; height:44px; padding:0; border:0; border-radius:50%;
+    background:#2563eb; color:#fff; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 10px rgba(0,0,0,.3); cursor:grab; font-size:18px; overflow:hidden;
+    z-index:2147483646; touch-action:none; user-select:none;
+    animation:indexAiBounceThree 4.8s ease-in-out infinite; will-change:transform,left,top;
+  }
+  #index-ai-fab img { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  #index-ai-fab.dragging { cursor:grabbing; animation:none; transform:none; }
+  #index-ai-fab:active { cursor:grabbing; }
+  #index-ai-modal { display:none; position:fixed; inset:0; z-index:2147483647; background:rgba(0,0,0,.55); align-items:center; justify-content:center; padding:12px; box-sizing:border-box; }
+  #index-ai-modal.show { display:flex; }
+  #index-ai-panel { width:min(380px,95vw); height:min(65vh,620px); display:flex; flex-direction:column; overflow:hidden; border-radius:16px; background:#fff; color:#111827; box-shadow:0 15px 50px rgba(0,0,0,.45); }
+  #index-ai-head { padding:10px 14px; background:#7c3aed; color:#fff; display:flex; justify-content:space-between; align-items:center; }
+  #index-ai-messages { flex:1; padding:10px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; background:#f8fafc; font-size:.78rem; }
+  #index-ai-input-row { padding:8px; border-top:1px solid #e5e7eb; display:flex; gap:6px; align-items:center; background:#fff; }
+  #index-ai-input { flex:1; min-width:0; padding:7px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:.78rem; }
+  #index-ai-mic,#index-ai-send,#index-ai-close,#index-ai-sound { border:0; cursor:pointer; color:#fff; border-radius:6px; }
+  #index-ai-mic { background:#374151; padding:6px 10px; }
+  #index-ai-send { background:#7c3aed; padding:6px 12px; font-weight:700; }
+  #index-ai-close { background:transparent; font-size:1.1rem; }
+  #index-ai-sound { background:rgba(255,255,255,.2); padding:2px 6px; font-size:.65rem; }
+  @media (prefers-reduced-motion:reduce){#index-ai-fab{animation:none!important}}
+</style>
+<button id="index-ai-fab" type="button" aria-label="Asisten AI" title="Asisten AI"><img src="./assets/gateway/robot-head-ai.png" alt="Kepala robot Asisten AI"></button>
+<div id="index-ai-modal" aria-hidden="true">
+  <div id="index-ai-panel">
+    <div id="index-ai-head">
+      <div style="display:flex;align-items:center;gap:6px"><strong style="font-size:.9rem">😀 Asisten Belanja AI</strong><button id="index-ai-sound" type="button">🔊 Suara: ON</button></div>
+      <button id="index-ai-close" type="button">&times;</button>
+    </div>
+    <div id="index-ai-messages"><div style="align-self:flex-start;background:#fff;border:1px solid #e5e7eb;color:#111827;padding:6px 10px;border-radius:8px;max-width:80%">HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?</div></div>
+    <div id="index-ai-input-row"><input id="index-ai-input" type="text" placeholder="Tanya atau ngobrol..." autocomplete="off" aria-label="Pesan untuk Asisten AI"><button id="index-ai-mic" type="button" title="Ngomong pakai suara">🎤</button><button id="index-ai-send" type="button">Kirim</button></div>
+  </div>
+</div>
+<script id="index-ai-fab-js">
+(function(){
+  const fab=document.getElementById('index-ai-fab'), modal=document.getElementById('index-ai-modal'), close=document.getElementById('index-ai-close');
+  const input=document.getElementById('index-ai-input'), messages=document.getElementById('index-ai-messages'), mic=document.getElementById('index-ai-mic'), sound=document.getElementById('index-ai-sound');
+  if(!fab||!modal)return;
+  let dragging=false,moved=false,pid=null,sx=0,sy=0,sl=0,st=0,isSound=true,recognition=null,listening=false;
+  const clamp=(v,min,max)=>Math.min(Math.max(v,min),max);
+  function place(left,top,save){
+    const maxL=Math.max(0,innerWidth-fab.offsetWidth), maxT=Math.max(0,innerHeight-fab.offsetHeight);
+    left=clamp(left,0,maxL); top=clamp(top,0,maxT);
+    fab.style.left=left+'px'; fab.style.top=top+'px'; fab.style.right='auto'; fab.style.bottom='auto';
+    if(save)localStorage.setItem('index_ai_fab_position_v1',JSON.stringify({left,top}));
+  }
+  function restore(){
+    try{const p=JSON.parse(localStorage.getItem('index_ai_fab_position_v1')||'null'); if(p&&Number.isFinite(p.left)&&Number.isFinite(p.top)){place(p.left,p.top,false);return;}}catch(e){}
+    requestAnimationFrame(()=>place(innerWidth-fab.offsetWidth-10,innerHeight-fab.offsetHeight-65,false));
+  }
+  fab.addEventListener('pointerdown',e=>{dragging=true;moved=false;pid=e.pointerId;sx=e.clientX;sy=e.clientY;const r=fab.getBoundingClientRect();sl=r.left;st=r.top;fab.setPointerCapture?.(pid);fab.classList.add('dragging');e.preventDefault();});
+  fab.addEventListener('pointermove',e=>{if(!dragging||e.pointerId!==pid)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.hypot(dx,dy)>5)moved=true;place(sl+dx,st+dy,false);e.preventDefault();});
+  function end(e){if(!dragging||e.pointerId!==pid)return;dragging=false;fab.releasePointerCapture?.(pid);fab.classList.remove('dragging');place(fab.getBoundingClientRect().left,fab.getBoundingClientRect().top,true);if(!moved)openAI();e.preventDefault();}
+  fab.addEventListener('pointerup',end); fab.addEventListener('pointercancel',end);
+  async function playWelcomeVoice(){
+    if(!isSound)return;
+    const teksSambutan='HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?';
+    try{
+      if(window._indexAiWelcomeAudio){try{window._indexAiWelcomeAudio.pause();}catch(e){} try{URL.revokeObjectURL(window._indexAiWelcomeAudioUrl);}catch(e){}}
+      const r=await fetch('/api/tts?text='+encodeURIComponent(teksSambutan));
+      if(!r.ok)throw new Error('TTS gagal');
+      const u=URL.createObjectURL(await r.blob());
+      const a=new Audio(u);
+      window._indexAiWelcomeAudio=a; window._indexAiWelcomeAudioUrl=u;
+      a.onended=()=>{try{URL.revokeObjectURL(u);}catch(e){} window._indexAiWelcomeAudio=null;window._indexAiWelcomeAudioUrl=null;};
+      await a.play();
+    }catch(e){console.warn('TTS sambutan AI index:',e);}
+  }
+  function openAI(){modal.classList.add('show');modal.setAttribute('aria-hidden','false');setTimeout(()=>input.focus(),40);playWelcomeVoice();}
+  function closeAI(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}
+  close.onclick=closeAI; modal.addEventListener('click',e=>{if(e.target===modal)closeAI();});
+  sound.onclick=()=>{isSound=!isSound;sound.textContent=isSound?'🔊 Suara: ON':'🔇 Suara: OFF';if(!isSound&&speechSynthesis)speechSynthesis.cancel();};
+  async function speak(text){if(!isSound)return;try{const r=await fetch('/api/tts?text='+encodeURIComponent(text));if(!r.ok)throw 0;const u=URL.createObjectURL(await r.blob()),a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();}catch(e){}}
+  function add(text,me){const d=document.createElement('div');d.style.cssText='max-width:75%;padding:6px 10px;border-radius:8px;font-size:.78rem;white-space:pre-line;align-self:'+(me?'flex-end':'flex-start')+';background:'+(me?'#7c3aed':'#fff')+';color:'+(me?'#fff':'#111827')+';border:'+(me?'0':'1px solid #e5e7eb');d.textContent=text;messages.appendChild(d);messages.scrollTop=messages.scrollHeight;return d;}
+  async function send(){const prompt=input.value.trim();if(!prompt)return;input.value='';add(prompt,true);const loading=add('Sedang mengetik...',false);try{const r=await fetch('/api/tanya',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,daftarProduk:'Tidak ada daftar produk saat berada di halaman pembuka.',namaToko:'Warunge Mimi'})});const data=await r.json();let reply=data.reply||(data.candidates&&data.candidates[0]?.content?.parts?.map(x=>x.text||'').join(''))||'Maaf, saya sedang mengalami kendala teknis.';loading.remove();add(reply,false);speak(reply);}catch(e){loading.remove();add('Gagal terhubung ke AI. Silakan coba lagi.',false);}}
+  document.getElementById('index-ai-send').onclick=send; input.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
+  if('SpeechRecognition'in window||'webkitSpeechRecognition'in window){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recognition=new SR();recognition.lang='id-ID';recognition.onresult=e=>{input.value=e.results[0][0].transcript;listening=false;mic.textContent='🎤';send();};recognition.onend=()=>{listening=false;mic.textContent='🎤';};recognition.onerror=()=>{listening=false;mic.textContent='🎤';};}
+  mic.onclick=()=>{if(!recognition)return;if(listening){recognition.stop();return;}listening=true;mic.textContent='🛑';recognition.start();};
+  addEventListener('resize',()=>{const r=fab.getBoundingClientRect();place(r.left,r.top,true);});
+  restore();
+})();
+</script>
+
+</body>
 </html>
