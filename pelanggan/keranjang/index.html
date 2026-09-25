@@ -27,29 +27,17 @@
 .v14-cart-badge[hidden]{display:none}
 </style>
 </head>
-<style id="v14-modern-navbar-style">
-.has-v14-modern-navbar{padding-bottom:82px}
-@media (min-width:768px){.has-v14-modern-navbar{padding-bottom:104px}}
-.v14-modern-navbar{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;align-items:center;justify-content:space-around;gap:6px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--card-bg,#fff) 94%,transparent);border-top:1px solid var(--border-color,rgba(148,163,184,.25));box-shadow:0 -8px 28px rgba(15,23,42,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-.v14-modern-navbar .v14-nav-link{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 4px;border-radius:14px;text-decoration:none;color:var(--text-color,#64748b);font-weight:700;transition:transform .18s ease,color .18s ease,background .18s ease,box-shadow .18s ease}
-.v14-modern-navbar .v14-nav-icon{font-size:22px;line-height:1;display:grid;place-items:center;transition:transform .18s ease,filter .18s ease}
-.v14-modern-navbar small{font-size:.64rem;line-height:1.05;white-space:nowrap}
-.v14-modern-navbar .v14-nav-link:hover{transform:translateY(-1px)}
-.v14-modern-navbar .v14-nav-link.is-active{color:#2563eb;background:rgba(37,99,235,.10);box-shadow:inset 0 0 0 1px rgba(37,99,235,.12),0 4px 14px rgba(37,99,235,.10)}
-.v14-modern-navbar .v14-nav-link.is-active .v14-nav-icon{transform:translateY(-1px) scale(1.10);filter:drop-shadow(0 4px 8px rgba(37,99,235,.22))}
-.v14-modern-navbar .v14-nav-link.is-active::after{content:"";position:absolute;bottom:3px;width:18px;height:3px;border-radius:999px;background:currentColor}
-@media (min-width:768px){.v14-modern-navbar{left:50%;right:auto;width:min(680px,calc(100% - 32px));transform:translateX(-50%);bottom:16px;border:1px solid var(--border-color,rgba(148,163,184,.25));border-radius:22px;padding:9px 12px}.v14-modern-navbar .v14-nav-link{padding:9px 8px}.v14-modern-navbar small{font-size:.68rem}}
 
-.v14-cart-checkout-layer{position:fixed;inset:0;z-index:10050;background:var(--page-bg,#f8fafc);overflow:auto;overscroll-behavior:contain;}
-.v14-cart-checkout-sheet{min-height:100%;background:var(--page-bg,#f8fafc);padding:0 0 32px;}
-.v14-cart-checkout-head{position:sticky;top:0;z-index:4;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-top));background:color-mix(in srgb,var(--card-bg,#fff) 94%,transparent);border-bottom:1px solid var(--border-color,#dbe3ef);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);}
-.v14-cart-checkout-head h1{margin:2px 0 2px;font-size:1.05rem}.v14-cart-checkout-head p{margin:0;font-size:.72rem;color:var(--text-muted,#64748b)}.v14-checkout-head-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:rgba(37,99,235,.1);color:#2563eb}.v14-icon-btn{width:40px;height:40px;border:0;border-radius:12px;background:var(--input-bg,#f1f5f9);color:var(--text-color,#0f172a);font-size:20px;cursor:pointer}.v14-cart-checkout-content{padding:16px;max-width:1080px;margin:0 auto}.v14-checkout-open{overflow:hidden!important}.v14-cart-checkout-layer[hidden]{display:none!important}
-@media(min-width:760px){.v14-cart-checkout-content{padding:24px}.v14-cart-checkout-head{padding-left:max(20px,calc((100% - 1080px)/2));padding-right:max(20px,calc((100% - 1080px)/2));grid-template-columns:48px 1fr 48px}.v14-cart-checkout-head h1{font-size:1.25rem}}
-</style>
 </head><body>
-<header class="v14-header"><a href="/pelanggan/produk/" class="brand">← Produk</a><span>V14 · 04</span></header>
-<main class="v14-main cart-page">
-  <section class="v14-page-heading"><div class="eyebrow">KERANJANG</div><h1>Belanjaan Kamu</h1><p id="cartSubtitle">Memuat keranjang…</p></section>
+<main class="v14-cart-page">
+  <header class="v14-cart-page-head">
+    <div>
+      <span class="eyebrow">KERANJANG</span>
+      <h1>Keranjang</h1>
+      <p id="cartSubtitle">Memuat keranjang…</p>
+    </div>
+    <a class="v14-cart-head-action" href="/pelanggan/produk/" aria-label="Lanjut belanja"><i class="ti ti-shopping-bag"></i></a>
+  </header>
   <section id="cartRoot" aria-live="polite"></section>
 </main>
 <section id="checkoutOverlay" class="v14-cart-checkout-layer" hidden aria-hidden="true">
@@ -75,29 +63,71 @@ const cartRoot=document.getElementById('cartRoot'), cartSubtitle=document.getEle
 const checkoutOverlay=document.getElementById('checkoutOverlay');
 const closeCheckoutBtn=document.getElementById('closeCheckout');
 let checkoutProducts={}; let checkoutStore={}; let checkoutProofBase64='';
+function cartKey(item){ return String(item?.id ?? item?.code ?? item?.kode ?? item?.productId ?? item?.nama ?? ''); }
+function getProductForCart(item){
+  const key=cartKey(item);
+  return checkoutProducts[key] || checkoutProducts[String(item?.code ?? item?.kode ?? item?.id ?? '')] || null;
+}
+function cartStep(item){
+  const p=getProductForCart(item);
+  const satuan=String(p?.satuan ?? item?.satuan ?? '').toLowerCase().trim();
+  return (satuan==='kg'||satuan==='kilogram') ? 0.25 : 1;
+}
+function cartStock(item){
+  const p=getProductForCart(item);
+  return p ? Number(p.stok)||0 : Infinity;
+}
 function render(){
- const cart=getCart(); const totalQty=cart.reduce((s,x)=>s+(Number(x.qty)||0),0); const total=cart.reduce((s,x)=>s+(Number(x.harga)||0)*(Number(x.qty)||0),0);
- cartSubtitle.textContent=cart.length?`${cart.length} produk · ${totalQty} item`:'Keranjang kamu masih kosong';
- if(!cart.length){cartRoot.innerHTML='<div class="shell-card v14-empty"><div class="v14-empty-icon">🛒</div><h2>Belum ada barang</h2><p>Pilih produk dari katalog untuk mulai berbelanja.</p><a class="v14-btn v14-btn-primary" href="/pelanggan/produk/">Mulai Belanja</a></div>';return;}
- cartRoot.innerHTML=`<div class="v14-cart-list">${cart.map(item=>{
-   const id=escapeHtml(item.id??item.kode??item.nama); const qty=Math.max(1,Number(item.qty)||1); const price=Number(item.harga)||0;
-   return `<article class="v14-cart-item" data-id="${id}">
-     <div class="v14-cart-photo">${item.foto?`<img src="${escapeHtml(item.foto)}" alt="${escapeHtml(item.nama||'Produk')}">`:'🛍️'}</div>
-     <div class="v14-cart-info"><h2>${escapeHtml(item.nama||'Produk')}</h2><p>${formatRupiah(price)}${item.satuan?` / ${escapeHtml(item.satuan)}`:''}</p>
-       <div class="v14-cart-actions"><button class="qty-minus" type="button">−</button><output>${qty}</output><button class="qty-plus" type="button">+</button><button class="cart-remove" type="button">Hapus</button></div>
-     </div><strong class="v14-cart-line">${formatRupiah(price*qty)}</strong>
-   </article>`;
- }).join('')}</div>
- <section class="v14-cart-summary"><div><span>Subtotal</span><strong>${formatRupiah(total)}</strong></div><p>Total akhir dan metode pembayaran akan dihitung pada Checkout.</p><div class="v14-cart-summary-actions"><button id="clearCart" class="v14-btn" type="button">Kosongkan</button><button id="openCheckout" class="v14-btn v14-btn-primary" type="button">Lanjut Checkout</button></div></section>`;
+ const cart=getCart();
+ const totalQty=cart.reduce((s,x)=>s+(Number(x.qty)||0),0);
+ const total=cart.reduce((s,x)=>s+(Number(x.harga)||0)*(Number(x.qty)||0),0);
+ cartSubtitle.textContent=cart.length?`${totalQty} item · ${cart.length} produk`:'Keranjang kamu masih kosong';
+ if(!cart.length){
+   cartRoot.innerHTML=`<section class="v14-cart-empty"><div class="v14-cart-empty-icon"><i class="ti ti-shopping-cart-off"></i></div><h2>Keranjang masih kosong</h2><p>Pilih produk yang ingin kamu beli. Produk yang kamu masukkan akan muncul di sini.</p><a class="v14-btn v14-btn-primary" href="/pelanggan/produk/"><i class="ti ti-shopping-bag"></i> Mulai Belanja</a></section>`;
+   return;
+ }
+ cartRoot.innerHTML=`
+   <div class="v14-cart-items-head"><strong>${totalQty} item</strong><span>${cart.length} produk</span></div>
+   <div class="v14-cart-list">${cart.map(item=>{
+     const id=escapeHtml(cartKey(item));
+     const qty=Math.max(0,Number(item.qty)||0);
+     const price=Number(item.harga)||0;
+     const satuan=String(getProductForCart(item)?.satuan ?? item.satuan ?? '').trim();
+     const stock=cartStock(item);
+     const maxed=Number.isFinite(stock) && qty>=stock;
+     return `<article class="v14-cart-item" data-id="${id}">
+       <div class="v14-cart-photo">${item.foto?`<img src="${escapeHtml(item.foto)}" alt="${escapeHtml(item.nama||'Produk')}" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('is-fallback')">`:'<i class="ti ti-photo-off"></i>'}</div>
+       <div class="v14-cart-info">
+         <div class="v14-cart-name-row"><h2>${escapeHtml(item.nama||'Produk')}</h2><button class="cart-remove" type="button" aria-label="Hapus ${escapeHtml(item.nama||'produk')}"><i class="ti ti-trash"></i></button></div>
+         <p class="v14-cart-unit">${formatRupiah(price)}${satuan?` / ${escapeHtml(satuan)}`:''}</p>
+         <div class="v14-cart-bottom">
+           <div class="v14-qty-control" aria-label="Atur jumlah">
+             <button class="qty-minus" type="button" aria-label="Kurangi"><i class="ti ti-minus"></i></button>
+             <output>${qty}</output>
+             <button class="qty-plus" type="button" aria-label="Tambah" ${maxed?'disabled':''}><i class="ti ti-plus"></i></button>
+           </div>
+           <strong class="v14-cart-line">${formatRupiah(price*qty)}</strong>
+         </div>
+       </div>
+     </article>`;
+   }).join('')}</div>
+   <section class="v14-cart-summary">
+     <div class="v14-cart-summary-row"><span>Total (${totalQty} item)</span><strong>${formatRupiah(total)}</strong></div>
+     <p>Periksa kembali barang dan jumlahnya. Setelah siap, lanjut ke Checkout untuk memilih pembayaran.</p>
+     <div class="v14-cart-summary-actions"><button id="clearCart" class="v14-btn v14-btn-light" type="button"><i class="ti ti-trash"></i> Kosongkan</button><button id="openCheckout" class="v14-btn v14-btn-primary" type="button"><i class="ti ti-arrow-right"></i> Checkout</button></div>
+   </section>`;
  cartRoot.querySelectorAll('.v14-cart-item').forEach(card=>{
-   const id=card.dataset.id, current=cart.find(x=>String(x.id??x.kode??x.nama)===id), qty=Math.max(1,Number(current?.qty)||1);
-   card.querySelector('.qty-minus').onclick=()=>updateCartItem(id,qty-1);
-   card.querySelector('.qty-plus').onclick=()=>updateCartItem(id,qty+1);
+   const id=card.dataset.id; const current=getCart().find(x=>cartKey(x)===id); if(!current) return;
+   const step=cartStep(current);
+   card.querySelector('.qty-minus').onclick=()=>{ const next=Math.max(0,(Number(current.qty)||0)-step); updateCartItem(id,Number(next.toFixed(3))); };
+   card.querySelector('.qty-plus').onclick=()=>{ const stock=cartStock(current); const next=(Number(current.qty)||0)+step; if(Number.isFinite(stock)&&next>stock){alert(`Stok ${current.nama||'produk'} hanya ${stock}.`);return;} updateCartItem(id,Number(next.toFixed(3))); };
    card.querySelector('.cart-remove').onclick=()=>updateCartItem(id,0);
  });
  document.getElementById('clearCart').onclick=()=>{ if(confirm('Kosongkan semua isi keranjang?')) clearCart(); };
+ document.getElementById('openCheckout').onclick=openCheckout;
 }
-window.addEventListener('kq:cart-changed',render); render();
+window.addEventListener('kq:cart-changed',render);
+render();
 
 
 
@@ -219,9 +249,6 @@ async function placeOrder(){
    checkoutSubtitle.textContent='Checkout selesai.';
  }catch(err){console.error(err); alert('Gagal memproses pesanan: '+err.message); button.disabled=false; button.textContent='🛒 Belanja Sekarang';}
 }
-subscribeProducts((data)=>{checkoutProducts=data||{}; if(!checkoutOverlay.hidden) renderCheckout();});
-getStoreConfig().then(v=>{checkoutStore=v||{};}).catch(()=>{});
-
 
 function openCheckout(){
   const cart=getCart();
@@ -261,7 +288,7 @@ window.addEventListener('hashchange',()=>{
 });
 document.getElementById('openCheckout')?.addEventListener('click',openCheckout);
 closeCheckoutBtn?.addEventListener('click',closeCheckout);
-subscribeProducts((data)=>{checkoutProducts=data||{}; if(!checkoutOverlay.hidden) renderCheckout();});
+subscribeProducts((data)=>{checkoutProducts=data||{}; render(); if(!checkoutOverlay.hidden) renderCheckout();});
 getStoreConfig().then(v=>{checkoutStore=v||{};}).catch(()=>{});
 if(location.hash==='#checkout' && getCart().length && isCustomerLoggedIn()){
   checkoutOverlay.hidden=false; checkoutOverlay.setAttribute('aria-hidden','false'); document.body.classList.add('v14-checkout-open'); renderCheckout();
