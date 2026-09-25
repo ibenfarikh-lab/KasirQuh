@@ -50,6 +50,25 @@
 .v14-nav-link .v14-nav-icon{flex:0 0 auto}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css">
+<style id="v14-modern-navbar-style">
+.has-v14-modern-navbar{padding-bottom:82px}
+@media (min-width:768px){.has-v14-modern-navbar{padding-bottom:104px}}
+.v14-modern-navbar{position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;align-items:center;justify-content:space-around;gap:6px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--card-bg,#fff) 94%,transparent);border-top:1px solid var(--border-color,rgba(148,163,184,.25));box-shadow:0 -8px 28px rgba(15,23,42,.08);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.v14-modern-navbar .v14-nav-link{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:7px 4px;border-radius:14px;text-decoration:none;color:var(--text-color,#64748b);font-weight:700;transition:transform .18s ease,color .18s ease,background .18s ease,box-shadow .18s ease}
+.v14-modern-navbar .v14-nav-icon{font-size:22px;line-height:1;display:grid;place-items:center;transition:transform .18s ease,filter .18s ease}
+.v14-modern-navbar small{font-size:.64rem;line-height:1.05;white-space:nowrap}
+.v14-modern-navbar .v14-nav-link:hover{transform:translateY(-1px)}
+.v14-modern-navbar .v14-nav-link.is-active{color:#2563eb;background:rgba(37,99,235,.10);box-shadow:inset 0 0 0 1px rgba(37,99,235,.12),0 4px 14px rgba(37,99,235,.10)}
+.v14-modern-navbar .v14-nav-link.is-active .v14-nav-icon{transform:translateY(-1px) scale(1.10);filter:drop-shadow(0 4px 8px rgba(37,99,235,.22))}
+.v14-modern-navbar .v14-nav-link.is-active::after{content:"";position:absolute;bottom:3px;width:18px;height:3px;border-radius:999px;background:currentColor}
+@media (min-width:768px){.v14-modern-navbar{left:50%;right:auto;width:min(680px,calc(100% - 32px));transform:translateX(-50%);bottom:16px;border:1px solid var(--border-color,rgba(148,163,184,.25));border-radius:22px;padding:9px 12px}.v14-modern-navbar .v14-nav-link{padding:9px 8px}.v14-modern-navbar small{font-size:.68rem}}
+</style>
+
+<style id="v14-cart-badge-style">
+.v14-nav-icon-wrap{position:relative;display:grid;place-items:center;line-height:1}
+.v14-cart-badge{position:absolute;top:-9px;right:-13px;min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;border-radius:999px;background:#dc2626;color:#fff;border:2px solid var(--card-bg,#fff);font-size:9px;line-height:1;font-weight:900;box-shadow:0 3px 8px rgba(220,38,38,.28);z-index:2}
+.v14-cart-badge[hidden]{display:none}
+</style>
 </head>
 
 <body data-theme="modern" style="font-size: 0.85rem;">
@@ -328,7 +347,7 @@
 <button class="fab-main" id="fab-search-btn" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;" title="Cari Barang" type="button">
 <svg height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="fill: none !important;" viewbox="0 0 24 24" width="20"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" x2="21" y1="15.17" y2="21"></line></svg>
 </button>
-<button class="fab-main" id="fab-cart-btn" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;" title="Buka Keranjang" type="button"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.89-2-1.99-2z"></path></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
+<button class="fab-main" id="fab-cart-btn" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;" title="Buka Keranjang" type="button"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.89-2-1.99-2z"></path></svg><span class="cart-badge" id="cart-count" data-cart-badge style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
 </div>
 <div class="modal-backdrop" id="aiChatModal" onclick="if(event.target === this) toggleAIChatModal()">
 <div class="modal-content" style="max-width: 380px; width: 95%; height: 65vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 16px;">
@@ -398,16 +417,6 @@
 <button aria-label="Kembali ke atas" class="no-print" id="scroll-helper-fab" title="Kembali ke atas" type="button">
 <svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 19V5M6.5 11.5 12 5l5.5 6.5"></path></svg>
 </button>
-<nav class="permanent-bottom-bar no-print v14-page-navbar" aria-label="Navigasi pelanggan" style="display:flex;align-items:center;justify-content:space-around;padding:7px 6px;background:var(--card-bg);border-top:1px solid var(--border-color);position:fixed;bottom:0;left:0;width:100%;z-index:100;box-sizing:border-box;gap:4px;">
-<a href="/pelanggan/" class="v14-nav-link" aria-current="page"><i class="ti ti-home-2 v14-nav-icon" aria-hidden="true"></i><small>Home</small></a>
-<a href="/pelanggan/produk/" class="v14-nav-link"><i class="ti ti-shopping-bag v14-nav-icon" aria-hidden="true"></i><small>Produk</small></a>
-<a href="/pelanggan/keranjang/" class="v14-nav-link"><i class="ti ti-shopping-cart v14-nav-icon" aria-hidden="true"></i><small>Keranjang</small></a>
-<a href="/pelanggan/pesanan/" class="v14-nav-link"><i class="ti ti-package v14-nav-icon" aria-hidden="true"></i><small>Pesanan</small></a>
-<a href="/pelanggan/lainnya/" class="v14-nav-link"><i class="ti ti-menu-2 v14-nav-icon" aria-hidden="true"></i><small>Lainnya</small></a>
-</nav>
-
-
-
 <!-- =========================================================
      NO. 1 — HEADER TOKO / TOP EDGE FIX
      Hanya mengatur wadah luar Header Toko.
@@ -427,7 +436,26 @@
 
 
 
-<script src="script.js"></script></body>
+<script src="script.js"></script><nav class="v14-modern-navbar" aria-label="Navigasi pelanggan">
+  <a href="/pelanggan/" class="v14-nav-link" data-nav="home"><i class="ti ti-home-2 v14-nav-icon" aria-hidden="true"></i><small>Home</small></a>
+  <a href="/pelanggan/produk/" class="v14-nav-link" data-nav="produk"><i class="ti ti-shopping-bag v14-nav-icon" aria-hidden="true"></i><small>Produk</small></a>
+  <a href="/pelanggan/keranjang/" class="v14-nav-link" data-nav="keranjang"><span class="v14-nav-icon-wrap"><i class="ti ti-shopping-cart v14-nav-icon" aria-hidden="true"></i><span class="v14-cart-badge" data-cart-badge hidden>0</span></span><small>Keranjang</small></a>
+  <a href="/pelanggan/pesanan/" class="v14-nav-link" data-nav="pesanan"><i class="ti ti-package v14-nav-icon" aria-hidden="true"></i><small>Pesanan</small></a>
+  <a href="/pelanggan/lainnya/" class="v14-nav-link" data-nav="lainnya"><i class="ti ti-menu-2 v14-nav-icon" aria-hidden="true"></i><small>Lainnya</small></a>
+</nav>
+<script id="v14-modern-navbar-script">
+(()=>{
+  const active='home';
+  document.querySelectorAll('.v14-modern-navbar .v14-nav-link').forEach(link=>{
+    const on=link.dataset.nav===active;
+    link.classList.toggle('is-active',on);
+    if(on) link.setAttribute('aria-current','page'); else link.removeAttribute('aria-current');
+  });
+  document.body.classList.add('has-v14-modern-navbar');
+})();
+</script>
+<script type="module">import {initCartBadge} from "/pelanggan/_core/cart-badge.js"; initCartBadge();</script>
+</body>
 \n\n
 
 

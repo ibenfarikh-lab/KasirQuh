@@ -243,7 +243,14 @@
     }
 
 
-    let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "", phone: "" };
+    const SHARED_CART_KEY = 'cust_cart_v14';
+    function readSharedCart(){ try { const raw=JSON.parse(localStorage.getItem(SHARED_CART_KEY)||'[]'); return Array.isArray(raw)?raw.map(item=>({ ...item, code:String(item.code ?? item.kode ?? item.id ?? item.productId ?? item.nama ?? ''), qty:Number(item.qty)||1, harga:Number(item.harga)||0, subtotal:Math.round((Number(item.harga)||0)*(Number(item.qty)||1)) })):[]; } catch { return []; } }
+    let databaseProduk = {}; let cart = readSharedCart(); let pengaturanToko = { nama: "", phone: "" };
+    let lastSharedCartSnapshot = JSON.stringify(cart);
+    function persistSharedCart(){ try { const normalized=cart.map(item=>({ ...item, id:String(item.id ?? item.code ?? item.kode ?? item.productId ?? item.nama ?? ''), code:String(item.code ?? item.kode ?? item.id ?? item.productId ?? item.nama ?? ''), qty:Number(item.qty)||1, harga:Number(item.harga)||0, subtotal:Math.round((Number(item.harga)||0)*(Number(item.qty)||1)) })); localStorage.setItem(SHARED_CART_KEY,JSON.stringify(normalized)); lastSharedCartSnapshot=JSON.stringify(normalized); window.dispatchEvent(new CustomEvent('kq:cart-changed',{detail:{cart:normalized}})); } catch(e) { console.warn('Cart sync gagal:',e); } }
+    function syncSharedCart(){ try { const raw=localStorage.getItem(SHARED_CART_KEY)||'[]'; if(raw!==lastSharedCartSnapshot){ cart=readSharedCart(); lastSharedCartSnapshot=JSON.stringify(cart); if(typeof renderCartPelanggan==='function') renderCartPelanggan(); } } catch(e){} }
+    window.addEventListener('storage', e=>{ if(e.key===SHARED_CART_KEY) syncSharedCart(); });
+    window.setInterval(syncSharedCart,500);
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24;
     // Dashboard Home hanya menampilkan 6 produk. Katalog lengkap berada di /pelanggan/produk/.
@@ -1851,6 +1858,7 @@
     }, { once: true });
 
     function renderCartPelanggan() {
+      persistSharedCart();
       const tbody = document.getElementById("cart-body"); tbody.innerHTML = ""; let total = 0, totalQty = 0;
       cart.forEach((item) => {
         total += item.subtotal; totalQty += item.qty;
@@ -2401,7 +2409,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('Opsi Developer')?.addEventListener("click", toggleOpsiDeveloper);
   document.getElementById('fab-ai-btn')?.addEventListener("click", toggleAIChatModal);
   document.getElementById('fab-search-btn')?.addEventListener("click", bukaKolomPencarian);
-  document.getElementById('fab-cart-btn')?.addEventListener("click", openCartModal);
+  document.getElementById('fab-cart-btn')?.addEventListener("click", () => {
+    window.location.href = '/pelanggan/keranjang/';
+  });
   document.getElementById('aiSoundToggle')?.addEventListener("click", toggleAISound);
   document.getElementById('aiMicButton')?.addEventListener("click", toggleAISpeechRecognition);
   document.getElementById('btn-detail-add')?.addEventListener("click", tambahDariDetail);
