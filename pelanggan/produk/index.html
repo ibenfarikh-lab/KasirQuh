@@ -18,7 +18,11 @@
 .kq-produk-main .pos-container{gap:0}
 .kq-produk-main #pos-card-wrapper{display:block!important}
 .kq-produk-hidden-stubs{display:none!important}
+
+.v14-nav-icon{font-size:1.22rem;line-height:1;display:block;font-weight:400}
+.v14-nav-link .v14-nav-icon{flex:0 0 auto}
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css">
 </head>
 <body data-theme="modern" style="font-size:0.85rem">
 
@@ -151,11 +155,11 @@
 <div class="toast" id="toastNotification">Notifikasi</div>
 
 <nav class="permanent-bottom-bar no-print v14-page-navbar" aria-label="Navigasi pelanggan" style="display:flex;align-items:center;justify-content:space-around;padding:7px 6px;background:var(--card-bg);border-top:1px solid var(--border-color);position:fixed;bottom:0;left:0;width:100%;z-index:100;box-sizing:border-box;gap:4px">
-  <a href="/pelanggan/" class="v14-nav-link"><span>🏠</span><small>Home</small></a>
-  <a href="/pelanggan/produk/" class="v14-nav-link" aria-current="page"><span>🛍️</span><small>Produk</small></a>
-  <a href="/pelanggan/keranjang/" class="v14-nav-link"><span>🛒</span><small>Keranjang</small></a>
-  <a href="/pelanggan/pesanan/" class="v14-nav-link"><span>📦</span><small>Pesanan</small></a>
-  <a href="/pelanggan/lainnya/" class="v14-nav-link"><span>☰</span><small>Lainnya</small></a>
+  <a href="/pelanggan/" class="v14-nav-link"><i class="ti ti-home-2 v14-nav-icon" aria-hidden="true"></i><small>Home</small></a>
+  <a href="/pelanggan/produk/" class="v14-nav-link" aria-current="page"><i class="ti ti-shopping-bag v14-nav-icon" aria-hidden="true"></i><small>Produk</small></a>
+  <a href="/pelanggan/keranjang/" class="v14-nav-link"><i class="ti ti-shopping-cart v14-nav-icon" aria-hidden="true"></i><small>Keranjang</small></a>
+  <a href="/pelanggan/pesanan/" class="v14-nav-link"><i class="ti ti-package v14-nav-icon" aria-hidden="true"></i><small>Pesanan</small></a>
+  <a href="/pelanggan/lainnya/" class="v14-nav-link"><i class="ti ti-menu-2 v14-nav-icon" aria-hidden="true"></i><small>Lainnya</small></a>
 </nav>
 
 <script src="script.js?v=v14-produk-copy"></script>
