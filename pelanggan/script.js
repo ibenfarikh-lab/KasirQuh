@@ -273,12 +273,14 @@
         categoryEl.classList.add('dashboard-category-ready');
       }
       if (dashboardHomeInfoCfg) renderCustomerHomeInfo(dashboardHomeInfoCfg);
-      // Katalog boleh tampil hanya setelah seluruh dashboard utama siap.
-      refreshKatalogPelanggan();
+      // Urutan first-paint: isi seluruh blok dashboard utama terlebih dahulu.
+      // Katalog TIDAK dibuka di tengah proses ini. Card produk baru boleh terlihat
+      // setelah blok Stok Rumah + Ide Masak + Sedang Laris selesai dirender.
       renderRecipeCards();
       muatBarangLarisHariIni();
       renderQuickReorder(lastFetchedOrders || []);
       initKategoriPelangganListener();
+      refreshKatalogPelanggan();
       initPromoTokoPelanggan();
       if (!dashboardChatStarted) {
         dashboardChatStarted = true;
