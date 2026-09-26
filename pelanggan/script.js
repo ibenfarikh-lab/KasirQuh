@@ -246,52 +246,6 @@
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "", phone: "" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24;
-    // STAGE 9: satu gerbang visual untuk dashboard utama agar konten berbasis DB
-    // tidak muncul sepotong-sepotong saat first paint. Listener tetap realtime.
-    let dashboardPrimaryReady = false;
-    let dashboardChatStarted = false;
-    let dashboardHomeInfoCfg = null;
-    let dashboardPrimaryState = { products:false, recipes:false, trendingConfig:false, trendingTransactions:false, stokConfig:false, stokOrders:false };
-    dashboardPrimaryState.stokOrders = !currentCustomerPhone;
-
-    function tryRevealPrimaryDashboard() {
-      if (dashboardPrimaryReady) return;
-      const ready = dashboardPrimaryState.products && dashboardPrimaryState.recipes &&
-        dashboardPrimaryState.trendingConfig && dashboardPrimaryState.trendingTransactions &&
-        dashboardPrimaryState.stokConfig && dashboardPrimaryState.stokOrders;
-      if (!ready) return;
-      dashboardPrimaryReady = true;
-      ['recipe-section-wrapper','trending-section-wrapper'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.classList.remove('dashboard-primary-pending');
-        el.classList.add('dashboard-primary-ready');
-      });
-      const categoryEl = document.getElementById('category-container');
-      if (categoryEl) {
-        categoryEl.classList.remove('dashboard-category-pending');
-        categoryEl.classList.add('dashboard-category-ready');
-      }
-      if (dashboardHomeInfoCfg) renderCustomerHomeInfo(dashboardHomeInfoCfg);
-      // Urutan first-paint: isi seluruh blok dashboard utama terlebih dahulu.
-      // Katalog TIDAK dibuka di tengah proses ini. Card produk baru boleh terlihat
-      // setelah blok Stok Rumah + Ide Masak + Sedang Laris selesai dirender.
-      renderRecipeCards();
-      muatBarangLarisHariIni();
-      renderQuickReorder(lastFetchedOrders || []);
-      initKategoriPelangganListener();
-      refreshKatalogPelanggan();
-      initPromoTokoPelanggan();
-      if (!dashboardChatStarted) {
-        dashboardChatStarted = true;
-        const deferCustomerRealtime = window.requestIdleCallback || function(cb) { setTimeout(cb, 700); };
-        deferCustomerRealtime(() => {
-          initChatRumpiListener();
-          if (currentCustomerPhone) initCustomerChatListener();
-        });
-      }
-    }
-
     // TAHAP 1: jumlah card katalog yang ditampilkan saat awal. Ini TIDAK membatasi databaseProduk/dashboard.
     const CATALOG_INITIAL_VISIBLE = 6;
     let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
@@ -406,27 +360,105 @@
 
 
 
+    // Stage 9: coordinator first-paint Home.
+    // Listener Firebase tetap realtime dan boleh selesai dalam urutan apa pun.
+    // Yang dikendalikan di sini hanya kapan hasil pertama Home boleh terlihat.
+    const dashboardFirstPaint = {
+      released: false,
+      ready: { products:false, stok:false, recipe:false, trending:false, category:false, orders: currentCustomerPhone ? false : true },
+      stokConfigReady: false
+    };
+
+    function prepareDashboardFirstPaint() {
+      ['reorder-section-wrapper','recipe-section-wrapper','trending-section-wrapper','category-container','pos-card-wrapper','promo-banner-section']
+        .forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.style.display = 'none';
+          el.style.visibility = 'hidden';
+        });
+
+      // Pagar terluar untuk Kategori + Katalog. Renderer produk tetap bebas bekerja,
+      // tetapi tidak mungkin terlihat sebelum coordinator melepas pagar ini.
+      const posContainer = document.querySelector('#belanja > .pos-container');
+      if (posContainer) {
+        posContainer.style.display = 'none';
+        posContainer.style.visibility = 'hidden';
+      }
+    }
+
+    function markDashboardFirstPaintReady(key) {
+      if (!(key in dashboardFirstPaint.ready)) return;
+      dashboardFirstPaint.ready[key] = true;
+      if (Object.values(dashboardFirstPaint.ready).every(Boolean) && !dashboardFirstPaint.released) {
+        revealDashboardFirstPaint();
+      }
+    }
+
+    function revealDashboardFirstPaint() {
+      dashboardFirstPaint.released = true;
+
+      const posContainer = document.querySelector('#belanja > .pos-container');
+      if (posContainer) {
+        posContainer.style.display = '';
+        posContainer.style.visibility = 'visible';
+      }
+      ['reorder-section-wrapper','trending-section-wrapper','category-container','pos-card-wrapper']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.style.visibility = 'visible'; });
+      const recipeWrapper = document.getElementById('recipe-section-wrapper');
+      if (recipeWrapper) { recipeWrapper.style.display = 'block'; recipeWrapper.style.visibility = 'visible'; }
+
+      // DOM order: Stok Rumah -> Ide Masak -> Sedang Laris -> Kategori -> Katalog.
+      renderQuickReorder(lastFetchedOrders || []);
+      renderRecipeCards();
+
+      const trendingWrapper = document.getElementById('trending-section-wrapper');
+      const trendingContainer = document.getElementById('trending-container');
+      if (trendingWrapper) trendingWrapper.style.display = trendingContainer?.querySelector('.trending-card') ? 'block' : 'none';
+
+      const category = document.getElementById('category-container');
+      if (category) category.style.display = '';
+      perbaruiTampilanKategori();
+
+      // Katalog menjadi operasi render terakhir pada first-paint.
+      refreshKatalogPelanggan();
+
+      // Promo adalah fitur sekunder; baru boleh terlihat setelah katalog dibuka.
+      const promoBanner = document.getElementById('promo-banner-section');
+      if (promoBanner) promoBanner.style.visibility = 'visible';
+    }
+
     window.onload = function() {
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
+
+      prepareDashboardFirstPaint();
       if (currentCustomerPhone) {
         document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); periksaCheckinHarian(); tampilkanKoinDiProfil();
-      } else { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); }
-      // Stage 9: header tetap first paint, lalu dashboard utama berbasis DB
-      // berjalan dalam satu fase paralel. Tidak ada delay buatan.
-      initHeaderTokoListener();
-      initCustomerHomeInfoListener();
-      const deferDashboardAfterHeader = window.requestAnimationFrame || function(cb) { setTimeout(cb, 16); };
-      deferDashboardAfterHeader(() => {
-        initStokRumahListener();
-        initIdeMasakPelanggan();
-        initSedangLarisListeners();
-        initProdukKatalogListener();
-      });
+      } else {
+        document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login');
+      }
 
+      // Semua listener utama dimulai tanpa saling menunggu. Coordinator yang
+      // menentukan kapan hasil awal Home boleh terlihat; realtime tetap aktif.
+      initHeaderTokoListener();
+      initStokRumahListener();
+      initIdeMasakPelanggan();
+      initFirebaseListeners(false);
+      initSedangLarisListeners();
+      initKategoriPelangganListener();
+      initProdukKatalogListener();
+      initCustomerHomeInfoListener();
+      initPromoTokoPelanggan();
+
+      const deferCustomerRealtime = window.requestIdleCallback || function(cb) { setTimeout(cb, 700); };
+      deferCustomerRealtime(() => {
+        initChatRumpiListener();
+        if (currentCustomerPhone) initCustomerChatListener();
+      });
     };
 
     function updateCustomerGreeting() {
@@ -438,7 +470,6 @@
     }
 
     function renderCustomerHomeInfo(cfg) {
-      dashboardHomeInfoCfg = cfg || {};
       const running=document.getElementById('customer-home-running-text');
       if(!running) return;
       const text = (cfg && typeof cfg.runningText === 'string') ? cfg.runningText.trim() : '';
@@ -447,12 +478,6 @@
       if(text) {
         void running.offsetWidth;
         running.classList.add('run-once');
-      }
-      if (!dashboardPrimaryReady) return;
-      const infoLine = document.getElementById('customer-home-info-line');
-      if (infoLine) {
-        infoLine.classList.remove('dashboard-home-info-pending');
-        infoLine.classList.add('dashboard-home-info-ready');
       }
     }
 
@@ -692,12 +717,11 @@
         adminCustomerRecipesEnabled = false;
         adminCustomerRecipes = [];
       }
-      dashboardPrimaryState.recipes = true;
-      tryRevealPrimaryDashboard();
+      renderRecipeCards();
+      markDashboardFirstPaintReady('recipe');
     }
 
     function renderRecipeCards() {
-      if (!dashboardPrimaryReady) return;
       const container = document.getElementById('recipe-scroll-container');
       if(!container) return;
       container.innerHTML = "";
@@ -1314,14 +1338,14 @@
       storeCollection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
         window.__stokRumahConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
-        dashboardPrimaryState.stokConfig = true;
         renderQuickReorder(lastFetchedOrders || []);
-        tryRevealPrimaryDashboard();
+        dashboardFirstPaint.stokConfigReady = true;
+        if (dashboardFirstPaint.ready.orders) markDashboardFirstPaintReady('stok');
       }, (err) => {
         console.warn("Listener pengaturan Stok Rumah gagal:", err);
-        dashboardPrimaryState.stokConfig = true;
         renderQuickReorder(lastFetchedOrders || []);
-        tryRevealPrimaryDashboard();
+        dashboardFirstPaint.stokConfigReady = true;
+        if (dashboardFirstPaint.ready.orders) markDashboardFirstPaintReady('stok');
       });
     }
 
@@ -1335,8 +1359,8 @@
       storeCollection("produk").onSnapshot((snapshot) => { 
         databaseProduk = {}; 
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
-        isProductsLoaded = true; 
-        dashboardPrimaryState.products = true;
+        isProductsLoaded = true;
+        markDashboardFirstPaintReady('products');
         muatBarangLarisHariIni(); 
         perbaruiTampilanKategori(); 
         refreshKatalogPelanggan(); 
@@ -1345,11 +1369,12 @@
         if (lastFetchedOrders && lastFetchedOrders.length > 0) {
           renderQuickReorder(lastFetchedOrders);
         }
-        tryRevealPrimaryDashboard();
       }, (err) => {
         console.warn("Listener produk gagal:", err);
-        dashboardPrimaryState.products = true;
-        tryRevealPrimaryDashboard();
+        isProductsLoaded = false;
+        markDashboardFirstPaintReady('products');
+        renderTrending([]);
+        markDashboardFirstPaintReady('trending');
       });
     }
 
@@ -1359,6 +1384,11 @@
       deferCategoryInit(() => {
         storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
           renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
+          markDashboardFirstPaintReady('category');
+        }, (err) => {
+          console.warn("Listener kategori gagal:", err);
+          renderKategoriPelanggan([]);
+          markDashboardFirstPaintReady('category');
         });
       });
     }
@@ -1371,27 +1401,15 @@
           const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
           window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
           isTrendingConfigLoaded = true;
-          dashboardPrimaryState.trendingConfig = true;
           muatBarangLarisHariIni();
-          tryRevealPrimaryDashboard();
-        }, (err) => {
-          console.warn("Listener pengaturan Sedang Laris gagal:", err);
-          isTrendingConfigLoaded = true;
-          dashboardPrimaryState.trendingConfig = true;
-          muatBarangLarisHariIni();
-          tryRevealPrimaryDashboard();
         });
 
         storeCollection("transaksi").onSnapshot((snapshot) => {
           window.__trendingTransactionsSnapshot = snapshot;
-          dashboardPrimaryState.trendingTransactions = true;
           muatBarangLarisHariIni();
-          tryRevealPrimaryDashboard();
         }, (err) => {
           console.warn("Listener transaksi Sedang Laris gagal:", err);
-          dashboardPrimaryState.trendingTransactions = true;
           muatBarangLarisHariIni();
-          tryRevealPrimaryDashboard();
         });
       });
     }
@@ -1520,7 +1538,7 @@
       if (!isProductsLoaded || !isTrendingConfigLoaded) return;
 
       const cfg = window.__sedangLarisConfig || {enabled:true, limit:5};
-      if (cfg.enabled === false) { renderTrending([]); return; }
+      if (cfg.enabled === false) { renderTrending([]); markDashboardFirstPaintReady('trending'); return; }
 
       const limit = Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5));
       const token = ++trendingLoadToken;
@@ -1582,6 +1600,7 @@
         if (!targetDateKey) {
           // Tidak ada transaksi sama sekali.
           renderTrending([]);
+          markDashboardFirstPaintReady('trending');
           return;
         }
 
@@ -1621,6 +1640,7 @@
           .slice(0, limit);
 
         renderTrending(top);
+        markDashboardFirstPaintReady('trending');
 
         // Simpan info tanggal yang sedang ditampilkan agar mudah dicek/debug.
         window.__sedangLarisDateKey = targetDateKey;
@@ -1632,6 +1652,7 @@
         // Jika belum pernah ada tampilan sama sekali, baru sembunyikan section.
         if (!document.querySelector('#trending-container .trending-card')) {
           renderTrending([]);
+          markDashboardFirstPaintReady('trending');
         }
       }
     }
@@ -1793,7 +1814,7 @@
       if (!['list','grid','card'].includes(catalogViewMode)) catalogViewMode = 'grid';
       container.className = catalogViewMode === 'list' ? "product-catalog-list" : (catalogViewMode === 'card' ? "product-catalog-card" : "product-catalog-grid");
       updateCatalogViewButtons();
-      if (!isProductsLoaded || !dashboardPrimaryReady) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
+      if (!isProductsLoaded) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
 
       let matchedProducts = [];
       for (let code in databaseProduk) {
@@ -2211,14 +2232,18 @@
     function muatRiwayatPesananOnlinePelanggan() { 
       storeCollection("transaksi").where("customerPhone", "==", currentCustomerPhone).onSnapshot((snapshot) => { 
         const container = document.getElementById("customer-online-orders-container"); 
-        if (!container) return; 
+        if (!container) {
+          dashboardFirstPaint.ready.orders = true;
+          if (dashboardFirstPaint.stokConfigReady) markDashboardFirstPaintReady('stok');
+          return;
+        }
         container.innerHTML = ""; 
         if (snapshot.empty) { 
           container.innerHTML = `<div class="empty-state" style="font-size: 0.78rem;">Belum ada riwayat pesanan online.</div>`; 
           lastFetchedOrders = [];
-          dashboardPrimaryState.stokOrders = true;
-          renderQuickReorder([]); 
-          tryRevealPrimaryDashboard();
+          renderQuickReorder([]);
+          dashboardFirstPaint.ready.orders = true;
+          if (dashboardFirstPaint.stokConfigReady) markDashboardFirstPaintReady('stok');
           return; 
         } 
         let orders = []; 
@@ -2229,9 +2254,9 @@
           return timeB - timeA; 
         }); 
         lastFetchedOrders = orders;
-        dashboardPrimaryState.stokOrders = true;
         renderQuickReorder(orders);
-        tryRevealPrimaryDashboard(); 
+        dashboardFirstPaint.ready.orders = true;
+        if (dashboardFirstPaint.stokConfigReady) markDashboardFirstPaintReady('stok'); 
         orders.forEach(trx => { 
           let statusLabel = trx.statusPesanan || "Menunggu Diproses"; 
           let s_lower = statusLabel.toLowerCase(); 
@@ -2249,9 +2274,9 @@
           container.innerHTML += `<div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: var(--card-bg); box-shadow: 0 1px 4px rgba(0,0,0,0.05);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><span style="font-size: 0.68rem; color: var(--text-muted);">🗓️ ${trx.waktu || '-'}</span><span style="background: ${step===4 ? '#16a34a' : (step===1 ? '#ef4444' : '#d97706')}; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.62rem; font-weight: bold;">${statusLabel}</span></div>${timelineHtml}<div style="font-size: 0.75rem; font-weight: 600; color: #2563eb;">Metode: ${trx.metode || '-'}</div>${itemsHtml}<div style="font-size: 0.82rem; font-weight: 800; color: #16a34a; text-align: right;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div></div>`; 
         }); 
       }, (err) => {
-        console.warn("Listener riwayat pesanan pelanggan gagal:", err);
-        dashboardPrimaryState.stokOrders = true;
-        tryRevealPrimaryDashboard();
+        console.warn("Listener riwayat pesanan gagal:", err);
+        dashboardFirstPaint.ready.orders = true;
+        if (dashboardFirstPaint.stokConfigReady) markDashboardFirstPaintReady('stok');
       });
     }
 
