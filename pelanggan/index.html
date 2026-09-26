@@ -4,15 +4,44 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>Beranda - KasirQuh</title>
+<title>Belanja - KasirQuh</title>
 <meta content="#2563eb" name="theme-color"/>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-<script src="_core/firebase.js?v=20260925-iconsfix"></script>
-<link href="style.css" rel="stylesheet"/>
-  <link rel="manifest" href="/manifest.json">
+<link href="style.css?v=1.0.12" rel="stylesheet"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </head>
-<body data-kq-route="home" data-theme="modern" style="font-size: 0.85rem;"><div class="login-overlay" id="customerLoginModal" style="display: none;">
+
+<body data-theme="modern" style="font-size: 0.85rem;">
+<div class="login-overlay" id="customerLoginModal" style="display: flex;">
 <div class="login-card" style="max-height: 90vh; overflow-y: auto; padding: 16px;">
 <h2 style="margin-top: 0; margin-bottom: 4px; font-size: 1.3rem;">KasirQuh</h2>
 <div id="formLoginContainer">
@@ -36,14 +65,46 @@
 <p style="text-align: center; margin-top: 12px; font-size: 0.75rem;">Sudah punya akun? <a data-kq-static-action="auth-login" href="javascript:void(0)" style="color: #2563eb; font-weight: bold;">Masuk di sini</a></p>
 </div>
 </div>
-</div><div class="modal-backdrop" id="dailyCheckinModal" style="display: none;">
+</div>
+<div class="modal-backdrop" id="dailyCheckinModal" style="display: none;">
 <div class="modal-content modal-checkin-content" style="background: var(--card-bg); max-width: 300px;">
 <div style="font-size: 3rem; margin-bottom: 8px;">🪙</div>
 <h2 style="margin: 0 0 8px 0; color: #d97706; font-size: 1.2rem;">Bonus Warga!</h2>
 <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Selamat! Kamu rajin buka aplikasi hari ini. Ini 10 Koin untukmu!</p>
 <button data-kq-static-action="claim-coin" style="background: #16a34a; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: bold; font-size: 0.85rem; cursor: pointer; width: 100%; box-shadow: 0 3px 10px rgba(22, 163, 74, 0.3);" type="button">Klaim Koin Sekarang</button>
 </div>
-</div><div class="main-content" data-kq-page-content=""><div class="tab-content active" id="belanja" style="display: block;">
+</div>
+<div class="modal-backdrop" id="menuToggleModal" onclick="if(event.target === this) toggleMenuModal()" style="background: rgba(0,0,0,0.4); justify-content: flex-end; align-items: flex-end; padding: 0 10px 65px 0;">
+<div class="modal-content" style="max-width: 200px; border-radius: 12px; padding: 6px; background: var(--card-bg); box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 1px solid var(--border-color);">
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<button class="popup-menu-btn active-menu" data-kq-static-action="menu-belanja" id="pop-btn-belanja" type="button"><svg viewbox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"></path></svg> Belanja</button>
+<button class="popup-menu-btn" data-kq-static-action="menu-data-pelanggan" id="pop-btn-datapelanggan" type="button"><svg viewbox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg> Data Pelanggan</button>
+<button class="popup-menu-btn" data-kq-static-action="menu-live-chat" id="pop-btn-livechat" style="justify-content: space-between;" type="button"><span style="display: flex; align-items: center; gap: 8px;"><svg viewbox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"></path></svg> Live Chat</span><span id="badge-livechat-cust" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; font-weight: bold; padding: 1px 5px; border-radius: 8px;">0</span></button>
+<button class="popup-menu-btn" data-kq-static-action="menu-pengaturan" id="pop-btn-pengaturan" type="button"><svg viewbox="0 0 24 24"><path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.53,5.05 19.27,4.97 19.05,5.05L16.56,6.05C16.04,5.66 15.45,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.55,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.97 4.47,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.47,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.55,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.45,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.53,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"></path></svg> Pengaturan</button>
+</div>
+</div>
+</div>
+<div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
+<div class="sticky-search-bar no-print" id="sticky-search-container" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
+<div style="display: flex; gap: 8px; align-items: center;">
+<input aria-label="Cari nama barang" id="inventory-search-input" oninput="filterKatalogPelanggan(this.value)" placeholder="🔍 Cari nama barang..." style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;" type="text"/>
+<button data-kq-static-action="close-search" style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" type="button">✕</button>
+</div>
+</div>
+<div class="modal-backdrop promo-floating-backdrop" id="promoTokoModal" onclick="if(event.target === this) tutupPromoTokoPelanggan()">
+<div aria-label="Promo toko" aria-modal="true" class="promo-floating-card" role="dialog">
+<button aria-label="Tutup promo" class="promo-floating-close" data-kq-static-action="close-promo" type="button">✕</button>
+<div class="promo-floating-badge">🎁 PROMO</div>
+<div class="promo-toko-slider" id="promo-toko-slider"></div>
+<div class="promo-floating-nav">
+<button aria-label="Promo sebelumnya" data-kq-static-action="promo-prev" id="promo-prev-btn" type="button">‹</button>
+<span id="promo-counter">1 / 1</span>
+<button aria-label="Promo berikutnya" data-kq-static-action="promo-next" id="promo-next-btn" type="button">›</button>
+</div>
+</div>
+</div>
+<!-- 1. HALAMAN BELANJA -->
+<div class="tab-content active" id="belanja" style="display: block;">
 <div class="customer-home-header no-print" id="customer-home-header">
 <div aria-hidden="true" class="customer-home-logo-wrap">
 <svg aria-label="KasirQuh Warunge Mimi" class="customer-home-logo" role="img" viewbox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
@@ -92,32 +153,33 @@
 <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 1px; color: var(--text-color);">🔥 Sedang Laris Hari Ini</div>
 <div class="auto-scroll-wrapper" id="trending-container"></div>
 </div>
+<!-- Kategori katalog: ikon saja; judul muncul hanya setelah masuk mode Produk/kategori. -->
+<div aria-label="Kategori produk" class="category-chips no-print" id="category-container">
+<button aria-label="Home" class="chip-btn active" data-category="Home" data-kq-static-action="category-home" title="Home" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M3 10.8 12 3l9 7.8"></path><path d="M6 10v10h12V10"></path><path d="M9 20v-6h6v6"></path><path d="M8 8.5h.01"></path></svg></button>
+<button aria-label="Produk" class="chip-btn" data-category="Produk" data-kq-static-action="category-produk" title="Produk" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M4 8.5h16l-1.2 11H5.2L4 8.5Z"></path><path d="M8 8.5c.2-3 1.7-4.5 4-4.5s3.8 1.5 4 4.5"></path><path d="M9 12.5h.01M15 12.5h.01"></path></svg></button>
+<button aria-label="Titipan Warga" class="chip-btn" data-category="Titipan Warga" data-kq-static-action="category-titipan-warga" title="Titipan Warga" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M4 9.5 12 3l8 6.5"></path><path d="M6 9v11h12V9"></path><path d="M8.5 20v-5h7v5"></path><path d="M4 20h16"></path><path d="M9 11.5h6"></path></svg></button>
+<button aria-label="Sembako" class="chip-btn" data-category="Sembako" data-kq-static-action="category-sembako" title="Sembako" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M5 8.5h14l-1 11H6l-1-11Z"></path><path d="M8 8.5c.3-2.8 1.7-4.2 4-4.2s3.7 1.4 4 4.2"></path><path d="M8.5 12.5c1.2.8 2.2.8 3.5 0s2.3-.8 3.5 0"></path></svg></button>
+<button aria-label="Minuman" class="chip-btn" data-category="Minuman" data-kq-static-action="category-minuman" title="Minuman" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M7 4h10"></path><path d="M8 4.5 9.2 20h5.6L16 4.5"></path><path d="M9 10h6"></path><path d="M10 14c1 .7 2 .7 3 0s2-.7 3 0"></path></svg></button>
+<button aria-label="Makanan" class="chip-btn" data-category="Makanan" data-kq-static-action="category-makanan" title="Makanan" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M4 13h16"></path><path d="M6 13a6 6 0 0 1 12 0"></path><path d="M7 17h10"></path><path d="M9 17v3M15 17v3"></path><path d="M8 10h.01M16 10h.01"></path></svg></button>
+<button aria-label="Snack" class="chip-btn" data-category="Snack" data-kq-static-action="category-snack" title="Snack" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M6 10h12l-1 10H7L6 10Z"></path><path d="M8 10c0-2 1-3 2-3 0-2 1-3 2-3s2 1 2 3c1 0 2 1 2 3"></path><path d="M9 14h.01M12 14h.01M15 14h.01"></path></svg></button>
+<button aria-label="Bumbu" class="chip-btn" data-category="Bumbu" data-kq-static-action="category-bumbu" title="Bumbu" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M7 8h10v12H7z"></path><path d="M8.5 8c.3-2.1 1.5-3.3 3.5-3.3S15.2 5.9 15.5 8"></path><path d="M9.5 12.5h5M9.5 16h3.5"></path></svg></button>
+<button aria-label="Perawatan" class="chip-btn" data-category="Perawatan" data-kq-static-action="category-perawatan" title="Perawatan" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M9 3h6v3H9z"></path><path d="M8 6h8l1 15H7L8 6Z"></path><path d="M10 11h4M10 15h4"></path><path d="M12 8v.01"></path></svg></button>
+<button aria-label="Kebutuhan Rumah" class="chip-btn" data-category="Kebutuhan Rumah" data-kq-static-action="category-kebutuhan-rumah" title="Kebutuhan Rumah" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M5 10h14l-1 11H6L5 10Z"></path><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M9 14c1 .7 2 .7 3 0s2-.7 3 0"></path></svg></button>
+<button aria-label="Lainnya" class="chip-btn" data-category="Lainnya" data-kq-static-action="category-lainnya" title="Lainnya" type="button"><svg aria-hidden="true" class="category-line-icon" viewbox="0 0 24 24"><path d="M5 7h14v14H5z"></path><path d="M8 7V4h8v3"></path><path d="M9 12h6M9 16h4"></path><path d="M12 9.5v.01"></path></svg></button>
+</div>
 <div class="pos-container" style="gap: 0;">
 <div aria-live="polite" class="catalog-category-title" id="catalog-category-title"></div>
-<div class="card no-print" id="pos-card-wrapper" style="margin-bottom: 0; display: none; padding: 0 6px 4px 6px; background: transparent; border: none; box-shadow: none;">
-<div id="pos-catalog-container"></div><div aria-hidden="true" id="catalog-load-sentinel" style="display:none;height:1px;width:100%;"></div>
+<div aria-label="Pilih tampilan produk" class="catalog-view-switcher no-print">
+<button aria-label="Tampilan list" class="catalog-view-btn" data-kq-static-action="view-list" data-view="list" title="List" type="button"><span class="catalog-view-icon">☷</span></button>
+<button aria-label="Tampilan grid" class="catalog-view-btn" data-kq-static-action="view-grid" data-view="grid" title="Grid" type="button"><span class="catalog-view-icon">▦</span></button>
+<button aria-label="Tampilan card" class="catalog-view-btn" data-kq-static-action="view-card" data-view="card" title="Card" type="button"><span class="catalog-view-icon">▣</span></button>
 </div>
-<button class="home-more-products-btn" data-kq-static-action="home-more-products" type="button" aria-label="Lihat produk lainnya">Lihat Produk Lainnya <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"></path></svg></button>
+<div class="card no-print" id="pos-card-wrapper" style="margin-bottom: 0; display: none; padding: 0 6px 4px 6px; background: transparent; border: none; box-shadow: none;">
+<div id="pos-catalog-container"></div><div aria-hidden="true" id="catalog-load-sentinel" style="height:1px;width:100%;"></div>
+</div>
 </div>
 <!-- MODAL KERANJANG -->
-
-</div></div><div class="sticky-search-bar no-print" id="sticky-search-container" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
-<div style="display: flex; gap: 8px; align-items: center;">
-<input aria-label="Cari nama barang" id="inventory-search-input" oninput="filterKatalogPelanggan(this.value)" placeholder="🔍 Cari nama barang..." style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;" type="text"/>
-<button data-kq-static-action="close-search" style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" type="button">✕</button>
-</div>
-</div><div class="modal-backdrop promo-floating-backdrop" id="promoTokoModal" onclick="if(event.target === this) tutupPromoTokoPelanggan()">
-<div aria-label="Promo toko" aria-modal="true" class="promo-floating-card" role="dialog">
-<button aria-label="Tutup promo" class="promo-floating-close" data-kq-static-action="close-promo" type="button">✕</button>
-<div class="promo-floating-badge">🎁 PROMO</div>
-<div class="promo-toko-slider" id="promo-toko-slider"></div>
-<div class="promo-floating-nav">
-<button aria-label="Promo sebelumnya" data-kq-static-action="promo-prev" id="promo-prev-btn" type="button">‹</button>
-<span id="promo-counter">1 / 1</span>
-<button aria-label="Promo berikutnya" data-kq-static-action="promo-next" id="promo-next-btn" type="button">›</button>
-</div>
-</div>
-</div><div class="modal-backdrop" id="cartModal" onclick="if(event.target === this) closeCartModal()">
+<div class="modal-backdrop" id="cartModal" onclick="if(event.target === this) closeCartModal()">
 <div class="modal-content" style="max-width: 380px; width: 95%; max-height: 85vh; border-radius: 16px; padding: 12px; background: var(--card-bg); display: flex; flex-direction: column; gap: 6px;">
 <div class="modal-header no-print" style="margin-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
 <h3 style="font-size: 1rem; margin: 0;">Keranjang Belanja</h3>
@@ -181,9 +243,101 @@
 </div>
 <button class="btn-clear-cart no-print" onclick="kosongkanKeranjang()" style="margin-top: 0; padding: 4px; font-size: 0.72rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;" type="button">🗑️ Kosongkan Keranjang</button>
 </div>
-</div><div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
+</div>
+</div>
+<!-- 2. HALAMAN DATA PELANGGAN -->
+<div class="tab-content" id="data-pelanggan" style="display: none;">
+<div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px;">
+<div>
+<h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Profil Saya</h3>
+<div style="font-size: 0.8rem;"><div><strong id="profile-name">-</strong></div><div id="profile-phone" style="color: var(--text-muted); font-size: 0.7rem;">-</div></div>
+</div>
+<div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 4px 10px; border-radius: 10px; text-align: center;">
+<div style="font-size: 0.6rem; color: #d97706; font-weight: bold;">Koin Warga</div>
+<div id="profile-coins" style="font-size: 0.95rem; font-weight: 800; color: #b45309;">0</div>
+</div>
+</div>
+<div class="card" style="padding: 12px; margin-bottom: 8px;"><h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">📦 Riwayat Pesanan Online Saya</h3><div id="customer-online-orders-container" style="display: flex; flex-direction: column; gap: 6px;"><div class="empty-state" style="font-size: 0.78rem;">Memuat riwayat pesanan...</div></div></div>
+<div class="card" style="padding: 12px;"><h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Catatan &amp; Tagihan dari Toko</h3><div id="customer-notes-container" style="display: flex; flex-direction: column; gap: 6px;"><div class="empty-state" style="font-size: 0.78rem;">Memuat catatan...</div></div></div>
+</div>
+<!-- 3. HALAMAN LIVE CHAT -->
+<div class="tab-content" id="live-chat" style="height: calc(100vh - 110px); padding: 0; display: none; flex-direction: column;">
+<div class="customer-chat-subtabs" style="display: flex; gap: 8px; padding: 8px; background: var(--card-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; box-sizing: border-box;">
+<button id="subtab-btn-rumpi" onclick="switchSubTabLiveChat('rumpi')" style="flex: 1; min-width: 0; padding: 10px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; font-weight: bold; font-size: 0.8rem; color: #2563eb; border-bottom: 3px solid #2563eb; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-sizing: border-box;" type="button"><span>Chat Rumpi</span><span id="badge-rumpi-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px;">0</span></button>
+<button id="subtab-btn-admin" onclick="switchSubTabLiveChat('admin')" style="flex: 1; min-width: 0; padding: 10px 8px; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; font-weight: bold; font-size: 0.8rem; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; box-sizing: border-box;" type="button"><span>Chat Admin Toko</span><span id="badge-admin-subtab" style="display: none; background: #ef4444; color: white; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px;">0</span></button>
+</div>
+<div class="subtab-content-pane" id="subtab-rumpi-content" style="display: flex; flex-direction: column; flex: 1; padding: 8px; box-sizing: border-box; overflow: hidden; height: 100%;">
+<div id="chat-rumpi-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color); padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);"><div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Memuat obrolan warga...</div></div>
+<div style="display: flex; gap: 6px; margin-top: 8px; flex-shrink: 0;"><input aria-label="Pesan Chat Rumpi" id="chat-rumpi-input" onkeypress="if(event.key==='Enter') kirimPesanChatRumpi()" placeholder="Tulis pesan ke warga toko..." style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.8rem;" type="text"/><button onclick="kirimPesanChatRumpi()" style="background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;" type="button">Kirim</button></div>
+</div>
+<div class="subtab-content-pane" id="subtab-admin-content" style="display: none; flex-direction: column; flex: 1; padding: 8px; box-sizing: border-box; overflow: hidden; height: 100%;">
+<div id="customer-chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color); padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);"><div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Memuat pesan...</div></div>
+<div style="display: flex; gap: 6px; margin-top: 8px; flex-shrink: 0;"><input aria-label="Pesan ke Admin" id="customer-chat-input" onkeypress="if(event.key==='Enter') kirimPesanPelanggan()" placeholder="Tulis pesan ke toko..." style="flex: 1; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.8rem;" type="text"/><button onclick="kirimPesanPelanggan()" style="background: #16a34a; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem;" type="button">Kirim</button></div>
+</div>
+</div>
+<!-- 4. HALAMAN PENGATURAN -->
+<div class="tab-content" id="pengaturan" style="display: none;">
+<div class="card" style="padding: 12px; margin-bottom: 8px;">
+<h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Identitas Pelanggan</h3>
+<div class="form-vertical" style="gap: 6px;">
+<label style="font-size: 0.75rem;">Nama:</label><input aria-label="Nama pelanggan" id="setting-cust-name" style="padding: 8px; font-size: 0.8rem;" type="text"/>
+<label style="font-size: 0.75rem;">No. WhatsApp (Username):</label><input aria-label="Nomor WhatsApp pelanggan" id="setting-cust-phone" readonly="" style="background: var(--input-bg); opacity: 0.7; padding: 8px; font-size: 0.8rem;" type="text"/>
+<label style="font-size: 0.75rem;">Alamat Pengiriman:</label><textarea aria-label="Alamat pelanggan" id="setting-cust-address" rows="2" style="background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); border-radius: 6px; padding: 6px; font-size: 0.8rem;"></textarea>
+<label style="font-size: 0.75rem;">Sandi Baru (Opsional):</label><input aria-label="Sandi pelanggan" id="setting-cust-pass" placeholder="Kosongkan jika tidak diubah" style="padding: 8px; font-size: 0.8rem;" type="password"/>
+<button onclick="simpanProfilPelanggan()" style="border-radius: 6px; padding: 8px; background: #2563eb; color: white; border: none; cursor: pointer; font-size: 0.8rem; margin-top: 4px;" type="button">Simpan Perubahan</button>
+</div>
+</div>
+<div class="card" style="padding: 12px; margin-bottom: 8px;">
+<h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Tampilan &amp; Tema</h3>
+<div class="form-vertical" style="display: flex; flex-direction: column; gap: 6px;">
+<label style="font-size: 0.75rem;">Tema:</label><select aria-label="Tema pelanggan" id="setting-cust-theme" onchange="gantiTemaPelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="light">Terang</option><option value="dark">Gelap</option><option value="modern">Modern</option></select>
+<label style="font-size: 0.75rem; margin-top: 4px;">Tampilan:</label><select aria-label="Tampilan katalog" id="setting-cust-view" onchange="gantiViewModePelanggan(this.value)" style="width: 100%; font-size: 0.8rem; padding: 6px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);"><option value="grid">Grid</option><option value="card">Card</option><option value="list">List</option></select>
+</div>
+</div>
+<!-- BAGIKAN APLIKASI DI PENGATURAN -->
+<div class="card" style="padding: 12px; margin-bottom: 8px;">
+<h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">📤 Bagikan Aplikasi</h3>
+<p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Ajak tetangga dan teman pakai KasirQuh biar belanja makin praktis.</p>
+<div style="display: flex; gap: 6px;">
+<button onclick="bukaModalQRCode()" style="flex: 1; background: #7c3aed; color: white; padding: 8px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem;" type="button">📷 Lihat Barcode</button>
+<button onclick="bagikanAplikasiViaWA()" style="flex: 1; background: #16a34a; color: white; padding: 8px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; font-size: 0.8rem;" type="button">💬 Bagikan ke WA</button>
+</div>
+</div>
+<div id="developer-options-panel" style="display: none; contain: layout style; contain-intrinsic-size: 1px 320px;">
+<div class="card" style="border: 1px solid var(--border-color); background: var(--card-bg); padding: 12px; margin-bottom: 8px;">
+<h3 style="color: var(--text-color); margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">🎞️ Animasi Navigasi</h3>
+<p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Matikan jika perpindahan Dashboard/Pengaturan terasa berat atau tersendat. Animasi kecil tombol dan FAB tetap berjalan.</p>
+<label style="display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer; font-size:0.78rem;">
+<span id="developer-animation-status">Animasi navigasi &amp; scroll: ON</span>
+<input checked="" id="developer-animation-toggle" onchange="toggleAnimasiNavigasiDeveloper(this.checked)" style="width:20px; height:20px; accent-color:#2563eb; cursor:pointer;" type="checkbox"/>
+</label>
+</div>
+<div class="card" style="border: 1px solid #f59e0b; background-color: #fffbeb; padding: 12px; margin-bottom: 8px;">
+<h3 style="color: #b45309; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembersih Data Situs</h3>
+<p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Menghapus cookie yang bisa diakses aplikasi, penyimpanan lokal, database situs, cache, dan pendaftaran service worker untuk situs ini. Anda mungkin perlu masuk kembali.</p>
+<button onclick="hapusDataSitusPelanggan()" style="background: #b45309; color: white; padding: 8px; font-weight: bold; border-radius: 6px; width: 100%; border: none; cursor: pointer; font-size: 0.8rem;" type="button">🧹 Hapus Cookie &amp; Data Situs</button>
+</div>
+<div class="card" style="border: 1px solid #fca5a5; background-color: #fff5f5; padding: 12px; margin-bottom: 8px;">
+<h3 style="color: #dc2626; margin-top: 0; font-size: 0.9rem; margin-bottom: 3px;">Pembaruan Sistem &amp; Cache</h3>
+<p style="color: var(--text-muted); font-size: 0.72rem; margin-bottom: 8px;">Gunakan tombol ini jika aplikasi tersangkut versi lama.</p>
+<button onclick="bersihkanCacheTotal()" style="background: #dc2626; color: white; padding: 8px; font-weight: bold; border-radius: 6px; width: 100%; border: none; cursor: pointer; font-size: 0.8rem;" type="button">🧹 Bersihkan Cache &amp; Muat Ulang</button>
+</div>
+</div>
+<div class="card" style="padding: 10px; margin-bottom: 8px; border: 1px dashed var(--border-color); background: var(--card-bg);">
+<button aria-expanded="false" id="Opsi Developer" style="width: 100%; background: transparent; color: var(--text-muted); border: none; padding: 6px; font-size: 0.72rem; cursor: pointer;" type="button">🛠️ Opsi Developer</button>
+</div>
+<div class="card" style="padding: 12px;"><h3 style="margin-top: 0; font-size: 0.9rem; margin-bottom: 6px;">Sesi Aplikasi</h3><button class="btn-logout" onclick="logoutPelanggan()" style="background: #dc2626; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 0.8rem;" type="button">🚪 Keluar / Ganti Akun</button></div>
+<div aria-label="Developer" class="customer-developer-footer">Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)</div>
+</div>
+</div>
+<div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
 <button class="fab-main fab-ai-bounce" id="fab-ai-btn" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;" title="Asisten Ai Toko" type="button">😀</button>
-</div><div class="modal-backdrop" id="aiChatModal" onclick="if(event.target === this) toggleAIChatModal()">
+<button class="fab-main" id="fab-search-btn" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;" title="Cari Barang" type="button">
+<svg height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="fill: none !important;" viewbox="0 0 24 24" width="20"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" x2="21" y1="15.17" y2="21"></line></svg>
+</button>
+<button class="fab-main" id="fab-cart-btn" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;" title="Buka Keranjang" type="button"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.89-2-1.99-2z"></path></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
+</div>
+<div class="modal-backdrop" id="aiChatModal" onclick="if(event.target === this) toggleAIChatModal()">
 <div class="modal-content" style="max-width: 380px; width: 95%; height: 65vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 16px;">
 <div class="modal-header" style="padding: 10px 14px; margin: 0; background: #7c3aed; color: white; display: flex; justify-content: space-between; align-items: center;">
 <div style="display: flex; align-items: center; gap: 6px;"><h3 style="margin: 0; font-size: 0.9rem;">😀 Asisten Belanja AI</h3><button id="aiSoundToggle" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 0.65rem;" type="button">🔊 Suara: ON</button></div>
@@ -192,7 +346,26 @@
 <div id="ai-chat-messages" style="flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; background: var(--bg-color);"><div style="align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; white-space: pre-line;">HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?</div></div>
 <div style="padding: 8px; border-top: 1px solid var(--border-color); background: var(--card-bg); display: flex; gap: 6px; align-items: center;"><input aria-label="Pesan untuk Asisten AI" id="ai-chat-input" onkeypress="if(event.key==='Enter') kirimPesanKeAI()" placeholder="Tanya stok, harga, atau ngobrol..." style="flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); font-size: 0.78rem;" type="text"/><button id="aiMicButton" style="background: #374151; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;" title="Ngomong pakai suara" type="button">🎤</button><button onclick="kirimPesanKeAI()" style="background: #7c3aed; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.78rem;" type="button">Kirim</button></div>
 </div>
-</div><div class="modal-backdrop" id="productDetailModal" onclick="if(event.target === this) closeProductDetail()">
+</div>
+<!-- MODAL BARCODE / QR CODE BAGIKAN APLIKASI -->
+<div class="modal-backdrop" id="qrCodeModal" onclick="if(event.target === this) tutupModalQRCode()">
+<div class="modal-content" style="max-width: 320px; width: 90%; background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative;">
+<button onclick="tutupModalQRCode()" style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;" type="button">✕</button>
+<div style="font-size: 1.5rem; margin-bottom: 4px;">🛍️</div>
+<h2 id="qr-store-name" style="margin: 0 0 2px 0; font-size: 1.4rem; font-weight: 800; letter-spacing: 0.5px;">KasirQuh</h2>
+<p id="qr-store-subtitle" style="font-size: 0.75rem; opacity: 0.9; margin: 0 0 15px 0;">Belanja Harian Makin Praktis</p>
+<div style="background: white; padding: 12px; border-radius: 12px; display: inline-block; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+<img alt="QR Code" id="qr-code-img" src="" style="width: 180px; height: 180px; display: block;"/>
+</div>
+<div style="font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">📷 Scan Untuk Daftar / Login</div>
+<div style="font-size: 0.65rem; opacity: 0.8; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 8px; margin-top: 8px;">✨ Tinggal Scan • Pilih Barang • Beres!</div>
+<button onclick="bagikanBarcodeSebagaiGambar()" style="margin-top: 14px; background: #16a34a; color: white; border: none; padding: 9px 16px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; cursor: pointer; width: 100%; box-shadow: 0 3px 8px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; gap: 6px;" type="button">
+<span>📤 Bagikan Gambar Barcode ke WA</span>
+</button>
+</div>
+</div>
+<!-- MODAL DETAIL PRODUK FLOATING DI TENGAH -->
+<div class="modal-backdrop" id="productDetailModal" onclick="if(event.target === this) closeProductDetail()">
 <div class="product-detail-box">
 <div style="position: relative;">
 <img alt="Gambar produk" id="detail-img" src="" style="width: 100%; height: 160px; object-fit: cover; border-radius: 16px 16px 0 0;"/>
@@ -226,26 +399,59 @@
         </button>
 </div>
 </div>
-</div><button aria-label="Kembali ke atas" class="no-print" id="scroll-helper-fab" title="Kembali ke atas" type="button">
+</div>
+<div class="toast" id="toastNotification">Notifikasi</div>
+<!-- Floating scroll helper: berdiri sendiri, tidak lagi menempel di navbar. -->
+<button aria-label="Kembali ke atas" class="no-print" id="scroll-helper-fab" title="Kembali ke atas" type="button">
 <svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 19V5M6.5 11.5 12 5l5.5 6.5"></path></svg>
-</button><div class="toast" id="toastNotification">Notifikasi</div><nav aria-label="Navigasi pelanggan" class="kq-bottom-nav no-print" id="kq-bottom-nav">
-<a class="kq-nav-item" data-route="home" href="/pelanggan/"><span class="kq-nav-icon">🏠</span><span>Beranda</span></a>
-<a class="kq-nav-item" data-route="produk" href="/pelanggan/produk/"><span class="kq-nav-icon">🛍️</span><span>Produk</span></a>
-<a class="kq-nav-item kq-nav-cart" data-route="keranjang" href="/pelanggan/keranjang/"><span class="kq-nav-icon">🛒</span><span>Keranjang</span><b id="kq-nav-cart-badge">0</b></a>
-<a class="kq-nav-item" data-route="chat" href="/pelanggan/chat/"><span class="kq-nav-icon">🗨️</span><span>Chat</span><b class="kq-nav-badge" id="kq-nav-chat-badge">0</b></a>
-<a class="kq-nav-item" data-route="akun" href="/pelanggan/akun/"><span class="kq-nav-icon">👤</span><span>Akun</span></a>
-</nav><div aria-hidden="true" class="kq-legacy-bottom-hooks"><span id="bottom-bar-title">Belanja</span><span id="pagination-box" style="display:none"><span id="pos-page-indicator">1/1</span></span></div><script src="_core/modules/products.js?v=20260925-iconsfix"></script>
-<script src="_core/modules/cart.js?v=20260925-iconsfix"></script><script src="_core/modules/transactions.js?v=20260925-iconsfix"></script><script src="_core/script.js?v=20260925-iconsfix"></script><script>window.KQ_CUSTOMER_PAGE={route:"home",tab:"belanja",category:"Home"};</script><script src="_core/router.js?v=20260925-iconsfix"></script>
-<script src="_core/navigation.js?v=20260925-iconsfix"></script><script src="script.js"></script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function(){ navigator.serviceWorker.register('/sw.js', {scope:'/'}).catch(function(err){ console.warn('[KasirQuh] Service Worker:', err); }); });
-  }
-</script>
-</body>
+</button>
+<div class="permanent-bottom-bar no-print" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--card-bg); border-top: 1px solid var(--border-color); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100; box-sizing: border-box;">
+<span id="bottom-bar-title" style="font-weight: bold; font-size: 0.85rem; color: var(--text-color);">Belanja</span>
+<div id="pagination-box" style="display: none !important; align-items: center; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 6px; padding: 2px 8px; gap: 6px;">
+<button onclick="ubahHalamanPos(-1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;" type="button">◄</button>
+<span id="pos-page-indicator" style="font-size: 0.72rem; font-weight: bold; color: var(--text-color);">1/1</span>
+<button onclick="ubahHalamanPos(1)" style="background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 0.8rem; font-weight: bold;" type="button">▶</button>
+</div>
+<div style="display:flex;align-items:center;gap:6px;">
+<button onclick="toggleMenuModal()" style="background: #dc2626; color: white; border: none; width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Menu" type="button"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg></button>
+</div>
+</div>
+
+
+
+<!-- =========================================================
+     NO. 1 — HEADER TOKO / TOP EDGE FIX
+     Hanya mengatur wadah luar Header Toko.
+     Isi Header TIDAK diubah.
+     ========================================================= -->
+
+<!-- =========================================================
+     NO. 2 — STOK RUMAH HABIS? BELI LAGI YUK!
+     Full viewport wrapper + safe card gutter.
+     Tidak mengubah No. 1, 3, 4, 5, 6, atau 7.
+     ========================================================= -->
+
+
+
+
+
+
+
+
+<script src="script.js"></script></body>
 \n\n
 
 
 
 
 </html>
+
+
+
+
+
+
+
+
+
+
