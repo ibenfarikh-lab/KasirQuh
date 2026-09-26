@@ -376,6 +376,8 @@
       initHeaderTokoListener();
       const deferDashboardAfterHeader = window.requestAnimationFrame || function(cb) { setTimeout(cb, 16); };
       deferDashboardAfterHeader(() => {
+        // Tahap 2 progressive render: setelah header, prioritaskan blok Stok Rumah.
+        initStokRumahListener();
         deferDashboardAfterHeader(() => {
           initFirebaseListeners(false);
           initPromoTokoPelanggan();
@@ -1258,6 +1260,18 @@
       });
     }
 
+    function initStokRumahListener() {
+      // Tahap 2: listener ringan untuk konfigurasi Stok Rumah diprioritaskan setelah header.
+      storeCollection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
+        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
+        window.__stokRumahConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        renderQuickReorder(lastFetchedOrders || []);
+      }, (err) => {
+        console.warn("Listener pengaturan Stok Rumah gagal:", err);
+        renderQuickReorder(lastFetchedOrders || []);
+      });
+    }
+
     function initFirebaseListeners(includeHeader = true) {
       if (includeHeader) initHeaderTokoListener();
       storeCollection("produk").onSnapshot((snapshot) => { 
@@ -1293,16 +1307,7 @@
           muatBarangLarisHariIni();
         });
       });
-      // Listener pengaturan "Stok Rumah Habis" dari Admin > Beranda Pelanggan.
-      // Jumlah kartu mengikuti konfigurasi Firebase yang disimpan Admin.
-      storeCollection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
-        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
-        window.__stokRumahConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
-        renderQuickReorder(lastFetchedOrders || []);
-      }, (err) => {
-        console.warn("Listener pengaturan Stok Rumah gagal:", err);
-        renderQuickReorder(lastFetchedOrders || []);
-      });
+      initStokRumahListener();
 
     }
 
