@@ -1,5 +1,0 @@
-@import url("../_core/style.css");
-
-/* V14 Phase 3 — Produk route */
-body[data-kq-route="produk"] .customer-home-header, body[data-kq-route="produk"] #reorder-section-wrapper, body[data-kq-route="produk"] #recipe-section-wrapper, body[data-kq-route="produk"] #trending-section-wrapper{display:none!important;}
-body[data-kq-route="produk"] .main-content{padding-bottom:78px;}
