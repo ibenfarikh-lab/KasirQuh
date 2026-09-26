@@ -2,11 +2,7 @@
   "name": "kasirquh",
   "version": "3.0.2",
   "description": "KasirQuh Belanja AI KasirQuh",
-  "main": "tanya.js",
   "type": "module",
-  "scripts": {
-    "start": "node tanya.js"
-  },
   "dependencies": {
     "node-edge-tts": "^1.1.2"
   }
