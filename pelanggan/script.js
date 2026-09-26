@@ -394,19 +394,19 @@
                   // Tahap 7: setelah katalog mendapat giliran, aktifkan Info Toko + Promo.
                   initCustomerHomeInfoListener();
                   initPromoTokoPelanggan();
+
+                  // Tahap 8: setelah Info Toko + Promo selesai mendapat giliran,
+                  // baru lepaskan realtime Chat sebagai pekerjaan sekunder.
+                  const deferCustomerRealtime = window.requestIdleCallback || function(cb) { setTimeout(cb, 700); };
+                  deferCustomerRealtime(() => {
+                    initChatRumpiListener();
+                    if (currentCustomerPhone) initCustomerChatListener();
+                  });
                 });
               });
             });
           });
         });
-      });
-
-      // Fitur realtime sekunder tidak boleh membebani first-paint dashboard.
-      // Aktifkan setelah browser selesai dengan pekerjaan utama.
-      const deferCustomerRealtime = window.requestIdleCallback || function(cb) { setTimeout(cb, 700); };
-      deferCustomerRealtime(() => {
-        initChatRumpiListener();
-        if (currentCustomerPhone) initCustomerChatListener();
       });
     };
 
