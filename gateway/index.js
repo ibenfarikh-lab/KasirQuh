@@ -321,7 +321,7 @@
   }
   function restore(){
     try{const p=JSON.parse(localStorage.getItem('index_ai_fab_position_v1')||'null'); if(p&&Number.isFinite(p.left)&&Number.isFinite(p.top)){place(p.left,p.top,false);return;}}catch(e){}
-    requestAnimationFrame(()=>place(innerWidth-fab.offsetWidth-10,innerHeight-fab.offsetHeight-65,false));
+    requestAnimationFrame(()=>place(innerWidth-fab.offsetWidth-20,(innerHeight-fab.offsetHeight)/2,false));
   }
   fab.addEventListener('pointerdown',e=>{dragging=true;moved=false;pid=e.pointerId;sx=e.clientX;sy=e.clientY;const r=fab.getBoundingClientRect();sl=r.left;st=r.top;fab.setPointerCapture?.(pid);fab.classList.add('dragging');e.preventDefault();});
   fab.addEventListener('pointermove',e=>{if(!dragging||e.pointerId!==pid)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.hypot(dx,dy)>5)moved=true;place(sl+dx,st+dy,false);e.preventDefault();});
