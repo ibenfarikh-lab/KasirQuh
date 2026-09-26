@@ -386,6 +386,10 @@
             initSedangLarisListeners();
             initPromoTokoPelanggan();
             initCustomerHomeInfoListener();
+            deferDashboardAfterHeader(() => {
+              // Tahap 5 progressive render: setelah blok atas, siapkan kategori.
+              initKategoriPelangganListener();
+            });
           });
         });
       });
@@ -1297,8 +1301,15 @@
           renderQuickReorder(lastFetchedOrders);
         }
       });
-      storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
-        renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
+    }
+
+    function initKategoriPelangganListener() {
+      // Tahap 5: kategori dirender setelah blok Sedang Laris mendapat giliran.
+      const deferCategoryInit = window.requestAnimationFrame || function(cb) { setTimeout(cb, 16); };
+      deferCategoryInit(() => {
+        storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
+          renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
+        });
       });
     }
 
