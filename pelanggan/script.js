@@ -389,6 +389,10 @@
             deferDashboardAfterHeader(() => {
               // Tahap 5 progressive render: setelah blok atas, siapkan kategori.
               initKategoriPelangganListener();
+              deferDashboardAfterHeader(() => {
+                // Tahap 6 progressive render: setelah kategori, baru ambil katalog produk.
+                initProdukKatalogListener();
+              });
             });
           });
         });
@@ -1288,6 +1292,11 @@
 
     function initFirebaseListeners(includeHeader = true) {
       if (includeHeader) initHeaderTokoListener();
+    }
+
+    function initProdukKatalogListener() {
+      // Tahap 6: produk baru dimuat setelah kategori mendapat giliran render.
+      // Database produk tetap realtime; yang berubah hanya waktunya saat first-load.
       storeCollection("produk").onSnapshot((snapshot) => { 
         databaseProduk = {}; 
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
@@ -1300,6 +1309,8 @@
         if (lastFetchedOrders && lastFetchedOrders.length > 0) {
           renderQuickReorder(lastFetchedOrders);
         }
+      }, (err) => {
+        console.warn("Listener produk gagal:", err);
       });
     }
 
