@@ -361,7 +361,6 @@
 
 
     window.onload = function() {
-      muatIdeMasakAdminPelanggan();
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
@@ -379,9 +378,13 @@
         // Tahap 2 progressive render: setelah header, prioritaskan blok Stok Rumah.
         initStokRumahListener();
         deferDashboardAfterHeader(() => {
-          initFirebaseListeners(false);
-          initPromoTokoPelanggan();
-          initCustomerHomeInfoListener();
+          // Tahap 3 progressive render: setelah Stok Rumah, muat Ide Masak.
+          initIdeMasakPelanggan();
+          deferDashboardAfterHeader(() => {
+            initFirebaseListeners(false);
+            initPromoTokoPelanggan();
+            initCustomerHomeInfoListener();
+          });
         });
       });
 
@@ -628,6 +631,11 @@
       let item = cart.find(i => i.code === code);
       if (item) { if (item.qty + qtyToAdd <= p.stok) { item.qty += qtyToAdd; item.qty = parseFloat(item.qty.toFixed(3)); item.subtotal = Math.round(item.qty * hargaParsed); } } 
       else { if (qtyToAdd <= p.stok) { cart.push({ code, nama: p.nama, harga: hargaParsed, modal: modalParsed, qty: qtyToAdd, subtotal: Math.round(qtyToAdd * hargaParsed), foto: p.foto }); } }
+    }
+
+    function initIdeMasakPelanggan() {
+      // Tahap 3: listener konfigurasi Ide Masak dimulai setelah Header + Stok Rumah sempat render.
+      muatIdeMasakAdminPelanggan();
     }
 
     async function muatIdeMasakAdminPelanggan() {
