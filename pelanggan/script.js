@@ -384,8 +384,6 @@
             // Tahap 4 progressive render: setelah Ide Masak, siapkan blok Sedang Laris.
             initFirebaseListeners(false);
             initSedangLarisListeners();
-            initPromoTokoPelanggan();
-            initCustomerHomeInfoListener();
             deferDashboardAfterHeader(() => {
               // Tahap 5 progressive render: setelah blok atas, siapkan kategori.
               initKategoriPelangganListener();
