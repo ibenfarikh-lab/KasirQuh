@@ -386,12 +386,11 @@ window.onload = function() {
 
     function renderCustomerHomeInfo(cfg) {
       const running=document.getElementById('customer-home-running-text');
-      const text = (cfg && typeof cfg.runningText === 'string' && cfg.runningText.trim())
-        ? cfg.runningText.trim()
-        : ((cfg && typeof cfg.infoText === 'string' && cfg.infoText.trim()) ? cfg.infoText.trim() : 'Selamat datang di toko kami 👋');
-      if(running) {
-        running.textContent = text;
-        running.classList.remove('run-once');
+      if(!running) return;
+      const text = (cfg && typeof cfg.runningText === 'string' && cfg.runningText.trim()) ? cfg.runningText.trim() : '';
+      running.textContent = text;
+      running.classList.remove('run-once');
+      if(text) {
         void running.offsetWidth;
         running.classList.add('run-once');
       }
@@ -399,8 +398,7 @@ window.onload = function() {
 
     function initCustomerHomeInfoListener() {
       storeCollection("pengaturan").doc('beranda_pelanggan_home').onSnapshot(snap => {
-        const cfg=snap.exists ? snap.data() : {};
-        renderCustomerHomeInfo(cfg);
+        renderCustomerHomeInfo(snap.exists ? snap.data() : {});
       }, () => renderCustomerHomeInfo({}));
     }
 
