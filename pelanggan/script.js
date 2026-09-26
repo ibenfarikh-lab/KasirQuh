@@ -357,18 +357,7 @@
     function appOpenModal(id, detailCode = null) {
       appPushState({ modal:id, detailCode:detailCode });
     }
-
-
-
-    const defaultRecipes = [
-      { nama: "Sayur Sop Bening", desc: "Praktis, tinggal cemplung. Isian kol, wortel, bumbu kaldu.", keywords: ['kol', 'wortel', 'royco', 'bawang'] },
-      { nama: "Nasi Goreng Dadakan", desc: "Bikin malam makin hangat. Butuh kecap, telur, bumbu instan.", keywords: ['kecap', 'telur', 'bumbu nasi goreng'] },
-      { nama: "Tumis Kangkung Segar", desc: "Menu rumahan favorit. Kangkung hijau segar dan bumbu pilihan.", keywords: ['kangkung', 'bawang', 'cabe'] },
-      { nama: "Mie Instan Telur", desc: "Andalan kala lapar melanda malam hari dengan tambahan telur.", keywords: ['mie instan', 'telur', 'sawi'] },
-      { nama: "Es Teh Manis Segar", desc: "Pelepas dahaga di siang hari yang panas dan menyegarkan.", keywords: ['teh', 'gula', 'es'] }
-    ];
-
-    window.onload = function() {
+window.onload = function() {
       muatIdeMasakAdminPelanggan();
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
@@ -627,10 +616,10 @@
       try {
         const snap = await storeCollection("pengaturan").doc("beranda_pelanggan_resep").get();
         const data = snap.exists ? snap.data() : {};
-        adminCustomerRecipesEnabled = data.enabled !== false;
+        adminCustomerRecipesEnabled = snap.exists && data.enabled === true;
         adminCustomerRecipes = Array.isArray(data.recipes) ? data.recipes : [];
       } catch(e) {
-        adminCustomerRecipesEnabled = true;
+        adminCustomerRecipesEnabled = false;
         adminCustomerRecipes = [];
       }
       renderRecipeCards();
@@ -650,24 +639,6 @@
           container.innerHTML += `<div class="recipe-card">${foto}<div><div style="font-weight:800;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">${escName}</div><div style="font-size:.65rem;opacity:.9;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;">${escDesc}</div></div><div style="display:flex;gap:4px;margin-top:auto;"><button type="button" class="recipe-btn-action" style="flex:1;" onclick='beliPaketResepCustom(${rJson})'>+ Masukkan Bahan</button><button type="button" class="recipe-btn-action" style="flex:0 0 30px;padding:5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepCustomKeRumpi(${rJson})'>📢</button></div></div>`;
         });
       }
-
-      defaultRecipes.forEach(r => {
-        let escName = escapeHtml(r.nama);
-        let escDesc = escapeHtml(r.desc);
-        let kwJson = JSON.stringify(r.keywords).replace(/"/g, '&quot;');
-        container.innerHTML += `
-          <div class="recipe-card">
-            <div>
-              <div style="font-weight: 800; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${escName}</div>
-              <div style="font-size: 0.65rem; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2;">${escDesc}</div>
-            </div>
-            <div style="display: flex; gap: 4px; margin-top: auto;">
-              <button type="button" class="recipe-btn-action" style="flex: 1;" onclick='beliPaketResepByKeywords("${escName}", ${kwJson})'>+ Masukkan Bahan</button>
-              <button type="button" class="recipe-btn-action" style="flex: 0 0 30px; padding: 5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepKeywordsKeRumpi("${escName}", ${kwJson})'>📢</button>
-            </div>
-          </div>`;
-      });
-
       customerSavedRecipes.forEach((sr, idx) => {
         let escName = escapeHtml(sr.nama);
         let srJson = JSON.stringify(sr).replace(/'/g, "&#39;");
