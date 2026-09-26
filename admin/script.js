@@ -1160,6 +1160,7 @@ storeCollection("produk").onSnapshot((snapshot) => {
   snapshot.forEach((doc) => {
     databaseProduk[doc.id] = doc.data();
   });
+  ensureKategoriMaster().catch(err => console.error("Gagal memastikan master kategori:", err));
   refreshData();
 });
 
@@ -1340,31 +1341,119 @@ function normalizeProductCategories(value) {
   return [];
 }
 
-const STANDARD_PRODUCT_CATEGORIES = [
-  "Titipan Warga",
-  "Sembako",
-  "Minuman",
-  "Makanan",
-  "Snack",
-  "Bumbu",
-  "Perawatan",
-  "Kebutuhan Rumah",
-  "Lainnya"
-];
+let masterKategoriProduk = [];
+const CATEGORY_MASTER_DOC = "kategori_produk_v13";
+
+function normalizeCategoryList(value) {
+  if (!Array.isArray(value)) return [];
+  return [...new Set(value.map(v => String(v || '').trim()).filter(Boolean))];
+}
 
 function getAllProductCategories() {
-  const set = new Set(STANDARD_PRODUCT_CATEGORIES);
-  Object.values(databaseProduk || {}).forEach(p => {
-    normalizeProductCategories(p && p.kategori).forEach(k => set.add(k));
-  });
-  return Array.from(set).sort((a,b) => {
-    const ai = STANDARD_PRODUCT_CATEGORIES.indexOf(a);
-    const bi = STANDARD_PRODUCT_CATEGORIES.indexOf(b);
-    if (ai >= 0 && bi >= 0) return ai - bi;
-    if (ai >= 0) return -1;
-    if (bi >= 0) return 1;
-    return a.localeCompare(b, 'id');
-  });
+  return [...masterKategoriProduk];
+}
+
+function kategoriMasterRef() {
+  return storeCollection("pengaturan").doc(CATEGORY_MASTER_DOC);
+}
+
+async function ensureKategoriMaster() {
+  const ref = kategoriMasterRef();
+  const snap = await ref.get();
+  if (snap.exists) {
+    masterKategoriProduk = normalizeCategoryList(snap.data().categories);
+    return masterKategoriProduk;
+  }
+  const fromProducts = [];
+  Object.values(databaseProduk || {}).forEach(p => normalizeProductCategories(p && p.kategori).forEach(k => {
+    if (!fromProducts.includes(k)) fromProducts.push(k);
+  }));
+  await ref.set({ categories: fromProducts, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  masterKategoriProduk = fromProducts;
+  return masterKategoriProduk;
+}
+
+kategoriMasterRef().onSnapshot((snap) => {
+  if (snap.exists) masterKategoriProduk = normalizeCategoryList(snap.data().categories);
+  else masterKategoriProduk = [];
+  renderProductCategoryPicker();
+  updateDropdowns(masterKategoriProduk);
+  renderDaftarKategoriProduk();
+});
+
+function renderDaftarKategoriProduk() {
+  const box = document.getElementById('category-manager-list');
+  if (!box) return;
+  if (!masterKategoriProduk.length) {
+    box.innerHTML = '<div style="padding:10px;text-align:center;color:var(--text-muted);font-size:.8rem;">Belum ada kategori di database.</div>';
+    return;
+  }
+  box.innerHTML = masterKategoriProduk.map((cat, i) => `
+    <div style="display:flex;align-items:center;gap:6px;padding:7px 8px;border:1px solid var(--border-color);border-radius:8px;background:var(--input-bg);">
+      <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem;font-weight:700;">${escapeHtml(cat)}</span>
+      <button type="button" onclick="editKategoriProduk(${i})" style="border:0;border-radius:6px;padding:5px 8px;cursor:pointer;">✏️</button>
+      <button type="button" onclick="hapusKategoriProduk(${i})" style="border:0;border-radius:6px;padding:5px 8px;cursor:pointer;">🗑️</button>
+    </div>`).join('');
+}
+
+function bukaKelolaKategoriProduk() {
+  const m = document.getElementById('categoryManagerModal');
+  if (!m) return;
+  renderDaftarKategoriProduk();
+  m.style.display = 'flex';
+}
+function tutupKelolaKategoriProduk() {
+  const m = document.getElementById('categoryManagerModal');
+  if (m) m.style.display = 'none';
+}
+
+async function tambahKategoriProduk() {
+  const input = document.getElementById('category-manager-new');
+  const name = (input?.value || '').trim();
+  if (!name) return alert('Nama kategori belum diisi.');
+  if (masterKategoriProduk.some(k => k.toLowerCase() === name.toLowerCase())) return alert('Kategori tersebut sudah ada.');
+  const next = [...masterKategoriProduk, name];
+  try {
+    await kategoriMasterRef().set({ categories: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    input.value = '';
+  } catch (e) { alert('Gagal menambah kategori: ' + e.message); }
+}
+
+async function editKategoriProduk(index) {
+  const oldName = masterKategoriProduk[index];
+  if (!oldName) return;
+  const newName = prompt('Ubah nama kategori:', oldName);
+  if (newName === null) return;
+  const clean = newName.trim();
+  if (!clean || clean === oldName) return;
+  if (masterKategoriProduk.some((k,i) => i !== index && k.toLowerCase() === clean.toLowerCase())) return alert('Nama kategori tersebut sudah ada.');
+  if (!confirm(`Ubah kategori "${oldName}" menjadi "${clean}"?\n\nProduk yang memakai kategori lama akan ikut diperbarui.`)) return;
+  try {
+    const products = Object.entries(databaseProduk).filter(([_, p]) => normalizeProductCategories(p?.kategori).includes(oldName));
+    for (let start = 0; start < products.length; start += 400) {
+      const batch = db.batch();
+      products.slice(start, start + 400).forEach(([code, p]) => {
+        const cats = normalizeProductCategories(p.kategori).map(k => k === oldName ? clean : k);
+        batch.update(storeCollection('produk').doc(code), { kategori: cats });
+      });
+      await batch.commit();
+    }
+    const next = [...masterKategoriProduk]; next[index] = clean;
+    await kategoriMasterRef().set({ categories: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    showNotif('Kategori dan produk berhasil diperbarui.');
+  } catch (e) { alert('Gagal mengubah kategori: ' + e.message); }
+}
+
+async function hapusKategoriProduk(index) {
+  const name = masterKategoriProduk[index];
+  if (!name) return;
+  const usedBy = Object.values(databaseProduk).filter(p => normalizeProductCategories(p?.kategori).includes(name)).length;
+  if (usedBy > 0) return alert(`Kategori "${name}" masih dipakai oleh ${usedBy} produk.\n\nUbah kategori produk tersebut terlebih dahulu sebelum menghapus kategori.`);
+  if (!confirm(`Hapus kategori "${name}" dari master kategori?`)) return;
+  const next = masterKategoriProduk.filter((_, i) => i !== index);
+  try {
+    await kategoriMasterRef().set({ categories: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  } catch (e) { alert('Gagal menghapus kategori: ' + e.message); }
 }
 
 function syncSelectedProductCategories() {

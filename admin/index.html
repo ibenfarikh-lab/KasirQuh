@@ -450,6 +450,10 @@
 </div>
 <!-- 3. HALAMAN MANAJEMEN STOK -->
 <div class="tab-content" id="data-barang">
+<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+<div style="font-weight:800; font-size:.85rem;">🏷️ Master Kategori Produk</div>
+<button type="button" onclick="bukaKelolaKategoriProduk()" style="background:#2563eb;color:#fff;border:0;padding:7px 10px;border-radius:8px;font-size:.76rem;font-weight:800;cursor:pointer;">⚙️ Kelola Kategori</button>
+</div>
 <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; gap: 6px; width: 100%;">
 <select aria-label="Filter kategori produk" id="filter-category" onchange="refreshData()" style="padding: 6px 10px; font-size: 0.78rem; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border); flex: 1; min-width: 0;">
 <option data-i18n="all_categories" value="Semua">Semua Kategori</option>
@@ -825,40 +829,20 @@
         Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)
       </div>
 <script>
-let adminKoinWargaConfig = { enabled:false, daily:0 };
-async function getPengaturanKoinWarga() {
-  try {
-    const snap = await storeCollection("pengaturan").doc('beranda_pelanggan_koin_warga').get();
-    if (!snap.exists) return { enabled:false, daily:0 };
-    const data = snap.data() || {};
-    return { enabled:data.enabled === true, daily:Math.max(0, parseInt(data.daily,10) || 0) };
-  } catch(e) {
-    return { enabled:false, daily:0 };
-  }
+function getPengaturanKoinWarga() {
+  return { enabled: localStorage.getItem('admin_koin_warga_enabled') !== 'false', daily: Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'), 10) || 10) };
 }
-async function toggleAdminKoinWarga() {
+function toggleAdminKoinWarga() {
   const panel=document.getElementById('admin-koin-warga-panel'); if(!panel) return;
   const open=panel.style.display !== 'none'; panel.style.display=open?'none':'block';
-  if(!open){
-    const c=await getPengaturanKoinWarga();
-    adminKoinWargaConfig=c;
-    const enabled=document.getElementById('admin-koin-enabled');
-    const daily=document.getElementById('admin-koin-daily');
-    if(enabled) enabled.checked=c.enabled;
-    if(daily) daily.value=c.daily;
-  }
+  if(!open){ const c=getPengaturanKoinWarga(); document.getElementById('admin-koin-enabled').checked=c.enabled; document.getElementById('admin-koin-daily').value=c.daily; }
 }
-async function simpanPengaturanKoinWarga() {
-  const enabled=document.getElementById('admin-koin-enabled')?.checked === true;
-  const daily=Math.max(0, parseInt(document.getElementById('admin-koin-daily')?.value,10) || 0);
-  const cfg={enabled,daily,updatedAt:Date.now()};
-  try {
-    await storeCollection("pengaturan").doc('beranda_pelanggan_koin_warga').set(cfg,{merge:true});
-    adminKoinWargaConfig=cfg;
-    const st=document.getElementById('admin-koin-status'); if(st) st.textContent='✓ Pengaturan Koin Warga tersimpan dan tersinkron ke pelanggan.';
-  } catch(err) {
-    const st=document.getElementById('admin-koin-status'); if(st) st.textContent='⚠️ Gagal menyimpan ke Firebase: ' + (err.message || err);
-  }
+function simpanPengaturanKoinWarga() {
+  const enabled=document.getElementById('admin-koin-enabled').checked;
+  const daily=Math.max(0, parseInt(document.getElementById('admin-koin-daily').value,10) || 0);
+  localStorage.setItem('admin_koin_warga_enabled', String(enabled));
+  localStorage.setItem('admin_koin_warga_daily', String(daily));
+  const st=document.getElementById('admin-koin-status'); if(st) st.textContent='✓ Pengaturan Koin Warga tersimpan.';
 }
 function getPengaturanPromoTokoLocal() {
   try { return JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{"enabled":true,"codes":[]}'); }
@@ -905,32 +889,20 @@ async function simpanPengaturanPromoToko() {
     const st=document.getElementById('admin-promo-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
   }
 }
-async function toggleAdminHomeInfo() {
+function getAdminHomeInfoConfig() {
+  try { const c=JSON.parse(localStorage.getItem('admin_home_info_v1') || '{}'); return {runningText:c.runningText || ''}; }
+  catch(e) { return {runningText:''}; }
+}
+function toggleAdminHomeInfo() {
   const panel=document.getElementById('admin-home-info-panel'); if(!panel) return;
   const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
-  if(open) return;
-  const input=document.getElementById('admin-home-running-text');
-  const status=document.getElementById('admin-home-info-status');
-  if(status) status.textContent='Memuat pengaturan dari Firestore…';
-  try {
-    const snap=await storeCollection("pengaturan").doc('beranda_pelanggan_home').get();
-    const cfg=snap.exists ? snap.data() : {};
-    if(input) input.value=typeof cfg.runningText === 'string' ? cfg.runningText : '';
-    if(status) status.textContent=snap.exists ? '✓ Pengaturan dimuat dari Firestore.' : 'Belum ada pengaturan tersimpan di Firestore.';
-  } catch(err) {
-    if(input) input.value='';
-    if(status) status.textContent='⚠️ Gagal membaca pengaturan dari Firestore.';
-  }
+  if(!open) { const c=getAdminHomeInfoConfig(); document.getElementById('admin-home-running-text').value=c.runningText; }
 }
 async function simpanPengaturanHomeInfo() {
   const cfg={infoText:'Info Toko....', runningText:(document.getElementById('admin-home-running-text')?.value || '').trim(), updatedAt:Date.now()};
-  const st=document.getElementById('admin-home-info-status');
-  try {
-    await storeCollection("pengaturan").doc('beranda_pelanggan_home').set(cfg,{merge:true});
-    if(st) st.textContent='✓ Info toko & running text tersimpan di Firestore dan siap tampil di pelanggan.';
-  } catch(err) {
-    if(st) st.textContent='⚠️ Gagal menyimpan ke Firestore. Tidak disimpan ke perangkat.';
-  }
+  localStorage.setItem('admin_home_info_v1',JSON.stringify(cfg));
+  try { await storeCollection("pengaturan").doc('beranda_pelanggan_home').set(cfg,{merge:true}); const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='✓ Info toko & running text tersimpan dan siap tampil di pelanggan.'; }
+  catch(err) { const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.'; }
 }
 function getAdminIdeMasakConfig() {
   try {
@@ -1175,6 +1147,17 @@ function scrollKePengaturanBerandaPelanggan() {
 </div>
 </div>
 </div>
+<!-- MODAL KELOLA KATEGORI PRODUK -->
+<div class="modal-backdrop" id="categoryManagerModal" onclick="if(event.target === this) tutupKelolaKategoriProduk()" style="display:none;">
+<div class="modal-content" style="max-width:420px; max-height:90vh; overflow-y:auto;">
+<div class="modal-header"><h3>🏷️ Kelola Kategori Produk</h3><button class="btn-close-modal" onclick="tutupKelolaKategoriProduk()">×</button></div>
+<div style="font-size:.76rem;color:var(--text-muted);margin-bottom:10px;">Kategori disimpan di Firestore dan dipakai bersama oleh Admin dan Pelanggan.</div>
+<div id="category-manager-list" style="display:flex;flex-direction:column;gap:7px;"></div>
+<div style="display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border-color);">
+<input id="category-manager-new" type="text" placeholder="Nama kategori baru..." style="flex:1;padding:8px;border:1px solid var(--input-border);border-radius:8px;background:var(--input-bg);color:var(--text-color);">
+<button type="button" onclick="tambahKategoriProduk()" style="background:#16a34a;color:#fff;border:0;border-radius:8px;padding:8px 12px;font-weight:800;cursor:pointer;">＋ Tambah</button>
+</div>
+</div></div>
 <!-- MODAL TAMBAH / EDIT BARANG (PRODUCT MODAL) -->
 <div class="modal-backdrop" id="productModal" onclick="if(event.target === this) closeProductModal()">
 <div class="modal-content" style="max-width: 420px; max-height: 90vh; overflow-y: auto;">
