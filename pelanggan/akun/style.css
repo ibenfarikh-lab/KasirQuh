@@ -1,5 +1,0 @@
-@import url("../_core/style.css");
-
-/* V14 Phase 3 — Akun route */
-body[data-kq-route="akun"] .main-content{padding-bottom:78px;}
-body[data-kq-route="akun"] #data-pelanggan, body[data-kq-route="akun"] #pengaturan{display:block!important;}
