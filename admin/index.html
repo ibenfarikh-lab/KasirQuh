@@ -905,20 +905,32 @@ async function simpanPengaturanPromoToko() {
     const st=document.getElementById('admin-promo-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.';
   }
 }
-function getAdminHomeInfoConfig() {
-  try { const c=JSON.parse(localStorage.getItem('admin_home_info_v1') || '{}'); return {runningText:c.runningText || ''}; }
-  catch(e) { return {runningText:''}; }
-}
-function toggleAdminHomeInfo() {
+async function toggleAdminHomeInfo() {
   const panel=document.getElementById('admin-home-info-panel'); if(!panel) return;
   const open=panel.style.display!=='none'; panel.style.display=open?'none':'block';
-  if(!open) { const c=getAdminHomeInfoConfig(); document.getElementById('admin-home-running-text').value=c.runningText; }
+  if(open) return;
+  const input=document.getElementById('admin-home-running-text');
+  const status=document.getElementById('admin-home-info-status');
+  if(status) status.textContent='Memuat pengaturan dari Firestore…';
+  try {
+    const snap=await storeCollection("pengaturan").doc('beranda_pelanggan_home').get();
+    const cfg=snap.exists ? snap.data() : {};
+    if(input) input.value=typeof cfg.runningText === 'string' ? cfg.runningText : '';
+    if(status) status.textContent=snap.exists ? '✓ Pengaturan dimuat dari Firestore.' : 'Belum ada pengaturan tersimpan di Firestore.';
+  } catch(err) {
+    if(input) input.value='';
+    if(status) status.textContent='⚠️ Gagal membaca pengaturan dari Firestore.';
+  }
 }
 async function simpanPengaturanHomeInfo() {
   const cfg={infoText:'Info Toko....', runningText:(document.getElementById('admin-home-running-text')?.value || '').trim(), updatedAt:Date.now()};
-  localStorage.setItem('admin_home_info_v1',JSON.stringify(cfg));
-  try { await storeCollection("pengaturan").doc('beranda_pelanggan_home').set(cfg,{merge:true}); const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='✓ Info toko & running text tersimpan dan siap tampil di pelanggan.'; }
-  catch(err) { const st=document.getElementById('admin-home-info-status'); if(st) st.textContent='⚠️ Tersimpan di perangkat, tetapi sinkronisasi gagal.'; }
+  const st=document.getElementById('admin-home-info-status');
+  try {
+    await storeCollection("pengaturan").doc('beranda_pelanggan_home').set(cfg,{merge:true});
+    if(st) st.textContent='✓ Info toko & running text tersimpan di Firestore dan siap tampil di pelanggan.';
+  } catch(err) {
+    if(st) st.textContent='⚠️ Gagal menyimpan ke Firestore. Tidak disimpan ke perangkat.';
+  }
 }
 function getAdminIdeMasakConfig() {
   try {
