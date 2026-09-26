@@ -250,7 +250,7 @@
     const CATALOG_INITIAL_VISIBLE = 6;
     let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
     let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
-    let activeKategoriPelanggan = 'Home'; let toastTimeout;
+    let activeKategoriPelanggan = 'Home'; let toastTimeout; let masterKategoriPelanggan = [];
     let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = true;
 
     // ============================================================
@@ -845,6 +845,27 @@
       filterKatalogPelanggan("");
     }
 
+    function renderKategoriPelanggan(categories) {
+      masterKategoriPelanggan = Array.isArray(categories) ? [...new Set(categories.map(v => String(v || '').trim()).filter(Boolean))] : [];
+      const container = document.getElementById('category-container');
+      if (!container) return;
+      const keep = container.querySelectorAll('[data-category="Home"],[data-category="Produk"]');
+      container.innerHTML = '';
+      keep.forEach(btn => container.appendChild(btn));
+      masterKategoriPelanggan.forEach((cat, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'chip-btn'; btn.dataset.category = cat; btn.title = cat; btn.setAttribute('aria-label', cat);
+        btn.innerHTML = '<svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M5 7h14v14H5z"></path><path d="M8 7V4h8v3"></path><path d="M9 12h6M9 16h4"></path></svg>';
+        btn.addEventListener('click', () => pilihKategoriPelanggan(cat));
+        container.appendChild(btn);
+      });
+      if (activeKategoriPelanggan !== 'Home' && activeKategoriPelanggan !== 'Produk' && !masterKategoriPelanggan.includes(activeKategoriPelanggan)) {
+        activeKategoriPelanggan = 'Home';
+      }
+      document.querySelectorAll('#category-container .chip-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.category === activeKategoriPelanggan));
+      perbaruiTampilanKategori();
+    }
+
     function pilihKategoriPelanggan(kategori) {
       const wasHome = activeKategoriPelanggan === 'Home';
       if (wasHome && kategori !== 'Home' && animasiNavigasiDeveloperAktif() && window.smoothHomeToCategory) window.smoothHomeToCategory();
@@ -1245,6 +1266,9 @@
         if (lastFetchedOrders && lastFetchedOrders.length > 0) {
           renderQuickReorder(lastFetchedOrders);
         }
+      });
+      storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
+        renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
       });
       storeCollection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
@@ -2166,7 +2190,7 @@
     }
     syncAnimasiNavigasiDeveloper();
 
-    async function perbaruiAplikasiPelanggan() {
+    async function perbaruiAplikasi() {
       const status = document.getElementById('update-app-status');
       const setStatus = (text) => { if (status) status.textContent = text; };
       if (!confirm('Perbarui aplikasi sekarang?\n\nCache aplikasi akan disegarkan dan halaman dimuat ulang. Login, pengaturan lokal, dan data Firestore tidak dihapus.')) return;
@@ -2466,15 +2490,6 @@ document.addEventListener('DOMContentLoaded', () => {
     'promo-next': () => geserPromoTokoPelanggan(1),
     'category-home': () => pilihKategoriPelanggan('Home'),
     'category-produk': () => pilihKategoriPelanggan('Produk'),
-    'category-titipan-warga': () => pilihKategoriPelanggan('Titipan Warga'),
-    'category-sembako': () => pilihKategoriPelanggan('Sembako'),
-    'category-minuman': () => pilihKategoriPelanggan('Minuman'),
-    'category-makanan': () => pilihKategoriPelanggan('Makanan'),
-    'category-snack': () => pilihKategoriPelanggan('Snack'),
-    'category-bumbu': () => pilihKategoriPelanggan('Bumbu'),
-    'category-perawatan': () => pilihKategoriPelanggan('Perawatan'),
-    'category-kebutuhan-rumah': () => pilihKategoriPelanggan('Kebutuhan Rumah'),
-    'category-lainnya': () => pilihKategoriPelanggan('Lainnya'),
     'view-list': () => gantiViewModePelanggan('list'),
     'view-grid': () => gantiViewModePelanggan('grid'),
     'view-card': () => gantiViewModePelanggan('card')
