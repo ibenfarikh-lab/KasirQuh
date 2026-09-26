@@ -381,7 +381,9 @@
           // Tahap 3 progressive render: setelah Stok Rumah, muat Ide Masak.
           initIdeMasakPelanggan();
           deferDashboardAfterHeader(() => {
+            // Tahap 4 progressive render: setelah Ide Masak, siapkan blok Sedang Laris.
             initFirebaseListeners(false);
+            initSedangLarisListeners();
             initPromoTokoPelanggan();
             initCustomerHomeInfoListener();
           });
@@ -1298,7 +1300,11 @@
       storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
         renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
       });
-      const deferTrendingInit = window.requestIdleCallback || function(cb) { setTimeout(cb, 900); };
+    }
+
+    function initSedangLarisListeners() {
+      // Tahap 4: blok Sedang Laris baru mulai setelah tiga blok teratas mendapat giliran render.
+      const deferTrendingInit = window.requestAnimationFrame || function(cb) { setTimeout(cb, 16); };
       deferTrendingInit(() => {
         storeCollection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
           const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
@@ -1315,10 +1321,7 @@
           muatBarangLarisHariIni();
         });
       });
-      initStokRumahListener();
-
     }
-
 
     let homeFeatureTransitionTimer = null;
     function setHomeFeatureTransition(showHome) {
