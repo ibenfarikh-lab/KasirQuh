@@ -390,6 +390,11 @@
               deferDashboardAfterHeader(() => {
                 // Tahap 6 progressive render: setelah kategori, baru ambil katalog produk.
                 initProdukKatalogListener();
+                deferDashboardAfterHeader(() => {
+                  // Tahap 7: setelah katalog mendapat giliran, aktifkan Info Toko + Promo.
+                  initCustomerHomeInfoListener();
+                  initPromoTokoPelanggan();
+                });
               });
             });
           });
