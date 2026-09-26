@@ -250,7 +250,7 @@
     const CATALOG_INITIAL_VISIBLE = 6;
     let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
     let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
-    let activeKategoriPelanggan = 'Home'; let toastTimeout;
+    let activeKategoriPelanggan = 'Home'; let toastTimeout; let masterKategoriPelanggan = [];
     let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = true;
 
     // ============================================================
@@ -357,9 +357,18 @@
     function appOpenModal(id, detailCode = null) {
       appPushState({ modal:id, detailCode:detailCode });
     }
-let koinWargaPelangganCfg = { enabled:false, daily:0 };
 
-window.onload = function() {
+
+
+    const defaultRecipes = [
+      { nama: "Sayur Sop Bening", desc: "Praktis, tinggal cemplung. Isian kol, wortel, bumbu kaldu.", keywords: ['kol', 'wortel', 'royco', 'bawang'] },
+      { nama: "Nasi Goreng Dadakan", desc: "Bikin malam makin hangat. Butuh kecap, telur, bumbu instan.", keywords: ['kecap', 'telur', 'bumbu nasi goreng'] },
+      { nama: "Tumis Kangkung Segar", desc: "Menu rumahan favorit. Kangkung hijau segar dan bumbu pilihan.", keywords: ['kangkung', 'bawang', 'cabe'] },
+      { nama: "Mie Instan Telur", desc: "Andalan kala lapar melanda malam hari dengan tambahan telur.", keywords: ['mie instan', 'telur', 'sawi'] },
+      { nama: "Es Teh Manis Segar", desc: "Pelepas dahaga di siang hari yang panas dan menyegarkan.", keywords: ['teh', 'gula', 'es'] }
+    ];
+
+    window.onload = function() {
       muatIdeMasakAdminPelanggan();
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
@@ -369,7 +378,7 @@ window.onload = function() {
       renderRecipeCards();
       if (currentCustomerPhone) {
         document.getElementById('customerLoginModal').style.display = 'none';
-        muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); tampilkanKoinDiProfil();
+        muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); periksaCheckinHarian(); tampilkanKoinDiProfil();
       } else { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); }
       initFirebaseListeners();
       initPromoTokoPelanggan();
@@ -386,11 +395,12 @@ window.onload = function() {
 
     function renderCustomerHomeInfo(cfg) {
       const running=document.getElementById('customer-home-running-text');
-      if(!running) return;
-      const text = (cfg && typeof cfg.runningText === 'string' && cfg.runningText.trim()) ? cfg.runningText.trim() : '';
-      running.textContent = text;
-      running.classList.remove('run-once');
-      if(text) {
+      const text = (cfg && typeof cfg.runningText === 'string' && cfg.runningText.trim())
+        ? cfg.runningText.trim()
+        : ((cfg && typeof cfg.infoText === 'string' && cfg.infoText.trim()) ? cfg.infoText.trim() : 'Selamat datang di toko kami 👋');
+      if(running) {
+        running.textContent = text;
+        running.classList.remove('run-once');
         void running.offsetWidth;
         running.classList.add('run-once');
       }
@@ -398,7 +408,8 @@ window.onload = function() {
 
     function initCustomerHomeInfoListener() {
       storeCollection("pengaturan").doc('beranda_pelanggan_home').onSnapshot(snap => {
-        renderCustomerHomeInfo(snap.exists ? snap.data() : {});
+        const cfg=snap.exists ? snap.data() : {};
+        renderCustomerHomeInfo(cfg);
       }, () => renderCustomerHomeInfo({}));
     }
 
@@ -447,12 +458,15 @@ window.onload = function() {
     }
 
     function initPromoTokoPelanggan() {
-      promoTokoPelangganCfg = { enabled:false, codes:[] };
+      try {
+        const localCfg = JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{}');
+        if (localCfg && Array.isArray(localCfg.codes)) promoTokoPelangganCfg = { enabled: localCfg.enabled !== false, codes: localCfg.codes };
+      } catch(e) {}
       renderPromoTokoPelanggan();
       storeCollection("pengaturan").doc('beranda_pelanggan_promo').onSnapshot(doc => {
         if (doc.exists) {
           const data = doc.data() || {};
-          promoTokoPelangganCfg = { enabled: data.enabled === true, codes: Array.isArray(data.codes) ? data.codes : [] };
+          promoTokoPelangganCfg = { enabled: data.enabled !== false, codes: Array.isArray(data.codes) ? data.codes : [] };
           localStorage.setItem('admin_promo_toko_v1', JSON.stringify(promoTokoPelangganCfg));
         } else {
           promoTokoPelangganCfg = { enabled: false, codes: [] };
@@ -494,35 +508,8 @@ window.onload = function() {
       openCartModal();
     }
 
-    function periksaCheckinHarian() {
-      if(!currentCustomerPhone || !koinWargaPelangganCfg.enabled) return;
-      const today = new Date().toLocaleDateString('id-ID');
-      const lastCheckin = localStorage.getItem('last_checkin_date_' + currentCustomerPhone);
-      if(lastCheckin !== today) {
-        const bonus=Math.max(0, parseInt(koinWargaPelangganCfg.daily,10) || 0);
-        if (bonus <= 0) return;
-        const p=document.querySelector('#dailyCheckinModal p');
-        if(p) p.innerText='Selamat! Kamu rajin buka aplikasi hari ini. Ini ' + bonus + ' Koin untukmu!';
-        setTimeout(() => {
-          if (!koinWargaPelangganCfg.enabled || !currentCustomerPhone) return;
-          appOpenModal('dailyCheckinModal');
-          const modal=document.getElementById('dailyCheckinModal');
-          if(modal) modal.style.display = 'flex';
-        }, 1500);
-      }
-    }
-    function klaimKoinHarian() {
-      if(!currentCustomerPhone || !koinWargaPelangganCfg.enabled) return;
-      const today = new Date().toLocaleDateString('id-ID');
-      localStorage.setItem('last_checkin_date_' + currentCustomerPhone, today);
-      const bonus=Math.max(0, parseInt(koinWargaPelangganCfg.daily,10) || 0);
-      if (bonus <= 0) return;
-      const currentCoins = parseInt(localStorage.getItem('koin_warga_' + currentCustomerPhone)) || 0;
-      localStorage.setItem('koin_warga_' + currentCustomerPhone, currentCoins + bonus);
-      if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'dailyCheckinModal') history.back();
-      else { const modal=document.getElementById('dailyCheckinModal'); if(modal) modal.style.display = 'none'; }
-      showToast('🪙 Yey! ' + bonus + ' Koin berhasil ditambahkan ke dompetmu.'); playBeep(); tampilkanKoinDiProfil();
-    }
+    function periksaCheckinHarian() { if(!currentCustomerPhone) return; if(localStorage.getItem('admin_koin_warga_enabled') === 'false') return; let today = new Date().toLocaleDateString('id-ID'); let lastCheckin = localStorage.getItem('last_checkin_date_' + currentCustomerPhone); if(lastCheckin !== today) { const bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); const p=document.querySelector('#dailyCheckinModal p'); if(p) p.innerText='Selamat! Kamu rajin buka aplikasi hari ini. Ini ' + bonus + ' Koin untukmu!'; setTimeout(() => { appOpenModal('dailyCheckinModal'); document.getElementById('dailyCheckinModal').style.display = 'flex'; }, 1500); } }
+    function klaimKoinHarian() { let today = new Date().toLocaleDateString('id-ID'); localStorage.setItem('last_checkin_date_' + currentCustomerPhone, today); let bonus=Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'),10) || 10); let currentCoins = parseInt(localStorage.getItem('koin_warga_' + currentCustomerPhone)) || 0; localStorage.setItem('koin_warga_' + currentCustomerPhone, currentCoins + bonus); if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'dailyCheckinModal') history.back(); else document.getElementById('dailyCheckinModal').style.display = 'none'; showToast('🪙 Yey! ' + bonus + ' Koin berhasil ditambahkan ke dompetmu.'); playBeep(); tampilkanKoinDiProfil(); }
     function tampilkanKoinDiProfil() { let coins = localStorage.getItem('koin_warga_' + currentCustomerPhone) || 0; document.getElementById('profile-coins').innerText = coins; }
 
     window.__promoRenderHook = renderPromoTokoPelanggan;
@@ -640,10 +627,10 @@ window.onload = function() {
       try {
         const snap = await storeCollection("pengaturan").doc("beranda_pelanggan_resep").get();
         const data = snap.exists ? snap.data() : {};
-        adminCustomerRecipesEnabled = snap.exists && data.enabled === true;
+        adminCustomerRecipesEnabled = data.enabled !== false;
         adminCustomerRecipes = Array.isArray(data.recipes) ? data.recipes : [];
       } catch(e) {
-        adminCustomerRecipesEnabled = false;
+        adminCustomerRecipesEnabled = true;
         adminCustomerRecipes = [];
       }
       renderRecipeCards();
@@ -663,6 +650,24 @@ window.onload = function() {
           container.innerHTML += `<div class="recipe-card">${foto}<div><div style="font-weight:800;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;">${escName}</div><div style="font-size:.65rem;opacity:.9;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2;">${escDesc}</div></div><div style="display:flex;gap:4px;margin-top:auto;"><button type="button" class="recipe-btn-action" style="flex:1;" onclick='beliPaketResepCustom(${rJson})'>+ Masukkan Bahan</button><button type="button" class="recipe-btn-action" style="flex:0 0 30px;padding:5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepCustomKeRumpi(${rJson})'>📢</button></div></div>`;
         });
       }
+
+      defaultRecipes.forEach(r => {
+        let escName = escapeHtml(r.nama);
+        let escDesc = escapeHtml(r.desc);
+        let kwJson = JSON.stringify(r.keywords).replace(/"/g, '&quot;');
+        container.innerHTML += `
+          <div class="recipe-card">
+            <div>
+              <div style="font-weight: 800; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${escName}</div>
+              <div style="font-size: 0.65rem; opacity: 0.9; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.2;">${escDesc}</div>
+            </div>
+            <div style="display: flex; gap: 4px; margin-top: auto;">
+              <button type="button" class="recipe-btn-action" style="flex: 1;" onclick='beliPaketResepByKeywords("${escName}", ${kwJson})'>+ Masukkan Bahan</button>
+              <button type="button" class="recipe-btn-action" style="flex: 0 0 30px; padding: 5px 0;" title="Bagikan ke Rumpi" onclick='bagikanResepKeywordsKeRumpi("${escName}", ${kwJson})'>📢</button>
+            </div>
+          </div>`;
+      });
+
       customerSavedRecipes.forEach((sr, idx) => {
         let escName = escapeHtml(sr.nama);
         let srJson = JSON.stringify(sr).replace(/'/g, "&#39;");
@@ -838,6 +843,27 @@ window.onload = function() {
       setModePencarianPelanggan(false);
       perbaruiTampilanKategori();
       filterKatalogPelanggan("");
+    }
+
+    function renderKategoriPelanggan(categories) {
+      masterKategoriPelanggan = Array.isArray(categories) ? [...new Set(categories.map(v => String(v || '').trim()).filter(Boolean))] : [];
+      const container = document.getElementById('category-container');
+      if (!container) return;
+      const keep = container.querySelectorAll('[data-category="Home"],[data-category="Produk"]');
+      container.innerHTML = '';
+      keep.forEach(btn => container.appendChild(btn));
+      masterKategoriPelanggan.forEach((cat, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'chip-btn'; btn.dataset.category = cat; btn.title = cat; btn.setAttribute('aria-label', cat);
+        btn.innerHTML = '<svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M5 7h14v14H5z"></path><path d="M8 7V4h8v3"></path><path d="M9 12h6M9 16h4"></path></svg>';
+        btn.addEventListener('click', () => pilihKategoriPelanggan(cat));
+        container.appendChild(btn);
+      });
+      if (activeKategoriPelanggan !== 'Home' && activeKategoriPelanggan !== 'Produk' && !masterKategoriPelanggan.includes(activeKategoriPelanggan)) {
+        activeKategoriPelanggan = 'Home';
+      }
+      document.querySelectorAll('#category-container .chip-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.category === activeKategoriPelanggan));
+      perbaruiTampilanKategori();
     }
 
     function pilihKategoriPelanggan(kategori) {
@@ -1228,19 +1254,6 @@ window.onload = function() {
 
     function initFirebaseListeners() {
       storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
-      // Koin Warga: Firestore adalah satu-satunya sumber pengaturan dari Admin.
-      storeCollection("pengaturan").doc("beranda_pelanggan_koin_warga").onSnapshot((doc) => {
-        const data = doc.exists ? (doc.data() || {}) : {};
-        koinWargaPelangganCfg = { enabled: doc.exists && data.enabled === true, daily: Math.max(0, parseInt(data.daily,10) || 0) };
-        if (!koinWargaPelangganCfg.enabled) {
-          const modal=document.getElementById('dailyCheckinModal');
-          if(modal) modal.style.display='none';
-        }
-        if (currentCustomerPhone) periksaCheckinHarian();
-      }, (err) => {
-        console.warn("Listener pengaturan Koin Warga gagal:", err);
-        koinWargaPelangganCfg = { enabled:false, daily:0 };
-      });
       storeCollection("produk").onSnapshot((snapshot) => { 
         databaseProduk = {}; 
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
@@ -1254,17 +1267,20 @@ window.onload = function() {
           renderQuickReorder(lastFetchedOrders);
         }
       });
+      storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
+        renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
+      });
       storeCollection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
-        const cfg = doc.exists ? doc.data() : {enabled:false, limit:5};
-        window.__sedangLarisConfig = { enabled: doc.exists && cfg.enabled === true, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
+        window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
         isTrendingConfigLoaded = true;
         muatBarangLarisHariIni();
       });
       // Listener pengaturan "Stok Rumah Habis" dari Admin > Beranda Pelanggan.
       // Jumlah kartu mengikuti konfigurasi Firebase yang disimpan Admin.
       storeCollection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
-        const cfg = doc.exists ? doc.data() : {enabled:false, limit:5};
-        window.__stokRumahConfig = { enabled: doc.exists && cfg.enabled === true, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
+        window.__stokRumahConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
         renderQuickReorder(lastFetchedOrders || []);
       }, (err) => {
         console.warn("Listener pengaturan Stok Rumah gagal:", err);
@@ -1408,10 +1424,10 @@ window.onload = function() {
       // dalam urutan yang berbeda. Produk dan konfigurasi harus siap lebih dulu.
       if (!isProductsLoaded || !isTrendingConfigLoaded) return;
 
-      const cfg = window.__sedangLarisConfig || {enabled:false, limit:5};
+      const cfg = window.__sedangLarisConfig || {enabled:true, limit:5};
       if (cfg.enabled === false) { renderTrending([]); return; }
 
-      const limit = Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5));
+      const limit = Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5));
       const token = ++trendingLoadToken;
 
       try {
@@ -2075,8 +2091,8 @@ window.onload = function() {
       let renderedCount = 0; let itemsHtml = ""; 
       recentCodes.forEach(code => { 
         let p = databaseProduk[code]; 
-        const stokRumahCfg = window.__stokRumahConfig || {enabled:false, limit:5};
-        const stokRumahLimit = Math.min(10, Math.max(1, parseInt(stokRumahCfg.limit,10) || 5));
+        const stokRumahCfg = window.__stokRumahConfig || {enabled:true, limit:5};
+        const stokRumahLimit = Math.min(20, Math.max(1, parseInt(stokRumahCfg.limit,10) || 5));
         if(stokRumahCfg.enabled !== false && p && (p.stok || 0) > 0 && renderedCount < stokRumahLimit) { 
           let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>"; 
           let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs"); 
@@ -2479,15 +2495,6 @@ document.addEventListener('DOMContentLoaded', () => {
     'promo-next': () => geserPromoTokoPelanggan(1),
     'category-home': () => pilihKategoriPelanggan('Home'),
     'category-produk': () => pilihKategoriPelanggan('Produk'),
-    'category-titipan-warga': () => pilihKategoriPelanggan('Titipan Warga'),
-    'category-sembako': () => pilihKategoriPelanggan('Sembako'),
-    'category-minuman': () => pilihKategoriPelanggan('Minuman'),
-    'category-makanan': () => pilihKategoriPelanggan('Makanan'),
-    'category-snack': () => pilihKategoriPelanggan('Snack'),
-    'category-bumbu': () => pilihKategoriPelanggan('Bumbu'),
-    'category-perawatan': () => pilihKategoriPelanggan('Perawatan'),
-    'category-kebutuhan-rumah': () => pilihKategoriPelanggan('Kebutuhan Rumah'),
-    'category-lainnya': () => pilihKategoriPelanggan('Lainnya'),
     'view-list': () => gantiViewModePelanggan('list'),
     'view-grid': () => gantiViewModePelanggan('grid'),
     'view-card': () => gantiViewModePelanggan('card')
