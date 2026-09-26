@@ -246,6 +246,48 @@
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "", phone: "" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24;
+    // STAGE 9: satu gerbang visual untuk dashboard utama agar konten berbasis DB
+    // tidak muncul sepotong-sepotong saat first paint. Listener tetap realtime.
+    let dashboardPrimaryReady = false;
+    let dashboardChatStarted = false;
+    let dashboardHomeInfoCfg = null;
+    let dashboardPrimaryState = { products:false, recipes:false, trendingConfig:false, trendingTransactions:false, stokConfig:false, stokOrders:false };
+    dashboardPrimaryState.stokOrders = !currentCustomerPhone;
+
+    function tryRevealPrimaryDashboard() {
+      if (dashboardPrimaryReady) return;
+      const ready = dashboardPrimaryState.products && dashboardPrimaryState.recipes &&
+        dashboardPrimaryState.trendingConfig && dashboardPrimaryState.trendingTransactions &&
+        dashboardPrimaryState.stokConfig && dashboardPrimaryState.stokOrders;
+      if (!ready) return;
+      dashboardPrimaryReady = true;
+      ['recipe-section-wrapper','trending-section-wrapper'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('dashboard-primary-pending');
+        el.classList.add('dashboard-primary-ready');
+      });
+      const categoryEl = document.getElementById('category-container');
+      if (categoryEl) {
+        categoryEl.classList.remove('dashboard-category-pending');
+        categoryEl.classList.add('dashboard-category-ready');
+      }
+      if (dashboardHomeInfoCfg) renderCustomerHomeInfo(dashboardHomeInfoCfg);
+      renderRecipeCards();
+      muatBarangLarisHariIni();
+      renderQuickReorder(lastFetchedOrders || []);
+      initKategoriPelangganListener();
+      initPromoTokoPelanggan();
+      if (!dashboardChatStarted) {
+        dashboardChatStarted = true;
+        const deferCustomerRealtime = window.requestIdleCallback || function(cb) { setTimeout(cb, 700); };
+        deferCustomerRealtime(() => {
+          initChatRumpiListener();
+          if (currentCustomerPhone) initCustomerChatListener();
+        });
+      }
+    }
+
     // TAHAP 1: jumlah card katalog yang ditampilkan saat awal. Ini TIDAK membatasi databaseProduk/dashboard.
     const CATALOG_INITIAL_VISIBLE = 6;
     let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
@@ -365,49 +407,22 @@
       initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
-      renderRecipeCards();
       if (currentCustomerPhone) {
         document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); periksaCheckinHarian(); tampilkanKoinDiProfil();
       } else { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); }
-      // Tahap 1 progressive render: prioritaskan header toko terlebih dahulu.
-      // Listener berat/sekunder baru dimulai setelah browser sempat mengecat header.
+      // Stage 9: header tetap first paint, lalu dashboard utama berbasis DB
+      // berjalan dalam satu fase paralel. Tidak ada delay buatan.
       initHeaderTokoListener();
+      initCustomerHomeInfoListener();
       const deferDashboardAfterHeader = window.requestAnimationFrame || function(cb) { setTimeout(cb, 16); };
       deferDashboardAfterHeader(() => {
-        // Tahap 2 progressive render: setelah header, prioritaskan blok Stok Rumah.
         initStokRumahListener();
-        deferDashboardAfterHeader(() => {
-          // Tahap 3 progressive render: setelah Stok Rumah, muat Ide Masak.
-          initIdeMasakPelanggan();
-          deferDashboardAfterHeader(() => {
-            // Tahap 4 progressive render: setelah Ide Masak, siapkan blok Sedang Laris.
-            initFirebaseListeners(false);
-            initSedangLarisListeners();
-            deferDashboardAfterHeader(() => {
-              // Tahap 5 progressive render: setelah blok atas, siapkan kategori.
-              initKategoriPelangganListener();
-              deferDashboardAfterHeader(() => {
-                // Tahap 6 progressive render: setelah kategori, baru ambil katalog produk.
-                initProdukKatalogListener();
-                deferDashboardAfterHeader(() => {
-                  // Tahap 7: setelah katalog mendapat giliran, aktifkan Info Toko + Promo.
-                  initCustomerHomeInfoListener();
-                  initPromoTokoPelanggan();
-
-                  // Tahap 8: setelah Info Toko + Promo selesai mendapat giliran,
-                  // baru lepaskan realtime Chat sebagai pekerjaan sekunder.
-                  const deferCustomerRealtime = window.requestIdleCallback || function(cb) { setTimeout(cb, 700); };
-                  deferCustomerRealtime(() => {
-                    initChatRumpiListener();
-                    if (currentCustomerPhone) initCustomerChatListener();
-                  });
-                });
-              });
-            });
-          });
-        });
+        initIdeMasakPelanggan();
+        initSedangLarisListeners();
+        initProdukKatalogListener();
       });
+
     };
 
     function updateCustomerGreeting() {
@@ -419,6 +434,7 @@
     }
 
     function renderCustomerHomeInfo(cfg) {
+      dashboardHomeInfoCfg = cfg || {};
       const running=document.getElementById('customer-home-running-text');
       if(!running) return;
       const text = (cfg && typeof cfg.runningText === 'string') ? cfg.runningText.trim() : '';
@@ -427,6 +443,12 @@
       if(text) {
         void running.offsetWidth;
         running.classList.add('run-once');
+      }
+      if (!dashboardPrimaryReady) return;
+      const infoLine = document.getElementById('customer-home-info-line');
+      if (infoLine) {
+        infoLine.classList.remove('dashboard-home-info-pending');
+        infoLine.classList.add('dashboard-home-info-ready');
       }
     }
 
@@ -666,10 +688,12 @@
         adminCustomerRecipesEnabled = false;
         adminCustomerRecipes = [];
       }
-      renderRecipeCards();
+      dashboardPrimaryState.recipes = true;
+      tryRevealPrimaryDashboard();
     }
 
     function renderRecipeCards() {
+      if (!dashboardPrimaryReady) return;
       const container = document.getElementById('recipe-scroll-container');
       if(!container) return;
       container.innerHTML = "";
@@ -1286,10 +1310,14 @@
       storeCollection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
         window.__stokRumahConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        dashboardPrimaryState.stokConfig = true;
         renderQuickReorder(lastFetchedOrders || []);
+        tryRevealPrimaryDashboard();
       }, (err) => {
         console.warn("Listener pengaturan Stok Rumah gagal:", err);
+        dashboardPrimaryState.stokConfig = true;
         renderQuickReorder(lastFetchedOrders || []);
+        tryRevealPrimaryDashboard();
       });
     }
 
@@ -1304,6 +1332,7 @@
         databaseProduk = {}; 
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
         isProductsLoaded = true; 
+        dashboardPrimaryState.products = true;
         muatBarangLarisHariIni(); 
         perbaruiTampilanKategori(); 
         refreshKatalogPelanggan(); 
@@ -1312,8 +1341,11 @@
         if (lastFetchedOrders && lastFetchedOrders.length > 0) {
           renderQuickReorder(lastFetchedOrders);
         }
+        tryRevealPrimaryDashboard();
       }, (err) => {
         console.warn("Listener produk gagal:", err);
+        dashboardPrimaryState.products = true;
+        tryRevealPrimaryDashboard();
       });
     }
 
@@ -1335,15 +1367,27 @@
           const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
           window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
           isTrendingConfigLoaded = true;
+          dashboardPrimaryState.trendingConfig = true;
           muatBarangLarisHariIni();
+          tryRevealPrimaryDashboard();
+        }, (err) => {
+          console.warn("Listener pengaturan Sedang Laris gagal:", err);
+          isTrendingConfigLoaded = true;
+          dashboardPrimaryState.trendingConfig = true;
+          muatBarangLarisHariIni();
+          tryRevealPrimaryDashboard();
         });
 
         storeCollection("transaksi").onSnapshot((snapshot) => {
           window.__trendingTransactionsSnapshot = snapshot;
+          dashboardPrimaryState.trendingTransactions = true;
           muatBarangLarisHariIni();
+          tryRevealPrimaryDashboard();
         }, (err) => {
           console.warn("Listener transaksi Sedang Laris gagal:", err);
+          dashboardPrimaryState.trendingTransactions = true;
           muatBarangLarisHariIni();
+          tryRevealPrimaryDashboard();
         });
       });
     }
@@ -2168,7 +2212,9 @@
         if (snapshot.empty) { 
           container.innerHTML = `<div class="empty-state" style="font-size: 0.78rem;">Belum ada riwayat pesanan online.</div>`; 
           lastFetchedOrders = [];
+          dashboardPrimaryState.stokOrders = true;
           renderQuickReorder([]); 
+          tryRevealPrimaryDashboard();
           return; 
         } 
         let orders = []; 
@@ -2179,7 +2225,9 @@
           return timeB - timeA; 
         }); 
         lastFetchedOrders = orders;
-        renderQuickReorder(orders); 
+        dashboardPrimaryState.stokOrders = true;
+        renderQuickReorder(orders);
+        tryRevealPrimaryDashboard(); 
         orders.forEach(trx => { 
           let statusLabel = trx.statusPesanan || "Menunggu Diproses"; 
           let s_lower = statusLabel.toLowerCase(); 
@@ -2196,7 +2244,11 @@
           } 
           container.innerHTML += `<div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: var(--card-bg); box-shadow: 0 1px 4px rgba(0,0,0,0.05);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;"><span style="font-size: 0.68rem; color: var(--text-muted);">🗓️ ${trx.waktu || '-'}</span><span style="background: ${step===4 ? '#16a34a' : (step===1 ? '#ef4444' : '#d97706')}; color: white; padding: 2px 6px; border-radius: 8px; font-size: 0.62rem; font-weight: bold;">${statusLabel}</span></div>${timelineHtml}<div style="font-size: 0.75rem; font-weight: 600; color: #2563eb;">Metode: ${trx.metode || '-'}</div>${itemsHtml}<div style="font-size: 0.82rem; font-weight: 800; color: #16a34a; text-align: right;">Total: Rp ${(trx.total || 0).toLocaleString('id-ID')}</div></div>`; 
         }); 
-      }); 
+      }, (err) => {
+        console.warn("Listener riwayat pesanan pelanggan gagal:", err);
+        dashboardPrimaryState.stokOrders = true;
+        tryRevealPrimaryDashboard();
+      });
     }
 
     function simpanProfilPelanggan() { const nama = document.getElementById("setting-cust-name").value.trim(); const alamat = document.getElementById("setting-cust-address").value.trim(); if (!nama) return alert("Nama wajib diisi!"); storeCollection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => { if (!snap.empty) { storeCollection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!")).catch(err => alert("Gagal memperbarui: " + err.message)); } }).catch(err => alert("Terjadi kesalahan: " + err.message)); }

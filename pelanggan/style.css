@@ -2530,6 +2530,42 @@ body:not([data-theme="modern"]) .product-catalog-card .generic-card-stock { colo
 /* ===== EXTRACTED FROM pelanggan.html <style> #4 ===== */
 .customer-developer-footer{text-align:center;margin:16px 0 14px;padding:8px 0 12px;font-size:.7rem;color:var(--text-muted);border-top:1px solid var(--border-color);}.customer-developer-footer a{color:inherit;text-decoration:none;}
 
+/* ===== STAGE 9: SMOOTH DASHBOARD FIRST PAINT ===== */
+.dashboard-primary-pending {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  pointer-events: none !important;
+}
+.dashboard-primary-ready {
+  visibility: visible !important;
+  opacity: 1 !important;
+  max-height: 5000px !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
+.dashboard-home-info-pending {
+  visibility: hidden;
+  opacity: 0;
+}
+.dashboard-home-info-ready {
+  visibility: visible;
+  opacity: 1;
+}
+.dashboard-category-pending {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.dashboard-category-ready {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
 /* ===== EXTRACTED FROM pelanggan.html <style> #5 ===== */
 
 #reorder-section-wrapper,
