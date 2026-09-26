@@ -1256,7 +1256,7 @@ window.onload = function() {
       });
       storeCollection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:false, limit:5};
-        window.__sedangLarisConfig = { enabled: doc.exists && cfg.enabled === true, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        window.__sedangLarisConfig = { enabled: doc.exists && cfg.enabled === true, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
         isTrendingConfigLoaded = true;
         muatBarangLarisHariIni();
       });
@@ -1264,7 +1264,7 @@ window.onload = function() {
       // Jumlah kartu mengikuti konfigurasi Firebase yang disimpan Admin.
       storeCollection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:false, limit:5};
-        window.__stokRumahConfig = { enabled: doc.exists && cfg.enabled === true, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        window.__stokRumahConfig = { enabled: doc.exists && cfg.enabled === true, limit: Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5)) };
         renderQuickReorder(lastFetchedOrders || []);
       }, (err) => {
         console.warn("Listener pengaturan Stok Rumah gagal:", err);
@@ -1411,7 +1411,7 @@ window.onload = function() {
       const cfg = window.__sedangLarisConfig || {enabled:false, limit:5};
       if (cfg.enabled === false) { renderTrending([]); return; }
 
-      const limit = Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5));
+      const limit = Math.min(10, Math.max(1, parseInt(cfg.limit,10) || 5));
       const token = ++trendingLoadToken;
 
       try {
@@ -2076,7 +2076,7 @@ window.onload = function() {
       recentCodes.forEach(code => { 
         let p = databaseProduk[code]; 
         const stokRumahCfg = window.__stokRumahConfig || {enabled:false, limit:5};
-        const stokRumahLimit = Math.min(20, Math.max(1, parseInt(stokRumahCfg.limit,10) || 5));
+        const stokRumahLimit = Math.min(10, Math.max(1, parseInt(stokRumahCfg.limit,10) || 5));
         if(stokRumahCfg.enabled !== false && p && (p.stok || 0) > 0 && renderedCount < stokRumahLimit) { 
           let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>"; 
           let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs"); 
