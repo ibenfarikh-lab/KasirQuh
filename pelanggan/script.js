@@ -366,15 +366,22 @@
       initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
-      initChatRumpiListener();
       renderRecipeCards();
       if (currentCustomerPhone) {
         document.getElementById('customerLoginModal').style.display = 'none';
-        muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); periksaCheckinHarian(); tampilkanKoinDiProfil();
+        muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); periksaCheckinHarian(); tampilkanKoinDiProfil();
       } else { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); }
       initFirebaseListeners();
       initPromoTokoPelanggan();
       initCustomerHomeInfoListener();
+
+      // Fitur realtime sekunder tidak boleh membebani first-paint dashboard.
+      // Aktifkan setelah browser selesai dengan pekerjaan utama.
+      const deferCustomerRealtime = window.requestIdleCallback || function(cb) { setTimeout(cb, 700); };
+      deferCustomerRealtime(() => {
+        initChatRumpiListener();
+        if (currentCustomerPhone) initCustomerChatListener();
+      });
     };
 
     function updateCustomerGreeting() {
@@ -1248,11 +1255,22 @@
       storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
         renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
       });
-      storeCollection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
-        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
-        window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
-        isTrendingConfigLoaded = true;
-        muatBarangLarisHariIni();
+      const deferTrendingInit = window.requestIdleCallback || function(cb) { setTimeout(cb, 900); };
+      deferTrendingInit(() => {
+        storeCollection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
+          const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
+          window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+          isTrendingConfigLoaded = true;
+          muatBarangLarisHariIni();
+        });
+
+        storeCollection("transaksi").onSnapshot((snapshot) => {
+          window.__trendingTransactionsSnapshot = snapshot;
+          muatBarangLarisHariIni();
+        }, (err) => {
+          console.warn("Listener transaksi Sedang Laris gagal:", err);
+          muatBarangLarisHariIni();
+        });
       });
       // Listener pengaturan "Stok Rumah Habis" dari Admin > Beranda Pelanggan.
       // Jumlah kartu mengikuti konfigurasi Firebase yang disimpan Admin.
@@ -1265,17 +1283,6 @@
         renderQuickReorder(lastFetchedOrders || []);
       });
 
-      // Listener transaksi untuk "Sedang Laris".
-      // Jika hari ini belum ada transaksi, tampilkan data dari tanggal transaksi
-      // terakhir yang tersedia. Begitu ada transaksi baru, kartu otomatis dihitung ulang.
-      storeCollection("transaksi").onSnapshot((snapshot) => {
-        window.__trendingTransactionsSnapshot = snapshot;
-        muatBarangLarisHariIni();
-      }, (err) => {
-        console.warn("Listener transaksi Sedang Laris gagal:", err);
-        // muatBarangLarisHariIni() tetap boleh mencoba query langsung sebagai fallback.
-        muatBarangLarisHariIni();
-      });
     }
 
 
