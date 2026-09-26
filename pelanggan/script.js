@@ -371,9 +371,17 @@
         document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); periksaCheckinHarian(); tampilkanKoinDiProfil();
       } else { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); }
-      initFirebaseListeners();
-      initPromoTokoPelanggan();
-      initCustomerHomeInfoListener();
+      // Tahap 1 progressive render: prioritaskan header toko terlebih dahulu.
+      // Listener berat/sekunder baru dimulai setelah browser sempat mengecat header.
+      initHeaderTokoListener();
+      const deferDashboardAfterHeader = window.requestAnimationFrame || function(cb) { setTimeout(cb, 16); };
+      deferDashboardAfterHeader(() => {
+        deferDashboardAfterHeader(() => {
+          initFirebaseListeners(false);
+          initPromoTokoPelanggan();
+          initCustomerHomeInfoListener();
+        });
+      });
 
       // Fitur realtime sekunder tidak boleh membebani first-paint dashboard.
       // Aktifkan setelah browser selesai dengan pekerjaan utama.
@@ -1237,8 +1245,21 @@
       }
     }
 
-    function initFirebaseListeners() {
-      storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
+    function initHeaderTokoListener() {
+      storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
+        if (doc.exists) {
+          pengaturanToko = doc.data();
+          const namaToko = pengaturanToko.nama || "KasirQuh";
+          localStorage.setItem('cust_store_name_v13', namaToko);
+          document.getElementById('receipt-shop-name').innerText = namaToko;
+          document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || "";
+          if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko;
+        }
+      });
+    }
+
+    function initFirebaseListeners(includeHeader = true) {
+      if (includeHeader) initHeaderTokoListener();
       storeCollection("produk").onSnapshot((snapshot) => { 
         databaseProduk = {}; 
         snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
