@@ -273,6 +273,8 @@
         categoryEl.classList.add('dashboard-category-ready');
       }
       if (dashboardHomeInfoCfg) renderCustomerHomeInfo(dashboardHomeInfoCfg);
+      // Katalog boleh tampil hanya setelah seluruh dashboard utama siap.
+      refreshKatalogPelanggan();
       renderRecipeCards();
       muatBarangLarisHariIni();
       renderQuickReorder(lastFetchedOrders || []);
@@ -1789,7 +1791,7 @@
       if (!['list','grid','card'].includes(catalogViewMode)) catalogViewMode = 'grid';
       container.className = catalogViewMode === 'list' ? "product-catalog-list" : (catalogViewMode === 'card' ? "product-catalog-card" : "product-catalog-grid");
       updateCatalogViewButtons();
-      if (!isProductsLoaded) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
+      if (!isProductsLoaded || !dashboardPrimaryReady) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
 
       let matchedProducts = [];
       for (let code in databaseProduk) {
