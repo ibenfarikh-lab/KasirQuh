@@ -767,11 +767,5 @@
 })();
 </script>
 
-
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function(){ navigator.serviceWorker.register('/sw.js', {scope:'/'}).catch(function(err){ console.warn('[KasirQuh] Service Worker:', err); }); });
-  }
-</script>
 </body>
 </html>
