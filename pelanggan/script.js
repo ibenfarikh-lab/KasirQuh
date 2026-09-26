@@ -250,7 +250,7 @@
     const CATALOG_INITIAL_VISIBLE = 6;
     let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
     let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
-    let activeKategoriPelanggan = 'Home'; let toastTimeout; let masterKategoriPelanggan = [];
+    let activeKategoriPelanggan = 'Home'; let toastTimeout;
     let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = true;
 
     // ============================================================
@@ -845,27 +845,6 @@
       filterKatalogPelanggan("");
     }
 
-    function renderKategoriPelanggan(categories) {
-      masterKategoriPelanggan = Array.isArray(categories) ? [...new Set(categories.map(v => String(v || '').trim()).filter(Boolean))] : [];
-      const container = document.getElementById('category-container');
-      if (!container) return;
-      const keep = container.querySelectorAll('[data-category="Home"],[data-category="Produk"]');
-      container.innerHTML = '';
-      keep.forEach(btn => container.appendChild(btn));
-      masterKategoriPelanggan.forEach((cat, index) => {
-        const btn = document.createElement('button');
-        btn.type = 'button'; btn.className = 'chip-btn'; btn.dataset.category = cat; btn.title = cat; btn.setAttribute('aria-label', cat);
-        btn.innerHTML = '<svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M5 7h14v14H5z"></path><path d="M8 7V4h8v3"></path><path d="M9 12h6M9 16h4"></path></svg>';
-        btn.addEventListener('click', () => pilihKategoriPelanggan(cat));
-        container.appendChild(btn);
-      });
-      if (activeKategoriPelanggan !== 'Home' && activeKategoriPelanggan !== 'Produk' && !masterKategoriPelanggan.includes(activeKategoriPelanggan)) {
-        activeKategoriPelanggan = 'Home';
-      }
-      document.querySelectorAll('#category-container .chip-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.category === activeKategoriPelanggan));
-      perbaruiTampilanKategori();
-    }
-
     function pilihKategoriPelanggan(kategori) {
       const wasHome = activeKategoriPelanggan === 'Home';
       if (wasHome && kategori !== 'Home' && animasiNavigasiDeveloperAktif() && window.smoothHomeToCategory) window.smoothHomeToCategory();
@@ -1266,9 +1245,6 @@
         if (lastFetchedOrders && lastFetchedOrders.length > 0) {
           renderQuickReorder(lastFetchedOrders);
         }
-      });
-      storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
-        renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
       });
       storeCollection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
         const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
@@ -2190,43 +2166,38 @@
     }
     syncAnimasiNavigasiDeveloper();
 
-    function bersihkanCacheTotal() { if (confirm("Bersihkan cache aplikasi?")) { if ('caches' in window) caches.keys().then((names) => { names.forEach((name) => { caches.delete(name); }); }); if (navigator.serviceWorker) navigator.serviceWorker.getRegistrations().then((registrations) => { for(let r of registrations) r.unregister(); }); setTimeout(() => { window.location.reload(true); }, 500); } }
-    async function hapusDataSitusPelanggan() {
-      const ok = confirm("Hapus cookie & seluruh data situs aplikasi ini?\n\nYang akan dibersihkan: cookie yang dapat diakses JavaScript, localStorage, sessionStorage, IndexedDB, Cache Storage, dan service worker. Anda mungkin perlu masuk kembali.\n\nLanjutkan?");
-      if (!ok) return;
+    async function perbaruiAplikasiPelanggan() {
+      const status = document.getElementById('update-app-status');
+      const setStatus = (text) => { if (status) status.textContent = text; };
+      if (!confirm('Perbarui aplikasi sekarang?\n\nCache aplikasi akan disegarkan dan halaman dimuat ulang. Login, pengaturan lokal, dan data Firestore tidak dihapus.')) return;
+
       try {
-        // Cookie yang dapat diakses JavaScript pada domain/path ini. Cookie HttpOnly tidak dapat dihapus oleh halaman web.
-        const cookies = document.cookie ? document.cookie.split(";") : [];
-        cookies.forEach(cookie => {
-          const eq = cookie.indexOf("=");
-          const name = (eq >= 0 ? cookie.slice(0, eq) : cookie).trim();
-          if (!name) return;
-          document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; path=/";
-          document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; path=" + location.pathname;
-        });
-        try { localStorage.clear(); } catch (_) {}
-        try { sessionStorage.clear(); } catch (_) {}
-        if (window.indexedDB) {
-          if (indexedDB.databases) {
-            const dbs = await indexedDB.databases();
-            await Promise.all((dbs || []).map(db => db.name ? new Promise(resolve => { const req = indexedDB.deleteDatabase(db.name); req.onsuccess = req.onerror = req.onblocked = () => resolve(); }) : Promise.resolve()));
-          }
-        }
-        if (window.caches) {
+        setStatus('Menyiapkan pembaruan...');
+
+        // Hapus hanya Cache Storage milik aplikasi. localStorage/sessionStorage/IndexedDB tidak disentuh.
+        if ('caches' in window) {
           const names = await caches.keys();
           await Promise.all(names.map(name => caches.delete(name)));
         }
-        if (navigator.serviceWorker) {
+
+        // Minta Service Worker terbaru segera aktif, tetapi jangan menghapus data situs.
+        if ('serviceWorker' in navigator) {
           const registrations = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(registrations.map(r => r.unregister()));
+          await Promise.all(registrations.map(async registration => {
+            try { await registration.update(); } catch (_) {}
+            if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+          }));
         }
-      } catch (err) {
-        console.warn("Pembersihan data situs tidak sepenuhnya berhasil:", err);
-      } finally {
-        // Beri browser sedikit waktu menyelesaikan penghapusan sebelum memuat ulang.
+
+        setStatus('Pembaruan selesai. Memuat ulang...');
         setTimeout(() => window.location.reload(), 350);
+      } catch (err) {
+        console.warn('Pembaruan aplikasi tidak sepenuhnya berhasil:', err);
+        setStatus('Pembaruan sebagian gagal. Memuat ulang...');
+        setTimeout(() => window.location.reload(), 500);
       }
     }
+
   
 
 /* ===== EXTRACTED FROM pelanggan.html <script> #6 id=smooth-transisi-home-kategori-js-final ===== */
@@ -2495,6 +2466,15 @@ document.addEventListener('DOMContentLoaded', () => {
     'promo-next': () => geserPromoTokoPelanggan(1),
     'category-home': () => pilihKategoriPelanggan('Home'),
     'category-produk': () => pilihKategoriPelanggan('Produk'),
+    'category-titipan-warga': () => pilihKategoriPelanggan('Titipan Warga'),
+    'category-sembako': () => pilihKategoriPelanggan('Sembako'),
+    'category-minuman': () => pilihKategoriPelanggan('Minuman'),
+    'category-makanan': () => pilihKategoriPelanggan('Makanan'),
+    'category-snack': () => pilihKategoriPelanggan('Snack'),
+    'category-bumbu': () => pilihKategoriPelanggan('Bumbu'),
+    'category-perawatan': () => pilihKategoriPelanggan('Perawatan'),
+    'category-kebutuhan-rumah': () => pilihKategoriPelanggan('Kebutuhan Rumah'),
+    'category-lainnya': () => pilihKategoriPelanggan('Lainnya'),
     'view-list': () => gantiViewModePelanggan('list'),
     'view-grid': () => gantiViewModePelanggan('grid'),
     'view-card': () => gantiViewModePelanggan('card')
