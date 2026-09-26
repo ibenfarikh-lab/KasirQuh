@@ -825,20 +825,40 @@
         Developed by <strong>113-EN</strong> (<a href="mailto:ibenajah@gmail.com">ibenajah@gmail.com</a>)
       </div>
 <script>
-function getPengaturanKoinWarga() {
-  return { enabled: localStorage.getItem('admin_koin_warga_enabled') !== 'false', daily: Math.max(0, parseInt(localStorage.getItem('admin_koin_warga_daily'), 10) || 10) };
+let adminKoinWargaConfig = { enabled:false, daily:0 };
+async function getPengaturanKoinWarga() {
+  try {
+    const snap = await storeCollection("pengaturan").doc('beranda_pelanggan_koin_warga').get();
+    if (!snap.exists) return { enabled:false, daily:0 };
+    const data = snap.data() || {};
+    return { enabled:data.enabled === true, daily:Math.max(0, parseInt(data.daily,10) || 0) };
+  } catch(e) {
+    return { enabled:false, daily:0 };
+  }
 }
-function toggleAdminKoinWarga() {
+async function toggleAdminKoinWarga() {
   const panel=document.getElementById('admin-koin-warga-panel'); if(!panel) return;
   const open=panel.style.display !== 'none'; panel.style.display=open?'none':'block';
-  if(!open){ const c=getPengaturanKoinWarga(); document.getElementById('admin-koin-enabled').checked=c.enabled; document.getElementById('admin-koin-daily').value=c.daily; }
+  if(!open){
+    const c=await getPengaturanKoinWarga();
+    adminKoinWargaConfig=c;
+    const enabled=document.getElementById('admin-koin-enabled');
+    const daily=document.getElementById('admin-koin-daily');
+    if(enabled) enabled.checked=c.enabled;
+    if(daily) daily.value=c.daily;
+  }
 }
-function simpanPengaturanKoinWarga() {
-  const enabled=document.getElementById('admin-koin-enabled').checked;
-  const daily=Math.max(0, parseInt(document.getElementById('admin-koin-daily').value,10) || 0);
-  localStorage.setItem('admin_koin_warga_enabled', String(enabled));
-  localStorage.setItem('admin_koin_warga_daily', String(daily));
-  const st=document.getElementById('admin-koin-status'); if(st) st.textContent='✓ Pengaturan Koin Warga tersimpan.';
+async function simpanPengaturanKoinWarga() {
+  const enabled=document.getElementById('admin-koin-enabled')?.checked === true;
+  const daily=Math.max(0, parseInt(document.getElementById('admin-koin-daily')?.value,10) || 0);
+  const cfg={enabled,daily,updatedAt:Date.now()};
+  try {
+    await storeCollection("pengaturan").doc('beranda_pelanggan_koin_warga').set(cfg,{merge:true});
+    adminKoinWargaConfig=cfg;
+    const st=document.getElementById('admin-koin-status'); if(st) st.textContent='✓ Pengaturan Koin Warga tersimpan dan tersinkron ke pelanggan.';
+  } catch(err) {
+    const st=document.getElementById('admin-koin-status'); if(st) st.textContent='⚠️ Gagal menyimpan ke Firebase: ' + (err.message || err);
+  }
 }
 function getPengaturanPromoTokoLocal() {
   try { return JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{"enabled":true,"codes":[]}'); }
