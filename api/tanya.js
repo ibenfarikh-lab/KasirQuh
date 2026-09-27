@@ -21,8 +21,135 @@ export default async function handler(req, res) {
     body = body || {};
     
     const promptText = body.prompt || body.pesan || body.message || body.text || '';
-    const daftarProduk = body.daftarProduk || 'Tidak ada data produk.';
     const namaToko = body.namaToko || 'Toko';
+    const firebaseIdToken = typeof body.firebaseIdToken === 'string' ? body.firebaseIdToken.trim() : '';
+
+    // AI product context is resolved server-side from Firestore using the
+    // authenticated customer's Firebase ID token. This keeps the customer
+    // catalog from having to load the whole product collection into memory.
+    async function loadRelevantProducts() {
+      if (!firebaseIdToken) return [];
+
+      const projectId = 'kasirquh';
+      const parent = `projects/${projectId}/databases/(default)/documents/toko/toko_v13`;
+      const endpoint = `https://firestore.googleapis.com/v1/${parent}:runQuery`;
+      const normalized = String(promptText).toLowerCase().trim();
+      const tokens = [...new Set(
+        normalized
+          .replace(/[^\p{L}\p{N}]+/gu, ' ')
+          .split(/\s+/)
+          .filter(word => word.length >= 3 && !['berapa','adakah','yang','dan','atau','untuk','dengan','saya','mau','beli','punya','ada','stok','harga','jual','cari','barang','produk','toko','menu'].includes(word))
+          .slice(0, 4)
+      )];
+
+      const runQuery = async (whereClause) => {
+        const structuredQuery = {
+          from: [{ collectionId: 'produk' }],
+          orderBy: [{ field: { fieldPath: 'nama' }, direction: 'ASCENDING' }],
+          limit: 6
+        };
+        if (whereClause) structuredQuery.where = whereClause;
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${firebaseIdToken}`
+          },
+          body: JSON.stringify({ structuredQuery })
+        });
+        if (!response.ok) {
+          const detail = await response.text();
+          throw new Error(`Firestore query failed (${response.status}): ${detail}`);
+        }
+        return response.json();
+      };
+
+      const results = [];
+      const seen = new Set();
+
+      // Firestore has no native substring/contains query. Prefix queries let
+      // the API retrieve only small, relevant slices without downloading all products.
+      for (const token of tokens) {
+        // Firestore string ordering is case-sensitive, so probe the common
+        // lower-case and capitalized forms without widening into a full scan.
+        const variants = [...new Set([token, token.charAt(0).toUpperCase() + token.slice(1)])];
+        for (const variant of variants) {
+          const rows = await runQuery({
+            fieldFilter: {
+              field: { fieldPath: 'nama' },
+              op: 'GREATER_THAN_OR_EQUAL',
+              value: { stringValue: variant }
+            }
+          });
+          for (const row of rows) {
+            const doc = row.document;
+            if (!doc?.name) continue;
+            const code = doc.name.split('/').pop();
+            if (seen.has(code)) continue;
+            const f = doc.fields || {};
+            const nama = f.nama?.stringValue || '';
+            if (!nama.toLowerCase().startsWith(token)) continue;
+            seen.add(code);
+            results.push({
+              code,
+              nama,
+              kategori: f.kategori?.stringValue || 'Umum',
+              satuan: f.satuan?.stringValue || 'Pcs',
+              stok: Number(f.stok?.doubleValue ?? f.stok?.integerValue ?? 0),
+              hargaJual: Number(f.hargaJual?.doubleValue ?? f.hargaJual?.integerValue ?? f.harga?.doubleValue ?? f.harga?.integerValue ?? 0),
+              hargaRtg: Number(f.hargaRtg?.doubleValue ?? f.hargaRtg?.integerValue ?? 0)
+            });
+            if (results.length >= 12) return results;
+          }
+        }
+      }
+
+      // If the question is product-related but no name prefix matched, return
+      // only a small catalog sample rather than the entire collection.
+      const productWords = ['stok','harga','jual','beli','minta','berapa','cari','menu','list','barang','produk','toko','punya'];
+      if (!results.length && productWords.some(word => normalized.includes(word))) {
+        const rows = await runQuery(null);
+        for (const row of rows) {
+          const doc = row.document;
+          if (!doc?.name) continue;
+          const code = doc.name.split('/').pop();
+          if (seen.has(code)) continue;
+          const f = doc.fields || {};
+          seen.add(code);
+          results.push({
+            code,
+            nama: f.nama?.stringValue || '',
+            kategori: f.kategori?.stringValue || 'Umum',
+            satuan: f.satuan?.stringValue || 'Pcs',
+            stok: Number(f.stok?.doubleValue ?? f.stok?.integerValue ?? 0),
+            hargaJual: Number(f.hargaJual?.doubleValue ?? f.hargaJual?.integerValue ?? f.harga?.doubleValue ?? f.harga?.integerValue ?? 0),
+            hargaRtg: Number(f.hargaRtg?.doubleValue ?? f.hargaRtg?.integerValue ?? 0)
+          });
+        }
+      }
+      return results;
+    }
+
+    let daftarProduk = 'Tidak ada data produk yang relevan.';
+    try {
+      const relevantProducts = await loadRelevantProducts();
+      if (relevantProducts.length) {
+        daftarProduk = relevantProducts.map(p => {
+          let harga = p.hargaJual || 0;
+          let satuan = p.satuan || 'Pcs';
+          if (satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram') {
+            harga = p.hargaRtg || harga * 10;
+            satuan = 'kg';
+          } else if (satuan.toLowerCase() === 'rtg') {
+            satuan = 'pcs';
+          }
+          return `- ${p.nama}: Rp ${harga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${satuan}`;
+        }).join('\n');
+      }
+    } catch (firestoreError) {
+      console.error('AI Firestore lookup failed:', firestoreError.message);
+    }
 
     if (!promptText) {
       return sendJson(200, { reply: "Halo, Ka! Ada yang bisa dibantu atau mau ngobrol santai dulu nih?" });
