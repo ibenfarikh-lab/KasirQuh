@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>KasirQuh - Guest</title>
 <meta name="theme-color" content="#0b1220">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <style>
@@ -240,6 +243,7 @@ button{font:inherit}
   const STORE_COLLECTIONS=new Set(['produk','transaksi','pengaturan']);
   const storeCollection=name=>STORE_COLLECTIONS.has(name)?db.collection('toko').doc(ACTIVE_TOKO_ID).collection(name):db.collection(name);
   const dbProduk={};
+  let supplementalProductUnsubs=[];
   let promoCfg={enabled:true,codes:[]};
   let resepCfg={enabled:true,recipes:[]};
   let stokCfg={enabled:true,limit:5};
@@ -257,6 +261,18 @@ button{font:inherit}
   function greet(){const h=Number(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',hour12:false}).format(new Date()));$('customer-home-greeting').textContent=h>=5&&h<11?'Selamat pagi 👋':h>=11&&h<15?'Selamat siang ☀️':h>=15&&h<18?'Selamat sore 🌤️':'Selamat malam 🌙'}
   function renderInfo(data){const el=$('customer-home-running-text');el.textContent=String(data?.runningText||'Selamat datang di toko kami.').trim()}
   function renderStore(data){const n=String(data?.nama||'KasirQuh');$('customer-home-store-name').textContent=n}
+
+  function syncSupplementalProducts(extraCodes=[]){
+    const codes=[...new Set([...(Array.isArray(extraCodes)?extraCodes:[]),...(Array.isArray(promoCfg.codes)?promoCfg.codes:[]),...transactions.flatMap(t=>Array.isArray(t.items)?t.items.map(it=>String(it?.code||'').trim()).filter(Boolean):[])])];
+    supplementalProductUnsubs.forEach(u=>{try{u()}catch(_){}});
+    supplementalProductUnsubs=[];
+    if(!codes.length)return;
+    for(let i=0;i<codes.length;i+=30){
+      const chunk=codes.slice(i,i+30);
+      const q=storeCollection('produk').where(firebase.firestore.FieldPath.documentId(),'in',chunk);
+      supplementalProductUnsubs.push(q.onSnapshot(s=>{s.forEach(d=>dbProduk[d.id]=d.data()||{});renderPromo();renderStock();renderTrending()}));
+    }
+  }
 
   function renderPromo(){
     const box=$('promo-banner-section');
@@ -326,12 +342,40 @@ button{font:inherit}
     box.querySelectorAll('[data-code]').forEach(x=>x.onclick=gotoCustomer);
   }
 
-  function loadProducts(){storeCollection('produk').onSnapshot(s=>{Object.keys(dbProduk).forEach(k=>delete dbProduk[k]);s.forEach(d=>dbProduk[d.id]=d.data()||{});renderPromo();renderStock();renderTrending();renderCatalog()})}
-  function loadTransactions(){storeCollection('transaksi').onSnapshot(s=>{transactions=[];s.forEach(d=>{const data=d.data()||{};transactions.push({...data,_date:dateKey(data),_ms:data?.waktuTimestamp?.toMillis?data.waktuTimestamp.toMillis():0})});renderStock();renderTrending()})}
+  function loadProducts(){
+    storeCollection('produk').orderBy('nama','asc').limit(6).onSnapshot(s=>{
+      Object.keys(dbProduk).forEach(k=>delete dbProduk[k]);
+      s.forEach(d=>dbProduk[d.id]=d.data()||{});
+      syncSupplementalProducts();
+      renderPromo();renderStock();renderTrending();renderCatalog();
+    },()=>{
+      storeCollection('produk').limit(6).onSnapshot(s=>{
+        Object.keys(dbProduk).forEach(k=>delete dbProduk[k]);
+        s.forEach(d=>dbProduk[d.id]=d.data()||{});
+        syncSupplementalProducts();
+        renderPromo();renderStock();renderTrending();renderCatalog();
+      });
+    });
+  }
+  function loadTransactions(){
+    storeCollection('transaksi').orderBy('waktuTimestamp','desc').limit(100).onSnapshot(s=>{
+      transactions=[];
+      s.forEach(d=>{const data=d.data()||{};transactions.push({...data,_date:dateKey(data),_ms:data?.waktuTimestamp?.toMillis?data.waktuTimestamp.toMillis():0})});
+      syncSupplementalProducts();
+      renderStock();renderTrending();
+    },()=>{
+      storeCollection('transaksi').limit(100).onSnapshot(s=>{
+        transactions=[];
+        s.forEach(d=>{const data=d.data()||{};transactions.push({...data,_date:dateKey(data),_ms:data?.waktuTimestamp?.toMillis?data.waktuTimestamp.toMillis():0})});
+        syncSupplementalProducts();
+        renderStock();renderTrending();
+      });
+    });
+  }
   function loadConfig(){
     storeCollection('pengaturan').doc('toko_v13').onSnapshot(s=>renderStore(s.exists?s.data():{}));
     storeCollection('pengaturan').doc('beranda_pelanggan_home').onSnapshot(s=>renderInfo(s.exists?s.data():{}),()=>renderInfo({}));
-    storeCollection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};promoCfg={enabled:d.enabled!==false,codes:Array.isArray(d.codes)?d.codes:[]};renderPromo()});
+    storeCollection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};promoCfg={enabled:d.enabled!==false,codes:Array.isArray(d.codes)?d.codes:[]};syncSupplementalProducts();renderPromo()});
     storeCollection('pengaturan').doc('beranda_pelanggan_resep').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};resepCfg={enabled:d.enabled!==false,recipes:Array.isArray(d.recipes)?d.recipes:[]};renderRecipes()});
     storeCollection('pengaturan').doc('beranda_pelanggan_stok_rumah').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};stokCfg={enabled:d.enabled!==false,limit:d.limit??5};renderStock()});
     storeCollection('pengaturan').doc('beranda_pelanggan_laris').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};larisCfg={enabled:d.enabled!==false,limit:d.limit??5};renderTrending()});
