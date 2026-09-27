@@ -5094,3 +5094,12 @@ body[data-theme="modern"] #cartModal .summary-box > .no-print > div > div {
   border-color: #294564 !important;
 }
 
+
+/* FINAL FIX: Promo OFF / no valid promo must remove the floating button completely. */
+#promo-banner-section[aria-hidden="true"],
+#promo-banner-section[style*="display:none"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  animation: none !important;
+}
