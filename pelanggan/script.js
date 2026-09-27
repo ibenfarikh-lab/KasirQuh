@@ -246,7 +246,11 @@
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "", phone: "" };
     let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24;
-    // TAHAP 1: jumlah card katalog yang ditampilkan saat awal. Ini TIDAK membatasi databaseProduk/dashboard.
+    const CATALOG_FIRESTORE_BATCH = 24;
+    let catalogLastDoc = null;
+    let catalogHasMore = true;
+    let catalogFirestoreLoading = false;
+    // Jumlah card katalog yang ditampilkan saat awal. Data Firestore sendiri dimuat bertahap.
     const CATALOG_INITIAL_VISIBLE = 6;
     let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
     let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
@@ -447,17 +451,19 @@
       promoTokoPelangganIndex=Math.max(0,Math.min(codes.length-1,promoTokoPelangganIndex+dir)); updatePromoTokoSlider();
     }
 
-    function initPromoTokoPelanggan() {
+    async function initPromoTokoPelanggan() {
       try {
         const localCfg = JSON.parse(localStorage.getItem('admin_promo_toko_v1') || '{}');
         if (localCfg && Array.isArray(localCfg.codes)) promoTokoPelangganCfg = { enabled: localCfg.enabled !== false, codes: localCfg.codes };
       } catch(e) {}
+      await ensureProductsCached(promoTokoPelangganCfg.codes);
       renderPromoTokoPelanggan();
-      storeCollection("pengaturan").doc('beranda_pelanggan_promo').onSnapshot(doc => {
+      storeCollection("pengaturan").doc('beranda_pelanggan_promo').onSnapshot(async doc => {
         if (doc.exists) {
           const data = doc.data() || {};
           promoTokoPelangganCfg = { enabled: data.enabled !== false, codes: Array.isArray(data.codes) ? data.codes : [] };
           localStorage.setItem('admin_promo_toko_v1', JSON.stringify(promoTokoPelangganCfg));
+          await ensureProductsCached(promoTokoPelangganCfg.codes);
         } else {
           promoTokoPelangganCfg = { enabled: false, codes: [] };
         }
@@ -489,7 +495,8 @@
       if (modal) modal.classList.remove('show');
     }
 
-    function beliPromoTokoPelanggan(code) {
+    async function beliPromoTokoPelanggan(code) {
+      await ensureProductsCached(code);
       if (!databaseProduk[code]) return;
       tambahKeKeranjangDiamDiam(code);
       tutupPromoTokoPelanggan();
@@ -540,8 +547,9 @@
       });
     }
 
-    function beliPaketResepCustom(recipeObj) {
+    async function beliPaketResepCustom(recipeObj) {
       if(!isProductsLoaded) return alert("Tunggu katalog dimuat dulu ya kak.");
+      await ensureProductsCached((recipeObj.items || []).map(it => it.code));
       let addedCount = 0;
       if(recipeObj.items) {
         recipeObj.items.forEach(it => {
@@ -568,8 +576,9 @@
       if (addedCount > 0) { showToast(`🥘 Bahan ${recipeObj.nama} berhasil dimasukkan!`); renderCartPelanggan(); openCartModal(); } else { alert(`Maaf, bahan untuk ${recipeObj.nama} sedang kosong.`); }
     }
 
-    function bagikanResepCustomKeRumpi(recipeObj) {
+    async function bagikanResepCustomKeRumpi(recipeObj) {
       if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu untuk berbagi resep!");
+      await ensureProductsCached((recipeObj.items || []).map(it => it.code));
       let total = 0;
       let itemListText = "";
       recipeObj.items.forEach(it => {
@@ -636,6 +645,13 @@
       if(!container) return;
       container.innerHTML = "";
 
+      const savedRecipeCodes = [];
+      customerSavedRecipes.forEach(sr => (sr.items || []).forEach(it => { if (it.code) savedRecipeCodes.push(it.code); }));
+      const missingSavedRecipeCodes = [...new Set(savedRecipeCodes)].filter(code => !databaseProduk[code]);
+      if (missingSavedRecipeCodes.length) {
+        ensureProductsCached(missingSavedRecipeCodes).then(() => renderRecipeCards());
+      }
+
       if (adminCustomerRecipesEnabled && adminCustomerRecipes.length) {
         adminCustomerRecipes.forEach(r => {
           const escName=escapeHtml(r.nama||'Menu Warga');
@@ -688,9 +704,10 @@
         </div>`;
     }
 
-    function editSavedRecipe(index) {
+    async function editSavedRecipe(index) {
       let sr = customerSavedRecipes[index];
       if (!sr) return;
+      await ensureProductsCached((sr.items || []).map(it => it.code));
 
       cart = [];
       sr.items.forEach(it => {
@@ -856,8 +873,8 @@
         btn.classList.toggle('active', btn.dataset.category === kategori);
       });
       currentPosPage = 1;
+      resetCatalogQuery();
       perbaruiTampilanKategori();
-      refreshKatalogPelanggan();
     }
     
     function perbaruiTampilanKategori() {
@@ -1024,8 +1041,9 @@
       }
     }
 
-    function openProductDetail(code) {
+    async function openProductDetail(code) {
       if (!appNavRestoring) appOpenModal('productDetailModal', code);
+      await ensureProductsCached(code);
       let p = databaseProduk[code]; if(!p) return;
       currentDetailCode = code;
       let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>";
@@ -1230,21 +1248,60 @@
       }
     }
 
-    function initFirebaseListeners() {
-      storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
-      storeCollection("produk").onSnapshot((snapshot) => { 
-        databaseProduk = {}; 
-        snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
-        isProductsLoaded = true; 
-        muatBarangLarisHariIni(); 
-        perbaruiTampilanKategori(); 
-        refreshKatalogPelanggan(); 
+    async function loadInitialCatalogProducts() {
+      catalogLastDoc = null;
+      catalogHasMore = true;
+      isProductsLoaded = false;
+      catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
+      try {
+        await loadCatalogFirestoreBatch(true);
+      } catch (err) {
+        console.error("Gagal memuat katalog produk:", err);
+        isProductsLoaded = false;
+        refreshKatalogPelanggan();
+      }
+    }
+
+    async function loadCatalogFirestoreBatch(reset = false) {
+      if (catalogFirestoreLoading || (!catalogHasMore && !reset)) return false;
+      catalogFirestoreLoading = true;
+      try {
+        let q = storeCollection("produk")
+          .orderBy(firebase.firestore.FieldPath.documentId())
+          .limit(CATALOG_FIRESTORE_BATCH);
+        if (!reset && catalogLastDoc) q = q.startAfter(catalogLastDoc);
+        const snapshot = await q.get();
+        snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); });
+        catalogLastDoc = snapshot.docs.length ? snapshot.docs[snapshot.docs.length - 1] : catalogLastDoc;
+        catalogHasMore = snapshot.size === CATALOG_FIRESTORE_BATCH;
+        isProductsLoaded = true;
+        refreshKatalogPelanggan();
         if(window.__promoRenderHook) window.__promoRenderHook();
         renderPromoTokoPelanggan();
-        if (lastFetchedOrders && lastFetchedOrders.length > 0) {
-          renderQuickReorder(lastFetchedOrders);
+        if (lastFetchedOrders && lastFetchedOrders.length > 0) renderQuickReorder(lastFetchedOrders);
+        return snapshot.size > 0;
+      } finally {
+        catalogFirestoreLoading = false;
+      }
+    }
+
+    async function ensureProductsCached(codes) {
+      const uniqueCodes = [...new Set((Array.isArray(codes) ? codes : [codes]).map(v => String(v || '').trim()).filter(Boolean))];
+      const missing = uniqueCodes.filter(code => !databaseProduk[code]);
+      if (!missing.length) return;
+      await Promise.all(missing.map(async (code) => {
+        try {
+          const doc = await storeCollection("produk").doc(code).get();
+          if (doc.exists) databaseProduk[code] = doc.data();
+        } catch (err) {
+          console.warn("Gagal mengambil produk", code, err);
         }
-      });
+      }));
+    }
+
+    function initFirebaseListeners() {
+      storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
+      loadInitialCatalogProducts();
       storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
         renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
       });
@@ -1693,15 +1750,15 @@
       }
       
       matchedProducts.sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
-      // TAHAP 1: hanya card katalog yang dibatasi. databaseProduk tetap lengkap untuk seluruh dashboard.
+      // Hanya produk yang sudah dimuat secara bertahap dari Firestore yang dirender.
       let paginatedItems = matchedProducts.slice(0, catalogVisibleCount);
       container.innerHTML = "";
 
       const loadSentinel = document.getElementById('catalog-load-sentinel');
       cardWrapper.dataset.catalogTotal = String(matchedProducts.length);
-      if (loadSentinel) loadSentinel.style.display = (catalogVisibleCount < matchedProducts.length) ? 'block' : 'none';
+      if (loadSentinel) loadSentinel.style.display = (catalogHasMore || catalogVisibleCount < matchedProducts.length) ? 'block' : 'none';
 
-      if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; document.getElementById("pos-page-indicator").innerText = `1/1`; if (loadSentinel) loadSentinel.style.display='none'; return; }
+      if (matchedProducts.length === 0) { container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 15px; font-size: 0.8rem;">Produk tidak ditemukan untuk kategori ini.</div>`; document.getElementById("pos-page-indicator").innerText = `1/1`; if (loadSentinel) loadSentinel.style.display = catalogHasMore ? 'block' : 'none'; return; }
 
       paginatedItems.forEach(p => {
         let code = p.code; let isHabis = (p.stok || 0) <= 0;
@@ -1826,34 +1883,45 @@
       }); document.getElementById("pos-page-indicator").innerText = `${Math.min(catalogVisibleCount, matchedProducts.length)}/${matchedProducts.length}`;
     }
 
-    // Pagination lama tidak lagi mengubah sumber data. Tahap berikutnya akan menggantinya dengan infinite scroll.
+    // Pagination lama tidak lagi dipakai; infinite scroll mengambil batch Firestore berikutnya.
     function ubahHalamanPos(d) { return; }
+
+    let catalogFilterTimer = null;
+    function resetCatalogQuery() {
+      catalogLastDoc = null;
+      catalogHasMore = true;
+      catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
+      if (catalogFilterTimer) clearTimeout(catalogFilterTimer);
+      catalogFilterTimer = setTimeout(() => { loadCatalogFirestoreBatch(true); }, 120);
+    }
 
     function filterKatalogPelanggan(v) {
       currentPosPage = 1;
-      // Saat filter/kategori berubah, mulai lagi dari 6 card pertama yang cocok.
-      catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
-      refreshKatalogPelanggan();
+      resetCatalogQuery();
     }
 
-    // TAHAP 2: lazy rendering + infinite scroll.
-    // DatabaseProduk tetap penuh. Sentinel dipakai agar tidak bergantung
-    // pada window.scroll atau jenis container scroll yang dipakai halaman.
+    // Infinite scroll katalog: render bertahap dan ambil batch Firestore berikutnya saat diperlukan.
     let catalogScrollLoading = false;
     let catalogLoadObserver = null;
 
-    function loadNextCatalogBatch() {
+    async function loadNextCatalogBatch() {
       if (catalogScrollLoading) return;
       const wrapper = document.getElementById('pos-card-wrapper');
       if (!wrapper || wrapper.style.display === 'none') return;
 
-      const total = parseInt(wrapper.dataset.catalogTotal || '0', 10);
-      if (!total || catalogVisibleCount >= total) return;
-
       catalogScrollLoading = true;
-      catalogVisibleCount = Math.min(catalogVisibleCount + CATALOG_INITIAL_VISIBLE, total);
-      refreshKatalogPelanggan();
-      requestAnimationFrame(() => { catalogScrollLoading = false; });
+      try {
+        const loadedMatched = parseInt(wrapper.dataset.catalogTotal || '0', 10);
+        const targetVisible = catalogVisibleCount + CATALOG_INITIAL_VISIBLE;
+        if (targetVisible > loadedMatched && catalogHasMore) {
+          await loadCatalogFirestoreBatch(false);
+        }
+        const total = parseInt(document.getElementById('pos-card-wrapper')?.dataset.catalogTotal || '0', 10);
+        catalogVisibleCount = Math.min(targetVisible, total);
+        refreshKatalogPelanggan();
+      } finally {
+        requestAnimationFrame(() => { catalogScrollLoading = false; });
+      }
     }
 
     function setupCatalogInfiniteScroll() {
@@ -2064,8 +2132,9 @@
       });
     }
     
-    function renderQuickReorder(orders) {
+    async function renderQuickReorder(orders) {
       const container = document.getElementById("reorder-container"); const wrapper = document.getElementById("reorder-section-wrapper"); container.innerHTML = ""; let recentCodes = new Set(); orders.forEach(trx => { if(trx.items) trx.items.forEach(it => { if(it.code) recentCodes.add(it.code); }); });
+      await ensureProductsCached([...recentCodes].slice(0, 20));
       let renderedCount = 0; let itemsHtml = ""; 
       recentCodes.forEach(code => { 
         let p = databaseProduk[code]; 
