@@ -1,73 +1,345 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>KasirQuh</title>
-  <meta name="theme-color" content="#06132d">
-  <meta name="mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>KasirQuh - Guest</title>
+<meta name="theme-color" content="#0b1220">
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--bg:#08111f;--text:#fff;--muted:#cbd5e1;--blue:#2864e6;--shadow:0 5px 16px rgba(0,0,0,.22)}
+*{box-sizing:border-box;font-family:Georgia,"Times New Roman",serif}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}
+body{font-size:.9rem;overflow-x:hidden}
+button{font:inherit}
+.main-content{min-height:100vh;padding:0 0 18px;overflow-x:hidden}
+#customer-home-header{position:relative;display:grid;grid-template-columns:92px minmax(0,1fr) 68px;column-gap:12px;align-items:center;width:calc(100% + 16px);min-height:118px;padding:12px 14px 13px;margin:0 -8px 10px;background:#2b64e5;color:#fff;border-radius:0 0 34px 34px;box-shadow:0 8px 20px rgba(0,0,0,.16);overflow:hidden;box-sizing:border-box}
+#customer-home-header .customer-home-logo-wrap{width:92px;height:92px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;box-shadow:none}
+#customer-home-header .customer-home-logo{width:92px;height:92px;display:block;object-fit:contain;background:transparent;color:#fff}
+#customer-home-header .customer-home-title-row{min-width:0;width:100%;display:block;padding:0;margin:0}
+#customer-home-header .customer-home-title{margin:0;padding:0;font-size:1.12rem;line-height:1.15;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+#customer-home-header .customer-home-greeting{margin:5px 0 0;font-size:.78rem;line-height:1.2;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+#customer-home-header #customer-home-info-line{width:100%;max-width:100%;margin:7px 0 0;padding:6px 9px;box-sizing:border-box;min-width:0;overflow:hidden;white-space:nowrap;border-radius:999px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;gap:6px;color:#fff}
+#customer-home-header .customer-info-label{font-weight:900;white-space:nowrap;font-size:.68rem;flex:0 0 auto}
+#customer-home-header .customer-running-window{min-width:0;overflow:hidden;flex:1;white-space:nowrap;display:block}
+#customer-home-header .customer-running-text{display:inline-block;min-width:max-content;padding-left:100%;font-size:.66rem;color:rgba(255,255,255,.9);font-weight:600;animation:guestMarquee 14s linear infinite;white-space:nowrap}
+#customer-home-header #promo-banner-section{position:relative;justify-self:end;align-self:center;width:68px;min-width:68px;height:68px;min-height:68px;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:20;cursor:pointer;animation:guestPromoBounce 7.8s ease-in-out infinite;will-change:transform;filter:drop-shadow(0 5px 5px rgba(0,0,0,.18))}
+#customer-home-header #promo-banner-section .promo-stage{width:100%;height:100%;padding:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#customer-home-header #promo-banner-section .promo-gift{font-size:2rem;line-height:1}
+@keyframes guestMarquee{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+@keyframes guestPromoBounce{0%,62.5%,100%{transform:translateY(0)}4%{transform:translateY(-9px)}8%{transform:translateY(0)}12%{transform:translateY(-7px)}16%{transform:translateY(0)}20%{transform:translateY(-5px)}24%{transform:translateY(0)}}
+@media(max-width:480px){#customer-home-header{grid-template-columns:78px minmax(0,1fr) 60px;column-gap:9px;padding:11px 10px 13px;min-height:96px}#customer-home-header .customer-home-logo-wrap,#customer-home-header .customer-home-logo{width:78px;height:78px}#customer-home-header .customer-home-title{font-size:1rem}#customer-home-header .customer-home-greeting{font-size:.73rem}#customer-home-header #customer-home-info-line{margin-top:5px;padding:5px 7px}#customer-home-header #promo-banner-section{width:60px;min-width:60px;height:60px;min-height:60px}}
+@media(prefers-reduced-motion:reduce){#customer-home-header #promo-banner-section,#customer-home-header .customer-running-text{animation:none!important}}
+.feature-section{margin:0 0 14px}
+.section-label{padding:0 14px 7px;font-weight:900;font-size:.88rem;line-height:1.15;color:#fff;white-space:nowrap}
+.rail{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:0 0 4px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.rail::-webkit-scrollbar{display:none}
+.auto-rail{overflow:hidden!important}
+.auto-track{display:flex;gap:8px;width:max-content;padding:0 0 4px 0}
+.feature-card,.recipe-card,.trending-card{color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15);border:0;transition:transform .15s,box-shadow .15s;flex-shrink:0;cursor:pointer}
+.feature-card:active,.recipe-card:active,.trending-card:active{transform:scale(.97)}
+.auto-track>.feature-card{flex:0 0 95px;min-width:95px}
+.stock-card{min-height:112px;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.stock-card img{width:100%;height:55px;object-fit:cover;border-radius:12px;border:2px solid rgba(255,255,255,.35);background:#fff;display:block}
+.stock-card .card-title{font-size:.68rem;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stock-card .card-price{font-size:.68rem;font-weight:900;color:#fff;margin-top:0}
+.stock-card .card-sub{font-size:.6rem;color:#fff;margin-top:0}
+.auto-track>.feature-card:nth-child(5n+1){background:#13b982}
+.auto-track>.feature-card:nth-child(5n+2){background:#8b5cf6}
+.auto-track>.feature-card:nth-child(5n+3){background:#ec3f97}
+.auto-track>.feature-card:nth-child(5n+4){background:#2864e5}
+.auto-track>.feature-card:nth-child(5n+5){background:#f97316}
+.recipe-card{flex:0 0 175px;width:175px;min-width:175px;min-height:0;border-radius:12px;padding:10px;display:flex;flex-direction:column;justify-content:space-between;gap:7px;overflow:hidden}
+.recipe-card:nth-child(5n+1){background:#2864e5}.recipe-card:nth-child(5n+2){background:#f97316}.recipe-card:nth-child(5n+3){background:#10b981}.recipe-card:nth-child(5n+4){background:#8b5cf6}.recipe-card:nth-child(5n+5){background:#ec4899}
+.recipe-card img{width:100%;height:78px;object-fit:cover;border-radius:13px;display:block;background:#fff;border:2px solid rgba(255,255,255,.35)}
+.recipe-name{font-size:.85rem;font-weight:900;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recipe-desc{font-size:.65rem;color:#fff;line-height:1.22;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.recipe-action-row{display:flex;gap:7px;margin-top:auto}
+.recipe-btn-action{flex:1;min-height:30px;background:#111827;color:#fff;border:0;border-radius:11px;padding:5px 6px;font-size:.7rem;font-weight:900;cursor:pointer}
+.recipe-btn-action.share{flex:0 0 30px;padding:0}
+.auto-track>.trending-card{flex:0 0 180px;min-width:180px}
+.trending-card{min-height:70px;display:flex;align-items:center;gap:8px;border-radius:10px;padding:8px;background:#2864e5}
+.trending-card:nth-child(5n+1){background:#2864e5}.trending-card:nth-child(5n+2){background:#f97316}.trending-card:nth-child(5n+3){background:#10b981}.trending-card:nth-child(5n+4){background:#8b5cf6}.trending-card:nth-child(5n+5){background:#ec4899}
+.trending-card img{width:45px;height:45px;object-fit:cover;border-radius:12px;flex:0 0 auto;border:2px solid rgba(255,255,255,.35);background:#fff}
+.trending-card .card-title{font-size:.78rem;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trending-card .card-sub{font-size:.68rem;color:#fff;margin-top:3px}.trending-card .card-price{font-size:.78rem;color:#fff;font-weight:900;margin-top:3px}
+.product-catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;padding:0 6px}
+.guest-product-card{position:relative;min-width:0;aspect-ratio:1/1;border-radius:16px;background:#101b2d;border:1px solid #29456d;box-shadow:0 7px 18px rgba(0,0,0,.26);overflow:hidden;cursor:pointer}
+.guest-product-stage{position:absolute;inset:0;background:transparent}.guest-product-stage .product-photo{position:absolute;left:50%;top:18%;transform:translateX(-50%);width:57%;height:44%;object-fit:contain;z-index:3}.guest-platform{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);width:88%;height:30%;border-radius:50%;background:radial-gradient(ellipse at 50% 35%,#dff7ff 0 8%,#8ecbff 18%,#438cff 36%,#1260df 54%,#071536 86%);box-shadow:0 3px 7px rgba(0,0,0,.55),0 0 9px rgba(45,135,255,.7),inset 0 2px 3px rgba(255,255,255,.8),inset 0 -5px 7px rgba(0,34,120,.75);z-index:1}
+.guest-info{position:absolute;left:6px;right:6px;bottom:7px;z-index:8;line-height:1.05;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 5px rgba(0,0,0,.65)}.guest-name{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:.57rem;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.guest-price{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:.62rem;font-weight:900;color:#ffe100;margin-top:2px;white-space:nowrap}.guest-stock{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:.45rem;color:#d7ecff;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.guest-badge{position:absolute;top:5px;left:5px;z-index:10;padding:2px 5px;border-radius:7px;background:#ef4444;color:#fff;font-size:.46rem;font-weight:900;line-height:1;font-family:Arial,sans-serif}.guest-soldout{position:absolute;inset:0;z-index:12;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.56)}.guest-soldout span{padding:3px 7px;background:#dc2626;border-radius:6px;color:#fff;font-size:.62rem;font-weight:900;transform:rotate(-12deg);font-family:Arial,sans-serif}
+.loading,.empty{padding:16px 10px;color:var(--muted);font-size:.85rem;text-align:center}@media(max-width:480px){.section-label{padding:0 14px 6px;font-size:.88rem;line-height:1.2}.recipe-card{flex-basis:175px;width:175px;min-width:175px;min-height:0;border-radius:12px;padding:10px;gap:4px}.recipe-card img{height:78px;border-radius:8px}.recipe-name{font-size:.85rem;line-height:1.15}.recipe-desc{font-size:.65rem;line-height:1.2;-webkit-line-clamp:2}.recipe-btn-action{min-height:30px;padding:5px 6px;border-radius:6px;font-size:.7rem}.recipe-btn-action.share{flex-basis:30px}.auto-track>.feature-card{flex-basis:95px;width:95px;min-width:95px}.stock-card{min-height:0;height:112px;border-radius:10px;padding:6px;gap:4px}.stock-card img{height:55px;border-radius:6px}.stock-card .card-title,.stock-card .card-price{font-size:.68rem}.stock-card .card-sub{font-size:.6rem}.auto-track>.trending-card{flex-basis:180px;width:180px;min-width:180px}.trending-card{min-height:70px;border-radius:10px;padding:8px;gap:8px}.trending-card img{width:45px;height:45px;border-radius:6px}.trending-card .card-title,.trending-card .card-price{font-size:.78rem}.trending-card .card-sub{font-size:.68rem}.product-catalog-grid{gap:6px;padding:0 6px}}
+@media(max-width:360px){.recipe-card{}.recipe-card img{height:74px}.recipe-name{font-size:.82rem}.recipe-desc{font-size:.63rem}}
+@media(min-width:700px){.main-content{max-width:760px;margin:0 auto}.customer-home-header{width:100%}}
 
 
 
-  <link rel="stylesheet" href="./gateway/index.css">
+/* Gateway shortcuts — gaya tombol dari asset slide 1/2/3 */
+.guest-shortcuts{width:100%;padding:14px 38px 8px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.guest-shortcut-customer{width:100%;min-height:62px;border-radius:999px;border:3px solid rgba(255,255,255,.95);background:#ffb52f;color:#171717;box-shadow:0 0 12px rgba(255,181,47,.58),0 5px 12px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;gap:13px;padding:10px 18px;font-family:Georgia,"Times New Roman",serif;font-size:1.02rem;font-weight:900;cursor:pointer;text-decoration:none}
+.guest-shortcut-customer:active,.guest-shortcut-admin:active{transform:scale(.985)}
+.guest-shortcut-customer .shortcut-cart{width:31px;height:31px;flex:0 0 31px;display:block}
+.guest-shortcut-customer .shortcut-arrow{font-size:1.65rem;line-height:1;font-weight:900;margin-left:2px}
+.guest-shortcut-admin{align-self:flex-end;min-width:132px;min-height:49px;border-radius:999px;border:3px solid #27c9ff;background:rgba(15,52,151,.72);color:#fff;box-shadow:0 0 10px rgba(39,201,255,.34);display:flex;align-items:center;justify-content:center;gap:9px;padding:7px 15px;font-family:Georgia,"Times New Roman",serif;font-size:.88rem;font-weight:700;cursor:pointer;text-decoration:none}
+.guest-shortcut-admin .shortcut-lock{width:27px;height:27px;flex:0 0 27px;display:block}
+@media(max-width:480px){.guest-shortcuts{padding:12px 26px 7px;gap:7px}.guest-shortcut-customer{min-height:58px;gap:10px;padding:9px 15px;font-size:.94rem}.guest-shortcut-customer .shortcut-cart{width:28px;height:28px;flex-basis:28px}.guest-shortcut-customer .shortcut-arrow{font-size:1.45rem}.guest-shortcut-admin{min-width:124px;min-height:46px;padding:6px 13px;font-size:.82rem}.guest-shortcut-admin .shortcut-lock{width:25px;height:25px;flex-basis:25px}}
+@media(max-width:360px){.guest-shortcuts{padding-left:20px;padding-right:20px}.guest-shortcut-customer{min-height:54px;font-size:.88rem}.guest-shortcut-admin{min-width:116px;min-height:43px;font-size:.78rem}}
+
+</style>
 </head>
-<body>
-<!-- KASIRQUH FUTURISTIC PWA OPENING -->
-
+<body data-theme="modern">
+<!-- KASIRQUH FUTURISTIC PWA STARTUP -->
+<style id="kasirquh-startup-opening">
+#kasirquhPwaOpening{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#06132d;opacity:1;visibility:visible;transition:opacity .65s ease,visibility .65s ease}
+#kasirquhPwaOpening.hide{opacity:0;visibility:hidden;pointer-events:none}
+#kasirquhPwaOpening .kpo-grid{position:absolute;inset:-20%;opacity:.22;background-image:linear-gradient(rgba(80,170,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(80,170,255,.12) 1px,transparent 1px);background-size:42px 42px;transform:perspective(500px) rotateX(58deg) scale(1.35);transform-origin:center bottom;animation:kpoGrid 5s linear infinite}
+#kasirquhPwaOpening .kpo-glow{position:absolute;width:78vmax;height:78vmax;border-radius:50%;background:radial-gradient(circle,rgba(37,99,235,.38) 0%,rgba(14,165,233,.17) 28%,rgba(37,99,235,.06) 48%,transparent 70%);filter:blur(10px);animation:kpoPulse 2.2s ease-in-out infinite}
+#kasirquhPwaOpening .kpo-orbit{position:absolute;width:230px;height:230px;border-radius:50%;border:1px solid rgba(125,211,252,.22);box-shadow:0 0 35px rgba(37,99,235,.2),inset 0 0 35px rgba(14,165,233,.12);animation:kpoOrbit 3.8s linear infinite}
+#kasirquhPwaOpening .kpo-orbit:before,#kasirquhPwaOpening .kpo-orbit:after{content:"";position:absolute;inset:17px;border-radius:50%;border:1px solid rgba(96,165,250,.13)}
+#kasirquhPwaOpening .kpo-orbit:after{inset:-17px;border-color:rgba(56,189,248,.10)}
+#kasirquhPwaOpening .kpo-logo{position:relative;width:min(34vw,180px);height:min(34vw,180px);object-fit:contain;filter:drop-shadow(0 0 18px rgba(56,189,248,.55));animation:kpoLogo 1.15s cubic-bezier(.2,.8,.2,1) both,kpoPulse 2.2s ease-in-out infinite}
+#kasirquhPwaOpening .kpo-shine{position:absolute;inset:-10%;transform:translateX(-130%) rotate(18deg);background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.08) 45%,rgba(255,255,255,.7) 50%,rgba(255,255,255,.08) 55%,transparent 65%);animation:kpoShine 1.55s ease-in-out .35s both;pointer-events:none}
+#kasirquhPwaOpening .kpo-text{position:absolute;left:0;right:0;bottom:11%;text-align:center;color:#dff6ff;font:700 12px/1.2 Arial,sans-serif;letter-spacing:4px;text-transform:uppercase;text-shadow:0 0 12px rgba(56,189,248,.55);opacity:0;animation:kpoText .7s ease .35s forwards}
+@keyframes kpoLogo{0%{opacity:0;transform:scale(.72);filter:drop-shadow(0 0 2px rgba(56,189,248,0))}70%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+@keyframes kpoPulse{0%,100%{transform:scale(1);opacity:.86}50%{transform:scale(1.045);opacity:1}}
+@keyframes kpoOrbit{to{transform:rotate(360deg)}}
+@keyframes kpoShine{0%{transform:translateX(-130%) rotate(18deg);opacity:0}18%{opacity:1}55%{opacity:1}100%{transform:translateX(130%) rotate(18deg);opacity:0}}
+@keyframes kpoGrid{to{background-position:0 42px,42px 0}}
+@keyframes kpoText{to{opacity:1}}
+@media(prefers-reduced-motion:reduce){#kasirquhPwaOpening *{animation:none!important}}
+</style>
 <div id="kasirquhPwaOpening" aria-hidden="true">
-  <div class="kpo-grid"></div>
-  <div class="kpo-glow"></div>
-  <div class="kpo-orbit"></div>
+  <div class="kpo-grid"></div><div class="kpo-glow"></div><div class="kpo-orbit"></div>
   <div style="position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:min(34vw,180px);height:min(34vw,180px);border-radius:28%;">
-    <img class="kpo-logo" src="icon-512.png" alt="KasirQuh">
-    <div class="kpo-shine"></div>
+    <img class="kpo-logo" src="icon-512.png" alt="KasirQuh"><div class="kpo-shine"></div>
+  </div><div class="kpo-text">KasirQuh</div>
+</div>
+
+<!-- KASIRQUH GATEWAY SLIDE 1-2-3: TOTAL 3 DETIK, SMOOTH CROSSFADE -->
+<style id="kasirquh-gateway-3s">
+  #kasirquhGateway3s{
+    position:fixed;inset:0;z-index:2147483647;overflow:hidden;background:#000;
+    opacity:0;visibility:hidden;transform:scale(1.01);filter:blur(1px);
+    transition:opacity .55s ease,visibility .55s ease,transform .55s cubic-bezier(.2,.8,.2,1),filter .55s ease;
+  }
+  #kasirquhGateway3s.kg3-hide{opacity:0;visibility:hidden;pointer-events:none;transform:scale(1.025);filter:blur(2px)}
+  #kasirquhGateway3s .kg3-slide{
+    position:absolute;inset:0;width:100%;height:100%;display:block;
+    object-fit:cover;object-position:center;
+    user-select:none;-webkit-user-drag:none;
+    opacity:0;transform:scale(1.015);
+    transition:opacity .28s ease-in-out,transform .9s cubic-bezier(.2,.75,.2,1);
+  }
+  #kasirquhGateway3s .kg3-slide.kg3-active{opacity:1;transform:scale(1)}
+  #kasirquhGateway3s .kg3-dim{
+    position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(circle at 50% 55%,rgba(255,255,255,.025),rgba(0,0,0,.14) 72%,rgba(0,0,0,.26));
+  }
+  @media(prefers-reduced-motion:reduce){
+    #kasirquhGateway3s .kg3-slide{transition:none;transform:none}
+    #kasirquhGateway3s{transition:none}
+  }
+</style>
+<div id="kasirquhGateway3s" aria-label="KasirQuh">
+  <img class="kg3-slide kg3-active" src="./assets/gateway/slide1.png" alt="" aria-hidden="true">
+  <img class="kg3-slide" src="./assets/gateway/slide2.png" alt="" aria-hidden="true">
+  <img class="kg3-slide" src="./assets/gateway/slide3.png" alt="" aria-hidden="true">
+  <div class="kg3-dim" aria-hidden="true"></div>
+</div>
+<script id="kasirquh-gateway-3s-js">
+(function(){
+  const startup=document.getElementById('kasirquhPwaOpening');
+  const gateway=document.getElementById('kasirquhGateway3s');
+  if(!gateway)return;
+  const slides=Array.from(gateway.querySelectorAll('.kg3-slide'));
+  if(!slides.length)return;
+  slides.forEach(img=>{const preload=new Image();preload.src=img.src;});
+  let current=0;
+  const startGateway=()=>{ gateway.style.opacity="1"; gateway.style.visibility="visible"; gateway.style.transform="scale(1)"; gateway.style.filter="blur(0)"; };
+  const show=(index)=>{
+    slides[current].classList.remove('kg3-active');
+    current=index;
+    slides[current].classList.add('kg3-active');
+  };
+  // Urutan sengaja dibuat berantai: startup selesai dulu, baru 3 slide berjalan penuh 1 detik/slide.
+  const STARTUP_MS=1500;
+  const SLIDE_MS=1000;
+  setTimeout(()=>{
+    if(startup) startup.classList.add('hide');
+    startGateway();
+    setTimeout(()=>show(1),SLIDE_MS);
+    setTimeout(()=>show(2),SLIDE_MS*2);
+    setTimeout(()=>gateway.classList.add('kg3-hide'),SLIDE_MS*3);
+    setTimeout(()=>gateway.remove(),SLIDE_MS*3+600);
+  },STARTUP_MS);
+})();
+</script>
+
+<main class="main-content">
+<section>
+<header class="customer-home-header" id="customer-home-header">
+  <div class="customer-home-logo-wrap" aria-hidden="true">
+    <svg class="customer-home-logo" viewBox="0 0 260 260" role="img" aria-label="KasirQuh Warunge Mimi" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="7">
+        <path d="M48 78h164l-18-26H66L48 78Z"/><path d="M48 78c4 27 22 35 39 13 17 22 35 22 52 0 17 22 35 22 52 0 17 22 35 14 39-13"/>
+        <path d="M72 92v74M188 92v74M60 166h140"/><path d="M91 166v-47h39v47M91 128h39M153 166v-31h36"/><path d="M154 129c0-18 36-18 36 0"/>
+        <path d="M157 111c-3-10 5-13 4-21M171 111c-3-10 5-13 4-21M185 111c-3-10 5-13 4-21"/>
+        <path d="M39 190l-12-8M39 204l-15 2M39 218l-12 8M221 190l12-8M221 204l15 2M221 218l12 8"/>
+      </g>
+      <g fill="currentColor" font-family="Arial,Helvetica,sans-serif" text-anchor="middle"><text font-size="35" font-weight="900" letter-spacing="-1.5" x="130" y="203">KasirQuh</text><text font-size="21" font-weight="900" letter-spacing="-.8" x="130" y="228">Warunge Mimi</text></g>
+    </svg>
   </div>
-  <div class="kpo-text">KasirQuh</div>
-</div>
-
-
-
-<!-- KASIRQUH SLIDE 1-2-3 WELCOME PATCH -->
-
-
-<!-- KASIRQUH GATEWAY PWA INSTALL FAB -->
-
-<button id="gateway-pwa-install" type="button" aria-label="Install Aplikasi KasirQuh" title="Install Aplikasi KasirQuh">
-  <span id="gateway-pwa-install-icon" aria-hidden="true">📲</span>
-  <span>Install</span>
-</button>
-
-
-<div id="kasirquhVisual4Welcome" aria-label="Welcome screen">
-  <img id="kv4SlideImage" class="kv4-slide-image" src="./assets/gateway/slide1.png" alt="" aria-hidden="true">
-  <div class="kv4-dim" aria-hidden="true"></div>
-  <div id="kv4CustomerGlow" class="kv4-button-glow kv4-glow-customer" aria-hidden="true"></div>
-  <div id="kv4AdminGlow" class="kv4-button-glow kv4-glow-admin" aria-hidden="true"></div>
-  <div id="kv4CustomerSwipe" class="kv4-customer-swipe" aria-hidden="true"><span class="kv4-swipe-handle">→</span></div>
-  <button id="kv4CustomerHotspot" class="kv4-hotspot" type="button" aria-label="Geser untuk Mulai Belanja"></button>
-  <button id="kv4AdminHotspot" class="kv4-hotspot" type="button" aria-label="Admin"></button>
-</div>
-
-
-<!-- INDEX AI ASSISTANT FAB: copied customer style, draggable -->
-
-<button id="index-ai-fab" type="button" aria-label="Asisten AI" title="Asisten AI"><img src="./assets/gateway/robot-head-ai.png" alt="Kepala robot Asisten AI"></button>
-<div id="index-ai-modal" aria-hidden="true">
-  <div id="index-ai-panel">
-    <div id="index-ai-head">
-      <div style="display:flex;align-items:center;gap:6px"><strong style="font-size:.9rem">😀 Asisten Belanja AI</strong><button id="index-ai-sound" type="button">🔊 Suara: ON</button></div>
-      <button id="index-ai-close" type="button">&times;</button>
-    </div>
-    <div id="index-ai-messages"><div style="align-self:flex-start;background:#fff;border:1px solid #e5e7eb;color:#111827;padding:6px 10px;border-radius:8px;max-width:80%">HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?</div></div>
-    <div id="index-ai-input-row"><input id="index-ai-input" type="text" placeholder="Tanya atau ngobrol..." autocomplete="off" aria-label="Pesan untuk Asisten AI"><button id="index-ai-mic" type="button" title="Ngomong pakai suara">🎤</button><button id="index-ai-send" type="button">Kirim</button></div>
+  <div class="customer-home-title-row">
+    <h1 class="customer-home-title"><span id="customer-home-store-name">KasirQuh</span></h1>
+    <p class="customer-home-greeting" id="customer-home-greeting">Selamat datang 👋</p>
+    <div class="customer-home-info-line" id="customer-home-info-line"><span class="customer-info-label">📢 Info Toko:</span><span class="customer-running-window"><span class="customer-running-text" id="customer-home-running-text">Selamat datang di toko kami.</span></span></div>
   </div>
-</div>
+  <button class="promo-banner" id="promo-banner-section" type="button" aria-label="Lihat promo toko"><span class="promo-gift">🎁</span></button>
+</header>
 
 
 
-  <script src="./gateway/index.js"></script>
+<section class="feature-section">
+  <div class="section-label">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
+  <div class="rail" id="reorder-container"><div class="loading">Memuat...</div></div>
+</section>
+
+<section class="feature-section">
+  <div class="section-label">🍜 ide Masak Warga Hari Ini</div>
+  <div class="rail" id="recipe-scroll-container"><div class="loading">Memuat ide masak...</div></div>
+</section>
+
+<section class="feature-section">
+  <div class="section-label">🔥 Sedang Laris Hari Ini</div>
+  <div class="rail" id="trending-container"><div class="loading">Memuat...</div></div>
+</section>
+
+
+<section class="product-catalog-grid" id="pos-catalog-container" aria-label="6 produk teratas"></section>
+<section class="guest-shortcuts" aria-label="Akses cepat">
+  <a class="guest-shortcut-customer" href="/pelanggan/index.html" aria-label="Mulai Belanja">
+    <svg class="shortcut-cart" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h5l4 22h21l4-16H14"/><path d="M19 16h18M21 22h15"/><circle cx="19" cy="38" r="2.4" fill="currentColor"/><circle cx="35" cy="38" r="2.4" fill="currentColor"/></g></svg>
+    <span>Mulai Belanja</span><span class="shortcut-arrow" aria-hidden="true">→</span>
+  </a>
+  <a class="guest-shortcut-admin" href="/admin/index.html" aria-label="Admin">
+    <svg class="shortcut-lock" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="21" width="28" height="21" rx="3" fill="currentColor"/><path d="M16 21v-7c0-9 16-9 16 0v7" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="31" r="3" fill="#143b9b"/><path d="M24 31v6" stroke="#143b9b" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <span>Admin</span>
+  </a>
+</section>
+
+</section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  const ACTIVE_TOKO_ID='toko_v13';
+  const firebaseConfig={apiKey:'AIzaSyCwOxkcydduRDC9v1b_XOr8K8FYtpHOY2g',authDomain:'kasirquh.firebaseapp.com',projectId:'kasirquh',storageBucket:'kasirquh.firebasestorage.app',messagingSenderId:'87320899036',appId:'1:87320899036:web:592c6768ea4aca6bdbb319',measurementId:'G-2BL7RJN9Z5'};
+  firebase.initializeApp(firebaseConfig);
+  const db=firebase.firestore();
+  const STORE_COLLECTIONS=new Set(['produk','transaksi','pengaturan']);
+  const storeCollection=name=>STORE_COLLECTIONS.has(name)?db.collection('toko').doc(ACTIVE_TOKO_ID).collection(name):db.collection(name);
+  const dbProduk={};
+  let promoCfg={enabled:true,codes:[]};
+  let resepCfg={enabled:true,recipes:[]};
+  let stokCfg={enabled:true,limit:5};
+  let larisCfg={enabled:true,limit:5};
+  let transactions=[];
+
+  const $=id=>document.getElementById(id);
+  const esc=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const price=p=>{let v=p?.hargaJual??p?.harga??0;v=typeof v==='number'?v:(parseInt(String(v).replace(/[^0-9]/g,''),10)||0);const s=String(p?.satuan||'Pcs').toLowerCase();return s==='kg'||s==='kilogram'?v*10:v};
+  const unit=p=>String(p?.satuan||'Pcs').toLowerCase()==='rtg'?'pcs':(p?.satuan||'Pcs');
+  const photo=p=>p?.foto||"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%236b7b91' stroke-width='1.7'><rect x='3' y='3' width='18' height='18' rx='3'/><path d='m7 15 3-3 2 2 3-4 2 3'/></svg>";
+  const gotoCustomer=()=>{ window.location.href='/pelanggan/index.html'; };
+  const dateKey=data=>{let d=null;try{if(data?.waktuTimestamp?.toDate)d=data.waktuTimestamp.toDate();else if(data?.waktuTimestamp?.seconds)d=new Date(Number(data.waktuTimestamp.seconds)*1000);else if(data?.waktu){const x=new Date(data.waktu);if(!isNaN(x.getTime()))d=x;}}catch(e){}if(!d)return null;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+
+  function greet(){const h=Number(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',hour12:false}).format(new Date()));$('customer-home-greeting').textContent=h>=5&&h<11?'Selamat pagi 👋':h>=11&&h<15?'Selamat siang ☀️':h>=15&&h<18?'Selamat sore 🌤️':'Selamat malam 🌙'}
+  function renderInfo(data){const el=$('customer-home-running-text');el.textContent=String(data?.runningText||'Selamat datang di toko kami.').trim()}
+  function renderStore(data){const n=String(data?.nama||'KasirQuh');$('customer-home-store-name').textContent=n}
+
+  function renderPromo(){
+    const box=$('promo-banner-section');
+    const codes=(Array.isArray(promoCfg.codes)?promoCfg.codes:[]).filter(c=>dbProduk[c]&&Number(dbProduk[c].stok||0)>0);
+    const active=promoCfg.enabled!==false&&codes.length>0;
+    box.style.display=active?'flex':'none';
+    box.onclick=gotoCustomer;
+  }
+
+  const defaultRecipes=[
+    {nama:"Sayur Sop Bening",desc:"Praktis, tinggal cemplung. Isian kol, wortel, bumbu kaldu."},
+    {nama:"Nasi Goreng Dadakan",desc:"Bikin malam makin hangat. Butuh kecap, telur, bumbu instan."},
+    {nama:"Tumis Kangkung Segar",desc:"Menu rumahan favorit. Kangkung hijau segar dan bumbu pilihan."},
+    {nama:"Mie Instan Telur",desc:"Andalan kala lapar melanda malam hari dengan tambahan telur."},
+    {nama:"Es Teh Manis Segar",desc:"Pelepas dahaga di siang hari yang panas dan menyegarkan."}
+  ];
+
+  function renderRecipes(){
+    const box=$('recipe-scroll-container');
+    const firebaseRecipes=resepCfg.enabled!==false&&Array.isArray(resepCfg.recipes)?resepCfg.recipes:[];
+    const list=[...firebaseRecipes,...defaultRecipes];
+    if(!list.length){box.innerHTML='<div class="empty">Belum ada ide masak hari ini.</div>';return}
+    box.classList.remove('auto-rail');
+    box.innerHTML=list.map(r=>{
+      const foto=r.foto?`<img src="${esc(r.foto)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'';
+      return `<article class="recipe-card" data-go-customer="1">${foto}<div><div class="recipe-name">${esc(r.nama||'Menu Warga')}</div><div class="recipe-desc">${esc(r.desc||'Ide masak pilihan warga.')}</div></div><div class="recipe-action-row"><button type="button" class="recipe-btn-action">+ Masukkan Bahan</button><button type="button" class="recipe-btn-action share">📢</button></div></article>`;
+    }).join('');
+    box.querySelectorAll('.recipe-card').forEach(x=>x.onclick=gotoCustomer);
+    box.querySelectorAll('.recipe-btn-action').forEach(b=>b.onclick=e=>{e.stopPropagation();gotoCustomer()});
+  }
+
+  function setAutoRail(id,html){const box=$(id);if(!box)return;if(!html){box.innerHTML='<div class="empty">Belum ada data.</div>';return}box.classList.add('auto-rail');box.innerHTML=`<div class="auto-track">${html}${html}</div>`;startAutoScroll(box)}
+  function startAutoScroll(box){if(box.__guestScrollStarted)return;box.__guestScrollStarted=true;let last=performance.now(),pauseUntil=0;const tick=now=>{const dt=Math.min(now-last,50);last=now;if(now>pauseUntil&&box.scrollWidth>box.clientWidth){box.scrollLeft+=0.028*dt;const track=box.querySelector('.auto-track');const half=track?track.scrollWidth/2:0;if(half&&box.scrollLeft>=half)box.scrollLeft-=half}requestAnimationFrame(tick)};requestAnimationFrame(tick);const pause=()=>{pauseUntil=performance.now()+2200};['touchstart','mousedown','wheel'].forEach(e=>box.addEventListener(e,pause,{passive:true}));}
+  function renderStock(){
+    if(stokCfg.enabled===false){$('reorder-container').innerHTML='';return}
+    const limit=Math.min(20,Math.max(1,parseInt(stokCfg.limit,10)||5)),seen=new Set(),codes=[];
+    for(const t of [...transactions].sort((a,b)=>(b._ms||0)-(a._ms||0))){
+      for(const it of(Array.isArray(t.items)?t.items:[])){
+        if(it.code&&dbProduk[it.code]&&!seen.has(it.code)&&Number(dbProduk[it.code].stok||0)>0){seen.add(it.code);codes.push(it.code);if(codes.length>=limit)break}
+      }
+      if(codes.length>=limit)break;
+    }
+    if(!codes.length)Object.keys(dbProduk).sort((a,b)=>String(dbProduk[a]?.nama||'').localeCompare(String(dbProduk[b]?.nama||''),'id')).forEach(c=>{if(codes.length<limit&&Number(dbProduk[c]?.stok||0)>0)codes.push(c)});
+    setAutoRail('reorder-container',codes.map(c=>{const p=dbProduk[c];return `<article class="feature-card stock-card" data-go-customer="1"><img src="${esc(photo(p))}" alt="${esc(p.nama||'Produk')}" loading="lazy"><div class="card-title">${esc(p.nama||'Produk')}</div><div class="card-sub">Sisa: ${esc(p.stok||0)} ${esc(unit(p))}</div><div class="card-price">Rp ${price(p).toLocaleString('id-ID')}</div></article>`}).join(''));
+    $('reorder-container').querySelectorAll('[data-go-customer]').forEach(x=>x.onclick=gotoCustomer);
+  }
+
+  function renderTrending(){
+    if(larisCfg.enabled===false){$('trending-container').innerHTML='';return}
+    const limit=Math.min(20,Math.max(1,parseInt(larisCfg.limit,10)||5)),counts={};
+    const docs=[...transactions];
+    const dates=docs.map(t=>t._date).filter(Boolean);
+    const today=new Date();
+    const todayKey=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    const target=dates.includes(todayKey)?todayKey:(dates.sort().pop()||null);
+    if(target)docs.forEach(t=>{if(t._date!==target||!Array.isArray(t.items))return;t.items.forEach(it=>{const q=Number(it.qty)||0;if(q<=0)return;let c=String(it.code||'').trim();if(!c||!dbProduk[c]){const n=String(it.nama||'').trim().toLowerCase();c=Object.keys(dbProduk).find(k=>String(dbProduk[k]?.nama||'').trim().toLowerCase()===n)||''}if(c&&dbProduk[c])counts[c]=(counts[c]||0)+q})});
+    const codes=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0,limit);
+    setAutoRail('trending-container',codes.map(c=>{const p=dbProduk[c];return `<article class="trending-card" data-go-customer="1"><img src="${esc(photo(p))}" alt="${esc(p.nama||'Produk')}" loading="lazy"><div style="min-width:0;flex:1"><div class="card-title">${esc(p.nama||'Produk')}</div><div class="card-sub">Terjual: ${counts[c]} ${esc(unit(p))}</div><div class="card-price">Rp ${price(p).toLocaleString('id-ID')}</div></div></article>`}).join(''));
+    $('trending-container').querySelectorAll('[data-go-customer]').forEach(x=>x.onclick=gotoCustomer);
+  }
+
+
+  function renderCatalog(){
+    const box=$('pos-catalog-container');
+    const entries=Object.keys(dbProduk).map(code=>({code,p:dbProduk[code]})).sort((a,b)=>String(a.p.nama||'').localeCompare(String(b.p.nama||''),'id')).slice(0,6);
+    box.innerHTML=entries.length?entries.map(({code,p})=>{const habis=Number(p.stok||0)<=0;const low=!habis&&Number(p.stok||0)<=5;return `<article class="guest-product-card" data-code="${esc(code)}"><div class="guest-product-stage">${low?`<div class="guest-badge">🔥 Sisa ${esc(p.stok)}</div>`:''}<img class="product-photo" src="${esc(photo(p))}" alt="${esc(p.nama||'Produk')}" loading="lazy"><div class="guest-platform"></div>${habis?'<div class="guest-soldout"><span>HABIS</span></div>':''}</div><div class="guest-info"><div class="guest-name">${esc(p.nama||'Produk')}</div><div class="guest-price">Rp ${price(p).toLocaleString('id-ID')}</div><div class="guest-stock">Stok: ${esc(p.stok||0)} ${esc(unit(p))}</div></div></article>`}).join(''):'<div class="empty" style="grid-column:1/-1">Belum ada produk.</div>';
+    box.querySelectorAll('[data-code]').forEach(x=>x.onclick=gotoCustomer);
+  }
+
+  function loadProducts(){storeCollection('produk').onSnapshot(s=>{Object.keys(dbProduk).forEach(k=>delete dbProduk[k]);s.forEach(d=>dbProduk[d.id]=d.data()||{});renderPromo();renderStock();renderTrending();renderCatalog()})}
+  function loadTransactions(){storeCollection('transaksi').onSnapshot(s=>{transactions=[];s.forEach(d=>{const data=d.data()||{};transactions.push({...data,_date:dateKey(data),_ms:data?.waktuTimestamp?.toMillis?data.waktuTimestamp.toMillis():0})});renderStock();renderTrending()})}
+  function loadConfig(){
+    storeCollection('pengaturan').doc('toko_v13').onSnapshot(s=>renderStore(s.exists?s.data():{}));
+    storeCollection('pengaturan').doc('beranda_pelanggan_home').onSnapshot(s=>renderInfo(s.exists?s.data():{}),()=>renderInfo({}));
+    storeCollection('pengaturan').doc('beranda_pelanggan_promo').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};promoCfg={enabled:d.enabled!==false,codes:Array.isArray(d.codes)?d.codes:[]};renderPromo()});
+    storeCollection('pengaturan').doc('beranda_pelanggan_resep').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};resepCfg={enabled:d.enabled!==false,recipes:Array.isArray(d.recipes)?d.recipes:[]};renderRecipes()});
+    storeCollection('pengaturan').doc('beranda_pelanggan_stok_rumah').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};stokCfg={enabled:d.enabled!==false,limit:d.limit??5};renderStock()});
+    storeCollection('pengaturan').doc('beranda_pelanggan_laris').onSnapshot(s=>{const d=s.exists?s.data()||{}:{};larisCfg={enabled:d.enabled!==false,limit:d.limit??5};renderTrending()});
+  }
+
+  function init(){document.documentElement.style.colorScheme='dark';greet();setInterval(greet,60000);loadProducts();loadTransactions();loadConfig();}
+  init();
+})();
+</script>
 </body>
 </html>
