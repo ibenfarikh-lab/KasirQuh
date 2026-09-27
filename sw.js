@@ -1,40 +1,33 @@
-const CACHE_NAME = 'kasirquh-shell-v16';
+const CACHE_NAME = 'kasirquh-shell-v17';
+// Daftar ini WAJIB sinkron dengan file yang benar-benar ada di repo.
+// cache.addAll() bersifat all-or-nothing: satu URL saja 404 akan
+// membatalkan seluruh instalasi service worker.
 const CORE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
+  '/gateway/index.css',
+  '/gateway/index.js',
   '/pelanggan/index.html',
   '/pelanggan/style.css',
-  '/pelanggan/_core/style.css',
-  '/pelanggan/_core/router.js',
-  '/pelanggan/_core/navigation.js',
-  '/pelanggan/_core/firebase.js',
-  '/pelanggan/_core/script.js',
-  '/pelanggan/_core/modules/auth.js',
-  '/pelanggan/_core/modules/common.js',
-  '/pelanggan/_core/modules/products.js',
-  '/pelanggan/_core/modules/cart.js',
-  '/pelanggan/_core/modules/transactions.js',
-  '/pelanggan/_core/modules/chat.js',
-  '/pelanggan/_core/modules/settings.js',
-  '/pelanggan/produk/index.html',
-  '/pelanggan/produk/style.css',
-  '/pelanggan/produk/script.js',
-  '/pelanggan/keranjang/index.html',
-  '/pelanggan/keranjang/style.css',
-  '/pelanggan/keranjang/script.js',
-  '/pelanggan/chat/index.html',
-  '/pelanggan/chat/style.css',
-  '/pelanggan/chat/script.js',
-  '/pelanggan/akun/index.html',
-  '/pelanggan/akun/style.css',
-  '/pelanggan/akun/script.js'
+  '/pelanggan/script.js',
+  '/admin/index.html',
+  '/admin/style.css',
+  '/admin/script.js'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_ASSETS)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.allSettled(
+        CORE_ASSETS.map(url =>
+          cache.add(url).catch(err => console.warn('[SW] Gagal cache:', url, err))
+        )
+      )
+    ).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', event => {
@@ -60,7 +53,7 @@ self.addEventListener('fetch', event => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
         return response;
-      }).catch(() => caches.match(request).then(cached => cached || caches.match('/pelanggan/index.html')))
+      }).catch(() => caches.match(request).then(cached => cached || caches.match('/index.html')))
     );
     return;
   }
