@@ -97,3 +97,506 @@ body[data-theme="modern"] #category-container .chip-btn:active { transform: tran
     margin-right: auto !important;
   }
 }
+
+/* KQ M-01 — VISUAL TOKENS & SPACING POLISH
+   Conservative modern-only token layer. No JS/Firebase/layout architecture changes. */
+body[data-theme="modern"]{
+  --kq-space-page:14px;
+  --kq-space-grid:10px;
+  --kq-space-grid-compact:8px;
+  --kq-space-category:12px;
+  --kq-space-category-compact:10px;
+  --kq-radius-card:16px;
+  --kq-radius-control:12px;
+  --kq-shadow-card:0 4px 12px rgba(0,0,0,.22);
+}
+body[data-theme="modern"] .main-content{padding-left:var(--kq-space-page) !important;padding-right:var(--kq-space-page) !important;}
+body[data-theme="modern"] #category-container{gap:var(--kq-space-category) !important;}
+body[data-theme="modern"] .modern-product-card{border-radius:var(--kq-radius-card) !important;box-shadow:var(--kq-shadow-card) !important;}
+body[data-theme="modern"] .sub-tab-btn,
+body[data-theme="modern"] .popup-menu-btn{border-radius:var(--kq-radius-control) !important;}
+@media (max-width:420px){
+  body[data-theme="modern"] #category-container{gap:var(--kq-space-category-compact) !important;}
+}
+@media (min-width:380px) and (max-width:699px){
+  body[data-theme="modern"] .product-catalog-grid{gap:var(--kq-space-grid-compact) !important;}
+}
+@media (min-width:700px){
+  body[data-theme="modern"] .product-catalog-grid{gap:var(--kq-space-grid) !important;}
+}
+
+
+/* KQ M-02 — TYPOGRAPHY POLISH
+   Modern-only, conservative hierarchy layer.
+   Built on M-01 visual tokens. No JS/Firebase/HTML structure changes. */
+body[data-theme="modern"]{
+  --kq-type-home-title:1.12rem;
+  --kq-type-greeting:.74rem;
+  --kq-type-section:.88rem;
+  --kq-type-control:.78rem;
+  --kq-type-product-name:clamp(.59rem,7.5cqw,.82rem);
+  --kq-type-product-price:clamp(.63rem,8.2cqw,.90rem);
+  --kq-type-product-stock:clamp(.47rem,5.9cqw,.68rem);
+  --kq-type-badge:clamp(.46rem,4.8cqw,.62rem);
+}
+body[data-theme="modern"] #customer-home-header .customer-home-title{
+  font-size:var(--kq-type-home-title) !important;
+  line-height:1.15 !important;
+  font-weight:800 !important;
+}
+body[data-theme="modern"] #customer-home-header .customer-home-greeting{
+  font-size:var(--kq-type-greeting) !important;
+  line-height:1.2 !important;
+  font-weight:600 !important;
+}
+body[data-theme="modern"] .section-title{
+  font-size:var(--kq-type-section) !important;
+  line-height:1.2 !important;
+  font-weight:800 !important;
+}
+body[data-theme="modern"] .sub-tab-btn,
+body[data-theme="modern"] .popup-menu-btn{
+  font-size:var(--kq-type-control) !important;
+  line-height:1.15 !important;
+  font-weight:700 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-name{
+  font-size:var(--kq-type-product-name) !important;
+  line-height:1.08 !important;
+  font-weight:800 !important;
+  letter-spacing:0 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-price{
+  font-size:var(--kq-type-product-price) !important;
+  line-height:1.08 !important;
+  font-weight:900 !important;
+  letter-spacing:0 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-product-info .modern-product-stock{
+  font-size:var(--kq-type-product-stock) !important;
+  line-height:1.08 !important;
+  font-weight:600 !important;
+}
+body[data-theme="modern"] .modern-product-card .modern-stock-badge{
+  font-size:var(--kq-type-badge) !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+}
+
+/* KQ M-03 — TOUCH & BUTTON POLISH */
+body[data-theme="modern"] button,body[data-theme="modern"] [role="button"]{ -webkit-tap-highlight-color:transparent !important; touch-action:manipulation; }
+body[data-theme="modern"] button:focus-visible,body[data-theme="modern"] [role="button"]:focus-visible{ outline:2px solid rgba(143,201,255,.82) !important; outline-offset:2px !important; }
+body[data-theme="modern"] #category-container .chip-btn{ transition:transform .14s ease,background-color .14s ease,border-color .14s ease,box-shadow .14s ease !important; }
+body[data-theme="modern"] #category-container .chip-btn:active{ transform:translateY(0) scale(.94) !important; }
+body[data-theme="modern"] .modern-product-card .modern-cart-btn{ width:clamp(30px,19cqw,36px) !important; height:clamp(30px,19cqw,36px) !important; min-width:30px !important; min-height:30px !important; right:1% !important; bottom:1% !important; display:flex !important; align-items:center !important; justify-content:center !important; transition:transform .12s ease,box-shadow .12s ease !important; }
+body[data-theme="modern"] .modern-product-card .modern-cart-btn:active{ transform:scale(.90) !important; box-shadow:0 2px 5px rgba(0,0,0,.38) !important; }
+body[data-theme="modern"] .modern-card-cart-btn{ transition:transform .12s ease,box-shadow .12s ease !important; }
+body[data-theme="modern"] .modern-card-cart-btn:active{ transform:scale(.92) !important; box-shadow:0 3px 8px rgba(0,0,0,.35) !important; }
+body[data-theme="modern"] .sub-tab-btn,body[data-theme="modern"] .popup-menu-btn,body[data-theme="modern"] .customer-chat-subtabs button{ touch-action:manipulation; }
+body[data-theme="modern"] .sub-tab-btn:active,body[data-theme="modern"] .customer-chat-subtabs button:active{ transform:scale(.97) !important; }
+body[data-theme="modern"] .bottom-nav .nav-item{ touch-action:manipulation; -webkit-tap-highlight-color:transparent !important; }
+body[data-theme="modern"] #promo-banner-section,body[data-theme="modern"] #fab-search-btn,body[data-theme="modern"] #fab-cart-btn,body[data-theme="modern"] #fab-ai-btn{ touch-action:manipulation; -webkit-tap-highlight-color:transparent !important; }
+body[data-theme="modern"] #promo-banner-section:active,body[data-theme="modern"] #fab-search-btn:active,body[data-theme="modern"] #fab-cart-btn:active,body[data-theme="modern"] #fab-ai-btn:active{ transform:scale(.95) !important; }
+@media (prefers-reduced-motion:reduce){ body[data-theme="modern"] button,body[data-theme="modern"] [role="button"]{ transition:none !important; } }
+
+
+
+/* KQ M-03.1 — CART MODAL POLISH
+   Scope: cart modal layout, spacing, typography and touch sizing only.
+   No checkout/cart data logic changed. */
+body[data-theme="modern"] #cartModal .modal-content{
+  width:min(380px,calc(100vw - 24px)) !important;
+  max-width:380px !important;
+  max-height:min(88vh,720px) !important;
+  padding:14px !important;
+  gap:10px !important;
+  border-radius:18px !important;
+  box-sizing:border-box !important;
+}
+body[data-theme="modern"] #cartModal .modal-header{
+  min-height:32px !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+body[data-theme="modern"] #cartModal .modal-header h3{
+  font-size:1rem !important;
+  line-height:1.2 !important;
+  font-weight:850 !important;
+  letter-spacing:-.01em !important;
+}
+body[data-theme="modern"] #cartModal .btn-close-modal{
+  width:34px !important;
+  height:34px !important;
+  min-width:34px !important;
+  min-height:34px !important;
+  padding:0 !important;
+  display:grid !important;
+  place-items:center !important;
+  border-radius:10px !important;
+  font-size:1.35rem !important;
+  line-height:1 !important;
+}
+body[data-theme="modern"] #cartModal .receipt-header{
+  margin:0 !important;
+  padding:0 0 8px !important;
+  border-bottom:1px solid rgba(70,145,255,.18) !important;
+}
+body[data-theme="modern"] #cartModal #receipt-shop-name{
+  font-size:.86rem !important;
+  line-height:1.2 !important;
+  font-weight:800 !important;
+}
+body[data-theme="modern"] #cartModal #receipt-shop-address{
+  margin-top:3px !important;
+  font-size:.68rem !important;
+  line-height:1.25 !important;
+}
+body[data-theme="modern"] #cartModal .cart-table-wrapper{
+  max-height:30vh !important;
+  min-height:0 !important;
+  overflow:auto !important;
+  border-radius:10px !important;
+}
+body[data-theme="modern"] #cartModal .cart-table{
+  width:100% !important;
+  table-layout:fixed !important;
+  border-collapse:separate !important;
+  border-spacing:0 5px !important;
+  font-size:.78rem !important;
+}
+body[data-theme="modern"] #cartModal .cart-table thead th{
+  padding:0 7px 4px !important;
+  font-size:.67rem !important;
+  line-height:1.1 !important;
+  font-weight:800 !important;
+  white-space:nowrap !important;
+}
+body[data-theme="modern"] #cartModal .cart-table thead th:nth-child(1){width:42% !important;text-align:left !important}
+body[data-theme="modern"] #cartModal .cart-table thead th:nth-child(2){width:34% !important;text-align:center !important}
+body[data-theme="modern"] #cartModal .cart-table thead th:nth-child(3){width:24% !important;text-align:right !important}
+body[data-theme="modern"] #cartModal .cart-table tbody tr{
+  border-radius:10px !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td{
+  padding:8px 7px !important;
+  height:38px !important;
+  vertical-align:middle !important;
+  box-sizing:border-box !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:first-child{
+  border-radius:10px 0 0 10px !important;
+  text-align:left !important;
+  font-size:.76rem !important;
+  line-height:1.2 !important;
+  font-weight:750 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:nth-child(2){
+  text-align:center !important;
+  white-space:nowrap !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:last-child{
+  border-radius:0 10px 10px 0 !important;
+  text-align:right !important;
+  font-size:.74rem !important;
+  line-height:1.2 !important;
+  font-weight:850 !important;
+  white-space:nowrap !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:nth-child(2) button{
+  width:30px !important;
+  height:30px !important;
+  min-width:30px !important;
+  min-height:30px !important;
+  padding:0 !important;
+  border-radius:8px !important;
+  font-size:.82rem !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  vertical-align:middle !important;
+}
+body[data-theme="modern"] #cartModal .cart-table tbody td:nth-child(2) span{
+  width:30px !important;
+  min-width:30px !important;
+  font-size:.76rem !important;
+  line-height:30px !important;
+  font-weight:850 !important;
+  vertical-align:middle !important;
+}
+body[data-theme="modern"] #cartModal .summary-box{
+  margin:0 !important;
+  padding:10px !important;
+  gap:9px !important;
+  border-radius:12px !important;
+  border:1px solid rgba(70,145,255,.16) !important;
+  box-sizing:border-box !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > div:first-child{
+  padding:0 1px 7px !important;
+  border-bottom:1px solid rgba(70,145,255,.14) !important;
+  font-size:.88rem !important;
+  line-height:1.2 !important;
+  font-weight:850 !important;
+}
+body[data-theme="modern"] #cartModal #grand-total{
+  font-size:.92rem !important;
+  font-weight:900 !important;
+}
+body[data-theme="modern"] #cartModal .summary-box .no-print{
+  gap:8px !important;
+}
+body[data-theme="modern"] #cartModal #pay-method-cust{
+  min-height:34px !important;
+  padding:6px 8px !important;
+  border-radius:8px !important;
+  font-size:.73rem !important;
+  line-height:1.2 !important;
+}
+body[data-theme="modern"] #cartModal #wrapper-tf-proof{
+  padding:8px !important;
+  border-radius:8px !important;
+}
+body[data-theme="modern"] #cartModal #wrapper-tf-proof label{
+  font-size:.68rem !important;
+  line-height:1.2 !important;
+  margin-bottom:4px !important;
+}
+body[data-theme="modern"] #cartModal #wrapper-tf-proof input[type="file"]{font-size:.67rem !important}
+body[data-theme="modern"] #cartModal .summary-box label{line-height:1.2 !important}
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle,
+body[data-theme="modern"] #cartModal #cust-share-rumpi-toggle{
+  width:18px !important;
+  height:18px !important;
+  min-width:18px !important;
+  min-height:18px !important;
+  margin:0 !important;
+}
+body[data-theme="modern"] #cartModal #cust-save-recipe-toggle + *{margin-left:0}
+body[data-theme="modern"] #cartModal #wrapper-save-recipe-fields{
+  gap:7px !important;
+  margin-top:2px !important;
+}
+body[data-theme="modern"] #cartModal #cust-save-recipe-name{
+  min-height:34px !important;
+  padding:7px 8px !important;
+  border-radius:8px !important;
+  font-size:.72rem !important;
+  line-height:1.2 !important;
+}
+body[data-theme="modern"] #cartModal #cust-order-note{
+  min-height:38px !important;
+  padding:8px !important;
+  border-radius:8px !important;
+  font-size:.73rem !important;
+  line-height:1.25 !important;
+  resize:vertical !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div:first-child{
+  gap:7px !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div:first-child label{
+  width:31% !important;
+  min-width:74px !important;
+  font-size:.72rem !important;
+  line-height:1.2 !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div:nth-child(3){
+  padding:8px !important;
+  gap:7px !important;
+  border-radius:9px !important;
+}
+body[data-theme="modern"] #cartModal .summary-box > .no-print > div:nth-child(3) label{
+  min-height:22px !important;
+  font-size:.72rem !important;
+  line-height:1.2 !important;
+}
+body[data-theme="modern"] #cartModal .no-print:has(> .btn-success){
+  gap:8px !important;
+}
+body[data-theme="modern"] #cartModal .no-print > .btn-success,
+body[data-theme="modern"] #cartModal .no-print > button[onclick="prosesSimpanMenuSaja()"]{
+  min-height:40px !important;
+  padding:8px 7px !important;
+  border-radius:9px !important;
+  font-size:.76rem !important;
+  line-height:1.15 !important;
+  font-weight:850 !important;
+}
+body[data-theme="modern"] #cartModal .btn-clear-cart{
+  min-height:30px !important;
+  padding:5px 8px !important;
+  margin:0 !important;
+  border-radius:8px !important;
+  font-size:.69rem !important;
+  line-height:1.1 !important;
+  font-weight:750 !important;
+  opacity:.9 !important;
+}
+@media (max-width:390px){
+  body[data-theme="modern"] #cartModal .modal-content{width:calc(100vw - 18px) !important;padding:12px !important;gap:8px !important}
+  body[data-theme="modern"] #cartModal .cart-table{border-spacing:0 4px !important}
+  body[data-theme="modern"] #cartModal .cart-table tbody td{padding:7px 5px !important}
+  body[data-theme="modern"] #cartModal .cart-table tbody td:nth-child(2) button{width:28px !important;height:28px !important;min-width:28px !important;min-height:28px !important}
+  body[data-theme="modern"] #cartModal .cart-table tbody td:nth-child(2) span{width:26px !important;min-width:26px !important;line-height:28px !important}
+  body[data-theme="modern"] #cartModal .summary-box{padding:8px !important}
+  body[data-theme="modern"] #cartModal .no-print > .btn-success,
+  body[data-theme="modern"] #cartModal .no-print > button[onclick="prosesSimpanMenuSaja()"]{font-size:.71rem !important}
+}
+@media (prefers-reduced-motion:reduce){body[data-theme="modern"] #cartModal *{scroll-behavior:auto !important}}
+
+/* KQ M-04 — ICON CONSISTENCY + INTERACTION POLISH
+   Scope: modern customer UI icon sizing/alignment and interaction states.
+   No Firebase/cart data logic changed. Existing icon assets/markup are preserved. */
+body[data-theme="modern"] .category-line-icon,
+body[data-theme="modern"] .kq-icon,
+body[data-theme="modern"] .customer-info-label svg,
+body[data-theme="modern"] .section-label svg{
+  flex:0 0 auto !important;
+  vertical-align:middle !important;
+}
+body[data-theme="modern"] .category-line-icon{
+  width:22px !important;
+  height:22px !important;
+  stroke-width:1.8 !important;
+}
+body[data-theme="modern"] .chip-btn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:6px !important;
+}
+body[data-theme="modern"] .modern-card-cart-btn,
+body[data-theme="modern"] .modern-cart-btn,
+body[data-theme="modern"] .btn-quick-cart-icon{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+  text-align:center !important;
+  -webkit-font-smoothing:antialiased !important;
+}
+body[data-theme="modern"] .modern-card-cart-btn:focus-visible,
+body[data-theme="modern"] .modern-cart-btn:focus-visible,
+body[data-theme="modern"] .btn-quick-cart-icon:focus-visible,
+body[data-theme="modern"] #fab-search-btn:focus-visible,
+body[data-theme="modern"] #fab-cart-btn:focus-visible,
+body[data-theme="modern"] #fab-ai-btn:focus-visible{
+  outline:2px solid rgba(143,201,255,.9) !important;
+  outline-offset:3px !important;
+}
+body[data-theme="modern"] .modern-card-cart-btn:active,
+body[data-theme="modern"] .modern-cart-btn:active,
+body[data-theme="modern"] .btn-quick-cart-icon:active{
+  transform:scale(.92) !important;
+}
+body[data-theme="modern"] .cart-badge{
+  min-width:18px !important;
+  height:18px !important;
+  padding:0 4px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+  font-size:.62rem !important;
+  font-weight:900 !important;
+  box-sizing:border-box !important;
+}
+body[data-theme="modern"] .recipe-btn-action{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:5px !important;
+  line-height:1.05 !important;
+}
+body[data-theme="modern"] .customer-chat-subtabs button,
+body[data-theme="modern"] .sub-tab-btn,
+body[data-theme="modern"] .popup-menu-btn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:5px !important;
+}
+body[data-theme="modern"] button,
+body[data-theme="modern"] [role="button"]{
+  -webkit-tap-highlight-color:transparent !important;
+}
+@media (prefers-reduced-motion:reduce){
+  body[data-theme="modern"] .modern-card-cart-btn,
+  body[data-theme="modern"] .modern-cart-btn,
+  body[data-theme="modern"] .btn-quick-cart-icon{transition:none !important;}
+}
+
+
+/* KQ M-05 — FINAL MICRO CLEANUP
+   Scope: remove small CSS rough edges left after M-01..M-04.
+   Modern customer theme only; no JS/Firebase/data logic changed. */
+body[data-theme="modern"] #cartModal,
+body[data-theme="modern"] #cartModal .modal-content,
+body[data-theme="modern"] #cartModal .summary-box,
+body[data-theme="modern"] #cartModal .cart-table-wrapper{
+  box-sizing:border-box !important;
+}
+body[data-theme="modern"] #cartModal .modal-content{
+  overflow:hidden !important;
+}
+body[data-theme="modern"] #cartModal .cart-table-wrapper{
+  overscroll-behavior:contain !important;
+  scrollbar-width:thin;
+}
+body[data-theme="modern"] #cartModal .cart-table td,
+body[data-theme="modern"] #cartModal .cart-table th{
+  box-sizing:border-box !important;
+}
+body[data-theme="modern"] #cartModal input,
+body[data-theme="modern"] #cartModal select,
+body[data-theme="modern"] #cartModal textarea,
+body[data-theme="modern"] #cartModal button{
+  font-family:inherit !important;
+}
+body[data-theme="modern"] #cartModal button:focus-visible,
+body[data-theme="modern"] #cartModal input:focus-visible,
+body[data-theme="modern"] #cartModal select:focus-visible,
+body[data-theme="modern"] #cartModal textarea:focus-visible{
+  outline:2px solid rgba(143,201,255,.9) !important;
+  outline-offset:2px !important;
+}
+body[data-theme="modern"] #category-container,
+body[data-theme="modern"] .product-catalog-grid{
+  scrollbar-width:thin;
+}
+@media (max-width:390px){
+  body[data-theme="modern"] #cartModal .summary-box > .no-print > div:first-child label{
+    min-width:68px !important;
+    width:30% !important;
+  }
+  body[data-theme="modern"] #cartModal .cart-table thead th:nth-child(2){
+    width:36% !important;
+  }
+  body[data-theme="modern"] #cartModal .cart-table thead th:nth-child(3){
+    width:22% !important;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  body[data-theme="modern"] #cartModal *{
+    transition:none !important;
+    animation:none !important;
+  }
+}
+
+
+/* KQ GUEST-FIRST AUTH NOTICE */
+.guest-auth-backdrop{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(3,8,20,.58);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.guest-auth-card{width:min(360px,100%);box-sizing:border-box;padding:20px 18px 15px;border-radius:22px;background:var(--card-bg,#fff);color:var(--text-color,#111827);box-shadow:0 20px 55px rgba(0,0,0,.35);text-align:center}
+.guest-auth-icon{width:48px;height:48px;margin:0 auto 9px;display:grid;place-items:center;border-radius:15px;background:rgba(37,99,235,.10);font-size:25px}
+.guest-auth-card h3{margin:0 0 7px;font-size:1.08rem;line-height:1.2;font-weight:850}
+.guest-auth-card p{margin:0;color:var(--text-muted,#64748b);font-size:.78rem;line-height:1.5}
+.guest-auth-card p strong{color:var(--text-color,#111827)}
+.guest-auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}
+.guest-auth-btn{min-height:42px;border:0;border-radius:11px;font-size:.82rem;font-weight:800;cursor:pointer;touch-action:manipulation}
+.guest-auth-login{background:#16a34a;color:#fff}.guest-auth-register{background:#2563eb;color:#fff}
+.guest-auth-later{margin-top:9px;padding:8px 16px;border:0;background:transparent;color:var(--text-muted,#64748b);font-size:.74rem;font-weight:700;cursor:pointer}
+.guest-auth-btn:active,.guest-auth-later:active{transform:scale(.98)}
+@media(max-width:390px){.guest-auth-card{padding:17px 15px 13px;border-radius:19px}.guest-auth-actions{margin-top:12px}.guest-auth-btn{min-height:40px}}
+@media(prefers-reduced-motion:reduce){.guest-auth-btn,.guest-auth-later{transition:none!important}}

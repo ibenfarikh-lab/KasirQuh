@@ -43,7 +43,7 @@
 </head>
 
 <body data-theme="modern" style="font-size: 0.85rem;">
-<div class="login-overlay" id="customerLoginModal" style="display: flex;">
+<div class="login-overlay" id="customerLoginModal" style="display: none;">
 <div class="login-card" style="max-height: 90vh; overflow-y: auto; padding: 16px;">
 <h2 style="margin-top: 0; margin-bottom: 4px; font-size: 1.3rem;">KasirQuh</h2>
 <div id="formLoginContainer">
@@ -234,6 +234,20 @@
 </div>
 </div>
 </div>
+<!-- KQ GUEST-FIRST AUTH NOTICE -->
+<div class="guest-auth-backdrop" id="guestAuthNotice" style="display:none;" aria-hidden="true">
+  <div class="guest-auth-card" role="dialog" aria-modal="true" aria-labelledby="guest-auth-title">
+    <div class="guest-auth-icon" aria-hidden="true">🛒</div>
+    <h3 id="guest-auth-title">Pesananmu sudah siap!</h3>
+    <p>Yuk masuk dulu. Sudah punya akun? <strong>Login.</strong><br>Belum punya akun? <strong>Daftar sekarang</strong>, cepat kok. 😊</p>
+    <div class="guest-auth-actions">
+      <button type="button" class="guest-auth-btn guest-auth-login" data-kq-static-action="guest-auth-login">Login</button>
+      <button type="button" class="guest-auth-btn guest-auth-register" data-kq-static-action="guest-auth-register">Daftar</button>
+    </div>
+    <button type="button" class="guest-auth-later" data-kq-static-action="guest-auth-later">Nanti</button>
+  </div>
+</div>
+
 <!-- 2. HALAMAN DATA PELANGGAN -->
 <div class="tab-content" id="data-pelanggan" style="display: none;">
 <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 8px;">

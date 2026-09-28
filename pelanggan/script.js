@@ -263,11 +263,46 @@
     // Android/browser boleh menangani Back secara normal.
     // ============================================================
     let currentDetailCode = null; let currentDetailQty = 1; let currentDetailStep = 1;
+    let guestPendingAuthAction = localStorage.getItem('kq_guest_pending_auth_v1') || '';
+    const GUEST_CART_KEY = 'kq_guest_cart_v1';
     let appNavRestoring = false;
+
+    function simpanKeranjangGuest() {
+      try {
+        const compactCart = cart.map(item => ({
+          code: item.code, nama: item.nama, harga: item.harga, modal: item.modal,
+          qty: item.qty, subtotal: item.subtotal
+        }));
+        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(compactCart));
+      } catch (e) { console.warn('Keranjang sementara gagal disimpan:', e); }
+    }
+
+    function pulihkanKeranjangGuest() {
+      try {
+        const raw = localStorage.getItem(GUEST_CART_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (!Array.isArray(saved)) return;
+        cart = saved.filter(item => item && item.code && Number(item.qty) > 0).map(item => ({
+          code: item.code, nama: item.nama || 'Produk', harga: Number(item.harga) || 0,
+          modal: Number(item.modal) || 0, qty: Number(item.qty) || 1,
+          subtotal: Number(item.subtotal) || Math.round((Number(item.qty) || 1) * (Number(item.harga) || 0)),
+          foto: ''
+        }));
+      } catch (e) {
+        cart = [];
+        localStorage.removeItem(GUEST_CART_KEY);
+        console.warn('Keranjang sementara rusak, direset:', e);
+      }
+    }
+
+    function hapusKeranjangGuest() {
+      try { localStorage.removeItem(GUEST_CART_KEY); } catch (e) {}
+    }
     let appNavReady = false;
 
     function appGetState() {
-      const modalIds = ['customerLoginModal','dailyCheckinModal','menuToggleModal','promoTokoModal','cartModal','aiChatModal','qrCodeModal','productDetailModal'];
+      const modalIds = ['customerLoginModal','guestAuthNotice','dailyCheckinModal','menuToggleModal','promoTokoModal','cartModal','aiChatModal','qrCodeModal','productDetailModal'];
       let modal = null;
       for (const id of modalIds) {
         const el = document.getElementById(id);
@@ -308,6 +343,7 @@
       ids.forEach(id => document.getElementById(id)?.classList.remove('show'));
       const login = document.getElementById('customerLoginModal'); if (login) login.style.display = 'none';
       const checkin = document.getElementById('dailyCheckinModal'); if (checkin) checkin.style.display = 'none';
+      const guestAuth = document.getElementById('guestAuthNotice'); if (guestAuth) { guestAuth.style.display = 'none'; guestAuth.setAttribute('aria-hidden','true'); }
     }
 
     function appRestoreState(rawState) {
@@ -341,6 +377,7 @@
         else if (state.modal === 'qrCodeModal') document.getElementById('qrCodeModal')?.classList.add('show');
         else if (state.modal === 'promoTokoModal') document.getElementById('promoTokoModal')?.classList.add('show');
         else if (state.modal === 'customerLoginModal') document.getElementById('customerLoginModal').style.display = 'flex';
+        else if (state.modal === 'guestAuthNotice') { const n=document.getElementById('guestAuthNotice'); if(n){n.style.display='flex';n.setAttribute('aria-hidden','false');} }
         else if (state.modal === 'dailyCheckinModal') document.getElementById('dailyCheckinModal').style.display = 'flex';
       } finally {
         appNavRestoring = false;
@@ -373,6 +410,7 @@
       muatIdeMasakAdminPelanggan();
       applyThemePelanggan(localStorage.getItem('cust_theme_v13') || 'modern');
       initAndroidBackNavigation();
+      pulihkanKeranjangGuest();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
       initChatRumpiPreviewListener();
@@ -380,11 +418,70 @@
       if (currentCustomerPhone) {
         document.getElementById('customerLoginModal').style.display = 'none';
         muatDataPelangganRealtime(); muatRiwayatPesananOnlinePelanggan(); initCustomerChatListener(); periksaCheckinHarian(); tampilkanKoinDiProfil();
-      } else { document.getElementById('customerLoginModal').style.display = 'flex'; gantiFormAuth('login'); }
+      } else {
+        document.getElementById('customerLoginModal').style.display = 'none';
+      }
       initFirebaseListeners();
       initPromoTokoPelanggan();
       initCustomerHomeInfoListener();
+      if (currentCustomerPhone && guestPendingAuthAction) setTimeout(runGuestPendingAuthAction, 900);
     };
+
+    function showGuestAuthNotice(action) {
+      if (currentCustomerPhone) return true;
+      guestPendingAuthAction = action || 'checkout';
+      localStorage.setItem('kq_guest_pending_auth_v1', guestPendingAuthAction);
+      const n = document.getElementById('guestAuthNotice');
+      if (!n) return false;
+      appOpenModal('guestAuthNotice');
+      n.style.display = 'flex';
+      n.setAttribute('aria-hidden', 'false');
+      return false;
+    }
+
+    function closeGuestAuthNotice(clearPending) {
+      if (clearPending) { guestPendingAuthAction = ''; localStorage.removeItem('kq_guest_pending_auth_v1'); }
+      const n = document.getElementById('guestAuthNotice');
+      if (!n) return;
+      if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'guestAuthNotice') history.back();
+      else { n.style.display = 'none'; n.setAttribute('aria-hidden', 'true'); }
+    }
+
+    function startGuestLogin() {
+      const n = document.getElementById('guestAuthNotice'); if (n) { n.style.display='none'; n.setAttribute('aria-hidden','true'); }
+      const login = document.getElementById('customerLoginModal');
+      // Ganti state popup, jangan push state baru di atas guestAuthNotice.
+      if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'guestAuthNotice') {
+        history.replaceState({ __kasirquh:true, __kasirquhState:Object.assign({}, appGetState(), {modal:'customerLoginModal', detailCode:null}) }, '', location.href);
+      } else {
+        appOpenModal('customerLoginModal');
+      }
+      if (login) login.style.display='flex';
+      gantiFormAuth('login');
+    }
+
+    function startGuestRegister() {
+      const n = document.getElementById('guestAuthNotice'); if (n) { n.style.display='none'; n.setAttribute('aria-hidden','true'); }
+      const login = document.getElementById('customerLoginModal');
+      if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'guestAuthNotice') {
+        history.replaceState({ __kasirquh:true, __kasirquhState:Object.assign({}, appGetState(), {modal:'customerLoginModal', detailCode:null}) }, '', location.href);
+      } else {
+        appOpenModal('customerLoginModal');
+      }
+      if (login) login.style.display='flex';
+      gantiFormAuth('register');
+    }
+
+    function runGuestPendingAuthAction() {
+      const action = guestPendingAuthAction;
+      guestPendingAuthAction = '';
+      localStorage.removeItem('kq_guest_pending_auth_v1');
+      if (!currentCustomerPhone || !action) return;
+      if (action === 'checkout') return prosesCheckoutPelanggan();
+      if (action === 'save-recipe') return prosesSimpanMenuSaja();
+      if (action === 'chat-rumpi') { switchTabPelanggan('live-chat'); return; }
+      if (action === 'chat-admin') { switchTabPelanggan('live-chat'); return; }
+    }
 
     function updateCustomerGreeting() {
       const el = document.getElementById('customer-home-greeting');
@@ -521,7 +618,7 @@
     }
     
     function bagikanResepKeywordsKeRumpi(namaResep, keywords) {
-      if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu untuk berbagi resep!");
+      if (!currentCustomerPhone) return showGuestAuthNotice('chat-rumpi');
       if(!isProductsLoaded) return alert("Tunggu katalog dimuat dulu ya kak.");
       let foundItemsText = "";
       keywords.forEach(kw => {
@@ -578,7 +675,7 @@
     }
 
     function bagikanResepCustomKeRumpi(recipeObj) {
-      if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu untuk berbagi resep!");
+      if (!currentCustomerPhone) return showGuestAuthNotice('chat-rumpi');
       let total = 0;
       let itemListText = "";
       recipeObj.items.forEach(it => {
@@ -1333,7 +1430,7 @@
       });
     }
 
-    function kirimPesanChatRumpi() { if (!currentCustomerPhone) return alert("Silakan login untuk ikut merumpikan!"); let inputEl = document.getElementById("chat-rumpi-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); storeCollection("db_chat_rumpi").add({ senderPhone: currentCustomerPhone, senderName: currentCustomerName || 'Pelanggan', pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
+    function kirimPesanChatRumpi() { if (!currentCustomerPhone) return showGuestAuthNotice('chat-rumpi'); let inputEl = document.getElementById("chat-rumpi-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); storeCollection("db_chat_rumpi").add({ senderPhone: currentCustomerPhone, senderName: currentCustomerName || 'Pelanggan', pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
     function initCustomerChatListener() {
       if (!currentCustomerPhone) return;
       if (customerChatMetaUnsubscribe) customerChatMetaUnsubscribe();
@@ -1354,7 +1451,7 @@
         renderCustomerChatMessages(snapshot);
       });
     }
-    function kirimPesanPelanggan() { if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu!"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); storeCollection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { storeCollection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
+    function kirimPesanPelanggan() { if (!currentCustomerPhone) return showGuestAuthNotice('chat-admin'); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); storeCollection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { storeCollection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
 
     function prosesLoginPelanggan(e) {
       e.preventDefault();
@@ -1808,32 +1905,133 @@
       container.addEventListener("mouseleave", resume);
     }
 
+    // N-01: lifecycle-aware auto-scroll for "Sedang Laris".
+    // Replaces the legacy 30ms setInterval with requestAnimationFrame, and
+    // completely stops scheduling frames while the section is hidden, offscreen,
+    // the document is backgrounded, or the user is interacting with it.
+    const trendingAutoScrollCleanups = new Map();
     function setupAutoScrollInteraction(containerId) {
       const container = document.getElementById(containerId);
       if (!container) return;
-      
-      let scrollSpeed = 0.8;
+
+      const previousCleanup = trendingAutoScrollCleanups.get(containerId);
+      if (previousCleanup) previousCleanup();
+
       let isInteracting = false;
-      let timeoutId = null;
+      let resumeTimer = null;
+      let rafId = 0;
+      let running = false;
+      let lastTime = 0;
+      let isVisible = true;
+      const scrollSpeed = 0.026; // px/ms; same visual speed as the former 30ms timer
 
-      const scrollInterval = setInterval(() => {
-        if (!animasiNavigasiDeveloperAktif()) return;
-        if (!isInteracting) {
-          container.scrollLeft += scrollSpeed;
-          if (container.scrollLeft >= (container.scrollWidth - container.clientWidth - 2)) {
-            container.scrollLeft = 0;
-          }
+      const canRun = () => {
+        if (document.hidden || !isVisible || isInteracting) return false;
+        if (!animasiNavigasiDeveloperAktif()) return false;
+        return container.scrollWidth > container.clientWidth;
+      };
+
+      const stopFrameLoop = () => {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = 0;
         }
-      }, 30);
+        running = false;
+        lastTime = 0;
+      };
 
-      container.addEventListener('touchstart', () => { isInteracting = true; clearTimeout(timeoutId); });
-      container.addEventListener('touchend', () => {
-        timeoutId = setTimeout(() => { isInteracting = false; }, 2500);
-      });
-      container.addEventListener('mousedown', () => { isInteracting = true; clearTimeout(timeoutId); });
-      container.addEventListener('mouseup', () => {
-        timeoutId = setTimeout(() => { isInteracting = false; }, 2500);
-      });
+      const frame = (now) => {
+        rafId = 0;
+        if (!canRun()) {
+          stopFrameLoop();
+          return;
+        }
+
+        if (!lastTime) lastTime = now;
+        const dt = Math.min(now - lastTime, 50);
+        lastTime = now;
+
+        const track = container.querySelector('.auto-scroll-track');
+        const loopWidth = track ? track.scrollWidth / 2 : 0;
+        container.scrollLeft += scrollSpeed * dt;
+        if (loopWidth > 0 && container.scrollLeft >= loopWidth) {
+          container.scrollLeft -= loopWidth;
+        }
+
+        rafId = requestAnimationFrame(frame);
+      };
+
+      const startFrameLoop = () => {
+        if (running || !canRun()) return;
+        running = true;
+        lastTime = performance.now();
+        rafId = requestAnimationFrame(frame);
+      };
+
+      const pause = () => {
+        isInteracting = true;
+        if (resumeTimer) {
+          clearTimeout(resumeTimer);
+          resumeTimer = null;
+        }
+        stopFrameLoop();
+      };
+
+      const resume = () => {
+        if (resumeTimer) clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(() => {
+          resumeTimer = null;
+          isInteracting = false;
+          startFrameLoop();
+        }, 2500);
+      };
+
+      const onVisibilityChange = () => {
+        if (document.hidden) stopFrameLoop();
+        else startFrameLoop();
+      };
+
+      const onResize = () => {
+        if (canRun()) startFrameLoop();
+        else stopFrameLoop();
+      };
+
+      container.addEventListener('touchstart', pause, { passive: true });
+      container.addEventListener('touchend', resume, { passive: true });
+      container.addEventListener('touchcancel', resume, { passive: true });
+      container.addEventListener('mousedown', pause);
+      container.addEventListener('mouseup', resume);
+      container.addEventListener('mouseleave', resume);
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      window.addEventListener('resize', onResize, { passive: true });
+
+      const observer = 'IntersectionObserver' in window
+        ? new IntersectionObserver((entries) => {
+            isVisible = entries.some(entry => entry.isIntersecting && entry.intersectionRatio > 0);
+            if (isVisible) startFrameLoop();
+            else stopFrameLoop();
+          }, { threshold: 0.01 })
+        : null;
+
+      if (observer) observer.observe(container);
+      else startFrameLoop();
+
+      const cleanup = () => {
+        stopFrameLoop();
+        if (resumeTimer) clearTimeout(resumeTimer);
+        container.removeEventListener('touchstart', pause);
+        container.removeEventListener('touchend', resume);
+        container.removeEventListener('touchcancel', resume);
+        container.removeEventListener('mousedown', pause);
+        container.removeEventListener('mouseup', resume);
+        container.removeEventListener('mouseleave', resume);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        window.removeEventListener('resize', onResize);
+        if (observer) observer.disconnect();
+        trendingAutoScrollCleanups.delete(containerId);
+      };
+
+      trendingAutoScrollCleanups.set(containerId, cleanup);
     }
 
     function renderTrending(codes) {
@@ -2161,6 +2359,7 @@
       });
       if (cart.length === 0) tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-muted); padding: 10px; font-size: 0.75rem;">Keranjang kosong</td></tr>`;
       document.getElementById("cart-count").innerText = totalQty; document.getElementById("grand-total").innerText = total.toLocaleString('id-ID');
+      simpanKeranjangGuest();
     }
 
     function ubahQtyKeranjang(code, dir) {
@@ -2185,7 +2384,7 @@
       renderCartPelanggan();
     }
 
-    function kosongkanKeranjang() { if (cart.length === 0) return alert("Keranjang sudah kosong!"); if (confirm("Kosongkan keranjang?")) { cart = []; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal(); } }
+    function kosongkanKeranjang() { if (cart.length === 0) return alert("Keranjang sudah kosong!"); if (confirm("Kosongkan keranjang?")) { cart = []; hapusKeranjangGuest(); renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal(); } }
     function openCartModal() { appOpenModal('cartModal'); document.getElementById('cartModal').classList.add('show'); }
     function closeCartModal() { if (!appNavRestoring && history.state?.__kasirquhState?.modal === 'cartModal') { history.back(); return; } document.getElementById('cartModal').classList.remove('show'); }
     function togglePayMethodCust() { document.getElementById("wrapper-tf-proof").style.display = (document.getElementById("pay-method-cust").value === "TF") ? "block" : "none"; }
@@ -2193,6 +2392,7 @@
 
     function prosesSimpanMenuSaja() {
       if (cart.length === 0) return alert("Keranjang kosong, tidak ada barang untuk disimpan!");
+      if (!currentCustomerPhone) return showGuestAuthNotice('save-recipe');
       if (!currentCustomerDocId) return alert("Silakan login terlebih dahulu.");
 
       const saveRecipeName = document.getElementById("cust-save-recipe-name").value.trim();
@@ -2237,7 +2437,8 @@
     }
 
     async function prosesCheckoutPelanggan() {
-      if (cart.length === 0) return alert("Keranjang kosong!"); 
+      if (cart.length === 0) return alert("Keranjang kosong!");
+      if (!currentCustomerPhone) return showGuestAuthNotice('checkout'); 
       const payMethod = document.getElementById("pay-method-cust").value; 
       const proofBase64 = document.getElementById("cust-proof-base64").value; 
       const catatanPelanggan = document.getElementById("cust-order-note").value.trim(); 
@@ -2282,7 +2483,7 @@
           }
 
           let text = `*PESANAN BARU DARI PELANGGAN* 🛒\nNama : *${namaCust}*\nNo WA : ${currentCustomerPhone}\nAlamat : ${alamatCust}\nMetode : *${namaMetode}*\n`; if (catatanPelanggan) text += `Catatan : _${catatanPelanggan}_\n`; text += `------------------------------------\n`; cart.forEach((item, idx) => { text += `${idx + 1}. ${item.nama} (${item.qty}x) = Rp ${item.subtotal.toLocaleString('id-ID')}\n`; }); text += `------------------------------------\n*Total : Rp ${totalBelanja.toLocaleString('id-ID')}*`; window.open(`https://wa.me/${phoneToko}?text=${encodeURIComponent(text)}`, '_blank');
-          alert("Pesanan berhasil dikirim!"); cart = []; document.getElementById("cust-order-note").value = ""; document.getElementById("cust-save-recipe-toggle").checked = false; document.getElementById("cust-save-recipe-name").value = ""; document.getElementById("wrapper-save-recipe-fields").style.display = "none"; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
+          alert("Pesanan berhasil dikirim!"); cart = []; hapusKeranjangGuest(); document.getElementById("cust-order-note").value = ""; document.getElementById("cust-save-recipe-toggle").checked = false; document.getElementById("cust-save-recipe-name").value = ""; document.getElementById("wrapper-save-recipe-fields").style.display = "none"; renderCartPelanggan(); refreshKatalogPelanggan(); closeCartModal();
         } catch (err) { alert("Gagal memproses pesanan: " + err.message); }
       });
     }
@@ -2705,6 +2906,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const actions = {
     'auth-register': () => gantiFormAuth('register'),
     'auth-login': () => gantiFormAuth('login'),
+    'guest-auth-login': () => startGuestLogin(),
+    'guest-auth-register': () => startGuestRegister(),
+    'guest-auth-later': () => closeGuestAuthNotice(true),
     'claim-coin': () => klaimKoinHarian(),
     'menu-belanja': () => { switchTabPelanggan('belanja'); toggleMenuModal(); },
     'menu-data-pelanggan': () => { switchTabPelanggan('data-pelanggan'); toggleMenuModal(); },
