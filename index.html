@@ -193,6 +193,10 @@ body.kasirquh-startup-pending #index-ai-modal {
 </script>
 
 <svg class="kq-icon-sprite" aria-hidden="true" width="0" height="0" focusable="false">
+<symbol id="kq-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></symbol>
+<symbol id="kq-sunrise" viewBox="0 0 24 24"><path d="M3 18h18M5 18a7 7 0 0 1 14 0M12 3v4M4.93 6.93l2.12 2.12M19.07 6.93l-2.12 2.12M2 13h3M19 13h3"/></symbol>
+<symbol id="kq-sunset" viewBox="0 0 24 24"><path d="M3 18h18M5 18a7 7 0 0 1 14 0M12 3v4M4.93 6.93l2.12 2.12M19.07 6.93l-2.12 2.12"/></symbol>
+<symbol id="kq-moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 0 1 11.2 3 8.5 8.5 0 1 0 21 12.8Z"/></symbol>
 <symbol id="kq-wave" viewBox="0 0 24 24"><path d="M4 14c2 0 2-4 4-4s2 6 4 6 2-8 4-8 2 4 4 4"/><path d="M4 18h16"/></symbol>
 <symbol id="kq-megaphone" viewBox="0 0 24 24"><path d="M3 11v2a2 2 0 0 0 2 2h2l9 4V5L7 9H5a2 2 0 0 0-2 2Z"/><path d="M7 15l1.5 4"/><path d="M19 9a3 3 0 0 1 0 6"/></symbol>
 <symbol id="kq-gift" viewBox="0 0 24 24"><path d="M3 10h18v11H3zM2 7h20v3H2zM12 7v14"/><path d="M12 7H8.5A2.5 2.5 0 1 1 11 4.5L12 7Zm0 0h3.5A2.5 2.5 0 1 0 13 4.5L12 7Z"/></symbol>
@@ -222,7 +226,7 @@ body.kasirquh-startup-pending #index-ai-modal {
   </div>
   <div class="customer-home-title-row">
     <h1 class="customer-home-title"><span id="customer-home-store-name">KasirQuh</span></h1>
-    <p class="customer-home-greeting" id="customer-home-greeting">Selamat datang</p>
+    <p class="customer-home-greeting" id="customer-home-greeting"><svg class="kq-icon greeting-icon" aria-hidden="true"><use href="#kq-sun"/></svg><span class="greeting-text">Selamat datang</span></p>
     <div class="customer-home-info-line" id="customer-home-info-line"><span class="customer-info-label"><svg class="kq-icon" aria-hidden="true"><use href="#kq-megaphone"/></svg> Info Toko:</span><span class="customer-running-window"><span class="customer-running-text" id="customer-home-running-text">Selamat datang di toko kami.</span></span></div>
   </div>
   <button class="promo-banner" id="promo-banner-section" type="button" aria-label="Lihat promo toko"><span class="promo-gift"><svg class="kq-icon" aria-hidden="true"><use href="#kq-gift"/></svg></span></button>
@@ -286,7 +290,7 @@ body.kasirquh-startup-pending #index-ai-modal {
   const gotoCustomer=()=>{ window.location.href='/pelanggan/index.html'; };
   const dateKey=data=>{let d=null;try{if(data?.waktuTimestamp?.toDate)d=data.waktuTimestamp.toDate();else if(data?.waktuTimestamp?.seconds)d=new Date(Number(data.waktuTimestamp.seconds)*1000);else if(data?.waktu){const x=new Date(data.waktu);if(!isNaN(x.getTime()))d=x;}}catch(e){}if(!d)return null;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 
-  function greet(){const h=Number(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',hour12:false}).format(new Date()));$('customer-home-greeting').textContent=h>=5&&h<11?'Selamat pagi':h>=11&&h<15?'Selamat siang':h>=15&&h<18?'Selamat sore':'Selamat malam'}
+  function greet(){const h=Number(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',hour12:false}).format(new Date()));const el=$('customer-home-greeting');if(!el)return;const icon=el.querySelector('.greeting-icon');const text=el.querySelector('.greeting-text');let label='Selamat Malam',symbol='#kq-moon';if(h>=5&&h<11){label='Selamat Pagi';symbol='#kq-sunrise'}else if(h>=11&&h<15){label='Selamat Siang';symbol='#kq-sun'}else if(h>=15&&h<18){label='Selamat Sore';symbol='#kq-sunset'}if(text)text.textContent=label;if(icon){const use=icon.querySelector('use');if(use)use.setAttribute('href',symbol)}}
   function renderInfo(data){const el=$('customer-home-running-text');el.textContent=String(data?.runningText||'Selamat datang di toko kami.').trim()}
   function renderStore(data){const n=String(data?.nama||'KasirQuh');$('customer-home-store-name').textContent=n}
 
