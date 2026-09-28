@@ -10,7 +10,6 @@
     updateFabAuthVisibility();
     const el = document.getElementById('customerLoginModal');
     if (el) new MutationObserver(updateFabAuthVisibility).observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
-    setInterval(updateFabAuthVisibility, 250);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installFabAuthGuard);
   else installFabAuthGuard();
@@ -249,7 +248,11 @@
     // TAHAP 1: jumlah card katalog yang ditampilkan saat awal. Ini TIDAK membatasi databaseProduk/dashboard.
     const CATALOG_INITIAL_VISIBLE = 6;
     let catalogVisibleCount = CATALOG_INITIAL_VISIBLE;
-    let customerChatUnsubscribe = null; let chatRumpiUnsubscribe = null;
+    // TAHAP B: cache katalog hasil normalisasi/sort. Ini mencegah setiap refresh
+    // mengulang scan + parsing kategori + sort seluruh databaseProduk.
+    let catalogProductsCache = [];
+    let catalogCacheReady = false;
+    let customerChatUnsubscribe = null; let customerChatMetaUnsubscribe = null; let chatRumpiUnsubscribe = null; let chatRumpiPreviewUnsubscribe = null;
     let activeKategoriPelanggan = 'Home'; let toastTimeout; let masterKategoriPelanggan = [];
     let adminCustomerRecipes = []; let adminCustomerRecipesEnabled = false;
 
@@ -366,7 +369,7 @@
       initAndroidBackNavigation();
       updateCustomerGreeting(); setInterval(updateCustomerGreeting, 60000);
       const cachedStoreName = localStorage.getItem('cust_store_name_v13'); if (cachedStoreName) { document.getElementById('receipt-shop-name').innerText = cachedStoreName; if(document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = cachedStoreName; }
-      initChatRumpiListener();
+      initChatRumpiPreviewListener();
       renderRecipeCards();
       if (currentCustomerPhone) {
         document.getElementById('customerLoginModal').style.display = 'none';
@@ -1117,28 +1120,110 @@
       if (sub === 'admin') {
         btnAdmin.style.color = '#2563eb'; btnAdmin.style.borderBottomColor = '#2563eb'; btnRumpi.style.color = 'var(--text-muted)'; btnRumpi.style.borderBottomColor = 'transparent';
         contentAdmin.style.display = 'flex'; contentRumpi.style.display = 'none';
+        initChatRumpiPreviewListener();
         if (currentCustomerPhone) storeCollection("chats").doc(currentCustomerPhone).update({ unreadCustomer: 0 }).catch(() => {});
       } else {
         btnRumpi.style.color = '#2563eb'; btnRumpi.style.borderBottomColor = '#2563eb'; btnAdmin.style.color = 'var(--text-muted)'; btnAdmin.style.borderBottomColor = 'transparent';
         contentRumpi.style.display = 'flex'; contentAdmin.style.display = 'none';
         unreadRumpiCust = 0; document.getElementById("badge-rumpi-subtab").style.display = "none"; document.getElementById("badge-livechat-cust").style.display = "none";
+        initChatRumpiListener();
       }
     }
 
     let unreadRumpiCust = 0;
+
+    function renderCustomerChatMessages(snapshot) {
+      const msgContainer = document.getElementById("customer-chat-messages");
+      if (!msgContainer) return;
+      if (snapshot.empty) {
+        msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>`;
+        return;
+      }
+      let html = '';
+      [...snapshot.docs].reverse().forEach(doc => {
+        const m = doc.data();
+        const isCustomer = m.pengirim === "customer";
+        const alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
+        html += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignBubble}"><div>${escapeHtml(m.pesan || '')}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`;
+      });
+      msgContainer.innerHTML = html;
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    function initChatRumpiPreviewListener() {
+      if (chatRumpiUnsubscribe) { chatRumpiUnsubscribe(); chatRumpiUnsubscribe = null; }
+      if (chatRumpiPreviewUnsubscribe) return;
+      let isInitial = true;
+      chatRumpiPreviewUnsubscribe = storeCollection("db_chat_rumpi").orderBy("waktuTimestamp", "desc").limit(1).onSnapshot((snapshot) => {
+        if (!isInitial) {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added" && change.doc.data().senderPhone !== currentCustomerPhone) {
+              playCustomerNotificationSound();
+              const active = document.getElementById('live-chat')?.classList.contains('active') && document.getElementById('subtab-rumpi-content')?.style.display !== 'none';
+              if (!active) {
+                unreadRumpiCust++;
+                const badgeSub = document.getElementById("badge-rumpi-subtab");
+                if (badgeSub) { badgeSub.innerText = unreadRumpiCust; badgeSub.style.display = "inline-block"; }
+                const badgeMain = document.getElementById("badge-livechat-cust");
+                if (badgeMain) { badgeMain.innerText = unreadRumpiCust; badgeMain.style.display = "inline-block"; }
+              }
+            }
+          });
+        }
+        isInitial = false;
+      }, () => {});
+    }
+
     function initChatRumpiListener() {
-      let isInitialLoadRumpi = true; if (chatRumpiUnsubscribe) chatRumpiUnsubscribe();
-      chatRumpiUnsubscribe = storeCollection("db_chat_rumpi").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => {
-          if (!isInitialLoadRumpi) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().senderPhone !== currentCustomerPhone) { playCustomerNotificationSound(); let isRumpiSubActive = document.getElementById('live-chat').classList.contains('active') && document.getElementById('subtab-rumpi-content').style.display !== 'none'; if (!isRumpiSubActive) { unreadRumpiCust++; let badgeSub = document.getElementById("badge-rumpi-subtab"); if (badgeSub) { badgeSub.innerText = unreadRumpiCust; badgeSub.style.display = "inline-block"; } let badgeMain = document.getElementById("badge-livechat-cust"); if (badgeMain) { badgeMain.innerText = unreadRumpiCust; badgeMain.style.display = "inline-block"; } } } }); }
-          isInitialLoadRumpi = false; let msgContainer = document.getElementById("chat-rumpi-messages"); if (!msgContainer) return;
-          msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada percakapan. Yuk mulai ngobrol, Kak!</div>` : "";
-          snapshot.forEach(doc => { let m = doc.data(); let isMyMessage = m.senderPhone === currentCustomerPhone; let alignStyle = isMyMessage ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignStyle}">${!isMyMessage ? `<div style="font-size: 0.65rem; font-weight: bold; color: #16a34a; margin-bottom: 2px;">${m.senderName || 'Warga Toko'}</div>` : ''}<div>${escapeHtml(m.pesan || '')}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; });
-          msgContainer.scrollTop = msgContainer.scrollHeight;
+      if (chatRumpiPreviewUnsubscribe) { chatRumpiPreviewUnsubscribe(); chatRumpiPreviewUnsubscribe = null; }
+      if (chatRumpiUnsubscribe) return;
+      let isInitialLoadRumpi = true;
+      chatRumpiUnsubscribe = storeCollection("db_chat_rumpi").orderBy("waktuTimestamp", "desc").limit(100).onSnapshot((snapshot) => {
+        if (!isInitialLoadRumpi) {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added" && change.doc.data().senderPhone !== currentCustomerPhone) playCustomerNotificationSound();
+          });
+        }
+        isInitialLoadRumpi = false;
+        const msgContainer = document.getElementById("chat-rumpi-messages");
+        if (!msgContainer) return;
+        if (snapshot.empty) {
+          msgContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada percakapan. Yuk mulai ngobrol, Kak!</div>`;
+          return;
+        }
+        let html = '';
+        [...snapshot.docs].reverse().forEach(doc => {
+          const m = doc.data();
+          const isMyMessage = m.senderPhone === currentCustomerPhone;
+          const alignStyle = isMyMessage ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);";
+          html += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignStyle}">${!isMyMessage ? `<div style="font-size: 0.65rem; font-weight: bold; color: #16a34a; margin-bottom: 2px;">${escapeHtml(m.senderName || 'Warga Toko')}</div>` : ''}<div>${escapeHtml(m.pesan || '')}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`;
         });
+        msgContainer.innerHTML = html;
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+      });
     }
 
     function kirimPesanChatRumpi() { if (!currentCustomerPhone) return alert("Silakan login untuk ikut merumpikan!"); let inputEl = document.getElementById("chat-rumpi-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); storeCollection("db_chat_rumpi").add({ senderPhone: currentCustomerPhone, senderName: currentCustomerName || 'Pelanggan', pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
-    function initCustomerChatListener() { if (!currentCustomerPhone) return; storeCollection("chats").doc(currentCustomerPhone).onSnapshot((doc) => { if (doc.exists) { let unread = doc.data().unreadCustomer || 0; let badgeAdminSub = document.getElementById("badge-admin-subtab"); if (badgeAdminSub) { if (unread > 0) { badgeAdminSub.innerText = unread; badgeAdminSub.style.display = "inline-block"; } else { badgeAdminSub.style.display = "none"; } } } }); if (customerChatUnsubscribe) customerChatUnsubscribe(); let isInitialLoadChat = true; customerChatUnsubscribe = storeCollection("chats").doc(currentCustomerPhone).collection("messages").orderBy("waktuTimestamp", "asc").onSnapshot((snapshot) => { if (!isInitialLoadChat) { snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().pengirim === "admin") { playCustomerNotificationSound(); } }); } isInitialLoadChat = false; let msgContainer = document.getElementById("customer-chat-messages"); if (!msgContainer) return; msgContainer.innerHTML = snapshot.empty ? `<div style="text-align: center; color: var(--text-muted); font-size: 0.78rem; margin-top: 15px;">Belum ada pesan. Sampaikan pertanyaan Anda ke toko!</div>` : ""; snapshot.forEach(doc => { let m = doc.data(); let isCustomer = m.pengirim === "customer"; let alignBubble = isCustomer ? "align-self: flex-end; background: #2563eb; color: white;" : "align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);"; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; ${alignBubble}"><div>${m.pesan}</div><div style="font-size: 0.58rem; opacity: 0.8; text-align: right; margin-top: 2px;">${m.waktu || ''}</div></div>`; }); msgContainer.scrollTop = msgContainer.scrollHeight; }); }
+    function initCustomerChatListener() {
+      if (!currentCustomerPhone) return;
+      if (customerChatMetaUnsubscribe) customerChatMetaUnsubscribe();
+      customerChatMetaUnsubscribe = storeCollection("chats").doc(currentCustomerPhone).onSnapshot((doc) => {
+        if (doc.exists) {
+          const unread = doc.data().unreadCustomer || 0;
+          const badgeAdminSub = document.getElementById("badge-admin-subtab");
+          if (badgeAdminSub) { badgeAdminSub.innerText = unread; badgeAdminSub.style.display = unread > 0 ? "inline-block" : "none"; }
+        }
+      });
+      if (customerChatUnsubscribe) customerChatUnsubscribe();
+      let isInitialLoadChat = true;
+      customerChatUnsubscribe = storeCollection("chats").doc(currentCustomerPhone).collection("messages").orderBy("waktuTimestamp", "desc").limit(100).onSnapshot((snapshot) => {
+        if (!isInitialLoadChat) {
+          snapshot.docChanges().forEach((change) => { if (change.type === "added" && change.doc.data().pengirim === "admin") playCustomerNotificationSound(); });
+        }
+        isInitialLoadChat = false;
+        renderCustomerChatMessages(snapshot);
+      });
+    }
     function kirimPesanPelanggan() { if (!currentCustomerPhone) return alert("Silakan login terlebih dahulu!"); let inputEl = document.getElementById("customer-chat-input"); let pesan = inputEl.value.trim(); if (!pesan) return; let nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('id-ID'); storeCollection("chats").doc(currentCustomerPhone).collection("messages").add({ pengirim: "customer", pesan: pesan, waktu: nowStr, waktuTimestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { storeCollection("chats").doc(currentCustomerPhone).set({ customerNama: currentCustomerName, lastMessage: currentCustomerName + ": " + pesan, lastTimestamp: firebase.firestore.FieldValue.serverTimestamp(), unreadAdmin: firebase.firestore.FieldValue.increment(1) }, { merge: true }); inputEl.value = ""; }).catch(err => { alert("Gagal mengirim pesan: " + err.message); }); }
 
     function prosesLoginPelanggan(e) {
@@ -1162,13 +1247,10 @@
             currentCustomerPhone = phone;
             currentCustomerName = docData.nama || 'Pelanggan';
             document.getElementById('customerLoginModal').style.display = 'none';
-            // Refresh HANYA setelah tombol Masuk pada form login berhasil.
-            // Tidak terkait dengan bottom navbar/menu.
+            // Setelah login berhasil halaman memang direfresh untuk menyatukan state.
+            // Listener/render tidak dijalankan sebelum reload agar pekerjaan Firebase/DOM
+            // tidak dilakukan dua kali dalam jeda ~150 ms.
             setTimeout(() => { window.location.reload(); }, 150);
-            muatDataPelangganRealtime();
-            muatRiwayatPesananOnlinePelanggan();
-            initCustomerChatListener();
-            refreshKatalogPelanggan();
 
             showToast("Berhasil Masuk! Selamat Berbelanja 🛒");
             periksaCheckinHarian();
@@ -1232,13 +1314,33 @@
 
     function initFirebaseListeners() {
       storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
-      storeCollection("produk").onSnapshot((snapshot) => { 
-        databaseProduk = {}; 
-        snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); }); 
-        isProductsLoaded = true; 
-        muatBarangLarisHariIni(); 
-        perbaruiTampilanKategori(); 
-        refreshKatalogPelanggan(); 
+      storeCollection("produk").onSnapshot((snapshot) => {
+        const isInitialProductSnapshot = !isProductsLoaded;
+        let productChanged = isInitialProductSnapshot;
+
+        if (isInitialProductSnapshot) {
+          databaseProduk = {};
+          snapshot.forEach((doc) => { databaseProduk[doc.id] = doc.data(); });
+          rebuildCatalogProductsCache();
+        } else {
+          // TAHAP F: jangan rebuild seluruh katalog untuk setiap perubahan produk.
+          // Firestore docChanges() hanya berisi dokumen yang benar-benar berubah.
+          snapshot.docChanges().forEach((change) => {
+            productChanged = true;
+            if (change.type === 'removed') {
+              delete databaseProduk[change.doc.id];
+            } else {
+              databaseProduk[change.doc.id] = change.doc.data();
+            }
+          });
+          if (productChanged) rebuildCatalogProductsCache();
+        }
+
+        isProductsLoaded = true;
+        if (!productChanged) return;
+        muatBarangLarisHariIni();
+        perbaruiTampilanKategori();
+        refreshKatalogPelanggan();
         if(window.__promoRenderHook) window.__promoRenderHook();
         renderPromoTokoPelanggan();
         if (lastFetchedOrders && lastFetchedOrders.length > 0) {
@@ -1268,7 +1370,7 @@
       // Listener transaksi untuk "Sedang Laris".
       // Jika hari ini belum ada transaksi, tampilkan data dari tanggal transaksi
       // terakhir yang tersedia. Begitu ada transaksi baru, kartu otomatis dihitung ulang.
-      storeCollection("transaksi").onSnapshot((snapshot) => {
+      storeCollection("transaksi").orderBy("waktuTimestamp", "desc").limit(200).onSnapshot((snapshot) => {
         window.__trendingTransactionsSnapshot = snapshot;
         muatBarangLarisHariIni();
       }, (err) => {
@@ -1670,6 +1772,24 @@
       renderCartPelanggan();
     }
 
+    function rebuildCatalogProductsCache() {
+      const items = [];
+      for (const code in databaseProduk) {
+        const p = databaseProduk[code];
+        if (!p) continue;
+        const pNama = String(p.nama || '');
+        const pNamaLower = pNama.toLowerCase();
+        const pKat = p.kategori;
+        const kategoriProduk = Array.isArray(pKat)
+          ? pKat.flatMap(k => String(k || '').split(/[,;|]+/)).map(k => k.trim()).filter(Boolean)
+          : String(pKat || '').split(/[,;|]+/).map(k => k.trim()).filter(Boolean);
+        items.push({ code, ...p, _namaLower: pNamaLower, _kategoriLower: kategoriProduk.map(k => k.toLowerCase()) });
+      }
+      items.sort((a, b) => String(a.nama || '').localeCompare(String(b.nama || ''), 'id'));
+      catalogProductsCache = items;
+      catalogCacheReady = true;
+    }
+
     function refreshKatalogPelanggan() {
       const container = document.getElementById("pos-catalog-container"); const cardWrapper = document.getElementById("pos-card-wrapper");
       if (!container || !cardWrapper) return;
@@ -1678,23 +1798,18 @@
       updateCatalogViewButtons();
       if (!isProductsLoaded) { cardWrapper.style.display = "none"; return; } cardWrapper.style.display = "block";
 
-      let matchedProducts = [];
-      for (let code in databaseProduk) {
-        let p = databaseProduk[code]; let pNamaLower = String(p.nama || '').toLowerCase();
-        let pKat = p.kategori;
-        let kategoriProduk = Array.isArray(pKat)
-          ? pKat.flatMap(k => String(k || '').split(/[,;|]+/)).map(k => k.trim()).filter(Boolean)
-          : String(pKat || '').split(/[,;|]+/).map(k => k.trim()).filter(Boolean);
-      let searchKeyword = (document.getElementById("inventory-search-input")?.value || "").toLowerCase().trim();
-        let matchSearch = !searchKeyword || pNamaLower.includes(searchKeyword);
-        let matchCategory = (activeKategoriPelanggan === 'Home' || activeKategoriPelanggan === 'Produk') ||
-          kategoriProduk.some(k => k.toLowerCase() === activeKategoriPelanggan.toLowerCase().trim());
-        if (matchCategory && matchSearch) matchedProducts.push({ code, ...p });
-      }
-      
-      matchedProducts.sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
-      // TAHAP 1: hanya card katalog yang dibatasi. databaseProduk tetap lengkap untuk seluruh dashboard.
+      if (!catalogCacheReady) rebuildCatalogProductsCache();
+      const searchKeyword = (document.getElementById("inventory-search-input")?.value || "").toLowerCase().trim();
+      const activeCategoryLower = String(activeKategoriPelanggan || '').toLowerCase().trim();
+      const homeCategory = activeKategoriPelanggan === 'Home' || activeKategoriPelanggan === 'Produk';
+      const matchedProducts = catalogProductsCache.filter(p => {
+        const matchSearch = !searchKeyword || p._namaLower.includes(searchKeyword);
+        const matchCategory = homeCategory || p._kategoriLower.includes(activeCategoryLower);
+        return matchCategory && matchSearch;
+      });
+      // TAHAP B: cache sudah terurut saat snapshot produk berubah. Refresh cukup filter + slice.
       let paginatedItems = matchedProducts.slice(0, catalogVisibleCount);
+      let catalogHtml = '';
       container.innerHTML = "";
 
       const loadSentinel = document.getElementById('catalog-load-sentinel');
@@ -1714,7 +1829,7 @@
         if (catalogViewMode === 'card') {
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
-            container.innerHTML += `
+            catalogHtml += `
               <div class="catalog-card-view modern-product-card-view" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div class="modern-card-soldout"><span>HABIS</span></div>' : ''}
                 <div class="modern-card-stage">
@@ -1735,7 +1850,7 @@
                 </div>
               </div>`;
           } else {
-            container.innerHTML += `
+            catalogHtml += `
               <div class="catalog-card-view generic-card-view" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div class="generic-card-soldout"><span>HABIS</span></div>' : ''}
                 <div class="generic-card-image-wrap">
@@ -1751,7 +1866,7 @@
         } else if (catalogViewMode === 'grid') {
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
-            container.innerHTML += `
+            catalogHtml += `
               <div class="inv-card modern-product-card" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div class="modern-product-soldout"><span>HABIS</span></div>' : ''}
                 <div class="modern-product-stage">
@@ -1772,7 +1887,7 @@
                 </div>
               </div>`;
           } else {
-            container.innerHTML += `
+            catalogHtml += `
               <div class="inv-card" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10; border-radius:8px; display:flex; align-items:center; justify-content:center;"><span style="background:#dc2626; color:#fff; font-weight:bold; padding:3px 8px; border-radius:6px; font-size:0.7rem; transform:rotate(-15deg);">HABIS</span></div>' : ''}
                 <div style="text-align: center; margin-bottom: 4px; position: relative;">
@@ -1788,7 +1903,7 @@
         } else {
           const activeCustomerTheme = document.body.getAttribute('data-theme');
           if (activeCustomerTheme === 'modern') {
-            container.innerHTML += `
+            catalogHtml += `
               <div class="catalog-list-item" onclick="openProductDetail('${code}')">
                 <div class="modern-list-photo-wrap" style="position: relative; flex-shrink: 0;">
                   ${sisaStokBadge}
@@ -1805,7 +1920,7 @@
                 </div>
               </div>`;
           } else {
-            container.innerHTML += `
+            catalogHtml += `
               <div class="catalog-list-item" onclick="openProductDetail('${code}')">
                 <div class="generic-list-image-wrap" style="position:relative; flex-shrink:0; width:45px; height:45px;">
                   ${sisaStokBadge}
@@ -1823,7 +1938,9 @@
               </div>`;
           }
         }
-      }); document.getElementById("pos-page-indicator").innerText = `${Math.min(catalogVisibleCount, matchedProducts.length)}/${matchedProducts.length}`;
+      });
+      container.innerHTML = catalogHtml;
+      document.getElementById("pos-page-indicator").innerText = `${Math.min(catalogVisibleCount, matchedProducts.length)}/${matchedProducts.length}`;
     }
 
     // Pagination lama tidak lagi mengubah sumber data. Tahap berikutnya akan menggantinya dengan infinite scroll.
@@ -1867,8 +1984,8 @@
       catalogLoadObserver.observe(sentinel);
     }
 
-    // Fallback tambahan untuk browser/scroll container yang tidak memicu
-    // observer secara konsisten. Capture=true menangkap scroll dari elemen anak.
+    // TAHAP B: IntersectionObserver menjadi mekanisme utama. Fallback hanya satu
+    // listener window untuk browser yang tidak mendukung IntersectionObserver.
     function handleCatalogInfiniteScroll() {
       if (catalogScrollLoading) return;
       const sentinel = document.getElementById('catalog-load-sentinel');
@@ -1877,9 +1994,10 @@
       if (rect.top <= window.innerHeight + 500) loadNextCatalogBatch();
     }
 
-    window.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true });
-    document.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true, capture: true });
-    window.addEventListener('resize', handleCatalogInfiniteScroll, { passive: true });
+    if (!('IntersectionObserver' in window)) {
+      window.addEventListener('scroll', handleCatalogInfiniteScroll, { passive: true });
+      window.addEventListener('resize', handleCatalogInfiniteScroll, { passive: true });
+    }
     window.addEventListener('load', setupCatalogInfiniteScroll, { once: true });
 
     // Assistant AI dari welcome gateway.
@@ -2092,7 +2210,7 @@
     }
 
     function muatRiwayatPesananOnlinePelanggan() { 
-      storeCollection("transaksi").where("customerPhone", "==", currentCustomerPhone).onSnapshot((snapshot) => { 
+      storeCollection("transaksi").where("customerPhone", "==", currentCustomerPhone).limit(100).onSnapshot((snapshot) => { 
         const container = document.getElementById("customer-online-orders-container"); 
         if (!container) return; 
         container.innerHTML = ""; 
