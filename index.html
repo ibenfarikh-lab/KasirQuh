@@ -43,7 +43,7 @@ button{font:inherit}
 .feature-card,.recipe-card,.trending-card{color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15);border:0;transition:transform .15s,box-shadow .15s;flex-shrink:0;cursor:pointer}
 .feature-card:active,.recipe-card:active,.trending-card:active{transform:scale(.97)}
 .auto-track>.feature-card{flex:0 0 95px;min-width:95px}
-.stock-card{min-height:112px;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.stock-card{flex:0 0 130px;width:130px;min-width:130px;min-height:112px;border-radius:10px;padding:7px;display:flex;flex-direction:column;gap:5px;overflow:hidden;box-sizing:border-box}.stock-card .card-title{font-size:.72rem;font-weight:900;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.stock-card .card-sub{font-size:.62rem;color:#fff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:0}.stock-card .card-price{font-size:.7rem;font-weight:900;color:#fff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:0}
 .stock-card img{width:100%;height:55px;object-fit:cover;border-radius:12px;border:2px solid rgba(255,255,255,.35);background:#fff;display:block}
 .stock-card .card-title{font-size:.68rem;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stock-card .card-price{font-size:.68rem;font-weight:900;color:#fff;margin-top:0}
@@ -88,6 +88,8 @@ button{font:inherit}
 @media(max-width:480px){.guest-shortcuts{padding:12px 26px 7px;gap:7px}.guest-shortcut-customer{min-height:58px;gap:10px;padding:9px 15px;font-size:.94rem}.guest-shortcut-customer .shortcut-cart{width:28px;height:28px;flex-basis:28px}.guest-shortcut-customer .shortcut-arrow{font-size:1.45rem}.guest-shortcut-admin{min-width:124px;min-height:46px;padding:6px 13px;font-size:.82rem}.guest-shortcut-admin .shortcut-lock{width:25px;height:25px;flex-basis:25px}}
 @media(max-width:360px){.guest-shortcuts{padding-left:20px;padding-right:20px}.guest-shortcut-customer{min-height:54px;font-size:.88rem}.guest-shortcut-admin{min-width:116px;min-height:43px;font-size:.78rem}}
 
+
+.kq-icon-sprite{position:absolute;overflow:hidden}.kq-icon{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}.section-label,.customer-info-label{display:flex;align-items:center;gap:6px}.promo-gift{display:flex;align-items:center;justify-content:center}.promo-gift .kq-icon{width:30px;height:30px}.shortcut-arrow{display:flex;align-items:center}.shortcut-arrow .kq-icon{width:25px;height:25px}.guest-badge{display:flex;align-items:center;gap:3px}.guest-badge .kq-icon{width:11px;height:11px}.recipe-btn-action.share .kq-icon{width:15px;height:15px}.customer-info-label .kq-icon{width:15px;height:15px}.index-ai-actions .kq-icon,#index-ai-sound .kq-icon,#index-ai-mic .kq-icon{width:15px;height:15px;vertical-align:-.25em}
 </style>
 </head>
 <body data-theme="modern" class="kasirquh-startup-pending">
@@ -190,6 +192,20 @@ body.kasirquh-startup-pending #index-ai-modal {
 })();
 </script>
 
+<svg class="kq-icon-sprite" aria-hidden="true" width="0" height="0" focusable="false">
+<symbol id="kq-wave" viewBox="0 0 24 24"><path d="M4 14c2 0 2-4 4-4s2 6 4 6 2-8 4-8 2 4 4 4"/><path d="M4 18h16"/></symbol>
+<symbol id="kq-megaphone" viewBox="0 0 24 24"><path d="M3 11v2a2 2 0 0 0 2 2h2l9 4V5L7 9H5a2 2 0 0 0-2 2Z"/><path d="M7 15l1.5 4"/><path d="M19 9a3 3 0 0 1 0 6"/></symbol>
+<symbol id="kq-gift" viewBox="0 0 24 24"><path d="M3 10h18v11H3zM2 7h20v3H2zM12 7v14"/><path d="M12 7H8.5A2.5 2.5 0 1 1 11 4.5L12 7Zm0 0h3.5A2.5 2.5 0 1 0 13 4.5L12 7Z"/></symbol>
+<symbol id="kq-package" viewBox="0 0 24 24"><path d="m12 3 8 4v10l-8 4-8-4V7l8-4Z"/><path d="m4 7 8 4 8-4M12 11v10"/></symbol>
+<symbol id="kq-chef" viewBox="0 0 24 24"><path d="M6 10a4 4 0 1 1 2-7 4 4 0 0 1 8 0 4 4 0 1 1 2 7v4H6v-4Z"/><path d="M8 14v7h8v-7M5 21h14"/></symbol>
+<symbol id="kq-flame" viewBox="0 0 24 24"><path d="M12 21a7 7 0 0 0 6-10c-1.2 1-2.5 1.5-3.5.5C15 8 13 5 10 3c.5 3-1 4.5-2.5 6C6 10.5 5 12.5 5 15a7 7 0 0 0 7 6Z"/><path d="M12 21c-2.2-1.2-2.5-4 .1-6.4 1.2 1 1.8 2 1.7 3.1"/></symbol>
+<symbol id="kq-arrow" viewBox="0 0 24 24"><path d="M4 12h15M14 7l5 5-5 5"/></symbol>
+<symbol id="kq-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.5-4.3M8.2 13.2l7.5 4.3"/></symbol>
+<symbol id="kq-volume" viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M17 9a5 5 0 0 1 0 6M19.5 6.5a9 9 0 0 1 0 11"/></symbol>
+<symbol id="kq-volume-off" viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="m17 9 4 4M21 9l-4 4"/></symbol>
+<symbol id="kq-mic" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="12" rx="4"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></symbol>
+<symbol id="kq-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+</svg>
 <main class="main-content">
 <section>
 <header class="customer-home-header" id="customer-home-header">
@@ -206,26 +222,26 @@ body.kasirquh-startup-pending #index-ai-modal {
   </div>
   <div class="customer-home-title-row">
     <h1 class="customer-home-title"><span id="customer-home-store-name">KasirQuh</span></h1>
-    <p class="customer-home-greeting" id="customer-home-greeting">Selamat datang 👋</p>
-    <div class="customer-home-info-line" id="customer-home-info-line"><span class="customer-info-label">📢 Info Toko:</span><span class="customer-running-window"><span class="customer-running-text" id="customer-home-running-text">Selamat datang di toko kami.</span></span></div>
+    <p class="customer-home-greeting" id="customer-home-greeting">Selamat datang</p>
+    <div class="customer-home-info-line" id="customer-home-info-line"><span class="customer-info-label"><svg class="kq-icon" aria-hidden="true"><use href="#kq-megaphone"/></svg> Info Toko:</span><span class="customer-running-window"><span class="customer-running-text" id="customer-home-running-text">Selamat datang di toko kami.</span></span></div>
   </div>
-  <button class="promo-banner" id="promo-banner-section" type="button" aria-label="Lihat promo toko"><span class="promo-gift">🎁</span></button>
+  <button class="promo-banner" id="promo-banner-section" type="button" aria-label="Lihat promo toko"><span class="promo-gift"><svg class="kq-icon" aria-hidden="true"><use href="#kq-gift"/></svg></span></button>
 </header>
 
 
 
 <section class="feature-section">
-  <div class="section-label">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
+  <div class="section-label"><svg class="kq-icon" aria-hidden="true"><use href="#kq-package"/></svg> Stok Rumah Habis? Beli Lagi Yuk!</div>
   <div class="rail" id="reorder-container"><div class="loading">Memuat...</div></div>
 </section>
 
 <section class="feature-section">
-  <div class="section-label">🍜 ide Masak Warga Hari Ini</div>
+  <div class="section-label"><svg class="kq-icon" aria-hidden="true"><use href="#kq-chef"/></svg> Ide Masak Warga Hari Ini</div>
   <div class="rail" id="recipe-scroll-container"><div class="loading">Memuat ide masak...</div></div>
 </section>
 
 <section class="feature-section">
-  <div class="section-label">🔥 Sedang Laris Hari Ini</div>
+  <div class="section-label"><svg class="kq-icon" aria-hidden="true"><use href="#kq-flame"/></svg> Sedang Laris Hari Ini</div>
   <div class="rail" id="trending-container"><div class="loading">Memuat...</div></div>
 </section>
 
@@ -234,7 +250,7 @@ body.kasirquh-startup-pending #index-ai-modal {
 <section class="guest-shortcuts" aria-label="Akses cepat">
   <a class="guest-shortcut-customer" href="/pelanggan/index.html" aria-label="Mulai Belanja">
     <svg class="shortcut-cart" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h5l4 22h21l4-16H14"/><path d="M19 16h18M21 22h15"/><circle cx="19" cy="38" r="2.4" fill="currentColor"/><circle cx="35" cy="38" r="2.4" fill="currentColor"/></g></svg>
-    <span>Mulai Belanja</span><span class="shortcut-arrow" aria-hidden="true">→</span>
+    <span>Mulai Belanja</span><span class="shortcut-arrow" aria-hidden="true"><svg class="kq-icon" aria-hidden="true"><use href="#kq-arrow"/></svg></span>
   </a>
   <a class="guest-shortcut-admin" href="/admin/index.html" aria-label="Admin">
     <svg class="shortcut-lock" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="21" width="28" height="21" rx="3" fill="currentColor"/><path d="M16 21v-7c0-9 16-9 16 0v7" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="31" r="3" fill="#143b9b"/><path d="M24 31v6" stroke="#143b9b" stroke-width="2.5" stroke-linecap="round"/></svg>
@@ -270,7 +286,7 @@ body.kasirquh-startup-pending #index-ai-modal {
   const gotoCustomer=()=>{ window.location.href='/pelanggan/index.html'; };
   const dateKey=data=>{let d=null;try{if(data?.waktuTimestamp?.toDate)d=data.waktuTimestamp.toDate();else if(data?.waktuTimestamp?.seconds)d=new Date(Number(data.waktuTimestamp.seconds)*1000);else if(data?.waktu){const x=new Date(data.waktu);if(!isNaN(x.getTime()))d=x;}}catch(e){}if(!d)return null;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 
-  function greet(){const h=Number(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',hour12:false}).format(new Date()));$('customer-home-greeting').textContent=h>=5&&h<11?'Selamat pagi 👋':h>=11&&h<15?'Selamat siang ☀️':h>=15&&h<18?'Selamat sore 🌤️':'Selamat malam 🌙'}
+  function greet(){const h=Number(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',hour12:false}).format(new Date()));$('customer-home-greeting').textContent=h>=5&&h<11?'Selamat pagi':h>=11&&h<15?'Selamat siang':h>=15&&h<18?'Selamat sore':'Selamat malam'}
   function renderInfo(data){const el=$('customer-home-running-text');el.textContent=String(data?.runningText||'Selamat datang di toko kami.').trim()}
   function renderStore(data){const n=String(data?.nama||'KasirQuh');$('customer-home-store-name').textContent=n}
 
@@ -310,7 +326,7 @@ body.kasirquh-startup-pending #index-ai-modal {
     box.classList.remove('auto-rail');
     box.innerHTML=list.map(r=>{
       const foto=r.foto?`<img src="${esc(r.foto)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'';
-      return `<article class="recipe-card" data-go-customer="1">${foto}<div><div class="recipe-name">${esc(r.nama||'Menu Warga')}</div><div class="recipe-desc">${esc(r.desc||'Ide masak pilihan warga.')}</div></div><div class="recipe-action-row"><button type="button" class="recipe-btn-action">+ Masukkan Bahan</button><button type="button" class="recipe-btn-action share">📢</button></div></article>`;
+      return `<article class="recipe-card" data-go-customer="1">${foto}<div><div class="recipe-name">${esc(r.nama||'Menu Warga')}</div><div class="recipe-desc">${esc(r.desc||'Ide masak pilihan warga.')}</div></div><div class="recipe-action-row"><button type="button" class="recipe-btn-action">+ Masukkan Bahan</button><button type="button" class="recipe-btn-action share" aria-label="Bagikan resep"><svg class="kq-icon" aria-hidden="true"><use href="#kq-share"/></svg></button></div></article>`;
     }).join('');
     box.querySelectorAll('.recipe-card').forEach(x=>x.onclick=gotoCustomer);
     box.querySelectorAll('.recipe-btn-action').forEach(b=>b.onclick=e=>{e.stopPropagation();gotoCustomer()});
@@ -350,7 +366,7 @@ body.kasirquh-startup-pending #index-ai-modal {
   function renderCatalog(){
     const box=$('pos-catalog-container');
     const entries=Object.keys(dbProduk).map(code=>({code,p:dbProduk[code]})).sort((a,b)=>String(a.p.nama||'').localeCompare(String(b.p.nama||''),'id')).slice(0,6);
-    box.innerHTML=entries.length?entries.map(({code,p})=>{const habis=Number(p.stok||0)<=0;const low=!habis&&Number(p.stok||0)<=5;return `<article class="guest-product-card" data-code="${esc(code)}"><div class="guest-product-stage">${low?`<div class="guest-badge">🔥 Sisa ${esc(p.stok)}</div>`:''}<img class="product-photo" src="${esc(photo(p))}" alt="${esc(p.nama||'Produk')}" loading="lazy"><div class="guest-platform"></div>${habis?'<div class="guest-soldout"><span>HABIS</span></div>':''}</div><div class="guest-info"><div class="guest-name">${esc(p.nama||'Produk')}</div><div class="guest-price">Rp ${price(p).toLocaleString('id-ID')}</div><div class="guest-stock">Stok: ${esc(p.stok||0)} ${esc(unit(p))}</div></div></article>`}).join(''):'<div class="empty" style="grid-column:1/-1">Belum ada produk.</div>';
+    box.innerHTML=entries.length?entries.map(({code,p})=>{const habis=Number(p.stok||0)<=0;const low=!habis&&Number(p.stok||0)<=5;return `<article class="guest-product-card" data-code="${esc(code)}"><div class="guest-product-stage">${low?`<div class="guest-badge"><svg class="kq-icon" aria-hidden="true"><use href="#kq-flame"/></svg> Sisa ${esc(p.stok)}</div>`:''}<img class="product-photo" src="${esc(photo(p))}" alt="${esc(p.nama||'Produk')}" loading="lazy"><div class="guest-platform"></div>${habis?'<div class="guest-soldout"><span>HABIS</span></div>':''}</div><div class="guest-info"><div class="guest-name">${esc(p.nama||'Produk')}</div><div class="guest-price">Rp ${price(p).toLocaleString('id-ID')}</div><div class="guest-stock">Stok: ${esc(p.stok||0)} ${esc(unit(p))}</div></div></article>`}).join(''):'<div class="empty" style="grid-column:1/-1">Belum ada produk.</div>';
     box.querySelectorAll('[data-code]').forEach(x=>x.onclick=gotoCustomer);
   }
 
@@ -437,11 +453,11 @@ body.kasirquh-startup-pending #index-ai-modal {
 <div id="index-ai-modal" aria-hidden="true">
   <div id="index-ai-panel">
     <div id="index-ai-head">
-      <div style="display:flex;align-items:center;gap:6px"><strong style="font-size:.9rem">😀 Asisten Belanja AI</strong><button id="index-ai-sound" type="button">🔊 Suara: ON</button></div>
+      <div style="display:flex;align-items:center;gap:6px"><strong style="font-size:.9rem">Asisten Belanja AI</strong><button id="index-ai-sound" type="button"><svg class="kq-icon" aria-hidden="true"><use href="#kq-volume"/></svg> Suara: ON</button></div>
       <button id="index-ai-close" type="button">&times;</button>
     </div>
     <div id="index-ai-messages"><div style="align-self:flex-start;background:#fff;border:1px solid #e5e7eb;color:#111827;padding:6px 10px;border-radius:8px;max-width:80%">HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?</div></div>
-    <div id="index-ai-input-row"><input id="index-ai-input" type="text" placeholder="Tanya atau ngobrol..." autocomplete="off"><button id="index-ai-mic" type="button" title="Ngomong pakai suara">🎤</button><button id="index-ai-send" type="button">Kirim</button></div>
+    <div id="index-ai-input-row"><input id="index-ai-input" type="text" placeholder="Tanya atau ngobrol..." autocomplete="off"><button id="index-ai-mic" type="button" title="Ngomong pakai suara"><svg class="kq-icon" aria-hidden="true"><use href="#kq-mic"/></svg></button><button id="index-ai-send" type="button">Kirim</button></div>
   </div>
 </div>
 <script id="index-ai-fab-js">
@@ -482,13 +498,13 @@ body.kasirquh-startup-pending #index-ai-modal {
   function openAI(){modal.classList.add('show');modal.setAttribute('aria-hidden','false');setTimeout(()=>input.focus(),40);playWelcomeVoice();}
   function closeAI(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}
   close.onclick=closeAI; modal.addEventListener('click',e=>{if(e.target===modal)closeAI();});
-  sound.onclick=()=>{isSound=!isSound;sound.textContent=isSound?'🔊 Suara: ON':'🔇 Suara: OFF';if(!isSound&&speechSynthesis)speechSynthesis.cancel();};
+  sound.onclick=()=>{isSound=!isSound;sound.innerHTML=isSound?'<svg class="kq-icon" aria-hidden="true"><use href="#kq-volume"/></svg> Suara: ON':'<svg class="kq-icon" aria-hidden="true"><use href="#kq-volume-off"/></svg> Suara: OFF';if(!isSound&&speechSynthesis)speechSynthesis.cancel();};
   async function speak(text){if(!isSound)return;try{const r=await fetch('/api/tts?text='+encodeURIComponent(text));if(!r.ok)throw 0;const u=URL.createObjectURL(await r.blob()),a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();}catch(e){}}
   function add(text,me){const d=document.createElement('div');d.style.cssText='max-width:75%;padding:6px 10px;border-radius:8px;font-size:.78rem;white-space:pre-line;align-self:'+(me?'flex-end':'flex-start')+';background:'+(me?'#7c3aed':'#fff')+';color:'+(me?'#fff':'#111827')+';border:'+(me?'0':'1px solid #e5e7eb');d.textContent=text;messages.appendChild(d);messages.scrollTop=messages.scrollHeight;return d;}
   async function send(){const prompt=input.value.trim();if(!prompt)return;input.value='';add(prompt,true);const loading=add('Sedang mengetik...',false);try{const r=await fetch('/api/tanya',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,daftarProduk:'Tidak ada daftar produk saat berada di halaman pembuka.',namaToko:'Warunge Mimi'})});const data=await r.json();let reply=data.reply||(data.candidates&&data.candidates[0]?.content?.parts?.map(x=>x.text||'').join(''))||'Maaf, saya sedang mengalami kendala teknis.';loading.remove();add(reply,false);speak(reply);}catch(e){loading.remove();add('Gagal terhubung ke AI. Silakan coba lagi.',false);}}
   document.getElementById('index-ai-send').onclick=send; input.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
-  if('SpeechRecognition'in window||'webkitSpeechRecognition'in window){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recognition=new SR();recognition.lang='id-ID';recognition.onresult=e=>{input.value=e.results[0][0].transcript;listening=false;mic.textContent='🎤';send();};recognition.onend=()=>{listening=false;mic.textContent='🎤';};recognition.onerror=()=>{listening=false;mic.textContent='🎤';};}
-  mic.onclick=()=>{if(!recognition)return;if(listening){recognition.stop();return;}listening=true;mic.textContent='🛑';recognition.start();};
+  if('SpeechRecognition'in window||'webkitSpeechRecognition'in window){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recognition=new SR();recognition.lang='id-ID';recognition.onresult=e=>{input.value=e.results[0][0].transcript;listening=false;mic.innerHTML='<svg class="kq-icon" aria-hidden="true"><use href="#kq-mic"/></svg>';send();};recognition.onend=()=>{listening=false;mic.innerHTML='<svg class="kq-icon" aria-hidden="true"><use href="#kq-mic"/></svg>';};recognition.onerror=()=>{listening=false;mic.innerHTML='<svg class="kq-icon" aria-hidden="true"><use href="#kq-mic"/></svg>';};}
+  mic.onclick=()=>{if(!recognition)return;if(listening){recognition.stop();return;}listening=true;mic.innerHTML='<svg class="kq-icon" aria-hidden="true"><use href="#kq-stop"/></svg>';recognition.start();};
   addEventListener('resize',()=>{const r=fab.getBoundingClientRect();place(r.left,r.top,true);});
   restore();
 })();
