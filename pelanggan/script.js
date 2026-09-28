@@ -900,14 +900,17 @@
     }
 
     function gantiFormAuth(type) { document.getElementById('formLoginContainer').style.display = type === 'login' ? 'block' : 'none'; document.getElementById('formRegisterContainer').style.display = type === 'register' ? 'block' : 'none'; }
-    /* === DRAG FAB AI PELANGGAN === */
+    /* === DRAG FAB AI PELANGGAN + COLLISION GUARD === */
     (function initDraggableAiFab(){
       const fab = document.getElementById('fab-ai-btn');
       if (!fab || fab.dataset.dragReady === '1') return;
       fab.dataset.dragReady = '1';
 
+      const STORAGE_KEY = 'kasirquh_ai_fab_pos';
+      const EDGE_GAP = 10;
+      const STACK_GAP = 10;
       const saved = (() => {
-        try { return JSON.parse(localStorage.getItem('kasirquh_ai_fab_pos') || 'null'); } catch(e) { return null; }
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch(e) { return null; }
       })();
       let dragging = false;
       let moved = false;
@@ -916,26 +919,102 @@
       let offsetY = 0;
 
       function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
-      function place(x, y, save = true){
+
+      function visibleRect(el){
+        if (!el) return null;
+        const cs = window.getComputedStyle(el);
+        if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) === 0) return null;
+        const r = el.getBoundingClientRect();
+        if (r.width <= 0 || r.height <= 0) return null;
+        return r;
+      }
+
+      function rectsOverlap(a, b, gap = 0){
+        return !(a.right + gap <= b.left || a.left - gap >= b.right || a.bottom + gap <= b.top || a.top - gap >= b.bottom);
+      }
+
+      function getBlockedFabRects(){
+        return ['fab-search-btn','fab-cart-btn']
+          .map(id => visibleRect(document.getElementById(id)))
+          .filter(Boolean);
+      }
+
+      function candidateRect(x, y){
+        return {
+          left:x,
+          top:y,
+          right:x + fab.offsetWidth,
+          bottom:y + fab.offsetHeight
+        };
+      }
+
+      function findSafePosition(x, y){
+        const maxX = Math.max(EDGE_GAP, window.innerWidth - fab.offsetWidth - EDGE_GAP);
+        const maxY = Math.max(EDGE_GAP, window.innerHeight - fab.offsetHeight - EDGE_GAP);
+        const baseX = clamp(x, EDGE_GAP, maxX);
+        const baseY = clamp(y, EDGE_GAP, maxY);
+        const blocked = getBlockedFabRects();
+
+        const isSafe = (cx, cy) => {
+          const r = candidateRect(cx, cy);
+          return !blocked.some(b => rectsOverlap(r, b, STACK_GAP));
+        };
+        if (isSafe(baseX, baseY)) return {x:baseX, y:baseY};
+
+        // Prioritas default/repair: tepat di atas seluruh FAB stack, dengan gap aman.
+        const stack = visibleRect(document.querySelector('.fab-container'));
+        if (stack) {
+          const aboveX = clamp(stack.right - fab.offsetWidth, EDGE_GAP, maxX);
+          const aboveY = clamp(stack.top - fab.offsetHeight - STACK_GAP, EDGE_GAP, maxY);
+          if (isSafe(aboveX, aboveY)) return {x:aboveX, y:aboveY};
+        }
+
+        // Fallback: cari posisi aman terdekat secara vertikal lalu horizontal.
+        const candidates = [];
+        const step = Math.max(8, Math.round(fab.offsetHeight + STACK_GAP));
+        for (let d = step; d <= window.innerHeight + window.innerWidth; d += step) {
+          candidates.push([baseX, baseY - d], [baseX, baseY + d], [baseX - d, baseY], [baseX + d, baseY]);
+        }
+        for (const [cx, cy] of candidates) {
+          const tx = clamp(cx, EDGE_GAP, maxX);
+          const ty = clamp(cy, EDGE_GAP, maxY);
+          if (isSafe(tx, ty)) return {x:tx, y:ty};
+        }
+        return {x:baseX, y:baseY};
+      }
+
+      function savePosition(x, y){
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify({x,y})); } catch(e) {}
+      }
+
+      function place(x, y, save = true, guard = false){
         const maxX = Math.max(0, window.innerWidth - fab.offsetWidth);
         const maxY = Math.max(0, window.innerHeight - fab.offsetHeight);
         x = clamp(x, 0, maxX);
         y = clamp(y, 0, maxY);
+        if (guard) {
+          const safe = findSafePosition(x, y);
+          x = safe.x;
+          y = safe.y;
+        }
         fab.style.left = x + 'px';
         fab.style.top = y + 'px';
         fab.style.right = 'auto';
         fab.style.bottom = 'auto';
-        if(save){
-          try { localStorage.setItem('kasirquh_ai_fab_pos', JSON.stringify({x,y})); } catch(e) {}
-        }
+        if(save) savePosition(x, y);
       }
 
       function applyInitialPosition(){
         if(saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)){
-          place(saved.x, saved.y, false);
+          place(saved.x, saved.y, true, true);
         } else {
+          const stack = visibleRect(document.querySelector('.fab-container'));
           const rect = fab.getBoundingClientRect();
-          place(window.innerWidth - rect.width - 10, (window.innerHeight - rect.height) / 2, false);
+          if (stack) {
+            place(stack.right - rect.width, stack.top - rect.height - STACK_GAP, true, true);
+          } else {
+            place(window.innerWidth - rect.width - EDGE_GAP, window.innerHeight - rect.height - 180, true, true);
+          }
         }
       }
 
@@ -956,7 +1035,7 @@
         if(!dragging || e.pointerId !== pointerId) return;
         const rect = fab.getBoundingClientRect();
         if(Math.abs((e.clientX - rect.left) - offsetX) > 3 || Math.abs((e.clientY - rect.top) - offsetY) > 3) moved = true;
-        place(e.clientX - offsetX, e.clientY - offsetY);
+        place(e.clientX - offsetX, e.clientY - offsetY, false, false);
         e.preventDefault();
       }, {passive:false});
 
@@ -966,11 +1045,13 @@
         fab.classList.remove('is-dragging');
         try { if(pointerId != null) fab.releasePointerCapture(pointerId); } catch(err) {}
         pointerId = null;
+        const rect = fab.getBoundingClientRect();
+        // Setelah drag selesai, koreksi hanya bila benar-benar bertabrakan dengan Search/Cart.
+        place(rect.left, rect.top, true, true);
       }
       fab.addEventListener('pointerup', endDrag);
       fab.addEventListener('pointercancel', endDrag);
 
-      /* Setelah digeser, jangan sampai pointerup dianggap sebagai tap pembuka AI. */
       fab.addEventListener('click', (e) => {
         if(moved){
           e.preventDefault();
@@ -981,10 +1062,10 @@
 
       window.addEventListener('resize', () => {
         const rect = fab.getBoundingClientRect();
-        place(rect.left, rect.top, true);
+        place(rect.left, rect.top, true, true);
       });
 
-      requestAnimationFrame(applyInitialPosition);
+      requestAnimationFrame(() => requestAnimationFrame(applyInitialPosition));
     })();
 
     async function toggleAIChatModal() {
