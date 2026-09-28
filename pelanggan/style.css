@@ -3,3 +3,57 @@
 /* KASIRQUH TAHAP E — safe rendering optimization */
 #reorder-section-wrapper,#recipe-section-wrapper,#trending-section-wrapper,#pos-card-wrapper{content-visibility:auto;contain-intrinsic-size:260px;}
 @media (prefers-reduced-motion:reduce){#reorder-section-wrapper,#recipe-section-wrapper,#trending-section-wrapper,#pos-card-wrapper{scroll-behavior:auto;}}
+
+/* KQ CATEGORY ICON POLISH - Tahap H */
+body[data-theme="modern"] #category-container {
+  gap: 12px !important;
+  padding: 5px 14px 9px !important;
+  align-items: center !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  scrollbar-width: none !important;
+}
+body[data-theme="modern"] #category-container::-webkit-scrollbar { display: none !important; }
+body[data-theme="modern"] #category-container .chip-btn {
+  flex: 0 0 46px !important;
+  width: 46px !important;
+  min-width: 46px !important;
+  max-width: 46px !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  max-height: 46px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid color-mix(in srgb, var(--category-accent, #93c5fd) 28%, transparent) !important;
+  border-radius: 15px !important;
+  background: color-mix(in srgb, var(--category-accent, #93c5fd) 10%, #0b1629) !important;
+  color: var(--category-accent, #93c5fd) !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,.22) !important;
+  font-size: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: none !important;
+  transition: transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease !important;
+}
+body[data-theme="modern"] #category-container .chip-btn .category-line-icon {
+  width: 22px !important;
+  height: 22px !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
+  stroke-width: 1.8 !important;
+  fill: none !important;
+}
+body[data-theme="modern"] #category-container .chip-btn.active {
+  color: var(--category-accent, #93c5fd) !important;
+  border-color: var(--category-accent, #93c5fd) !important;
+  background: color-mix(in srgb, var(--category-accent, #93c5fd) 18%, #0b1629) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--category-accent, #93c5fd) 35%, transparent), 0 5px 14px rgba(0,0,0,.28) !important;
+  transform: translateY(-1px) !important;
+}
+body[data-theme="modern"] #category-container .chip-btn:active { transform: translateY(0) scale(.96) !important; }
+@media (max-width:420px) {
+  body[data-theme="modern"] #category-container { gap: 10px !important; padding-left: 12px !important; padding-right: 12px !important; }
+  body[data-theme="modern"] #category-container .chip-btn { flex-basis: 44px !important; width: 44px !important; min-width: 44px !important; max-width: 44px !important; height: 44px !important; min-height: 44px !important; max-height: 44px !important; }
+  body[data-theme="modern"] #category-container .chip-btn .category-line-icon { width: 21px !important; height: 21px !important; }
+}

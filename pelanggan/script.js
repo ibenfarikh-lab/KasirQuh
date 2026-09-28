@@ -826,6 +826,44 @@
       filterKatalogPelanggan("");
     }
 
+    function getKategoriIconPath(kategori) {
+      const key = String(kategori || '').trim().toLowerCase().replace(/\s+/g, ' ');
+      const icons = {
+        'umum': '<path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5z"></path><path d="m4 7.5 8 3.5 8-3.5M12 11v9"></path>',
+        'minuman': '<path d="M7 4h10l-1 16H8L7 4Z"></path><path d="M8 8h8M9 5h6"></path>',
+        'snack': '<path d="M5 8h14l-1 11H6L5 8Z"></path><path d="M7 8V6a5 5 0 0 1 10 0v2"></path><path d="M9 12h.01M12 15h.01M15 12h.01"></path>',
+        'bumbu': '<path d="M8 7h8v13H8z"></path><path d="M9 7V5h6v2M10 11h4M10 14h4M10 17h3"></path>',
+        'titipan warga': '<path d="M7 20v-3.5a3.5 3.5 0 0 1 7 0V20"></path><path d="M4 20v-2a3 3 0 0 1 3-3M20 20v-2a3 3 0 0 0-3-3"></path><circle cx="10.5" cy="8" r="3"></circle><path d="m15.5 9 1.2 1.2 2.3-2.5"></path>',
+        'semua': '<rect x="4" y="4" width="6" height="6" rx="1"></rect><rect x="14" y="4" width="6" height="6" rx="1"></rect><rect x="4" y="14" width="6" height="6" rx="1"></rect><rect x="14" y="14" width="6" height="6" rx="1"></rect>',
+        'sayuran': '<path d="M12 20c-3.5-3.2-6.5-6.4-6.5-10.2C5.5 6.6 8.2 5 12 5s6.5 1.6 6.5 4.8C18.5 13.6 15.5 16.8 12 20Z"></path><path d="M12 5c0-2 1.4-3.5 3.5-4M12 9c-2-.5-3.8-1.6-5-3.2"></path>',
+        'ikan': '<path d="M3 12s3.2-5 9-5c3.2 0 5.8 2 8 5-2.2 3-4.8 5-8 5-5.8 0-9-5-9-5Z"></path><path d="m20 12 2-2v4l-2-2M9 10h.01M7 15c1.5-1 3-1 4.5 0"></path>',
+        'sembako': '<path d="M5 9h14l-1 11H6L5 9Z"></path><path d="M8 9V6a4 4 0 0 1 8 0v3M9 13h6M10 16h4"></path>',
+        'buah': '<path d="M12 20c-4.2 0-7-3.1-7-7.2C5 9 7.5 7 10.5 7c.7 0 1.1.2 1.5.4.4-.2.8-.4 1.5-.4 3 0 5.5 2 5.5 5.8C19 16.9 16.2 20 12 20Z"></path><path d="M12 7c-.2-2.4 1.2-4.2 3.7-4.7M12 7c-1.7-1.2-3.2-1.2-4.4-.5"></path>',
+        'daging': '<path d="M5 15c0-4 3-8 7-8 3.9 0 7 2.3 7 5.8 0 3.1-2.4 5.2-5.8 5.2H8.5C6.6 18 5 16.8 5 15Z"></path><circle cx="13.5" cy="12.5" r="1.8"></circle><path d="M7 9c1.2-1.7 2.8-2.6 4.5-2.9"></path>',
+        'bumbu dapur': '<path d="M7 8h10v12H7z"></path><path d="M9 8V5h6v3M9 12h6M9 15h6M9 18h4"></path><path d="M17 4c1.5 0 2.5-1 2.5-2.5"></path>'
+      };
+      return icons[key] || '<path d="M5 7h14v14H5z"></path><path d="M8 7V4h8v3"></path><path d="M9 12h6M9 16h4"></path>';
+    }
+
+    function getKategoriAccent(kategori) {
+      const key = String(kategori || '').trim().toLowerCase().replace(/\s+/g, ' ');
+      const accents = {
+        'umum': '#60a5fa',
+        'minuman': '#22d3ee',
+        'snack': '#fbbf24',
+        'bumbu': '#fb923c',
+        'titipan warga': '#a78bfa',
+        'semua': '#34d399',
+        'sayuran': '#4ade80',
+        'ikan': '#38bdf8',
+        'sembako': '#facc15',
+        'buah': '#fb7185',
+        'daging': '#f87171',
+        'bumbu dapur': '#fb923c'
+      };
+      return accents[key] || '#93c5fd';
+    }
+
     function renderKategoriPelanggan(categories) {
       masterKategoriPelanggan = Array.isArray(categories) ? [...new Set(categories.map(v => String(v || '').trim()).filter(Boolean))] : [];
       const container = document.getElementById('category-container');
@@ -833,10 +871,15 @@
       const keep = container.querySelectorAll('[data-category="Home"],[data-category="Produk"]');
       container.innerHTML = '';
       keep.forEach(btn => container.appendChild(btn));
-      masterKategoriPelanggan.forEach((cat, index) => {
+      masterKategoriPelanggan.forEach((cat) => {
         const btn = document.createElement('button');
-        btn.type = 'button'; btn.className = 'chip-btn'; btn.dataset.category = cat; btn.title = cat; btn.setAttribute('aria-label', cat);
-        btn.innerHTML = '<svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24"><path d="M5 7h14v14H5z"></path><path d="M8 7V4h8v3"></path><path d="M9 12h6M9 16h4"></path></svg>';
+        btn.type = 'button';
+        btn.className = 'chip-btn';
+        btn.dataset.category = cat;
+        btn.title = cat;
+        btn.setAttribute('aria-label', cat);
+        btn.style.setProperty('--category-accent', getKategoriAccent(cat));
+        btn.innerHTML = '<svg aria-hidden="true" class="category-line-icon" viewBox="0 0 24 24">' + getKategoriIconPath(cat) + '</svg>';
         btn.addEventListener('click', () => pilihKategoriPelanggan(cat));
         container.appendChild(btn);
       });
@@ -2667,9 +2710,6 @@ document.addEventListener('DOMContentLoaded', () => {
     'promo-next': () => geserPromoTokoPelanggan(1),
     'category-home': () => pilihKategoriPelanggan('Home'),
     'category-produk': () => pilihKategoriPelanggan('Produk'),
-    'view-list': () => gantiViewModePelanggan('list'),
-    'view-grid': () => gantiViewModePelanggan('grid'),
-    'view-card': () => gantiViewModePelanggan('card')
   };
 
   document.querySelectorAll('[data-kq-static-action]').forEach((element) => {
