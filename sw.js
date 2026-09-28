@@ -8,8 +8,6 @@ const CORE_ASSETS = [
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
-  '/gateway/index.css',
-  '/gateway/index.js',
   '/pelanggan/index.html',
   '/pelanggan/style.css',
   '/pelanggan/script.js',
