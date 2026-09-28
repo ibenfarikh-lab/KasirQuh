@@ -57,3 +57,43 @@ body[data-theme="modern"] #category-container .chip-btn:active { transform: tran
   body[data-theme="modern"] #category-container .chip-btn { flex-basis: 44px !important; width: 44px !important; min-width: 44px !important; max-width: 44px !important; height: 44px !important; min-height: 44px !important; max-height: 44px !important; }
   body[data-theme="modern"] #category-container .chip-btn .category-line-icon { width: 21px !important; height: 21px !important; }
 }
+
+/* KQ TAHAP L - COMPACT ADAPTIVE PRODUCT GRID (LOCAL TEST CANDIDATE)
+   Keep small phones on 2 columns; allow 3 compact columns when the viewport
+   has enough room. No JS/Firebase/catalog structure changes. */
+@media (min-width:380px) and (max-width:699px) {
+  body[data-theme="modern"] .product-catalog-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    justify-content: stretch !important;
+    align-items: start !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  body[data-theme="modern"] .product-catalog-grid .modern-product-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+}
+
+@media (min-width:700px) {
+  body[data-theme="modern"] .product-catalog-grid {
+    grid-template-columns: repeat(3, minmax(125px, 1fr)) !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    max-width: 600px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  body[data-theme="modern"] .product-catalog-grid .modern-product-card {
+    width: 100% !important;
+    max-width: 190px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
