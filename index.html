@@ -250,7 +250,11 @@ body.kasirquh-startup-pending #index-ai-modal {
 </section>
 
 
-<section class="product-catalog-grid" id="pos-catalog-container" aria-label="6 produk teratas"></section>
+<section class="product-catalog-grid" id="pos-catalog-container" aria-label="Pilihan produk hari ini"></section>
+<section class="guest-shopping-invite" aria-label="Ajakan mulai belanja">
+  <div class="guest-shopping-invite-title">✨ Baru lihat sebagian kecil nih!</div>
+  <div class="guest-shopping-invite-text">Masih banyak pilihan lainnya. Yuk masuk dan lihat semuanya! 😄</div>
+</section>
 <section class="guest-shortcuts" aria-label="Akses cepat">
   <a class="guest-shortcut-customer" href="/pelanggan/index.html" aria-label="Mulai Belanja">
     <svg class="shortcut-cart" viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h5l4 22h21l4-16H14"/><path d="M19 16h18M21 22h15"/><circle cx="19" cy="38" r="2.4" fill="currentColor"/><circle cx="35" cy="38" r="2.4" fill="currentColor"/></g></svg>
@@ -290,7 +294,7 @@ body.kasirquh-startup-pending #index-ai-modal {
   const gotoCustomer=()=>{ window.location.href='/pelanggan/index.html'; };
   const dateKey=data=>{let d=null;try{if(data?.waktuTimestamp?.toDate)d=data.waktuTimestamp.toDate();else if(data?.waktuTimestamp?.seconds)d=new Date(Number(data.waktuTimestamp.seconds)*1000);else if(data?.waktu){const x=new Date(data.waktu);if(!isNaN(x.getTime()))d=x;}}catch(e){}if(!d)return null;return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 
-  function greet(){const h=Number(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',hour12:false}).format(new Date()));const el=$('customer-home-greeting');if(!el)return;const icon=el.querySelector('.greeting-icon');const text=el.querySelector('.greeting-text');let label='Selamat Malam',symbol='#kq-moon';if(h>=5&&h<11){label='Selamat Pagi';symbol='#kq-sunrise'}else if(h>=11&&h<15){label='Selamat Siang';symbol='#kq-sun'}else if(h>=15&&h<18){label='Selamat Sore';symbol='#kq-sunset'}if(text)text.textContent=label;if(icon){const use=icon.querySelector('use');if(use)use.setAttribute('href',symbol)}}
+  function greet(){const h=Number(new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',hour:'2-digit',hour12:false}).format(new Date()));const el=$('customer-home-greeting');if(!el)return;const icon=el.querySelector('.greeting-icon');const text=el.querySelector('.greeting-text');let label='Selamat malam',symbol='#kq-moon';if(h>=5&&h<11){label='Selamat pagi';symbol='#kq-sunrise'}else if(h>=11&&h<15){label='Selamat siang';symbol='#kq-sun'}else if(h>=15&&h<18){label='Selamat sore';symbol='#kq-sunset'}if(text)text.textContent=label;if(icon){const use=icon.querySelector('use');if(use)use.setAttribute('href',symbol)}}
   function renderInfo(data){const el=$('customer-home-running-text');el.textContent=String(data?.runningText||'Selamat datang di toko kami.').trim()}
   function renderStore(data){const n=String(data?.nama||'KasirQuh');$('customer-home-store-name').textContent=n}
 
