@@ -296,6 +296,11 @@
       const current = history.state && history.state.__kasirquhState;
       // Hindari entry duplikat yang sama persis.
       if (current && JSON.stringify(current) === JSON.stringify(next)) return;
+      // Hardening: keep only one KasirQuh UI-history step.
+      // The current state becomes the Back target; the next UI state is the
+      // only internal entry. This prevents long stacks after opening many
+      // categories/search/details/modals.
+      history.replaceState({ __kasirquh: true, __kasirquhState: current || appGetState() }, '', location.href);
       history.pushState({ __kasirquh: true, __kasirquhState: next }, '', location.href);
     }
     function appCloseAllOverlays() {
@@ -352,7 +357,8 @@
           appRestoreState(state);
           return;
         }
-        // Jika browser mengirim popstate tanpa state internal, kembalikan ke Home.
+        // State di luar controller KasirQuh adalah history milik browser/Android.
+        // Jangan menambah entry baru atau memaksa Home; cukup reset UI ke state awal.
         appRestoreState(initial);
       });
     }
