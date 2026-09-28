@@ -87,12 +87,7 @@
 </div>
 </div>
 <div class="main-content" style="padding-bottom: 70px; padding-left: 8px; padding-right: 8px;">
-<div class="sticky-search-bar no-print" id="sticky-search-container" style="display: none; position: sticky; top: 0; z-index: 90; background: var(--bg-color, #0f172a); padding: 8px 0; margin-bottom: 12px;">
-<div style="display: flex; gap: 8px; align-items: center;">
-<input aria-label="Cari nama barang" id="inventory-search-input" oninput="filterKatalogPelanggan(this.value)" placeholder="🔍 Cari nama barang..." style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-color); box-sizing: border-box;" type="text"/>
-<button data-kq-static-action="close-search" style="background: #dc2626; color: white; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;" type="button">✕</button>
-</div>
-</div>
+
 <div class="modal-backdrop promo-floating-backdrop" id="promoTokoModal" onclick="if(event.target === this) tutupPromoTokoPelanggan()">
 <div aria-label="Promo toko" aria-modal="true" class="promo-floating-card" role="dialog">
 <button aria-label="Tutup promo" class="promo-floating-close" data-kq-static-action="close-promo" type="button">✕</button>
@@ -138,6 +133,17 @@
 <div id="promo-slide-content" style="display:none;"></div>
 </div>
 </button>
+<div class="customer-home-action-row no-print" id="customer-home-action-row">
+<div class="header-search-box" id="sticky-search-container" style="display:flex;">
+<div class="header-search-inner">
+<input aria-label="Cari nama barang" id="inventory-search-input" oninput="filterKatalogPelanggan(this.value)" placeholder="Cari nama barang..." type="text"/>
+<button aria-label="Cari Barang" class="header-action-btn header-search-btn" id="fab-search-btn" title="Cari Barang" type="button">
+<svg height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="fill: none !important;" viewbox="0 0 24 24" width="20"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" x2="21" y1="15.17" y2="21"></line></svg>
+</button>
+</div>
+</div>
+<div class="header-action-icons" aria-label="Aksi belanja"><button class="fab-main header-action-btn" id="fab-cart-btn" title="Buka Keranjang" type="button"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 1.99-.9 1.99-2-.89-2-1.99-2z"></path></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button></div>
+</div>
 </div>
 <div class="no-print" id="reorder-section-wrapper" style="display: none; margin-bottom: 10px;">
 <div style="padding: 0 6px; font-weight: bold; font-size: 0.8rem; margin-bottom: 3px; color: var(--text-color);">Stok Rumah Habis? Beli Lagi Yuk! 👇</div>
@@ -330,10 +336,6 @@
 </div>
 <div class="fab-container no-print" style="position: fixed; bottom: 65px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 99;">
 <button class="fab-main fab-ai-bounce" id="fab-ai-btn" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; font-size: 18px;" title="Asisten Ai Toko" type="button">😀</button>
-<button class="fab-main" id="fab-search-btn" style="background: #2563eb; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer;" title="Cari Barang" type="button">
-<svg height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="fill: none !important;" viewbox="0 0 24 24" width="20"><circle cx="10.5" cy="10.5" r="6.5"></circle><line x1="15.17" x2="21" y1="15.17" y2="21"></line></svg>
-</button>
-<button class="fab-main" id="fab-cart-btn" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: none; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); cursor: pointer; background: #2563eb;" title="Buka Keranjang" type="button"><svg fill="currentColor" height="20" viewbox="0 0 24 24" width="20"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.89-2-1.99-2z"></path></svg><span class="cart-badge" id="cart-count" style="position: absolute; top: -2px; right: -2px; background: #dc2626; color: white; font-size: 0.65rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; border: 2px solid var(--card-bg, #fff);">0</span></button>
 </div>
 <div class="modal-backdrop" id="aiChatModal" onclick="if(event.target === this) toggleAIChatModal()">
 <div class="modal-content" style="max-width: 380px; width: 95%; height: 65vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: 16px;">

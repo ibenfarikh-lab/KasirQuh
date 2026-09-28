@@ -300,6 +300,7 @@
       try { localStorage.removeItem(GUEST_CART_KEY); } catch (e) {}
     }
     let appNavReady = false;
+    let searchModePelanggan = false;
 
     function appGetState() {
       const modalIds = ['customerLoginModal','guestAuthNotice','dailyCheckinModal','menuToggleModal','promoTokoModal','cartModal','aiChatModal','qrCodeModal','productDetailModal'];
@@ -310,7 +311,7 @@
         const visible = id === 'customerLoginModal' ? getComputedStyle(el).display !== 'none' : el.classList.contains('show') || getComputedStyle(el).display !== 'none';
         if (visible) { modal = id; break; }
       }
-      const searchOpen = document.getElementById('sticky-search-container')?.style.display === 'block';
+      const searchOpen = searchModePelanggan;
       return {
         tab: document.querySelector('.tab-content.active')?.id || 'belanja',
         category: activeKategoriPelanggan || 'Home',
@@ -358,14 +359,14 @@
         // Pulihkan keadaan pencarian secara eksplisit. Sebelumnya state.search=false
         // tidak menutup sticky-search-container, sehingga Back kedua terlihat tidak bereaksi.
         const searchContainer = document.getElementById('sticky-search-container');
+        searchModePelanggan = !!state.search;
+        if (searchContainer) searchContainer.style.display = 'flex';
         if (state.search) {
-          if (searchContainer) searchContainer.style.display = 'block';
           setModePencarianPelanggan(true);
           filterKatalogPelanggan(document.getElementById('inventory-search-input')?.value || '');
         } else {
           const input = document.getElementById('inventory-search-input');
           if (input) input.value = '';
-          if (searchContainer) searchContainer.style.display = 'none';
           setModePencarianPelanggan(false);
         }
         perbaruiTampilanKategori();
@@ -481,6 +482,9 @@
       if (action === 'save-recipe') return prosesSimpanMenuSaja();
       if (action === 'chat-rumpi') { switchTabPelanggan('live-chat'); if (currentCustomerPhone) switchSubTabLiveChat('rumpi'); return; }
       if (action === 'chat-admin') { switchTabPelanggan('live-chat'); if (currentCustomerPhone) switchSubTabLiveChat('admin'); return; }
+      if (action === 'menu-data-pelanggan') return switchTabPelanggan('data-pelanggan');
+      if (action === 'menu-live-chat') return switchTabPelanggan('live-chat');
+      if (action === 'menu-pengaturan') return switchTabPelanggan('pengaturan');
     }
 
     function updateCustomerGreeting() {
@@ -907,10 +911,11 @@
     }
 
     function bukaKolomPencarian() {
+      searchModePelanggan = true;
       if (!appNavRestoring) appPushState({ search:true, modal:null });
       const searchContainer = document.getElementById("sticky-search-container");
       if (searchContainer) {
-        searchContainer.style.display = "block";
+        searchContainer.style.display = "flex";
         setModePencarianPelanggan(true);
         filterKatalogPelanggan("");
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -919,11 +924,12 @@
     }
 
     function tutupKolomPencarian() {
+      searchModePelanggan = false;
       if (!appNavRestoring && history.state?.__kasirquhState?.search) { history.back(); return; }
       const input = document.getElementById("inventory-search-input");
       const searchContainer = document.getElementById("sticky-search-container");
       if (input) input.value = "";
-      if (searchContainer) searchContainer.style.display = "none";
+      if (searchContainer) searchContainer.style.display = "flex";
       setModePencarianPelanggan(false);
       perbaruiTampilanKategori();
       filterKatalogPelanggan("");
@@ -1010,7 +1016,7 @@
     }
     
     function perbaruiTampilanKategori() {
-      const searchOpen = document.getElementById('sticky-search-container')?.style.display === 'block';
+      const searchOpen = searchModePelanggan;
       const isHome = activeKategoriPelanggan === 'Home';
       const titleEl = document.getElementById('catalog-category-title');
       const activeBtn = Array.from(document.querySelectorAll('#category-container .chip-btn')).find(btn => btn.dataset.category === activeKategoriPelanggan);
@@ -1574,9 +1580,9 @@
         refreshKatalogPelanggan();
         if(window.__promoRenderHook) window.__promoRenderHook();
         renderPromoTokoPelanggan();
-        if (lastFetchedOrders && lastFetchedOrders.length > 0) {
-          renderQuickReorder(lastFetchedOrders);
-        }
+        // Render juga untuk guest. Jika belum login, renderQuickReorder akan memakai
+        // fallback produk tersedia; jika sudah login, riwayat pelanggan tetap dipakai.
+        renderQuickReorder(lastFetchedOrders || []);
       });
       storeCollection("pengaturan").doc("kategori_produk_v13").onSnapshot((doc) => {
         renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
@@ -1719,6 +1725,7 @@
       const searchFab = document.getElementById('fab-search-btn');
       if (tabId === 'belanja') {
         if (searchFab) searchFab.style.display = 'flex';
+        if (searchContainer) searchContainer.style.display = 'flex';
       } else {
         if (searchContainer) searchContainer.style.display = 'none';
         if (searchFab) searchFab.style.display = 'none';
@@ -1882,7 +1889,7 @@
           const loopWidth = track ? track.scrollWidth / 2 : 0;
 
           // Slow, frame-rate-independent movement.
-          container.scrollLeft += 0.026 * dt;
+          container.scrollLeft += 0.008 * dt;
 
           // Seamless loop: the second copy is identical to the first.
           if (loopWidth > 0 && container.scrollLeft >= loopWidth) {
@@ -2522,7 +2529,22 @@
     }
     
     function renderQuickReorder(orders) {
-      const container = document.getElementById("reorder-container"); const wrapper = document.getElementById("reorder-section-wrapper"); container.innerHTML = ""; let recentCodes = new Set(); orders.forEach(trx => { if(trx.items) trx.items.forEach(it => { if(it.code) recentCodes.add(it.code); }); });
+      const container = document.getElementById("reorder-container"); const wrapper = document.getElementById("reorder-section-wrapper");
+      if (!container || !wrapper) return;
+      container.innerHTML = "";
+      let recentCodes = new Set();
+      (orders || []).forEach(trx => { if(trx.items) trx.items.forEach(it => { if(it.code) recentCodes.add(it.code); }); });
+
+      // Guest fallback: sebelum login tidak ada riwayat transaksi pelanggan,
+      // jadi gunakan produk yang masih tersedia agar section tetap berisi card.
+      // Setelah login, recentCodes dari riwayat pelanggan tetap menjadi sumber utama.
+      if (recentCodes.size === 0 && !currentCustomerPhone && databaseProduk && Object.keys(databaseProduk).length > 0) {
+        Object.keys(databaseProduk).forEach(code => {
+          const p = databaseProduk[code];
+          if (p && Number(p.stok || 0) > 0) recentCodes.add(code);
+        });
+      }
+
       let renderedCount = 0; let itemsHtml = ""; 
       recentCodes.forEach(code => { 
         let p = databaseProduk[code]; 
@@ -2898,7 +2920,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('promo-banner-section')?.addEventListener("click", bukaPromoTokoPelanggan);
   document.getElementById('Opsi Developer')?.addEventListener("click", toggleOpsiDeveloper);
   document.getElementById('fab-ai-btn')?.addEventListener("click", toggleAIChatModal);
-  document.getElementById('fab-search-btn')?.addEventListener("click", bukaKolomPencarian);
+  document.getElementById('fab-search-btn')?.addEventListener("click", () => { document.getElementById('inventory-search-input')?.focus(); });
+  document.getElementById('inventory-search-input')?.addEventListener('focus', () => {
+    // Pencarian header mengikuti transisi Home -> Produk yang sudah ada:
+    // panel Stok Rumah / Ide Masak / Sedang Laris mengempis ke atas,
+    // lalu katalog naik tanpa mengubah kategori produk yang sedang dipakai.
+    if (!searchModePelanggan) {
+      searchModePelanggan = true;
+      if (!appNavRestoring) appPushState({ search:true, modal:null });
+      setModePencarianPelanggan(true);
+      perbaruiTampilanKategori();
+      filterKatalogPelanggan(document.getElementById('inventory-search-input')?.value || '');
+    }
+  });
   document.getElementById('fab-cart-btn')?.addEventListener("click", openCartModal);
   document.getElementById('aiSoundToggle')?.addEventListener("click", toggleAISound);
   document.getElementById('aiMicButton')?.addEventListener("click", toggleAISpeechRecognition);
@@ -2919,9 +2953,9 @@ document.addEventListener('DOMContentLoaded', () => {
     'guest-auth-later': () => closeGuestAuthNotice(true),
     'claim-coin': () => klaimKoinHarian(),
     'menu-belanja': () => { switchTabPelanggan('belanja'); toggleMenuModal(); },
-    'menu-data-pelanggan': () => { switchTabPelanggan('data-pelanggan'); toggleMenuModal(); },
-    'menu-live-chat': () => { switchTabPelanggan('live-chat'); toggleMenuModal(); },
-    'menu-pengaturan': () => { switchTabPelanggan('pengaturan'); toggleMenuModal(); },
+    'menu-data-pelanggan': () => { if (currentCustomerPhone) { switchTabPelanggan('data-pelanggan'); toggleMenuModal(); } else { showGuestAuthNotice('menu-data-pelanggan'); toggleMenuModal(); } },
+    'menu-live-chat': () => { if (currentCustomerPhone) { switchTabPelanggan('live-chat'); toggleMenuModal(); } else { showGuestAuthNotice('menu-live-chat'); toggleMenuModal(); } },
+    'menu-pengaturan': () => { if (currentCustomerPhone) { switchTabPelanggan('pengaturan'); toggleMenuModal(); } else { showGuestAuthNotice('menu-pengaturan'); toggleMenuModal(); } },
     'close-search': () => tutupKolomPencarian(),
     'close-promo': () => tutupPromoTokoPelanggan(),
     'promo-prev': () => geserPromoTokoPelanggan(-1),
