@@ -479,8 +479,8 @@
       if (!currentCustomerPhone || !action) return;
       if (action === 'checkout') return prosesCheckoutPelanggan();
       if (action === 'save-recipe') return prosesSimpanMenuSaja();
-      if (action === 'chat-rumpi') { switchTabPelanggan('live-chat'); return; }
-      if (action === 'chat-admin') { switchTabPelanggan('live-chat'); return; }
+      if (action === 'chat-rumpi') { switchTabPelanggan('live-chat'); if (currentCustomerPhone) switchSubTabLiveChat('rumpi'); return; }
+      if (action === 'chat-admin') { switchTabPelanggan('live-chat'); if (currentCustomerPhone) switchSubTabLiveChat('admin'); return; }
     }
 
     function updateCustomerGreeting() {
@@ -1336,12 +1336,14 @@
       if(!currentDetailCode) return;
       let p = databaseProduk[currentDetailCode];
       closeProductDetail(true);
+      if (!currentCustomerPhone) return showGuestAuthNotice('chat-admin');
       switchTabPelanggan('live-chat'); switchSubTabLiveChat('admin');
       let inputEl = document.getElementById("customer-chat-input");
       if(inputEl) { inputEl.value = `Halo admin, saya mau tanya soal barang ${p.nama}... `; setTimeout(() => inputEl.focus(), 500); }
     }
 
     function switchSubTabLiveChat(sub) {
+      if (!currentCustomerPhone) { if (!appNavRestoring) showGuestAuthNotice(sub === 'admin' ? 'chat-admin' : 'chat-rumpi'); return false; }
       const btnAdmin = document.getElementById('subtab-btn-admin'); const btnRumpi = document.getElementById('subtab-btn-rumpi');
       const contentAdmin = document.getElementById('subtab-admin-content'); const contentRumpi = document.getElementById('subtab-rumpi-content');
       if (sub === 'admin') {
@@ -1378,6 +1380,7 @@
     }
 
     function initChatRumpiPreviewListener() {
+      if (!currentCustomerPhone) return;
       if (chatRumpiUnsubscribe) { chatRumpiUnsubscribe(); chatRumpiUnsubscribe = null; }
       if (chatRumpiPreviewUnsubscribe) return;
       let isInitial = true;
@@ -1402,6 +1405,7 @@
     }
 
     function initChatRumpiListener() {
+      if (!currentCustomerPhone) return;
       if (chatRumpiPreviewUnsubscribe) { chatRumpiPreviewUnsubscribe(); chatRumpiPreviewUnsubscribe = null; }
       if (chatRumpiUnsubscribe) return;
       let isInitialLoadRumpi = true;
@@ -1679,6 +1683,10 @@
     }
 
     function switchTabPelanggan(tabId) {
+      if (tabId === 'live-chat' && !currentCustomerPhone) {
+        if (!appNavRestoring) showGuestAuthNotice('chat-rumpi');
+        return false;
+      }
       if (!appNavRestoring) {
         const nextState = Object.assign({}, appGetState(), { tab:tabId, category:tabId === 'belanja' ? (activeKategoriPelanggan || 'Home') : 'Home', search:false, modal:null, detailCode:null });
         const cur = history.state && history.state.__kasirquhState;
