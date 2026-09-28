@@ -90,7 +90,16 @@ button{font:inherit}
 
 </style>
 </head>
-<body data-theme="modern">
+<body data-theme="modern" class="kasirquh-startup-pending">
+<style id="kasirquh-startup-visibility-fix">
+/* Keep the real Gateway completely out of the first paint until the startup slides finish. */
+body.kasirquh-startup-pending .main-content,
+body.kasirquh-startup-pending #index-ai-fab,
+body.kasirquh-startup-pending #index-ai-modal {
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+</style>
 <!-- KASIRQUH FUTURISTIC PWA STARTUP -->
 <style id="kasirquh-startup-opening">
 #kasirquhPwaOpening{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#06132d;opacity:1;visibility:visible;transition:opacity .65s ease,visibility .65s ease}
@@ -173,7 +182,10 @@ button{font:inherit}
     setTimeout(()=>show(1),SLIDE_MS);
     setTimeout(()=>show(2),SLIDE_MS*2);
     setTimeout(()=>gateway.classList.add('kg3-hide'),SLIDE_MS*3);
-    setTimeout(()=>gateway.remove(),SLIDE_MS*3+600);
+    setTimeout(()=>{
+      gateway.remove();
+      document.body.classList.remove('kasirquh-startup-pending');
+    },SLIDE_MS*3+600);
   },STARTUP_MS);
 })();
 </script>
