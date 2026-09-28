@@ -78,6 +78,12 @@ button{font:inherit}
 
 
 /* Gateway shortcuts — gaya tombol dari asset slide 1/2/3 */
+/* KQ GUEST-FIRST — teaser after the 6 Gateway products */
+.guest-shopping-invite{margin:12px 0 10px;padding:12px 14px;border:1px solid rgba(255,255,255,.12);border-radius:16px;background:rgba(255,255,255,.06);display:flex;align-items:center;gap:10px;text-align:left;box-shadow:0 8px 22px rgba(0,0,0,.12)}
+.guest-shopping-invite-icon{width:34px;height:34px;display:grid;place-items:center;flex:none;border-radius:11px;background:rgba(255,193,7,.14);font-size:20px}
+.guest-shopping-invite-copy{display:flex;min-width:0;flex-direction:column;gap:3px}
+.guest-shopping-invite-copy strong{font-size:.84rem;line-height:1.2;font-weight:850;color:#fff}
+.guest-shopping-invite-copy span{font-size:.70rem;line-height:1.35;color:rgba(255,255,255,.78)}
 .guest-shortcuts{width:100%;padding:14px 38px 8px;display:flex;flex-direction:column;align-items:center;gap:8px}
 .guest-shortcut-customer{width:100%;min-height:62px;border-radius:999px;border:3px solid rgba(255,255,255,.95);background:#ffb52f;color:#171717;box-shadow:0 0 12px rgba(255,181,47,.58),0 5px 12px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;gap:13px;padding:10px 18px;font-family:Georgia,"Times New Roman",serif;font-size:1.02rem;font-weight:900;cursor:pointer;text-decoration:none}
 .guest-shortcut-customer:active,.guest-shortcut-admin:active{transform:scale(.985)}
@@ -250,10 +256,13 @@ body.kasirquh-startup-pending #index-ai-modal {
 </section>
 
 
-<section class="product-catalog-grid" id="pos-catalog-container" aria-label="Pilihan produk hari ini"></section>
+<section class="product-catalog-grid" id="pos-catalog-container" aria-label="6 produk teratas"></section>
 <section class="guest-shopping-invite" aria-label="Ajakan mulai belanja">
-  <div class="guest-shopping-invite-title">✨ Baru lihat sebagian kecil nih!</div>
-  <div class="guest-shopping-invite-text">Masih banyak pilihan lainnya. Yuk masuk dan lihat semuanya! 😄</div>
+  <div class="guest-shopping-invite-icon" aria-hidden="true">✨</div>
+  <div class="guest-shopping-invite-copy">
+    <strong>Baru lihat sebagian kecil nih!</strong>
+    <span>Masih banyak pilihan lainnya. Yuk masuk dan lihat semuanya! 😄</span>
+  </div>
 </section>
 <section class="guest-shortcuts" aria-label="Akses cepat">
   <a class="guest-shortcut-customer" href="/pelanggan/index.html" aria-label="Mulai Belanja">
