@@ -192,11 +192,11 @@
 
       ctx.fillStyle = '#16a34a';
       ctx.font = 'bold 18px sans-serif';
-      ctx.fillText(`Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}`, 200, 280);
+      ctx.fillText(`${guestSafePrice(hargaParsed)} / ${satuan}`, 200, 280);
 
       ctx.fillStyle = '#64748b';
       ctx.font = '12px sans-serif';
-      ctx.fillText(`Stok Tersedia: ${p.stok || 0} ${satuan}`, 200, 310);
+      ctx.fillText(`Stok Tersedia: ${guestSafeStock(p.stok)} ${satuan}`, 200, 310);
 
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 13px sans-serif';
@@ -211,7 +211,7 @@
             await navigator.share({
               files: [file],
               title: p.nama,
-              text: `Yuk beli *${p.nama}* seharga Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan} di ${storeName}!\n\nCek di sini:\n${vercelUrl}`
+              text: `Yuk beli *${p.nama}* seharga ${guestSafePrice(hargaParsed)} / ${satuan} di ${storeName}!\n\nCek di sini:\n${vercelUrl}`
             });
           } catch (err) {
             console.log(err);
@@ -243,7 +243,12 @@
 
 
     let databaseProduk = {}; let cart = []; let pengaturanToko = { nama: "", phone: "" };
-    let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || ''; let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
+    let currentCustomerPhone = localStorage.getItem('cust_phone_v13') || '';
+    // Sensor informasi sensitif khusus Guest. Data asli tetap dipakai untuk logika
+    // keranjang/checkout dan otomatis tampil normal setelah login.
+    function guestSafePrice(value) { return currentCustomerPhone ? `Rp ${Number(value || 0).toLocaleString('id-ID')}` : 'Rp. XX.XXX'; }
+    function guestSafeStock(value) { return currentCustomerPhone ? String(value ?? 0) : 'XXX'; }
+    let currentCustomerName = 'Pelanggan'; let currentCustomerDocId = ''; let customerSavedRecipes = []; let lastFetchedOrders = []; let catalogViewMode = localStorage.getItem('cust_view_v13') || 'grid';
     let isProductsLoaded = false; let isTrendingConfigLoaded = false; let trendingLoadToken = 0; let currentPosPage = 1; let itemsPerPagePos = 24;
     // TAHAP 1: jumlah card katalog yang ditampilkan saat awal. Ini TIDAK membatasi databaseProduk/dashboard.
     const CATALOG_INITIAL_VISIBLE = 6;
@@ -537,7 +542,7 @@
         const satuan=(p.satuan||'Pcs').toLowerCase();
         if(satuan==='kg'||satuan==='kilogram') harga*=10;
         const foto=p.foto||'';
-        return `<div class="promo-detail">${foto ? `<img src="${escapeHtml(foto)}" alt="${escapeHtml(String(p.nama||'Produk promo'))}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}<div class="promo-detail-placeholder" style="${foto?'display:none;':''}">🎁</div><div class="promo-detail-name">${escapeHtml(String(p.nama||'Produk'))}</div><div class="promo-detail-price-label">Harga promo hari ini</div><div class="promo-detail-price">Rp ${harga.toLocaleString('id-ID')}</div><div class="promo-detail-stock">Tersedia: ${p.stok||0} ${escapeHtml(String(p.satuan||'Pcs'))}</div><button class="promo-detail-add" type="button" data-promo-code="${escapeHtml(String(code))}">+ Masukkan Keranjang</button></div>`;
+        return `<div class="promo-detail">${foto ? `<img src="${escapeHtml(foto)}" alt="${escapeHtml(String(p.nama||'Produk promo'))}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : ''}<div class="promo-detail-placeholder" style="${foto?'display:none;':''}">🎁</div><div class="promo-detail-name">${escapeHtml(String(p.nama||'Produk'))}</div><div class="promo-detail-price-label">Harga promo hari ini</div><div class="promo-detail-price">${guestSafePrice(harga)}</div><div class="promo-detail-stock">Tersedia: ${guestSafeStock(p.stok)} ${escapeHtml(String(p.satuan||'Pcs'))}</div><button class="promo-detail-add" type="button" data-promo-code="${escapeHtml(String(code))}">+ Masukkan Keranjang</button></div>`;
       }).join('') + '</div>';
       slider.querySelectorAll('.promo-detail-add').forEach(btn => btn.addEventListener('click', () => beliPromoTokoPelanggan(btn.getAttribute('data-promo-code'))));
       updatePromoTokoSlider();
@@ -1285,8 +1290,8 @@
       }
       document.getElementById('detail-category').innerText = p.kategori || "UMUM";
       document.getElementById('detail-name').innerText = p.nama;
-      document.getElementById('detail-price').innerText = `Rp ${hargaParsed.toLocaleString('id-ID')} / ${satuan}`;
-      document.getElementById('detail-stock').innerText = `${p.stok || 0} ${satuan}`;
+      document.getElementById('detail-price').innerText = `${guestSafePrice(hargaParsed)} / ${satuan}`;
+      document.getElementById('detail-stock').innerText = `${guestSafeStock(p.stok)} ${satuan}`;
       document.getElementById('detail-desc').innerText = p.deskripsi || "Barang berkualitas dari toko kami.";
       document.getElementById('detail-qty-input').value = currentDetailQty;
 
@@ -2065,8 +2070,8 @@
             <img src="${fotoSrc}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3);">
             <div style="flex: 1; min-width: 0;">
               <div style="font-weight: bold; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
-              <div style="font-size: 0.68rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Sisa: ${p.stok} ${satuan}</div>
-              <div style="font-size: 0.78rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+              <div style="font-size: 0.68rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Sisa: ${guestSafeStock(p.stok)} ${satuan}</div>
+              <div style="font-size: 0.78rem; color: #fde047; font-weight: bold;">${guestSafePrice(hargaParsed)}</div>
             </div>
           </div>`;
       });
@@ -2167,7 +2172,7 @@
         let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
         let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
         if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10;
-        let sisaStokBadge = (!isHabis && p.stok <= 5) ? `<div style="position:absolute; top:4px; left:4px; background:#ef4444; color:white; font-size:0.55rem; padding:2px 5px; border-radius:4px; font-weight:bold; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none; z-index: 5;">🔥 Sisa ${p.stok}</div>` : "";
+        let sisaStokBadge = (!isHabis && p.stok <= 5) ? `<div style="position:absolute; top:4px; left:4px; background:#ef4444; color:white; font-size:0.55rem; padding:2px 5px; border-radius:4px; font-weight:bold; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none; z-index: 5;">🔥 Sisa ${guestSafeStock(p.stok)}</div>` : "";
 
         if (catalogViewMode === 'card') {
           const activeCustomerTheme = document.body.getAttribute('data-theme');
@@ -2176,7 +2181,7 @@
               <div class="catalog-card-view modern-product-card-view" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div class="modern-card-soldout"><span>HABIS</span></div>' : ''}
                 <div class="modern-card-stage">
-                  ${sisaStokBadge ? `<div class="modern-card-stock-badge">🔥 Sisa ${p.stok}</div>` : ''}
+                  ${sisaStokBadge ? `<div class="modern-card-stock-badge">🔥 Sisa ${guestSafeStock(p.stok)}</div>` : ''}
                   <img class="modern-card-product" src="${fotoSrc}" alt="${p.nama}" loading="lazy" onload="makeModernProductTransparent(this)">
                   <div class="modern-card-platform" aria-hidden="true">
                     <div class="modern-card-base"></div>
@@ -2188,8 +2193,8 @@
                 </div>
                 <div class="modern-card-info">
                   <div class="modern-card-name">${p.nama}</div>
-                  <div class="modern-card-price">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
-                  <div class="modern-card-stock">Stok: ${p.stok || 0} ${satuan}</div>
+                  <div class="modern-card-price">${guestSafePrice(hargaParsed)}</div>
+                  <div class="modern-card-stock">Stok: ${guestSafeStock(p.stok)} ${satuan}</div>
                 </div>
               </div>`;
           } else {
@@ -2202,8 +2207,8 @@
                   <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
                 </div>
                 <div class="generic-card-name">${p.nama}</div>
-                <div class="generic-card-price">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
-                <div class="generic-card-stock">Stok: ${p.stok || 0} ${satuan}</div>
+                <div class="generic-card-price">${guestSafePrice(hargaParsed)}</div>
+                <div class="generic-card-stock">Stok: ${guestSafeStock(p.stok)} ${satuan}</div>
               </div>`;
           }
         } else if (catalogViewMode === 'grid') {
@@ -2213,7 +2218,7 @@
               <div class="inv-card modern-product-card" onclick="openProductDetail('${code}')">
                 ${isHabis ? '<div class="modern-product-soldout"><span>HABIS</span></div>' : ''}
                 <div class="modern-product-stage">
-                  ${sisaStokBadge ? `<div class="modern-stock-badge">🔥 ${p.stok}</div>` : ''}
+                  ${sisaStokBadge ? `<div class="modern-stock-badge">🔥 ${guestSafeStock(p.stok)}</div>` : ''}
                   <img class="modern-product" src="${fotoSrc}" alt="${p.nama}" loading="lazy">
                   <div class="modern-platform" aria-hidden="true">
                     <div class="modern-base"></div>
@@ -2225,8 +2230,8 @@
                 </div>
                 <div class="modern-product-info">
                   <div class="modern-product-name">${p.nama}</div>
-                  <div class="modern-product-price">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
-                  <div class="modern-product-stock">Stok: ${p.stok || 0} ${satuan}</div>
+                  <div class="modern-product-price">${guestSafePrice(hargaParsed)}</div>
+                  <div class="modern-product-stock">Stok: ${guestSafeStock(p.stok)} ${satuan}</div>
                 </div>
               </div>`;
           } else {
@@ -2239,8 +2244,8 @@
                   <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" title="Beli">🛒</button>
                 </div>
                 <div style="font-weight: bold; font-size: 0.75rem; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nama}</div>
-                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Stok: ${p.stok || 0} ${satuan}</div>
-                <div style="font-size: 0.78rem; font-weight: bold; color: #fde047; margin-top: 2px;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+                <div style="font-size: 0.65rem; color: rgba(255,255,255,0.8); margin-bottom: 2px;">Stok: ${guestSafeStock(p.stok)} ${satuan}</div>
+                <div style="font-size: 0.78rem; font-weight: bold; color: #fde047; margin-top: 2px;">${guestSafePrice(hargaParsed)}</div>
               </div>`;
           }
         } else {
@@ -2255,10 +2260,10 @@
                 </div>
                 <div class="modern-list-info" style="min-width: 0; flex: 1;">
                   <div style="font-weight: bold; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div>
-                  <div style="font-size: 0.68rem; color: rgba(255,255,255,0.8);">Stok: ${p.stok || 0} ${satuan}</div>
+                  <div style="font-size: 0.68rem; color: rgba(255,255,255,0.8);">Stok: ${guestSafeStock(p.stok)} ${satuan}</div>
                 </div>
                 <div class="modern-list-actions" style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-                  <div style="font-size: 0.8rem; font-weight: bold; color: #fde047;">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+                  <div style="font-size: 0.8rem; font-weight: bold; color: #fde047;">${guestSafePrice(hargaParsed)}</div>
                   <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position: static; width: 24px; height: 24px; font-size: 0.7rem;">🛒</button>
                 </div>
               </div>`;
@@ -2272,10 +2277,10 @@
                 </div>
                 <div style="min-width:0; flex:1;">
                   <div style="font-weight:bold; font-size:.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--text-color);">${p.nama}</div>
-                  <div style="font-size:.68rem; color:var(--text-muted);">Stok: ${p.stok || 0} ${satuan}</div>
+                  <div style="font-size:.68rem; color:var(--text-muted);">Stok: ${guestSafeStock(p.stok)} ${satuan}</div>
                 </div>
                 <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
-                  <div style="font-size:.8rem; font-weight:bold; color:var(--text-color);">Rp ${hargaParsed.toLocaleString('id-ID')}</div>
+                  <div style="font-size:.8rem; font-weight:bold; color:var(--text-color);">${guestSafePrice(hargaParsed)}</div>
                   <button type="button" class="btn-quick-cart-icon" onclick="event.stopPropagation(); tambahKeKeranjangCepat('${code}')" style="position:static; width:24px; height:24px; font-size:.7rem;">🛒</button>
                 </div>
               </div>`;
@@ -2557,7 +2562,7 @@
           let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0; 
           if ((satuan.toLowerCase() === 'kg' || satuan.toLowerCase() === 'kilogram')) hargaParsed *= 10; 
           
-          itemsHtml += `<div class="reorder-card" onclick="openProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">Rp ${hargaParsed.toLocaleString('id-ID')}</div></div>`; 
+          itemsHtml += `<div class="reorder-card" onclick="openProductDetail('${code}')"><img src="${fotoSrc}" style="width: 100%; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);"><div style="font-size: 0.68rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">${p.nama}</div><div style="font-size: 0.68rem; color: #fde047; font-weight: bold;">${guestSafePrice(hargaParsed)}</div></div>`; 
           renderedCount++; 
         } 
       });
@@ -2610,7 +2615,7 @@
     }
 
     function simpanProfilPelanggan() { const nama = document.getElementById("setting-cust-name").value.trim(); const alamat = document.getElementById("setting-cust-address").value.trim(); if (!nama) return alert("Nama wajib diisi!"); storeCollection("pelanggan").where("phone", "==", currentCustomerPhone).get().then((snap) => { if (!snap.empty) { storeCollection("pelanggan").doc(snap.docs[0].id).update({ nama, alamat }).then(() => alert("Profil diperbarui!")).catch(err => alert("Gagal memperbarui: " + err.message)); } }).catch(err => alert("Terjadi kesalahan: " + err.message)); }
-    async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: Rp ${valHarga.toLocaleString('id-ID')}, Stok: ${p.stok || 0} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
+    async function kirimPesanKeAI() { let inputEl = document.getElementById("ai-chat-input"); let msgContainer = document.getElementById("ai-chat-messages"); let prompt = inputEl.value.trim(); if (!prompt) return; msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-end; background: #7c3aed; color: white;">${escapeHtml(prompt)}</div>`; inputEl.value = ""; msgContainer.scrollTop = msgContainer.scrollHeight; let loadingId = "loading-" + Date.now(); msgContainer.innerHTML += `<div id="${loadingId}" style="align-self: flex-start; background: var(--input-bg); color: var(--text-muted); padding: 6px 10px; border-radius: 8px; font-size: 0.78rem;">Sedang mengetik...</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; try { let daftarProdukText = ""; let keywordLower = prompt.toLowerCase(); let isAskingProduct = ["stok", "harga", "jual", "ada", "beli", "minta", "berapa", "cari", "menu", "list", "barang", "toko", "punya"].some(kw => keywordLower.includes(kw)); let matchedProducts = []; for (let code in databaseProduk) { let p = databaseProduk[code]; let pNamaLower = p.nama.toLowerCase(); let words = pNamaLower.split(' ').filter(w => w.length > 2); if (keywordLower.includes(pNamaLower) || words.some(w => keywordLower.includes(w))) matchedProducts.push(p); } if (isAskingProduct || matchedProducts.length > 0) { let targetList = matchedProducts.length > 0 ? matchedProducts.slice(0, 3) : Object.values(databaseProduk).slice(0, 3); targetList.forEach(p => { let sat = (p.satuan || 'Pcs').toLowerCase(); let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0); if (sat === 'kg' || sat === 'kilogram') { valHarga = p.hargaRtg || (valHarga * 10); sat = 'kg'; } else if (sat === 'rtg') sat = 'pcs'; else sat = p.satuan || 'Pcs'; daftarProdukText += `- ${p.nama}: ${guestSafePrice(valHarga)}, Stok: ${guestSafeStock(p.stok)} ${sat}\n`; }); } else { daftarProdukText = "Tidak ada produk dilampirkan (obrolan santai)."; } let response = await fetch('/api/tanya', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: prompt, daftarProduk: daftarProdukText, namaToko: pengaturanToko.nama || 'KasirQuh' }) }); let data = await response.json(); let aiReply = "Maaf, saya sedang kendala teknis. Silakan tanya ke admin."; if (data.reply) aiReply = data.reply.split('\n').map(l => l.trim()).join('\n').trim(); else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) aiReply = data.candidates[0].content.parts[0].text.split('\n').map(l => l.trim()).join('\n').trim(); let audioUrl = null; if (isAiSoundOn) { const cleanText = aiReply.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '').trim(); try { const ttsResponse = await fetch(`/api/tts?text=${encodeURIComponent(cleanText)}`); if (ttsResponse.ok) audioUrl = URL.createObjectURL(await ttsResponse.blob()); } catch (e) { console.error(e); } } document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); white-space: pre-line;">${escapeHtml(aiReply)}</div>`; msgContainer.scrollTop = msgContainer.scrollHeight; if (audioUrl) { const audio = new Audio(audioUrl); audio.play(); } } catch (err) { document.getElementById(loadingId)?.remove(); msgContainer.innerHTML += `<div style="max-width: 75%; padding: 6px 10px; border-radius: 8px; font-size: 0.78rem; align-self: flex-start; background: #fee2e2; color: #dc2626;">Gagal terhubung ke AI.</div>`; } }
     function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/&lt;*</g, "&lt;").replace(/>/g, "&gt;"); }
     function toggleOpsiDeveloper() {
       const panel = document.getElementById('developer-options-panel');
