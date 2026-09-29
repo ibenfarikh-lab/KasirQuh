@@ -575,6 +575,27 @@
       }
     }
 
+    function resetGatewayAfterBFCache() {
+      // Android/standalone Chrome may restore Gateway from BFCache instead of
+      // rebuilding the document. The transition class used before entering a
+      // panel must not survive that restore, otherwise Gateway can remain
+      // blurred/dimmed and look frozen.
+      welcome.classList.remove('kv4-focus-customer', 'kv4-focus-admin', 'kv4-leaving');
+      leaving = false;
+      swipeDragging = false;
+      swipeCompleted = false;
+      swipeCurrentX = 0;
+      if (slideTimer) clearInterval(slideTimer);
+      slideTimer = setInterval(showNextSlide, 4500);
+      syncSlideButtonPositions();
+      resetSwipeVisual(false);
+      pulseButtonGlows();
+    }
+
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) resetGatewayAfterBFCache();
+    });
+
     pulseButtonGlows();
     slideTimer = setInterval(showNextSlide, 4500);
 
