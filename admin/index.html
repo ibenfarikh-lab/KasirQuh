@@ -601,7 +601,6 @@
 <div class="card no-print" style="margin-bottom: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
 <span id="catatan-date-display" style="font-size: 0.85rem; font-weight: bold;">📅 Sabtu, 22/08/26</span>
 <input aria-label="Tanggal catatan" id="catatan-date-picker" onchange="ubahTanggalCatatan(this.value)" style="padding: 6px 10px; font-weight: bold; border-radius: 8px; width: auto; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--input-border);" type="date"/>
-<button onclick="copyDataCatatanKemarin()" class="no-print" style="background: var(--button-bg, #2563eb); color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; white-space: nowrap;">⧉ Copy Kemarin</button>
 </div>
 <div class="sub-nav-tabs no-print" style="overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 6px; gap: 6px; align-items: center;">
 <div id="container-sub-tabs-catatan" style="display: flex; gap: 6px; flex-wrap: nowrap; align-items: center;"></div>
@@ -741,10 +740,10 @@
 <div class="card">
 <h3 data-i18n="change_login_account" style="margin-top: 0; font-size: 1rem;">Ubah Akun Login</h3>
 <div class="form-vertical">
-<label class="h04a-form-label" data-i18n="new_username">Email Login Baru:</label>
-<input aria-label="Email login Admin" autocomplete="username" id="setting-user" placeholder="Email Login Baru" type="email"/>
+<label class="h04a-form-label" data-i18n="new_username">Username Baru:</label>
+<input aria-label="Nama pengguna Admin" id="setting-user" placeholder="Username" type="text"/>
 <label class="h04a-form-label" data-i18n="new_password">Password Baru:</label>
-<input aria-label="Password baru Admin" autocomplete="new-password" id="setting-pass" placeholder="Password Baru" type="password"/>
+<input aria-label="Sandi Admin" id="setting-pass" placeholder="Password Baru" type="password"/>
 <button data-i18n="save_account" onclick="simpanPengaturanAkun()" style="border-radius: 8px; padding: 10px;">Simpan Akun</button>
 </div>
 </div>
@@ -820,13 +819,6 @@
 <button onclick="hapusAdvanceScript()" style="flex:1; background:#dc2626; color:white; padding:8px; font-weight:bold; border-radius:7px; border:none; cursor:pointer;">🗑️ Hapus</button>
 </div>
 <div id="advance-script-status" style="font-size:0.72rem; color:var(--text-muted); margin-top:7px; text-align:center;">Belum ada script tersimpan.</div>
-<div style="margin-top:9px;">
-  <div style="display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:5px;">
-    <strong style="font-size:0.78rem; color:var(--text-color);">Hasil Eksekusi</strong>
-    <button type="button" onclick="bersihkanAdvanceScriptOutput()" style="background:transparent; color:var(--text-muted); border:1px solid var(--input-border); padding:4px 7px; border-radius:6px; font-size:0.68rem; cursor:pointer;">Bersihkan</button>
-  </div>
-  <pre id="advance-script-output" aria-live="polite" style="display:none; max-height:280px; overflow:auto; white-space:pre-wrap; word-break:break-word; margin:0; padding:9px; box-sizing:border-box; border:1px solid var(--input-border); border-radius:7px; background:var(--input-bg); color:var(--text-color); font-family:monospace; font-size:0.72rem; line-height:1.45;"></pre>
-</div>
 </div>
 </div>
 <div class="card">
