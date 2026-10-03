@@ -808,54 +808,21 @@ function setupCatatanListener(tabKey) {
     catatanListeners[tabKey] = null;
   }
 
-  catatanListeners[tabKey] = storeCollection("catatan").doc(docId).onSnapshot(async (docSnap) => {
+  // Catatan adalah read-through dari Firestore:
+  // toko/{tokoId}/catatan/{tabKey}_{YYYY-MM-DD}
+  // Tidak ada rollover, copy dari hari sebelumnya, atau pembuatan default.
+  catatanListeners[tabKey] = storeCollection("catatan").doc(docId).onSnapshot((docSnap) => {
     if (docSnap.exists) {
+      // Dokumen ada: gunakan isi Firebase apa adanya.
       databaseCatatanDinamis[tabKey] = docSnap.data();
-      renderHalamanSubCatatan(tabKey);
     } else {
-      let currDate = new Date(selectedCatatanDate + "T00:00:00");
-      currDate.setDate(currDate.getDate() - 1);
-      let prevDateStr = currDate.getFullYear() + '-' + String(currDate.getMonth() + 1).padStart(2, '0') + '-' + String(currDate.getDate()).padStart(2, '0');
-      let prevDocId = `${tabKey}_${prevDateStr}`;
-      
-      try {
-        let prevDocSnap = await storeCollection("catatan").doc(prevDocId).get();
-
-        // Hari baru: jika data kemarin benar-benar ada, salin judulnya saja.
-        // Jika data kemarin juga tidak ada, jangan membuat dokumen/default apa pun.
-        if (prevDocSnap.exists && Array.isArray(prevDocSnap.data()?.items)) {
-          const targetItems = prevDocSnap.data().items.map(item => ({
-            id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 3),
-            judul: item.judul || "",
-            subjudul: "",
-            isi: "",
-            waktu: new Date().toLocaleString('id-ID')
-          }));
-
-          const targetData = {
-            tabKey: tabKey,
-            tanggal: selectedCatatanDate,
-            modalAwal: "0",
-            items: targetItems
-          };
-          await storeCollection("catatan").doc(docId).set(targetData);
-          databaseCatatanDinamis[tabKey] = targetData;
-          renderHalamanSubCatatan(tabKey);
-        } else {
-          databaseCatatanDinamis[tabKey] = {
-            tabKey: tabKey,
-            tanggal: selectedCatatanDate,
-            modalAwal: "0",
-            items: []
-          };
-          renderHalamanSubCatatan(tabKey);
-        }
-      } catch (err) {
-        // Gagal membaca hari sebelumnya = jangan membuat/reset data hari ini.
-        console.error("Gagal memeriksa Catatan hari sebelumnya:", err);
-      }
+      // Dokumen tidak ada: jangan membuat/mengisi data bisnis secara otomatis.
+      // null dipakai untuk membedakan "tidak ada dokumen" dari dokumen kosong.
+      databaseCatatanDinamis[tabKey] = null;
     }
+    renderHalamanSubCatatan(tabKey);
   }, err => {
+    // Error baca bukan berarti dokumen kosong. Pertahankan state terakhir yang valid.
     console.error("Gagal memuat catatan: ", err);
   });
 }
@@ -1047,18 +1014,27 @@ function hitungRingkasanCatatanDinamis(tabKey) {
 
 function renderHalamanSubCatatan(tabKey) {
   let dataObj = databaseCatatanDinamis[tabKey];
-  if (!dataObj) return;
 
   let inputEl = document.getElementById(`modal-awal-${tabKey}`);
-  if (inputEl && dataObj.modalAwal !== undefined) {
-    inputEl.value = dataObj.modalAwal;
-  }
-
   let container = document.getElementById(`container-list-${tabKey}`);
   if (!container) return;
+
+  // Dokumen tidak ada di Firebase: tampilkan keadaan kosong tanpa membuat
+  // object bisnis default atau menulis apa pun ke Firestore.
+  if (!dataObj) {
+    if (inputEl) inputEl.value = "";
+    container.innerHTML = `<div class="empty-state">Belum ada data untuk tanggal ini.</div>`;
+    hitungRingkasanCatatanDinamis(tabKey);
+    return;
+  }
+
+  if (inputEl) {
+    inputEl.value = dataObj.modalAwal !== undefined ? dataObj.modalAwal : "";
+  }
+
   container.innerHTML = "";
 
-  let listData = dataObj.items || [];
+  let listData = Array.isArray(dataObj.items) ? dataObj.items : [];
   if (listData.length === 0) {
     container.innerHTML = `<div class="empty-state">Belum ada catatan untuk tanggal ini. Tekan tombol <b>+</b> di kanan bawah untuk membuat catatan baru.</div>`;
     hitungRingkasanCatatanDinamis(tabKey);
