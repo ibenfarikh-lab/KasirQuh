@@ -3517,6 +3517,23 @@ async function simpanAdvanceScript() {
   }
 }
 
+function setAdvanceScriptOutput(text, isError = false) {
+  const output = document.getElementById('advance-script-output');
+  if (!output) return;
+  const value = String(text ?? '');
+  output.textContent = value || '(Tidak ada output.)';
+  output.style.display = 'block';
+  output.style.borderColor = isError ? '#dc2626' : 'var(--input-border)';
+}
+
+function bersihkanAdvanceScriptOutput() {
+  const output = document.getElementById('advance-script-output');
+  if (!output) return;
+  output.textContent = '';
+  output.style.display = 'none';
+  output.style.borderColor = 'var(--input-border)';
+}
+
 async function jalankanAdvanceScript() {
   const input = document.getElementById('advance-script-input');
   const status = document.getElementById('advance-script-status');
@@ -3525,17 +3542,62 @@ async function jalankanAdvanceScript() {
   if (!code) return alert('Belum ada Advance Script.');
   if (!currentAdminProfile?.tokoId) return alert('Profil toko belum siap.');
   if (!confirm('Jalankan Advance Script sekarang?\n\nPastikan script memang ditujukan untuk toko aktif dan sudah diuji.')) return;
+
+  const captured = [];
+  const originalLog = console.log;
+  const originalWarn = console.warn;
+  const originalError = console.error;
+  const formatArgs = args => args.map(value => {
+    if (typeof value === 'string') return value;
+    try { return JSON.stringify(value, null, 2); }
+    catch (_) { return String(value); }
+  }).join(' ');
+
+  console.log = (...args) => {
+    captured.push(formatArgs(args));
+    originalLog.apply(console, args);
+  };
+  console.warn = (...args) => {
+    captured.push('[WARN] ' + formatArgs(args));
+    originalWarn.apply(console, args);
+  };
+  console.error = (...args) => {
+    captured.push('[ERROR] ' + formatArgs(args));
+    originalError.apply(console, args);
+  };
+
   try {
     status.textContent = 'Menjalankan script...';
+    bersihkanAdvanceScriptOutput();
+
     // Direct eval sengaja dipakai agar script maintenance dapat mengakses helper
     // dan variabel runtime script.js. Fitur ini hanya tersedia dari panel admin.
-    await eval(`(async () => {\n${code}\n})()`);
+    const result = await eval(`(async () => {\n${code}\n})()`);
+
+    const parts = [...captured];
+    if (result !== undefined) {
+      parts.push(
+        typeof result === 'string'
+          ? result
+          : (() => { try { return JSON.stringify(result, null, 2); } catch (_) { return String(result); } })()
+      );
+    }
+
+    const output = parts.join('\n');
+    setAdvanceScriptOutput(output || 'Script selesai tanpa output.');
     status.textContent = 'Script selesai dijalankan.';
-    alert('Advance Script selesai dijalankan.');
+    alert('Advance Script selesai dijalankan. Hasil eksekusi tampil di panel.');
   } catch (err) {
-    console.error('Advance Script error:', err);
+    const message = err?.stack || err?.message || String(err);
+    captured.push('[ERROR] ' + message);
+    setAdvanceScriptOutput(captured.join('\n'), true);
     status.textContent = 'Script gagal: ' + (err.message || err);
+    originalError('Advance Script error:', err);
     alert('Advance Script gagal: ' + (err.message || err));
+  } finally {
+    console.log = originalLog;
+    console.warn = originalWarn;
+    console.error = originalError;
   }
 }
 
