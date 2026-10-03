@@ -44,7 +44,7 @@
       const currentUrl = getPelangganVercelUrl();
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}`;
       document.getElementById('qr-code-img').src = qrApiUrl;
-      const storeName = pengaturanToko.nama || "KasirQuh";
+      const storeName = pengaturanToko.nama || "";
       document.getElementById('qr-store-name').innerText = storeName;
       document.getElementById('qr-store-subtitle').innerText = "Belanja Harian Makin Praktis - " + storeName + " -";
       document.getElementById('qrCodeModal').classList.add('show');
@@ -57,7 +57,7 @@
 
     function bagikanAplikasiViaWA() {
       const currentUrl = getPelangganVercelUrl();
-      const storeName = pengaturanToko.nama || "KasirQuh";
+      const storeName = pengaturanToko.nama || "";
       const pesan = `Halo! Yuk belanja kebutuhan harian makin praktis di *${storeName}* pakai aplikasi KasirQuh.\n\nKlik tautan Vercel berikut untuk mulai belanja & daftar:\n${currentUrl}\n\nTinggal Pilih Barang • Beres! 🛒✨`;
       window.open(`https://wa.me/?text=${encodeURIComponent(pesan)}`, '_blank');
     }
@@ -77,7 +77,7 @@
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 26px sans-serif';
       ctx.textAlign = 'center';
-      const storeName = pengaturanToko.nama || "KasirQuh";
+      const storeName = pengaturanToko.nama || "";
       ctx.fillText(storeName, 200, 65);
 
       ctx.font = '13px sans-serif';
@@ -136,7 +136,7 @@
     function bagikanProdukViaWA() {
       if(!currentDetailCode) return;
       let p = databaseProduk[currentDetailCode]; if(!p) return;
-      let storeName = pengaturanToko.nama || "KasirQuh";
+      let storeName = pengaturanToko.nama || "";
       let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs");
       let valHarga = p.hargaJual !== undefined ? p.hargaJual : (p.harga || 0);
       let hargaParsed = typeof valHarga === 'number' ? valHarga : parseInt(valHarga.toString().replace(/[^0-9]/g, '')) || 0;
@@ -1241,7 +1241,7 @@
 
     async function putarSuaraSambutanAI() {
       if (!isAiSoundOn) return;
-      const namaToko = (pengaturanToko && pengaturanToko.nama) ? pengaturanToko.nama : "KasirQuh";
+      const namaToko = (pengaturanToko && pengaturanToko.nama) ? pengaturanToko.nama : "";
       const teksSambutan = `HALOOOO BESTIE! Aku Asisten AI Warunge Mimi. Mau ngobrol atau tanya-tanya dulu?`;
       try {
         if (window._aiWelcomeAudio) {
@@ -1555,7 +1555,15 @@
     }
 
     function initFirebaseListeners() {
-      storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => { if (doc.exists) { pengaturanToko = doc.data(); const namaToko = pengaturanToko.nama || "KasirQuh"; localStorage.setItem('cust_store_name_v13', namaToko); document.getElementById('receipt-shop-name').innerText = namaToko; document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || ""; if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko; } });
+      storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
+        if (!doc.exists) { console.warn("Pengaturan toko belum tersedia."); return; }
+        pengaturanToko = doc.data() || {};
+        const namaToko = typeof pengaturanToko.nama === "string" ? pengaturanToko.nama : "";
+        localStorage.setItem('cust_store_name_v13', namaToko);
+        document.getElementById('receipt-shop-name').innerText = namaToko;
+        document.getElementById('receipt-shop-address').innerText = pengaturanToko.alamat || "";
+        if (document.getElementById('customer-home-store-name')) document.getElementById('customer-home-store-name').innerText = namaToko;
+      }, (err) => console.error("Gagal membaca pengaturan toko:", err));
       storeCollection("produk").onSnapshot((snapshot) => {
         const isInitialProductSnapshot = !isProductsLoaded;
         let productChanged = isInitialProductSnapshot;
@@ -1593,19 +1601,40 @@
         renderKategoriPelanggan(doc.exists ? (doc.data().categories || []) : []);
       });
       storeCollection("pengaturan").doc("beranda_pelanggan_laris").onSnapshot((doc) => {
-        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
-        window.__sedangLarisConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
-        isTrendingConfigLoaded = true;
+        if (!doc.exists) {
+          window.__sedangLarisConfig = null;
+          isTrendingConfigLoaded = false;
+          renderTrending([]);
+          return;
+        }
+        const cfg = doc.data() || {};
+        window.__sedangLarisConfig = {
+          enabled: cfg.enabled === true,
+          limit: Number.isFinite(Number(cfg.limit)) ? Math.min(20, Math.max(1, Number(cfg.limit))) : null
+        };
+        isTrendingConfigLoaded = window.__sedangLarisConfig.limit !== null;
         muatBarangLarisHariIni();
+      }, (err) => {
+        console.error("Listener pengaturan Sedang Laris gagal:", err);
+        isTrendingConfigLoaded = false;
+        window.__sedangLarisConfig = null;
+        renderTrending([]);
       });
       // Listener pengaturan "Stok Rumah Habis" dari Admin > Beranda Pelanggan.
       // Jumlah kartu mengikuti konfigurasi Firebase yang disimpan Admin.
       storeCollection("pengaturan").doc("beranda_pelanggan_stok_rumah").onSnapshot((doc) => {
-        const cfg = doc.exists ? doc.data() : {enabled:true, limit:5};
-        window.__stokRumahConfig = { enabled: cfg.enabled !== false, limit: Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5)) };
+        if (!doc.exists) {
+          window.__stokRumahConfig = null;
+          renderQuickReorder(lastFetchedOrders || []);
+          return;
+        }
+        const cfg = doc.data() || {};
+        const limit = Number.isFinite(Number(cfg.limit)) ? Math.min(20, Math.max(1, Number(cfg.limit))) : null;
+        window.__stokRumahConfig = limit === null ? null : { enabled: cfg.enabled === true, limit };
         renderQuickReorder(lastFetchedOrders || []);
       }, (err) => {
         console.warn("Listener pengaturan Stok Rumah gagal:", err);
+        window.__stokRumahConfig = null;
         renderQuickReorder(lastFetchedOrders || []);
       });
 
@@ -1751,10 +1780,11 @@
       // dalam urutan yang berbeda. Produk dan konfigurasi harus siap lebih dulu.
       if (!isProductsLoaded || !isTrendingConfigLoaded) return;
 
-      const cfg = window.__sedangLarisConfig || {enabled:true, limit:5};
-      if (cfg.enabled === false) { renderTrending([]); return; }
+      const cfg = window.__sedangLarisConfig;
+      if (!cfg || cfg.limit == null) { renderTrending([]); return; }
+      if (cfg.enabled !== true) { renderTrending([]); return; }
 
-      const limit = Math.min(20, Math.max(1, parseInt(cfg.limit,10) || 5));
+      const limit = cfg.limit;
       const token = ++trendingLoadToken;
 
       try {
@@ -2553,8 +2583,9 @@
       let renderedCount = 0; let itemsHtml = ""; 
       recentCodes.forEach(code => { 
         let p = databaseProduk[code]; 
-        const stokRumahCfg = window.__stokRumahConfig || {enabled:true, limit:5};
-        const stokRumahLimit = Math.min(20, Math.max(1, parseInt(stokRumahCfg.limit,10) || 5));
+        const stokRumahCfg = window.__stokRumahConfig;
+        if (!stokRumahCfg) return;
+        const stokRumahLimit = stokRumahCfg.limit;
         if(stokRumahCfg.enabled !== false && p && (p.stok || 0) > 0 && renderedCount < stokRumahLimit) { 
           let fotoSrc = p.foto || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/></svg>"; 
           let satuan = (p.satuan || "Pcs").toLowerCase() === 'rtg' ? "pcs" : (p.satuan || "Pcs"); 
