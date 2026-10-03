@@ -3572,7 +3572,7 @@ async function jalankanAdvanceScript() {
 
     // Direct eval sengaja dipakai agar script maintenance dapat mengakses helper
     // dan variabel runtime script.js. Fitur ini hanya tersedia dari panel admin.
-    const result = await eval(`(async () => {\n${code}\n})()`);
+    const result = await eval(code);
 
     const parts = [...captured];
     if (result !== undefined) {
