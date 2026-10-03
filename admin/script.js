@@ -3119,22 +3119,38 @@ function initStoreDataListeners() {
 
   registerStoreListener(storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
     if (doc.exists) {
+      // Firebase adalah sumber kebenaran. Setiap snapshot yang valid
+      // menggantikan state konfigurasi secara utuh, termasuk ketika field kosong.
       pengaturanToko = doc.data() || {};
-      refreshData();
     } else {
-      console.warn("Pengaturan toko belum ada. Tidak membuat default/WRITE otomatis.");
+      // Dokumen benar-benar hilang: kosongkan state agar data lama tidak
+      // tetap tampil/terpakai sebagai sumber data bayangan. Jangan WRITE/default.
+      pengaturanToko = {};
+      console.warn("Pengaturan toko tidak ditemukan di Firebase. State dikosongkan; tidak ada default/WRITE otomatis.");
     }
-  }, (err) => console.error("Gagal membaca pengaturan toko:", err)));
+    refreshData();
+  }, (err) => {
+    // READ ERROR berbeda dari MISSING. Pertahankan snapshot valid terakhir
+    // dan jangan mengosongkan atau menulis apa pun.
+    console.error("Gagal membaca pengaturan toko:", err);
+  }));
 
   registerStoreListener(storeCollection("pengaturan").doc("sistem_v13").onSnapshot((doc) => {
     if (doc.exists) {
       const data = doc.data() || {};
-      if (Number.isFinite(Number(data.cooldown))) scanCooldownDuration = Number(data.cooldown);
-      refreshData();
+      const parsedCooldown = Number(data.cooldown);
+      // Set state dari snapshot secara deterministik. Field hilang/invalid
+      // berarti state konfigurasi ini memang tidak memiliki nilai cooldown.
+      scanCooldownDuration = Number.isFinite(parsedCooldown) ? parsedCooldown : null;
     } else {
-      console.warn("Pengaturan sistem belum ada. Tidak membuat default/WRITE otomatis.");
+      scanCooldownDuration = null;
+      console.warn("Pengaturan sistem tidak ditemukan di Firebase. State dikosongkan; tidak ada default/WRITE otomatis.");
     }
-  }, (err) => console.error("Gagal membaca pengaturan sistem:", err)));
+    refreshData();
+  }, (err) => {
+    // READ ERROR bukan MISSING: pertahankan nilai valid terakhir dan jangan WRITE.
+    console.error("Gagal membaca pengaturan sistem:", err);
+  }));
 
   registerStoreListener(storeCollection("produk").onSnapshot((snapshot) => {
     databaseProduk = {};
