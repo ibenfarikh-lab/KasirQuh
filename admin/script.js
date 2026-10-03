@@ -60,7 +60,7 @@ const translations = {
     shop_phone_label: "Nomor Telepon / WA:",
     save_profile: "Simpan Profil",
     change_login_account: "Ubah Akun Login",
-    new_username: "Username Baru:",
+    new_username: "Email Login Baru:",
     new_password: "Password Baru:",
     save_account: "Simpan Akun",
     pref_appearance: "Preferensi Tampilan & Bahasa",
@@ -542,7 +542,6 @@ function parseRupiahToNumber(stringVal) {
   return parseInt(stringVal.toString().replace(/\./g, '')) || 0;
 }
 
-let userAuth = { user: "", pass: "", updatedAt: 0 };
 let currentAdminProfile = null;
 
 // ===== SUMBER DATA TOKO BERDASARKAN profil Firebase =====
@@ -634,6 +633,7 @@ function handleAuthState(user) {
       clearStoreDataListeners();
       // Profil toko sudah valid. Baru sekarang semua listener tenant diaktifkan.
       initStoreDataListeners();
+      refreshData();
       muatAdvanceScriptAdmin();
     })
     .catch((err) => {
@@ -3201,9 +3201,9 @@ function initStoreDataListeners() {
 
 function refreshData() {
   const setUsr = document.getElementById("setting-user");
-  if (setUsr) setUsr.value = userAuth.user;
+  if (setUsr) setUsr.value = (auth && auth.currentUser && auth.currentUser.email) || (currentAdminProfile && currentAdminProfile.email) || "";
   const setPass = document.getElementById("setting-pass");
-  if (setPass) setPass.value = userAuth.pass;
+  if (setPass && document.activeElement !== setPass) setPass.value = "";
   const setShopName = document.getElementById("setting-shop-name");
   if (setShopName) setShopName.value = pengaturanToko.nama;
   const setShopAddr = document.getElementById("setting-shop-address");
