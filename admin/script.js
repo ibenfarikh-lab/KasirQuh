@@ -727,8 +727,25 @@ function initCatatanConfigListener() {
     .doc("daftar_tab_catatan_v13")
     .onSnapshot((doc) => {
       if (!doc.exists) {
-        // Dokumen benar-benar tidak ada. Jangan membuat default 1-4.
-        // Hentikan listener harian lama agar tenant/config lama tidak tetap aktif.
+        // Dokumen benar-benar tidak ada. Ini adalah keadaan valid: 0 tab.
+        // Pembacaan Firebase berhasil, sehingga aksi eksplisit seperti
+        // "Tambah Tab" tetap boleh membuat konfigurasi untuk pertama kalinya.
+        Object.keys(catatanListeners).forEach(key => {
+          try { if (typeof catatanListeners[key] === "function") catatanListeners[key](); } catch (e) {}
+        });
+        catatanListeners = {};
+        catatanConfigReady = true;
+        daftarNamaTabCatatan = [];
+        labelNamaTabCatatan = {};
+        activeSubCatatanTab = null;
+        databaseCatatanDinamis = {};
+        renderSubTabsCatatanUI();
+        return;
+      }
+
+      const data = doc.data() || {};
+      if (!Array.isArray(data.list)) {
+        console.error("Konfigurasi tab Catatan tidak valid: field list bukan array.");
         Object.keys(catatanListeners).forEach(key => {
           try { if (typeof catatanListeners[key] === "function") catatanListeners[key](); } catch (e) {}
         });
@@ -742,14 +759,13 @@ function initCatatanConfigListener() {
         return;
       }
 
-      const data = doc.data() || {};
-      if (!Array.isArray(data.list) || data.list.length === 0) {
-        console.error("Konfigurasi tab Catatan tidak valid: field list kosong/tidak valid.");
+      // list: [] adalah konfigurasi valid yang berarti 0 tab.
+      if (data.list.length === 0) {
         Object.keys(catatanListeners).forEach(key => {
           try { if (typeof catatanListeners[key] === "function") catatanListeners[key](); } catch (e) {}
         });
         catatanListeners = {};
-        catatanConfigReady = false;
+        catatanConfigReady = true;
         daftarNamaTabCatatan = [];
         labelNamaTabCatatan = {};
         activeSubCatatanTab = null;
@@ -3175,7 +3191,11 @@ function initStoreDataListeners() {
       restockListItems = Array.isArray(data.items) ? data.items : [];
       refreshData();
     } else {
-      console.warn("Pengaturan restock belum ada. Tidak membuat default/WRITE otomatis.");
+      // Dokumen benar-benar hilang: kosongkan state. Jangan mempertahankan
+      // data lama sebagai sumber bayangan dan jangan membuat default/WRITE.
+      restockListItems = [];
+      refreshData();
+      console.warn("Pengaturan restock tidak ditemukan di Firebase. State dikosongkan; tidak ada default/WRITE otomatis.");
     }
   }, (err) => console.error("Gagal membaca pengaturan restock:", err)));
 
