@@ -547,7 +547,7 @@ let currentAdminProfile = null;
 
 // ===== SUMBER DATA TOKO BERDASARKAN tokoId =====
 // Untuk V13, data operasional berada di toko/{tokoId}/{koleksi}.
-// Fallback toko_v13 menjaga listener awal tetap aman sebelum profil Auth selesai dibaca.
+// toko_v13 adalah tokoId resmi untuk toko ini, bukan fallback/ghost database.
 let ACTIVE_TOKO_ID = "toko_v13";
 function storeCollection(name) {
   const tokoId = (currentAdminProfile && currentAdminProfile.tokoId) || ACTIVE_TOKO_ID;
@@ -558,6 +558,15 @@ function handleAuthState(user) {
   const loginModal = document.getElementById("loginModal");
   if (!user) {
     currentAdminProfile = null;
+    if (catatanConfigUnsubscribe) {
+      catatanConfigUnsubscribe();
+      catatanConfigUnsubscribe = null;
+    }
+    catatanConfigReady = false;
+    daftarNamaTabCatatan = [];
+    labelNamaTabCatatan = {};
+    activeSubCatatanTab = null;
+    databaseCatatanDinamis = {};
     if (loginModal) loginModal.style.display = "flex";
     return;
   }
@@ -589,6 +598,9 @@ function handleAuthState(user) {
       }
 
       ACTIVE_TOKO_ID = currentAdminProfile.tokoId;
+      // Profil toko sudah valid. Baru setelah tokoId diketahui, aktifkan listener Catatan.
+      // Ini mencegah Catatan membaca tenant fallback sebelum profil selesai dimuat.
+      initCatatanConfigListener();
       // Profil toko sudah valid. Jangan jalankan migrasi global otomatis.
       // Data operasional harus tetap berada di toko/{tokoId}.
       refreshData();
@@ -605,36 +617,44 @@ function handleAuthState(user) {
 
 if (typeof auth !== "undefined") auth.onAuthStateChanged(handleAuthState);
 
-let pengaturanToko = { nama: "", alamat: "", phone: "" };
+let pengaturanToko = {};
 storeCollection("pengaturan").doc("toko_v13").onSnapshot((doc) => {
   if (doc.exists) {
-    pengaturanToko = doc.data();
+    pengaturanToko = doc.data() || {};
+    refreshData();
   } else {
-    storeCollection("pengaturan").doc("toko_v13").set(pengaturanToko);
+    console.warn("Pengaturan toko belum ada. Tidak membuat default/WRITE otomatis.");
   }
-  refreshData();
+}, (err) => {
+  console.error("Gagal membaca pengaturan toko:", err);
+  // Pertahankan snapshot terakhir yang valid. Tidak ada default dan tidak ada WRITE.
 });
 
-let scanCooldownDuration = 1500;
+let scanCooldownDuration = null;
 storeCollection("pengaturan").doc("sistem_v13").onSnapshot((doc) => {
   if (doc.exists) {
-    let data = doc.data();
-    if (data.cooldown) scanCooldownDuration = data.cooldown;
+    const data = doc.data() || {};
+    if (Number.isFinite(Number(data.cooldown))) {
+      scanCooldownDuration = Number(data.cooldown);
+    }
+    refreshData();
   } else {
-    storeCollection("pengaturan").doc("sistem_v13").set({ cooldown: 1500 });
+    console.warn("Pengaturan sistem belum ada. Tidak membuat default/WRITE otomatis.");
   }
-  refreshData();
+}, (err) => {
+  console.error("Gagal membaca pengaturan sistem:", err);
+  // Pertahankan snapshot terakhir yang valid. Tidak ada default dan tidak ada WRITE.
 });
 
-let daftarNamaTabCatatan = ["catatan1", "catatan2", "catatan3", "catatan4"];
-let labelNamaTabCatatan = {
-  catatan1: "Catatan 1",
-  catatan2: "Catatan 2",
-  catatan3: "Catatan 3",
-  catatan4: "Catatan 4"
-};
+// Firebase adalah sumber kebenaran untuk konfigurasi tab Catatan.
+// Tidak ada default tab 1-4. Jika konfigurasi belum terbaca, UI tidak membuat
+// konfigurasi baru dan tidak menulis apa pun ke Firestore.
+let daftarNamaTabCatatan = [];
+let labelNamaTabCatatan = {};
 let databaseCatatanDinamis = {};
-let activeSubCatatanTab = "catatan1";
+let activeSubCatatanTab = null;
+let catatanConfigReady = false;
+let catatanConfigUnsubscribe = null;
 
 function getLocalDateStr() {
   const d = new Date();
@@ -692,20 +712,62 @@ function updateDateDisplayUI() {
   }
 }
 
-storeCollection("pengaturan").doc("daftar_tab_catatan_v13").onSnapshot((doc) => {
-  if (doc.exists) {
-    let data = doc.data();
-    if (data.list && data.list.length > 0) daftarNamaTabCatatan = data.list;
-    if (data.labels) labelNamaTabCatatan = data.labels;
-  } else {
-    storeCollection("pengaturan").doc("daftar_tab_catatan_v13").set({
-      list: daftarNamaTabCatatan,
-      labels: labelNamaTabCatatan
-    });
+function initCatatanConfigListener() {
+  if (catatanConfigUnsubscribe) {
+    catatanConfigUnsubscribe();
+    catatanConfigUnsubscribe = null;
   }
-  updateDateDisplayUI();
-  renderSubTabsCatatanUI();
-});
+
+  catatanConfigUnsubscribe = storeCollection("pengaturan")
+    .doc("daftar_tab_catatan_v13")
+    .onSnapshot((doc) => {
+      if (!doc.exists) {
+        // Dokumen benar-benar tidak ada. Jangan membuat default 1-4.
+        // UI dibiarkan kosong sampai konfigurasi dibuat secara eksplisit.
+        catatanConfigReady = false;
+        daftarNamaTabCatatan = [];
+        labelNamaTabCatatan = {};
+        activeSubCatatanTab = null;
+        databaseCatatanDinamis = {};
+        renderSubTabsCatatanUI();
+        return;
+      }
+
+      const data = doc.data() || {};
+      if (!Array.isArray(data.list) || data.list.length === 0) {
+        console.error("Konfigurasi tab Catatan tidak valid: field list kosong/tidak valid.");
+        catatanConfigReady = false;
+        daftarNamaTabCatatan = [];
+        labelNamaTabCatatan = {};
+        activeSubCatatanTab = null;
+        databaseCatatanDinamis = {};
+        renderSubTabsCatatanUI();
+        return;
+      }
+
+      // Hanya setelah READ Firebase berhasil, state aktif diganti dengan snapshot terbaru.
+      daftarNamaTabCatatan = [...data.list];
+      labelNamaTabCatatan = (data.labels && typeof data.labels === "object")
+        ? { ...data.labels }
+        : {};
+      catatanConfigReady = true;
+
+      if (!daftarNamaTabCatatan.includes(activeSubCatatanTab)) {
+        activeSubCatatanTab = daftarNamaTabCatatan[0];
+      }
+
+      updateDateDisplayUI();
+      renderSubTabsCatatanUI();
+    }, (err) => {
+      // READ ERROR bukan berarti dokumen kosong. Pertahankan snapshot terakhir yang valid.
+      console.error("Gagal membaca konfigurasi tab Catatan dari Firebase:", err);
+      // Tidak ada reset ke 1-4, tidak ada .set(), dan tidak ada pembuatan tab baru.
+      if (catatanConfigReady) {
+        updateDateDisplayUI();
+        renderSubTabsCatatanUI();
+      }
+    });
+}
 
 let catatanListeners = {};
 
@@ -727,31 +789,42 @@ function setupCatatanListener(tabKey) {
       let prevDateStr = currDate.getFullYear() + '-' + String(currDate.getMonth() + 1).padStart(2, '0') + '-' + String(currDate.getDate()).padStart(2, '0');
       let prevDocId = `${tabKey}_${prevDateStr}`;
       
-      let prevDocSnap = await storeCollection("catatan").doc(prevDocId).get();
-      let targetItems = [];
+      try {
+        let prevDocSnap = await storeCollection("catatan").doc(prevDocId).get();
 
-      if (prevDocSnap.exists && prevDocSnap.data().items) {
-        targetItems = prevDocSnap.data().items.map(item => ({
-          id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 3),
-          judul: item.judul || "",
-          subjudul: "",
-          isi: "",
-          waktu: new Date().toLocaleString('id-ID')
-        }));
-      } else {
-        let defaultLabel = labelNamaTabCatatan[tabKey] || tabKey;
-        targetItems = [
-          { id: "NOTE-" + Date.now(), judul: defaultLabel, subjudul: "", isi: "", waktu: new Date().toLocaleString('id-ID') }
-        ];
+        // Hari baru: jika data kemarin benar-benar ada, salin judulnya saja.
+        // Jika data kemarin juga tidak ada, jangan membuat dokumen/default apa pun.
+        if (prevDocSnap.exists && Array.isArray(prevDocSnap.data()?.items)) {
+          const targetItems = prevDocSnap.data().items.map(item => ({
+            id: "NOTE-" + Date.now() + Math.random().toString(36).substr(2, 3),
+            judul: item.judul || "",
+            subjudul: "",
+            isi: "",
+            waktu: new Date().toLocaleString('id-ID')
+          }));
+
+          const targetData = {
+            tabKey: tabKey,
+            tanggal: selectedCatatanDate,
+            modalAwal: "0",
+            items: targetItems
+          };
+          await storeCollection("catatan").doc(docId).set(targetData);
+          databaseCatatanDinamis[tabKey] = targetData;
+          renderHalamanSubCatatan(tabKey);
+        } else {
+          databaseCatatanDinamis[tabKey] = {
+            tabKey: tabKey,
+            tanggal: selectedCatatanDate,
+            modalAwal: "0",
+            items: []
+          };
+          renderHalamanSubCatatan(tabKey);
+        }
+      } catch (err) {
+        // Gagal membaca hari sebelumnya = jangan membuat/reset data hari ini.
+        console.error("Gagal memeriksa Catatan hari sebelumnya:", err);
       }
-
-      let targetData = {
-        tabKey: tabKey,
-        tanggal: selectedCatatanDate,
-        modalAwal: "0",
-        items: targetItems
-      };
-      await storeCollection("catatan").doc(docId).set(targetData);
     }
   }, err => {
     console.error("Gagal memuat catatan: ", err);
@@ -766,8 +839,13 @@ function renderSubTabsCatatanUI() {
   containerTabs.innerHTML = "";
   containerContent.innerHTML = "";
 
+  if (daftarNamaTabCatatan.length === 0) {
+    updatePermanentBarTitle();
+    return;
+  }
+
   if (!daftarNamaTabCatatan.includes(activeSubCatatanTab)) {
-    activeSubCatatanTab = daftarNamaTabCatatan[0] || "catatan1";
+    activeSubCatatanTab = daftarNamaTabCatatan[0];
   }
 
   daftarNamaTabCatatan.forEach(tabKey => {
@@ -831,6 +909,7 @@ function switchSubCatatanTab(tabKey) {
 }
 
 function tambahTabCatatanBaru() {
+  if (!catatanConfigReady) return alert("Konfigurasi Catatan belum berhasil dibaca dari Firebase.");
   let nomorBaru = daftarNamaTabCatatan.length + 1;
   let newKey = "catatan" + Date.now();
   let newLabel = "Catatan " + nomorBaru;
@@ -848,6 +927,7 @@ function tambahTabCatatanBaru() {
 }
 
 function ubahNamaTabDinamis(tabKey) {
+  if (!catatanConfigReady) return alert("Konfigurasi Catatan belum berhasil dibaca dari Firebase.");
   let labelLama = labelNamaTabCatatan[tabKey] || tabKey;
   let labelBaru = prompt(`Masukkan nama baru untuk "${labelLama}":`, labelLama);
   if (labelBaru !== null && labelBaru.trim() !== "") {
@@ -863,6 +943,7 @@ function ubahNamaTabDinamis(tabKey) {
 }
 
 function hapusTabCatatanDinamis(tabKey) {
+  if (!catatanConfigReady) return alert("Konfigurasi Catatan belum berhasil dibaca dari Firebase.");
   if (daftarNamaTabCatatan.length <= 1) {
     return alert("Minimal harus menyisakan 1 tab catatan!");
   }
@@ -1018,6 +1099,9 @@ function closeCatatanModal() {
 }
 
 function simpanCatatanCard() {
+  if (!catatanConfigReady || !daftarNamaTabCatatan.length) {
+    return alert("Catatan belum siap karena konfigurasi Firebase belum berhasil dibaca.");
+  }
   const targetTabKey = document.getElementById("catatan-type-target").value;
   const id = document.getElementById("catatan-id").value;
   const judul = document.getElementById("catatan-title-input").value.trim();
@@ -1178,11 +1262,15 @@ storeCollection("pelanggan").onSnapshot((snapshot) => {
 let restockListItems = [];
 storeCollection("pengaturan").doc("restock_v13").onSnapshot((doc) => {
   if (doc.exists) {
-    restockListItems = doc.data().items || [];
+    const data = doc.data() || {};
+    restockListItems = Array.isArray(data.items) ? data.items : [];
+    refreshData();
   } else {
-    storeCollection("pengaturan").doc("restock_v13").set({ items: [] });
+    console.warn("Pengaturan restock belum ada. Tidak membuat default/WRITE otomatis.");
   }
-  refreshData();
+}, (err) => {
+  console.error("Gagal membaca pengaturan restock:", err);
+  // Pertahankan snapshot terakhir yang valid. Tidak ada default dan tidak ada WRITE.
 });
 
 function simpanRestockKeCloud() {
@@ -1364,12 +1452,8 @@ async function ensureKategoriMaster() {
     masterKategoriProduk = normalizeCategoryList(snap.data().categories);
     return masterKategoriProduk;
   }
-  const fromProducts = [];
-  Object.values(databaseProduk || {}).forEach(p => normalizeProductCategories(p && p.kategori).forEach(k => {
-    if (!fromProducts.includes(k)) fromProducts.push(k);
-  }));
-  await ref.set({ categories: fromProducts, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  masterKategoriProduk = fromProducts;
+  // Dokumen master belum ada: jangan membuat data berdasarkan produk secara otomatis.
+  masterKategoriProduk = [];
   return masterKategoriProduk;
 }
 
@@ -3034,9 +3118,9 @@ function updateDropdowns(kategoriList) {
 }
 
 function simpanPengaturanToko() {
-  const nama = document.getElementById("setting-shop-name").value.trim() || "";
-  const alamat = document.getElementById("setting-shop-address").value.trim() || "-";
-  const phone = document.getElementById("setting-shop-phone").value.trim() || "-";
+  const nama = document.getElementById("setting-shop-name").value.trim();
+  const alamat = document.getElementById("setting-shop-address").value.trim();
+  const phone = document.getElementById("setting-shop-phone").value.trim();
 
   storeCollection("pengaturan").doc("toko_v13").set({
     nama: nama,
@@ -3050,7 +3134,13 @@ function simpanPengaturanToko() {
 }
 
 function simpanPengaturanScan() {
-  scanCooldownDuration = parseInt(document.getElementById("setting-cooldown").value) || 1500;
+  const rawCooldown = document.getElementById("setting-cooldown").value.trim();
+  const parsedCooldown = Number(rawCooldown);
+  if (!rawCooldown || !Number.isFinite(parsedCooldown) || parsedCooldown < 0) {
+    alert("Jeda scan belum diisi dengan nilai yang valid.");
+    return;
+  }
+  scanCooldownDuration = parsedCooldown;
 
   storeCollection("pengaturan").doc("sistem_v13").set({
     cooldown: scanCooldownDuration
@@ -3072,7 +3162,7 @@ function refreshData() {
   const setShopPhone = document.getElementById("setting-shop-phone");
   if (setShopPhone) setShopPhone.value = pengaturanToko.phone;
   const setCooldown = document.getElementById("setting-cooldown");
-  if (setCooldown) setCooldown.value = scanCooldownDuration;
+  if (setCooldown) setCooldown.value = scanCooldownDuration == null ? "" : scanCooldownDuration;
   
   const viewSelect = document.getElementById("setting-view-mode");
   if (viewSelect) viewSelect.value = viewMode;
